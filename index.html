@@ -439,83 +439,101 @@
           Comprehensive Capabilities
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
-          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: FTS_01</div>
+          <!-- Each capability card "More" → routes to /capabilities/<slug> (pages TBD). -->
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative flex flex-col">
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">auto_awesome</span>
+              <h4 class="font-button-text text-primary">Agentic search</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed mb-lg">
+              AI agents understand shopper intent, not just keywords. Conversational follow-ups
+              progressively refine the result set. Every answer plugs into your catalog so the
+              recommendations reflect your store's actual stock and brand voice.
+            </p>
+            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 transition-all self-start">
+              More
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
+          </div>
+
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative flex flex-col">
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">bolt</span>
+              <h4 class="font-button-text text-primary">Fast checkout</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed mb-lg">
+              One-tap checkout that remembers shipping, payment, and address. The average flow
+              collapses from seven form fields to a single confirm screen. Mobile abandonment falls
+              40–60% in the first week of release.
+            </p>
+            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 transition-all self-start">
+              More
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
+          </div>
+
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative flex flex-col">
             <div class="flex items-center gap-md mb-md">
               <span class="material-symbols-outlined text-primary">search_check</span>
-              <h4 class="font-button-text text-primary">Full-text search</h4>
+              <h4 class="font-button-text text-primary">Enhanced search</h4>
             </div>
-            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
-              Leverage reliable and performant search with features like geosearch and faceting.
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed mb-lg">
+              Synonym expansion, typo tolerance, and brand-aware ranking out of the box.
+              Merchandisers promote stock, new arrivals, and sale items with inline boost rules.
+              Sub-50 ms response times even on catalogs north of one million products.
             </p>
-            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
-              RETRIEVAL_LATENCY: <span class="text-success-emerald">&lt;50MS</span>
-            </div>
+            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 transition-all self-start">
+              More
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
           </div>
-          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: SEM_02</div>
+
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative flex flex-col">
             <div class="flex items-center gap-md mb-md">
-              <span class="material-symbols-outlined text-primary">psychology</span>
-              <h4 class="font-button-text text-primary">Semantic search</h4>
+              <span class="material-symbols-outlined text-primary">inventory_2</span>
+              <h4 class="font-button-text text-primary">Product catalog enhancement</h4>
             </div>
-            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
-              Unlock deeper understanding and context in search queries for meaningful results.
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed mb-lg">
+              Audit every product for missing attributes, weak descriptions, and broken images.
+              AI-generated copy and metadata match your brand voice while respecting category rules.
+              Continuous quality scoring surfaces problems before customers ever notice them.
             </p>
-            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
-              VECTOR_DIMENSIONS: <span class="text-primary">1536d</span>
-            </div>
+            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 transition-all self-start">
+              More
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
           </div>
-          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: HYB_03</div>
+
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative flex flex-col">
             <div class="flex items-center gap-md mb-md">
-              <span class="material-symbols-outlined text-primary">layers</span>
-              <h4 class="font-button-text text-primary">Hybrid search</h4>
+              <span class="material-symbols-outlined text-primary">monitoring</span>
+              <h4 class="font-button-text text-primary">GA4 traffic monitor</h4>
             </div>
-            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
-              Blend full-text search efficiency and semantic depth for unparalleled experience.
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed mb-lg">
+              Daily GA4 snapshots with anomaly detection on every traffic source. Alerts fire the
+              moment a channel, campaign, or geo deviates from your baseline. One dashboard ties
+              sessions, conversions, and revenue back to the funnel that produced them.
             </p>
-            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
-              MATCH_ACCURACY: <span class="text-success-emerald">99.8%</span>
-            </div>
+            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 transition-all self-start">
+              More
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
           </div>
-          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: MUL_04</div>
+
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative flex flex-col">
             <div class="flex items-center gap-md mb-md">
-              <span class="material-symbols-outlined text-primary">photo_library</span>
-              <h4 class="font-button-text text-primary">Multimodal search</h4>
+              <span class="material-symbols-outlined text-primary">person_search</span>
+              <h4 class="font-button-text text-primary">User analytics tracking</h4>
             </div>
-            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
-              Search across images, video, and audio alongside text with AI-powered embeddings.
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed mb-lg">
+              First-party event capture for clicks, searches, filters, and conversions — all stored
+              in your stack. Per-shopper journeys show the full path before a purchase, not just
+              last-click. Anonymized cohort exports feed retargeting, lookalike, and loyalty models.
             </p>
-            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
-              SUPPORTED_MEDIA: <span class="text-primary">IMG/VID/AUD</span>
-            </div>
-          </div>
-          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: FLT_05</div>
-            <div class="flex items-center gap-md mb-md">
-              <span class="material-symbols-outlined text-primary">filter_alt</span>
-              <h4 class="font-button-text text-primary">Filtering &amp; sorting</h4>
-            </div>
-            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
-              Build complex search interfaces with a powerful toolkit for precise data retrieval.
-            </p>
-            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
-              NESTING_DEPTH: <span class="text-primary">UNLIMITED</span>
-            </div>
-          </div>
-          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: VEC_06</div>
-            <div class="flex items-center gap-md mb-md">
-              <span class="material-symbols-outlined text-primary">database</span>
-              <h4 class="font-button-text text-primary">Vector storage</h4>
-            </div>
-            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
-              Store and retrieve vectors for advanced similarity queries or RAG applications.
-            </p>
-            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
-              STORAGE_ENGINE: <span class="text-primary">KINETIC_DB</span>
-            </div>
+            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 transition-all self-start">
+              More
+              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+            </a>
           </div>
         </div>
       </section>
