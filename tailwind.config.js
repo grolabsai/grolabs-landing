@@ -3,7 +3,7 @@ import containerQueries from '@tailwindcss/container-queries';
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{ts,js}'],
+  content: ['./src/**/*.{astro,html,ts,tsx,js,jsx,md,mdx}'],
   darkMode: 'class',
   theme: {
     extend: {
