@@ -157,24 +157,9 @@ body {
   filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4));
 }
 
-/* "if they find what they want" — yellow swap + hand-drawn ellipse on scroll-into-view */
+/* "if they find what they want" — yellow color swap when the card scrolls past viewport centre */
 .highlight-phrase.is-highlighted {
   color: #fae194;
-}
-.handdrawn-circle path {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  filter: drop-shadow(0 0 6px rgba(250, 225, 148, 0.3));
-}
-.handdrawn-circle.is-drawn path {
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 1.2s ease-out 0.1s;
-}
-
-/* Scroll lock used by the highlight animation — avoids layout shift via position:fixed */
-body.is-scroll-locked {
-  position: fixed;
-  width: 100%;
 }
 
 /* Material Symbols inside SVG <text> — medium-thin stroke at the smaller stage icon size */

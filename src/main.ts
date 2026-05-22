@@ -137,58 +137,15 @@ if (particlesContainer) {
 }
 
 // ============================================================
-// "if they find what they want" — scroll-pinned highlight animation.
-// Triggers only when the Internal Site Search card's vertical centre is at
-// the viewport's vertical centre (within 40 px). Locks scroll, paints the
-// yellow swap + hand-drawn ellipse, then restores scroll (with
-// scroll-behavior temporarily set to 'auto' so smooth-scroll doesn't
-// animate a visible jump back). Fires once per page load.
+// "if they find what they want" — fades to yellow when the Internal Site
+// Search card's vertical centre passes the viewport's vertical centre.
+// Doesn't lock scroll; just flips the .is-highlighted class once and lets
+// the CSS color transition handle the fade.
 // ============================================================
 const searchQuote = document.querySelector<HTMLElement>('[data-search-quote]');
 if (searchQuote) {
   const phrase = searchQuote.querySelector<HTMLElement>('.highlight-phrase');
-  const circle = searchQuote.querySelector<SVGElement>('.handdrawn-circle');
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
   let triggered = false;
-
-  const lockScroll = () => {
-    const scrollY = window.scrollY;
-    document.body.dataset.scrollY = String(scrollY);
-    document.body.style.top = `-${scrollY}px`;
-    document.body.classList.add('is-scroll-locked');
-  };
-
-  const unlockScroll = () => {
-    const scrollY = parseInt(document.body.dataset.scrollY ?? '0', 10);
-    const html = document.documentElement;
-    const prevBehavior = html.style.scrollBehavior;
-    // html.scroll-smooth would animate the scrollTo below — bypass it.
-    html.style.scrollBehavior = 'auto';
-
-    document.body.classList.remove('is-scroll-locked');
-    document.body.style.top = '';
-    delete document.body.dataset.scrollY;
-    window.scrollTo(0, scrollY);
-
-    requestAnimationFrame(() => {
-      html.style.scrollBehavior = prevBehavior;
-    });
-  };
-
-  const fire = () => {
-    if (reduceMotion) {
-      phrase?.classList.add('is-highlighted');
-      circle?.classList.add('is-drawn');
-      return;
-    }
-    lockScroll();
-    requestAnimationFrame(() => {
-      phrase?.classList.add('is-highlighted');
-      circle?.classList.add('is-drawn');
-    });
-    setTimeout(unlockScroll, 1700);
-  };
 
   const handleQuoteScroll = () => {
     if (triggered) return;
@@ -198,12 +155,12 @@ if (searchQuote) {
     if (Math.abs(targetCenter - viewportCenter) < 40) {
       triggered = true;
       window.removeEventListener('scroll', handleQuoteScroll);
-      fire();
+      phrase?.classList.add('is-highlighted');
     }
   };
 
   window.addEventListener('scroll', handleQuoteScroll, { passive: true });
-  // Also evaluate once on load in case the card is already centred at load time.
+  // Initial check covers the card already being centred at load time.
   handleQuoteScroll();
 }
 
