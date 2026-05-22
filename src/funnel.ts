@@ -72,15 +72,17 @@ const STAGES: Stage[] = [
 
 const TRANSITIONS: Transition[] = [
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
-  // labelOffset shifts the 45% pill RIGHT of the Search leak column (which falls at x≈315).
+  // Home→Browsing exits Home going down-right (cubicCurve C1 pushes downward instead of horizontal),
+  // and labelOffset stacks the 45% pill directly below the 40% pill so the breakdown is easy to read.
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward',
-    labelOffset: { dx: 80 } },
-  // 35% pill lifted up to the level of Search's top edge — breathing room above the cluster.
+    cubicCurve: { c1x: 200, c1y: 115, c2x: 320, c2y: 115 },
+    labelOffset: { dx: -60, dy: -10 } },
+  // Search→PDP arcs UP through the 35% pill — the line "from Search to 35%" is the rising half of the arc.
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward',
-    labelOffset: { dy: -55 } },
-  // 25% pill pulled LEFT to sit close to Browsing's (new) right edge instead of mid-arrow.
-  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward',
-    labelOffset: { dx: -75 } },
+    cubicCurve: { c1x: 480, c1y: -11, c2x: 640, c2y: -11 } },
+  // 25% pill sits at the natural midpoint of Browsing→PDP — acts as a junction where the line from
+  // Browsing meets the outgoing lines to PDP (the arrow itself) and Cart (the dotted connector).
+  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward' },
   { id: 't-pdp-cart',      from: 'pdp',      to: 'cart',     pct: 20, variant: 'forward' },
   { id: 't-cart-checkout', from: 'cart',     to: 'checkout', pct: 30, variant: 'forward' },
 ];
