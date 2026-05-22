@@ -1,343 +1,703 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="GroLabs — Recover lost revenue and grow your business without paying for more traffic. Funnel optimization, search, and analytics for e-commerce." />
-    <title>GroLabs — Engineered growth for e-commerce</title>
-
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>GroLabs | Engineered Luxury AI Search</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Caveat:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
       rel="stylesheet"
     />
   </head>
-  <body class="bg-zinc-black text-neutral-100">
-    <!-- ============================================================
-         NAV
-         ============================================================ -->
-    <nav class="mx-auto flex w-full max-w-page items-center justify-between px-8 pt-10">
-      <a href="#" class="flex items-center gap-2">
-        <span class="font-marker text-2xl text-kinetic-yellow">GroLabs</span>
-      </a>
-      <div class="hidden items-center gap-10 text-sm text-neutral-400 md:flex">
-        <a href="#capabilities" class="hover:text-neutral-100">Capabilities</a>
-        <a href="#integrations" class="hover:text-neutral-100">Integrations</a>
-        <a href="#benchmark" class="hover:text-neutral-100">Funnel benchmark</a>
-        <a href="#growth" class="hover:text-neutral-100">Compound growth</a>
-      </div>
-      <a href="#contact" class="btn-ghost">
-        Book a demo
-        <span aria-hidden="true">→</span>
-      </a>
-    </nav>
+  <body class="font-body-md text-body-md selection:bg-primary selection:text-zinc-950 overflow-x-hidden">
+    <div class="ambient-grid"></div>
 
-    <!-- ============================================================
-         HERO
-         ============================================================ -->
-    <header class="relative overflow-hidden">
-      <div class="ambient-glow-bg pointer-events-none absolute inset-0 -z-0"></div>
+    <!-- Scroll Progress -->
+    <div class="hidden md:block" id="scroll-progress">
+      <div id="scroll-indicator"></div>
+    </div>
 
-      <div class="relative mx-auto w-full max-w-page px-8 pt-32 pb-40 text-center">
-        <span class="pill animate-on-scroll">
-          <span class="h-1.5 w-1.5 rounded-full bg-kinetic-yellow"></span>
-          Engineered growth platform
-        </span>
-
-        <h1
-          class="animate-on-scroll mx-auto mt-10 max-w-5xl text-5xl font-normal leading-[1.05] tracking-tight text-neutral-50 md:text-6xl lg:text-7xl"
-        >
-          Recover lost <em class="font-light italic text-kinetic-yellow">revenue</em>
-          &amp; grow your business without paying for more traffic
-        </h1>
-
-        <p
-          class="animate-on-scroll mx-auto mt-10 max-w-2xl text-lg leading-relaxed text-neutral-400"
-        >
-          GroLabs turns the visitors you already have into customers. Find the leaks in your funnel,
-          fix them with focused experiments, and compound the lift quarter after quarter.
-        </p>
-
-        <div class="animate-on-scroll mt-14 flex flex-wrap items-center justify-center gap-4">
-          <a href="#contact" class="btn-primary">
-            Book a 20-min audit
-            <span aria-hidden="true">→</span>
-          </a>
-          <a href="#benchmark" class="btn-ghost">See how it works</a>
+    <!-- TopNavBar -->
+    <header
+      class="fixed top-0 left-0 w-full backdrop-blur-md h-20 flex items-center px-margin-mobile md:px-margin-desktop border-b border-zinc-800 z-50 bg-[#131316]/80"
+    >
+      <div class="max-w-[1440px] mx-auto w-full flex justify-between items-center">
+        <div class="flex items-center gap-xl">
+          <div class="flex flex-col">
+            <h1 class="font-page-title-mobile text-2xl font-bold text-primary leading-none">GroLabs</h1>
+            <p class="font-section-header text-[10px] text-secondary-fixed-dim tracking-[0.2em] mt-1">
+              ENGINEERED LUXURY
+            </p>
+          </div>
+          <nav class="hidden lg:flex items-center gap-lg ml-xl">
+            <a class="font-button-text text-white hover:text-primary transition-colors" href="#">Solutions</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Documentation</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Cloud</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Pricing</a>
+          </nav>
+        </div>
+        <div class="flex items-center gap-md">
+          <div class="relative hidden xl:block mr-md">
+            <span
+              class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm"
+              >search</span
+            >
+            <input
+              class="bg-zinc-900 border-zinc-800 text-body-sm px-xl py-xs rounded w-48 focus:border-primary focus:ring-0 transition-all focus:w-64"
+              placeholder="Search docs..."
+              type="text"
+            />
+          </div>
+          <button class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors px-sm">
+            Log In
+          </button>
+          <button
+            class="bg-primary text-on-primary font-button-text px-md py-sm rounded hover:brightness-110 transition-all shadow-[0_0_20px_rgba(250,225,148,0.2)] shimmer-btn"
+          >
+            Get Started
+          </button>
         </div>
       </div>
     </header>
 
-    <!-- ============================================================
-         CAPABILITIES
-         ============================================================ -->
-    <section id="capabilities" class="relative">
-      <div class="ambient-glow-bg pointer-events-none absolute inset-0 -z-0 opacity-60"></div>
+    <main class="relative z-10 pt-20 min-h-screen bg-transparent">
+      <!-- Hero Section -->
+      <section
+        class="relative px-margin-mobile md:px-margin-desktop py-xl overflow-hidden min-h-[85vh] flex flex-col justify-center items-center text-center"
+      >
+        <div id="particles-container"></div>
 
-      <div class="relative mx-auto w-full max-w-page px-8 py-stack-3x">
-        <div class="animate-on-scroll mx-auto max-w-3xl text-center">
-          <span class="pill">Comprehensive capabilities</span>
-          <h2 class="mt-8 text-4xl font-normal leading-tight text-neutral-50 md:text-5xl">
-            Every lever that moves <em class="italic text-kinetic-yellow">revenue per visitor</em>
+        <!-- Cinematic Background Glow -->
+        <div
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none z-0 transition-transform duration-700 ease-out"
+          id="hero-glow"
+        >
+          <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ambient-glow-yellow-sharp blur-[100px] opacity-70"
+          ></div>
+          <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1000px] ambient-glow-yellow blur-[160px] opacity-100"
+          ></div>
+          <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] ambient-glow-yellow blur-[200px] opacity-30"
+          ></div>
+        </div>
+
+        <div class="relative z-10 max-w-5xl reveal active">
+          <div
+            class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-caps text-label-caps rounded mb-md backdrop-blur-sm border border-primary/20"
+          >
+            REINVENTING RETRIEVAL
+          </div>
+          <h1
+            class="font-page-title text-page-title-mobile md:text-[64px] text-white leading-tight mb-lg drop-shadow-2xl"
+          >
+            Recover <span class="text-primary italic">revenue</span><br />
+            &amp;<br />
+            grow your business without paying for more traffic
+          </h1>
+          <p class="text-body-lg text-secondary-fixed-dim mb-xl max-w-2xl mx-auto">
+            Engineered for high-performance commerce and enterprise data. Simplifying how elite teams
+            build with search through a sophisticated, AI-driven core.
+          </p>
+          <div
+            class="glass-card p-sm rounded-xl max-w-2xl mx-auto flex flex-col md:flex-row gap-sm items-stretch shadow-2xl"
+          >
+            <div class="flex-grow relative flex items-center">
+              <span class="material-symbols-outlined absolute left-md text-primary">search</span>
+              <input
+                class="w-full bg-transparent border-0 text-white focus:ring-0 pl-xl placeholder:text-zinc-600"
+                placeholder="Feel good comedy..."
+                type="text"
+              />
+            </div>
+            <div
+              class="flex items-center gap-md px-md border-t md:border-t-0 md:border-l border-zinc-800 py-sm md:py-0"
+            >
+              <span class="font-label-caps text-label-caps text-zinc-400">BOOST WITH AI</span>
+              <button class="w-10 h-5 bg-primary rounded-full relative transition-all">
+                <div class="absolute right-0.5 top-0.5 w-4 h-4 bg-zinc-900 rounded-full"></div>
+              </button>
+            </div>
+            <button
+              class="bg-primary text-on-primary font-button-text px-xl py-sm rounded-lg hover:brightness-110 transition-all shimmer-btn"
+            >
+              Search
+            </button>
+          </div>
+          <div class="mt-xl flex flex-wrap items-center justify-center gap-xl opacity-40">
+            <span class="font-section-header text-section-header uppercase">Trusted by leading teams</span>
+            <span class="font-page-title-mobile text-lg text-white/60 tracking-tight">acme&nbsp;corp</span>
+            <span class="font-page-title-mobile text-lg text-white/60 tracking-tight italic">vela.io</span>
+            <span class="font-page-title-mobile text-lg text-white/60 tracking-tight">NORTHWIND</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Leak Numbers Section -->
+      <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-xl my-xl mt-48">
+        <div class="text-center mb-xl reveal">
+          <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md leading-tight">
+            Five places small e-commerce stores quietly bleed revenue — every day.
           </h2>
-          <p class="mt-6 text-lg text-neutral-400">
-            One platform for the work that used to require five tools and a contractor.
+          <p class="text-body-lg text-secondary-fixed-dim max-w-3xl mx-auto">
+            Small leaks sink large ships. In the high-velocity world of online commerce, these friction
+            points represent the difference between scaling and stagnating.
           </p>
         </div>
-
-        <div class="mt-20 grid gap-6 md:grid-cols-3">
-          <article class="feature-block animate-on-scroll">
-            <div class="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fae194" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 3h18l-7 9v7l-4 2v-9z" />
-              </svg>
-              <h3 class="text-xl font-medium text-kinetic-yellow">Funnel benchmarking</h3>
+        <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg mb-xl">
+          <!-- Card 1: Internal Site Search (Featured) -->
+          <div
+            class="glass-card p-xl rounded-xl group transition-all md:col-span-6 lg:col-span-8 flex flex-col reveal relative min-h-[320px]"
+          >
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+              CONFIDENCE: HIGH // SOURCE: FORRESTER
             </div>
-            <p class="mt-4 text-base leading-relaxed text-neutral-400">
-              Map every stage from first visit to repeat purchase. Compare each transition against
-              industry benchmarks and your own history to find where revenue is leaking.
-            </p>
-          </article>
-
-          <article class="feature-block animate-on-scroll">
-            <div class="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fae194" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              <h3 class="text-xl font-medium text-kinetic-yellow">On-site search</h3>
+            <div class="mb-lg">
+              <span class="font-mono text-primary text-xs tracking-tighter bg-primary/10 px-2 py-1 rounded">
+                01 / Highest impact
+              </span>
+              <h3 class="font-page-title-mobile text-[32px] text-white mt-md">Internal site search</h3>
             </div>
-            <p class="mt-4 text-base leading-relaxed text-neutral-400">
-              Sub-100ms typo-tolerant search with no-result analytics, synonyms, and click tracking
-              wired in. The shoppers who use search convert at 3-5× the site average.
-            </p>
-          </article>
-
-          <article class="feature-block animate-on-scroll">
-            <div class="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fae194" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 12h4l3-9 4 18 3-9h4" />
-              </svg>
-              <h3 class="text-xl font-medium text-kinetic-yellow">Traffic-health monitor</h3>
+            <div class="flex flex-col md:flex-row md:items-end gap-xl mt-auto">
+              <div class="font-page-title text-primary text-6xl md:text-8xl leading-none">2–3×</div>
+              <p class="text-body-md text-secondary-fixed-dim italic max-w-sm mb-2 border-l border-primary/30 pl-md">
+                "Users who search convert 2–3× more often than those who don't—if they find what they
+                want."
+              </p>
             </div>
-            <p class="mt-4 text-base leading-relaxed text-neutral-400">
-              GA4 + on-site signals continuously checked against your norms. Alerts fire the moment
-              a channel, page, or device segment falls out of range — before the week is lost.
-            </p>
-          </article>
-
-          <article class="feature-block animate-on-scroll">
-            <div class="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fae194" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="16" rx="2" />
-                <path d="M3 10h18M8 4v16" />
-              </svg>
-              <h3 class="text-xl font-medium text-kinetic-yellow">Catalog quality</h3>
-            </div>
-            <p class="mt-4 text-base leading-relaxed text-neutral-400">
-              Attribute coverage scores, variant integrity checks, and brand/category audits. The
-              foundation every downstream conversion gain depends on.
-            </p>
-          </article>
-
-          <article class="feature-block animate-on-scroll">
-            <div class="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fae194" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 2v20M2 12h20" />
-              </svg>
-              <h3 class="text-xl font-medium text-kinetic-yellow">Pricing engine</h3>
-            </div>
-            <p class="mt-4 text-base leading-relaxed text-neutral-400">
-              Rule-based and elasticity-aware pricing computed in GroLabs, synced to your storefront.
-              No spreadsheets. No drift between channels.
-            </p>
-          </article>
-
-          <article class="feature-block animate-on-scroll">
-            <div class="flex items-center gap-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fae194" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M4 4h16v6H4zM4 14h16v6H4z" />
-              </svg>
-              <h3 class="text-xl font-medium text-kinetic-yellow">Experimentation</h3>
-            </div>
-            <p class="mt-4 text-base leading-relaxed text-neutral-400">
-              Ship A/B tests against any funnel stage with stage-level guardrails. Roll out winners,
-              roll back losers, and stack the lift into compound growth.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         INTEGRATIONS
-         ============================================================ -->
-    <section id="integrations" class="relative border-y border-white/[0.04] bg-zinc-card/30">
-      <div class="relative mx-auto w-full max-w-page px-8 py-stack-3x">
-        <div class="grid gap-16 lg:grid-cols-2 lg:items-center">
-          <div class="animate-on-scroll">
-            <span class="pill">Easy to integrate</span>
-            <h2 class="mt-8 text-4xl font-normal leading-tight text-neutral-50 md:text-5xl">
-              Connects to what you already <em class="italic text-kinetic-yellow">run</em>
-            </h2>
-            <p class="mt-6 text-lg leading-relaxed text-neutral-400">
-              WooCommerce, Shopify, GA4, and Meilisearch out of the box. One-click SSO from your
-              store admin. We pull from your systems — we don't ask you to migrate.
-            </p>
-            <ul class="mt-10 space-y-4 text-base text-neutral-300">
-              <li class="flex items-start gap-3">
-                <span class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-kinetic-yellow"></span>
-                Live in days, not quarters
-              </li>
-              <li class="flex items-start gap-3">
-                <span class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-kinetic-yellow"></span>
-                Read-only by default — write access opt-in per integration
-              </li>
-              <li class="flex items-start gap-3">
-                <span class="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-kinetic-yellow"></span>
-                Your data stays in your accounts. We never resell or pool it.
-              </li>
-            </ul>
           </div>
-
-          <div class="animate-on-scroll grid grid-cols-2 gap-4">
-            <div class="feature-block flex h-32 items-center justify-center text-lg text-neutral-200">WooCommerce</div>
-            <div class="feature-block flex h-32 items-center justify-center text-lg text-neutral-200">Shopify</div>
-            <div class="feature-block flex h-32 items-center justify-center text-lg text-neutral-200">GA4</div>
-            <div class="feature-block flex h-32 items-center justify-center text-lg text-neutral-200">Meilisearch</div>
-            <div class="feature-block flex h-32 items-center justify-center text-lg text-neutral-200">Stripe</div>
-            <div class="feature-block flex h-32 items-center justify-center text-lg text-neutral-200">WordPress</div>
+          <!-- Card 2: SEO -->
+          <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+              CONFIDENCE: MED
+            </div>
+            <div class="mb-lg">
+              <span class="font-mono text-zinc-500 text-xs tracking-tighter">02</span>
+              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">Product description SEO</h3>
+            </div>
+            <div class="mt-auto">
+              <div class="font-page-title text-primary text-6xl mb-md">53%</div>
+              <p class="text-body-sm text-secondary-fixed-dim">
+                More than half of all organic traffic is lost to thin, unoptimized content.
+              </p>
+            </div>
+          </div>
+          <!-- Card 3: Checkout -->
+          <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+              SOURCE: BAYMARD
+            </div>
+            <div class="mb-lg">
+              <span class="font-mono text-zinc-500 text-xs tracking-tighter">03</span>
+              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">Checkout friction</h3>
+            </div>
+            <div class="mt-auto">
+              <div class="font-page-title text-primary text-6xl mb-md">70%</div>
+              <p class="text-body-sm text-secondary-fixed-dim">
+                Cart abandonment remains the single largest "unforced error" in retail.
+              </p>
+            </div>
+          </div>
+          <!-- Card 4: Returns -->
+          <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+              CONFIDENCE: HIGH
+            </div>
+            <div class="mb-lg">
+              <span class="font-mono text-zinc-500 text-xs tracking-tighter">04</span>
+              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">
+                Returns from mismatched expectations
+              </h3>
+            </div>
+            <div class="mt-auto">
+              <div class="font-page-title text-primary text-6xl mb-md">17–20%</div>
+              <p class="text-body-sm text-secondary-fixed-dim">
+                Revenue lost to returns caused by search/image disconnect.
+              </p>
+            </div>
+          </div>
+          <!-- Card 5: AEO -->
+          <div
+            class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative border-primary/20"
+          >
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+              SOURCE: GARTNER
+            </div>
+            <div class="mb-lg">
+              <span class="font-mono text-primary/60 text-xs tracking-tighter">05 / Emerging</span>
+              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">
+                Answer Engine Optimization (AEO)
+              </h3>
+            </div>
+            <div class="mt-auto">
+              <div class="font-page-title text-primary text-6xl mb-md">25%</div>
+              <p class="text-body-sm text-secondary-fixed-dim">
+                "By 2026, traditional search volume will drop 25%, shifting to AI-powered answers."
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+        <!-- Footer Note -->
+        <div
+          class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-lg"
+        >
+          <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
+            <span class="material-symbols-outlined text-primary">info</span>
+          </div>
+          <div>
+            <h4 class="font-label-caps text-label-caps text-primary mb-1">A NOTE ON THESE NUMBERS</h4>
+            <p class="font-mono text-[11px] text-zinc-500 leading-tight">
+              These benchmarks represent industry averages for mid-market merchants. While your specific
+              "leakage" may vary, the compound effect of solving just two of these points often results
+              in a 15–20% immediate lift in Net Revenue.
+            </p>
+          </div>
+        </div>
+      </section>
 
-    <!-- ============================================================
-         FUNNEL BENCHMARK
-         ============================================================ -->
-    <section id="benchmark" class="relative">
-      <div class="ambient-glow-bg pointer-events-none absolute inset-0 -z-0"></div>
+      <!-- Interactive Showcase -->
+      <section class="pt-48 pb-xl bg-zinc-900/50 relative overflow-hidden my-xl">
+        <div class="absolute inset-0 pointer-events-none">
+          <div
+            class="absolute -right-1/4 top-1/4 w-[800px] h-[800px] ambient-glow-yellow blur-[120px] opacity-40"
+          ></div>
+        </div>
+        <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+          <div class="flex flex-col lg:flex-row gap-xl items-center reveal">
+            <div class="w-full lg:w-1/2">
+              <h2 class="font-page-title text-4xl md:text-6xl text-white mb-lg">Apps &amp; sites</h2>
+              <p class="text-body-lg text-secondary-fixed-dim mb-xl">
+                Leverage a unified information retrieval platform with AI-powered hybrid search. Deliver
+                fast, relevant results across private or public data.
+              </p>
+              <div class="flex flex-wrap gap-sm">
+                <button class="px-lg py-sm rounded-full bg-primary text-on-primary font-button-text transition-all scale-105">
+                  Apps
+                </button>
+                <button class="px-lg py-sm rounded-full border border-zinc-700 text-zinc-400 font-button-text hover:border-primary hover:text-primary transition-all">
+                  Ecomm
+                </button>
+                <button class="px-lg py-sm rounded-full border border-zinc-700 text-zinc-400 font-button-text hover:border-primary hover:text-primary transition-all">
+                  Media
+                </button>
+                <button class="px-lg py-sm rounded-full border border-zinc-700 text-zinc-400 font-button-text hover:border-primary hover:text-primary transition-all">
+                  Enterprise
+                </button>
+              </div>
+            </div>
+            <div class="w-full lg:w-1/2">
+              <div class="glass-card p-lg rounded-xl shadow-2xl relative overflow-hidden group">
+                <div class="flex items-center justify-between mb-lg">
+                  <div class="flex gap-xs">
+                    <div class="w-3 h-3 rounded-full bg-error-red/50"></div>
+                    <div class="w-3 h-3 rounded-full bg-primary/50"></div>
+                    <div class="w-3 h-3 rounded-full bg-success-emerald/50"></div>
+                  </div>
+                  <div class="text-zinc-600 font-label-caps text-label-caps font-mono">
+                    GROLABS-OS v1.2 // SYS_READY
+                  </div>
+                </div>
+                <div class="space-y-sm">
+                  <div class="flex items-center gap-md p-md bg-zinc-950 rounded border border-zinc-800 transition-all hover:translate-x-2">
+                    <span class="material-symbols-outlined text-primary">settings</span>
+                    <span class="text-zinc-300">Open settings</span>
+                    <span class="ml-auto text-zinc-600 font-mono text-[10px]">CTRL + S</span>
+                  </div>
+                  <div class="flex items-center gap-md p-md bg-zinc-950 rounded border border-zinc-800 transition-all hover:translate-x-2">
+                    <span class="material-symbols-outlined text-primary">add_circle</span>
+                    <span class="text-zinc-300">Create new project</span>
+                  </div>
+                  <div class="flex items-center gap-md p-md bg-zinc-950 rounded border border-zinc-800 transition-all hover:translate-x-2">
+                    <span class="material-symbols-outlined text-primary">search</span>
+                    <span class="text-zinc-300">Search files</span>
+                  </div>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent pointer-events-none"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div class="relative mx-auto w-full max-w-page px-8 py-stack-4x">
-        <div class="animate-on-scroll mx-auto max-w-3xl text-center">
-          <span class="pill">Funnel benchmark</span>
-          <h2 class="mt-8 text-4xl font-normal leading-tight text-neutral-50 md:text-5xl">
-            See where your funnel is <em class="italic text-kinetic-yellow">leaking</em> revenue
-          </h2>
-          <p class="mt-6 text-lg leading-relaxed text-neutral-400">
-            Hover any stage to inspect the transition. The red arrows are revenue exiting before
-            checkout — every percentage point we recover compounds through the rest of the funnel.
+      <!-- Funnel Benchmark -->
+      <section
+        class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl relative my-xl reveal"
+      >
+        <div class="text-center mb-xl">
+          <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md">Funnel benchmark</h2>
+          <p class="text-body-lg text-secondary-fixed-dim max-w-2xl mx-auto">
+            Quantifying the compound impact of search precision across the entire user journey.
           </p>
         </div>
-
-        <!-- Interactive funnel — rendered by funnel.ts -->
-        <div id="funnel-root" class="animate-on-scroll mt-20"></div>
-
-        <!-- Comparison table -->
-        <div class="animate-on-scroll mt-20 overflow-hidden rounded-2xl bg-zinc-card">
-          <table class="w-full text-left text-sm">
-            <thead class="text-xs uppercase tracking-[0.18em] text-neutral-500">
-              <tr class="border-b border-white/5">
-                <th class="px-6 py-5 font-normal">Funnel transition</th>
-                <th class="px-6 py-5 font-normal">Old %</th>
-                <th class="px-6 py-5 font-normal text-kinetic-yellow">New %</th>
-                <th class="px-6 py-5 font-normal">GRO improvement</th>
-              </tr>
-            </thead>
-            <tbody class="text-base text-neutral-200">
-              <tr class="border-b border-white/5">
-                <td class="px-6 py-5">Traffic → Home</td>
-                <td class="px-6 py-5 text-neutral-400">62%</td>
-                <td class="px-6 py-5 text-kinetic-yellow">74%</td>
-                <td class="px-6 py-5 text-neutral-300">+12 pts</td>
-              </tr>
-              <tr class="border-b border-white/5">
-                <td class="px-6 py-5">Home → Search</td>
-                <td class="px-6 py-5 text-neutral-400">40%</td>
-                <td class="px-6 py-5 text-kinetic-yellow">52%</td>
-                <td class="px-6 py-5 text-neutral-300">+12 pts</td>
-              </tr>
-              <tr class="border-b border-white/5">
-                <td class="px-6 py-5">Search → Product detail</td>
-                <td class="px-6 py-5 text-neutral-400">35%</td>
-                <td class="px-6 py-5 text-kinetic-yellow">58%</td>
-                <td class="px-6 py-5 text-neutral-300">+23 pts</td>
-              </tr>
-              <tr class="border-b border-white/5">
-                <td class="px-6 py-5">Product detail → Cart</td>
-                <td class="px-6 py-5 text-neutral-400">12%</td>
-                <td class="px-6 py-5 text-kinetic-yellow">18%</td>
-                <td class="px-6 py-5 text-neutral-300">+6 pts</td>
-              </tr>
-              <tr>
-                <td class="px-6 py-5">Cart → Checkout</td>
-                <td class="px-6 py-5 text-neutral-400">30%</td>
-                <td class="px-6 py-5 text-kinetic-yellow">44%</td>
-                <td class="px-6 py-5 text-neutral-300">+14 pts</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================================================
-         COMPOUND GROWTH
-         ============================================================ -->
-    <section id="growth" class="relative border-t border-white/[0.04]">
-      <div class="relative mx-auto w-full max-w-page px-8 py-stack-4x">
-        <div class="grid gap-16 lg:grid-cols-2 lg:items-center">
-          <div class="animate-on-scroll">
-            <span class="pill">Compound growth</span>
-            <h2 class="mt-8 text-4xl font-normal leading-tight text-neutral-50 md:text-5xl">
-              Small gains, <em class="italic text-kinetic-yellow">stacked</em>
-            </h2>
-            <p class="mt-6 text-lg leading-relaxed text-neutral-400">
-              A 10-point improvement at each stage of a 5-stage funnel is not 50% more revenue.
-              It's 1.85×. Every transition multiplies the next.
-            </p>
-            <p class="mt-6 text-lg leading-relaxed text-neutral-400">
-              The chart on the right shows what happens when you treat the funnel as a system
-              instead of a list of vanity metrics.
-            </p>
-          </div>
-
-          <div class="animate-on-scroll">
-            <div id="growth-chart"></div>
+        <!-- Interactive Funnel Flow -->
+        <div class="glass-card p-xl rounded-xl mb-xl flex flex-col items-center">
+          <div class="w-full max-w-4xl relative aspect-[16/9]">
+            <svg class="w-full h-full" viewBox="0 0 800 400">
+              <!-- Default Path (Gray) -->
+              <path
+                d="M50,50 L750,50 L700,350 L100,350 Z"
+                fill="none"
+                stroke="#3f3f46"
+                stroke-dasharray="4 4"
+                stroke-width="1"
+              ></path>
+              <path
+                d="M50,50 Q400,60 750,50 L720,150 Q400,160 80,150 Z"
+                fill="#27272a"
+                fill-opacity="0.3"
+              ></path>
+              <text
+                class="font-mono text-[10px] tracking-widest uppercase"
+                fill="#71717a"
+                text-anchor="middle"
+                x="400"
+                y="100"
+              >
+                Default Flow (40% Bounce)
+              </text>
+              <!-- GRO Optimized Path (Yellow) -->
+              <path
+                class="transition-all hover:fill-opacity-40 cursor-pointer"
+                d="M50,50 Q400,40 750,50 L735,100 Q400,110 65,100 Z"
+                fill="#fae194"
+                fill-opacity="0.2"
+              ></path>
+              <path
+                class="transition-all hover:fill-opacity-30 cursor-pointer"
+                d="M65,100 Q400,110 735,100 L710,200 Q400,210 90,200 Z"
+                fill="#fae194"
+                fill-opacity="0.15"
+              ></path>
+              <g class="group cursor-help">
+                <circle cx="400" cy="50" fill="#fae194" r="4"></circle>
+                <text
+                  class="font-mono text-[12px] font-bold"
+                  fill="#fae194"
+                  text-anchor="middle"
+                  x="400"
+                  y="35"
+                >
+                  GRO OPTIMIZED (25% BOUNCE)
+                </text>
+              </g>
+              <!-- Stages Labels -->
+              <g class="font-label-caps text-[10px]" fill="#71717a" transform="translate(50, 40)">
+                <text x="0" y="0">TRAFFIC</text>
+                <text text-anchor="end" x="700" y="0">CHECKOUT</text>
+              </g>
+            </svg>
           </div>
         </div>
-      </div>
-    </section>
+        <!-- Diagnostic Table -->
+        <div class="glass-card overflow-hidden rounded-xl border border-zinc-800">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead class="bg-zinc-900/50">
+                <tr>
+                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">EDGE</th>
+                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">OLD %</th>
+                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">NEW %</th>
+                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">GRO IMPROVEMENT</th>
+                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">WHY</th>
+                </tr>
+              </thead>
+              <tbody class="text-body-sm text-zinc-300 divide-y divide-zinc-800/50">
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Traffic → bounce</td>
+                  <td class="px-lg py-md text-zinc-600">40%</td>
+                  <td class="px-lg py-md text-primary font-bold">~25%</td>
+                  <td class="px-lg py-md text-success-emerald">-15%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Industry average bounce for ecommerce sits around 20-45%.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Traffic → Home</td>
+                  <td class="px-lg py-md text-zinc-600">45%</td>
+                  <td class="px-lg py-md text-primary font-bold">62%</td>
+                  <td class="px-lg py-md text-success-emerald">+17%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Majority of non-bounced traffic lands on home/category.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Traffic → PDP (bypass)</td>
+                  <td class="px-lg py-md text-zinc-600">15%</td>
+                  <td class="px-lg py-md text-primary font-bold">12%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">-3%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Paid product ads and deep-linked SEO.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Home → Search</td>
+                  <td class="px-lg py-md text-zinc-600">50%</td>
+                  <td class="px-lg py-md text-primary font-bold">40%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">-10%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Site search adoption is typically 30-45% of homepage visitors.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Home → Browsing</td>
+                  <td class="px-lg py-md text-zinc-600">50%</td>
+                  <td class="px-lg py-md text-primary font-bold">45%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">-5%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">The rest navigate via categories, promos, menus.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Search → PDP</td>
+                  <td class="px-lg py-md text-zinc-600">30%</td>
+                  <td class="px-lg py-md text-primary font-bold">35%</td>
+                  <td class="px-lg py-md text-success-emerald">+5%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Search users are higher-intent — they click through to PDPs more often.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Browsing → PDP</td>
+                  <td class="px-lg py-md text-zinc-600">30%</td>
+                  <td class="px-lg py-md text-primary font-bold">25%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">-5%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Lower intent than searchers.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">PDP → Cart</td>
+                  <td class="px-lg py-md text-zinc-600">10%</td>
+                  <td class="px-lg py-md text-primary font-bold">12%</td>
+                  <td class="px-lg py-md text-success-emerald">+2%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Typical add-to-cart rate sits 8-15% for most categories.</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02] transition-colors">
+                  <td class="px-lg py-md font-medium">Cart → Checkout</td>
+                  <td class="px-lg py-md text-zinc-600">30%</td>
+                  <td class="px-lg py-md text-primary font-bold">30%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">0%</td>
+                  <td class="px-lg py-md text-zinc-500 italic">Inverse of the Baymard 70% cart abandonment baseline — unchanged.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="mt-xl text-body-md text-zinc-500 max-w-4xl">
+          The implicit dropouts now add up correctly: from Home, 40% search + 45% browse = 85% progress,
+          15% exit. From Search, 35% reach PDP, 65% leak. From Browsing, 25% reach PDP, 75% leak. These
+          match the spread of realistic numbers without inflating any single stage.
+        </p>
+        <!-- Section Glow -->
+        <div
+          class="absolute -left-1/4 bottom-0 w-[600px] h-[600px] ambient-glow-yellow blur-[150px] opacity-20 pointer-events-none"
+        ></div>
+      </section>
 
-    <!-- ============================================================
-         CTA / FOOTER
-         ============================================================ -->
-    <section id="contact" class="relative">
-      <div class="ambient-glow-bg pointer-events-none absolute inset-0 -z-0"></div>
-
-      <div class="relative mx-auto w-full max-w-page px-8 py-stack-3x text-center">
-        <h2 class="animate-on-scroll text-4xl font-normal leading-tight text-neutral-50 md:text-6xl">
-          Stop paying for <em class="italic text-kinetic-yellow">more traffic</em>.<br />
-          Convert the traffic you have.
+      <!-- Comprehensive Capabilities -->
+      <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl relative my-xl">
+        <h2 class="font-page-title text-4xl md:text-6xl text-white mb-xl text-center reveal">
+          Comprehensive Capabilities
         </h2>
-        <div class="animate-on-scroll mt-12 flex flex-wrap items-center justify-center gap-4">
-          <a href="mailto:hello@grolabs.io" class="btn-primary">
-            Book a 20-min audit
-            <span aria-hidden="true">→</span>
-          </a>
-          <a href="#capabilities" class="btn-ghost">Explore capabilities</a>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: FTS_01</div>
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">search_check</span>
+              <h4 class="font-button-text text-primary">Full-text search</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
+              Leverage reliable and performant search with features like geosearch and faceting.
+            </p>
+            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
+              RETRIEVAL_LATENCY: <span class="text-success-emerald">&lt;50MS</span>
+            </div>
+          </div>
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: SEM_02</div>
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">psychology</span>
+              <h4 class="font-button-text text-primary">Semantic search</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
+              Unlock deeper understanding and context in search queries for meaningful results.
+            </p>
+            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
+              VECTOR_DIMENSIONS: <span class="text-primary">1536d</span>
+            </div>
+          </div>
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: HYB_03</div>
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">layers</span>
+              <h4 class="font-button-text text-primary">Hybrid search</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
+              Blend full-text search efficiency and semantic depth for unparalleled experience.
+            </p>
+            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
+              MATCH_ACCURACY: <span class="text-success-emerald">99.8%</span>
+            </div>
+          </div>
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: MUL_04</div>
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">photo_library</span>
+              <h4 class="font-button-text text-primary">Multimodal search</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
+              Search across images, video, and audio alongside text with AI-powered embeddings.
+            </p>
+            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
+              SUPPORTED_MEDIA: <span class="text-primary">IMG/VID/AUD</span>
+            </div>
+          </div>
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: FLT_05</div>
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">filter_alt</span>
+              <h4 class="font-button-text text-primary">Filtering &amp; sorting</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
+              Build complex search interfaces with a powerful toolkit for precise data retrieval.
+            </p>
+            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
+              NESTING_DEPTH: <span class="text-primary">UNLIMITED</span>
+            </div>
+          </div>
+          <div class="glass-card p-lg rounded-xl transition-all reveal relative">
+            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">OP_CODE: VEC_06</div>
+            <div class="flex items-center gap-md mb-md">
+              <span class="material-symbols-outlined text-primary">database</span>
+              <h4 class="font-button-text text-primary">Vector storage</h4>
+            </div>
+            <p class="text-body-sm text-secondary-fixed-dim leading-relaxed">
+              Store and retrieve vectors for advanced similarity queries or RAG applications.
+            </p>
+            <div class="mt-md font-mono text-[10px] text-zinc-600 border-t border-zinc-800 pt-sm">
+              STORAGE_ENGINE: <span class="text-primary">KINETIC_DB</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <footer class="border-t border-white/[0.04]">
-        <div class="mx-auto flex w-full max-w-page flex-col items-center justify-between gap-4 px-8 py-10 text-sm text-neutral-500 md:flex-row">
-          <span class="font-marker text-xl text-kinetic-yellow">GroLabs</span>
-          <span>© <span id="footer-year"></span> GroLabs. Engineered growth for e-commerce.</span>
+      <!-- Code Section -->
+      <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl my-xl">
+        <div class="flex flex-col items-center text-center mb-xl reveal">
+          <h2 class="font-page-title text-4xl md:text-6xl text-white mb-md">Easy to integrate</h2>
+          <p class="text-body-lg text-secondary-fixed-dim max-w-2xl">
+            Engineered luxury for developers. Our API is self-explanatory, allowing you to focus on
+            high-impact product features.
+          </p>
+        </div>
+        <div
+          class="code-block p-lg md:p-xl rounded-xl shadow-inner border border-zinc-800 font-mono text-body-sm relative reveal group"
+        >
+          <div class="absolute top-md right-md flex gap-md">
+            <span class="text-zinc-600 font-mono text-[10px]">JS_SDK // v4.0.2</span>
+            <span class="text-primary hover:cursor-pointer text-[12px] opacity-60 group-hover:opacity-100 transition-opacity">Copy Code</span>
+          </div>
+          <div class="overflow-x-auto">
+<pre><code class="text-zinc-400"><span class="text-primary">const</span> client = <span class="text-primary">new</span> MeiliSearch(<span class="text-success-emerald">'http://localhost:7700'</span>, <span class="text-success-emerald">'masterKey'</span>)
+
+<span class="text-primary">await</span> client.index(<span class="text-success-emerald">'movies'</span>).addDocuments([
+  { <span class="text-primary-fixed-dim">'id'</span>: 1, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Carol'</span> },
+  { <span class="text-primary-fixed-dim">'id'</span>: 2, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Wonder Woman'</span> },
+  { <span class="text-primary-fixed-dim">'id'</span>: 3, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Life of Pi'</span> }
+])
+
+<span class="text-zinc-600">// Highly performant AI-retrieval call</span>
+<span class="text-primary">const</span> search = <span class="text-primary">await</span> index.search(<span class="text-success-emerald">'philadelphia'</span>)
+console.log(search)</code></pre>
+          </div>
+        </div>
+        <div class="mt-xl flex justify-center gap-md flex-wrap reveal">
+          <button class="px-xl py-sm bg-primary text-on-primary font-button-text rounded-lg hover:brightness-110 shadow-[0_0_20px_rgba(250,225,148,0.15)] shimmer-btn">
+            Full Documentation
+          </button>
+          <button class="px-xl py-sm border border-zinc-700 text-primary font-button-text rounded-lg hover:border-primary transition-all shimmer-btn">
+            See Integrations
+          </button>
+        </div>
+      </section>
+
+      <!-- Stats Section -->
+      <section class="py-xl bg-zinc-900/30 my-xl">
+        <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-xl reveal">
+            <div class="text-center group">
+              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">2.4M</div>
+              <div class="font-label-caps text-label-caps text-zinc-400">DOWNLOADS</div>
+            </div>
+            <div class="text-center group">
+              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">15k+</div>
+              <div class="font-label-caps text-label-caps text-zinc-400">SERVERS</div>
+            </div>
+            <div class="text-center group">
+              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">800+</div>
+              <div class="font-label-caps text-label-caps text-zinc-400">CONTRIBUTORS</div>
+            </div>
+            <div class="text-center group">
+              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">57.6k</div>
+              <div class="font-label-caps text-label-caps text-zinc-400">GITHUB STARS</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-zinc-950 py-xl border-t border-zinc-800">
+        <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-xl">
+            <div>
+              <div class="font-label-caps text-label-caps text-primary mb-md">GROLABS AI</div>
+              <p class="font-body-sm text-body-sm text-zinc-500">
+                © <span id="footer-year"></span> GroLabs AI. Engineered Luxury. All rights reserved.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-lg">
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Terms of Service</a>
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Security</a>
+            </div>
+          </div>
+          <div class="mt-xl pt-xl border-t border-zinc-900 grid grid-cols-2 md:grid-cols-5 gap-xl">
+            <div class="space-y-md">
+              <h5 class="font-label-caps text-label-caps text-white">PRODUCT</h5>
+              <ul class="space-y-sm text-body-sm text-zinc-500">
+                <li><a class="hover:text-primary transition-colors" href="#">Search Engine</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">AI Hybrid</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Cloud Platform</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
+              </ul>
+            </div>
+            <div class="space-y-md">
+              <h5 class="font-label-caps text-label-caps text-white">DEVELOPERS</h5>
+              <ul class="space-y-sm text-body-sm text-zinc-500">
+                <li><a class="hover:text-primary transition-colors" href="#">Docs</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">API Reference</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">GitHub</a></li>
+              </ul>
+            </div>
+            <div class="space-y-md">
+              <h5 class="font-label-caps text-label-caps text-white">RESOURCES</h5>
+              <ul class="space-y-sm text-body-sm text-zinc-500">
+                <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Customers</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Newsletter</a></li>
+              </ul>
+            </div>
+            <div class="space-y-md col-span-2">
+              <h5 class="font-label-caps text-label-caps text-white">NEWSLETTER</h5>
+              <p class="text-body-sm text-zinc-500 mb-md">Get the latest on AI retrieval tech.</p>
+              <div class="flex gap-sm">
+                <input
+                  class="bg-zinc-900 border-zinc-800 rounded px-md py-xs text-body-sm w-full focus:ring-primary focus:border-primary text-white transition-all"
+                  placeholder="email@grolabs.ai"
+                  type="email"
+                />
+                <button class="bg-zinc-800 text-primary font-button-text px-md py-xs rounded hover:bg-zinc-700 transition-colors">
+                  Join
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
-    </section>
+    </main>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
