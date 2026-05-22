@@ -6,65 +6,91 @@ Standalone marketing landing page for GroLabs, deployed separately from the main
 
 ## Stack
 
-- **Vite 8** — static build, deployable to Vercel / Netlify / Cloudflare Pages
-- **TypeScript** — strict
-- **Tailwind CSS v3.4** — custom theme tokens in [tailwind.config.js](./tailwind.config.js)
-- **No framework** — vanilla TS modules. The interactive funnel and bar chart are hand-rolled SVG.
+- **Astro 6** — static-site generator, file-based routing, content collections for the blog
+- **TypeScript** — strict (`astro/tsconfigs/strict`)
+- **Tailwind CSS v3.4** via `@astrojs/tailwind` — custom theme tokens in [tailwind.config.js](./tailwind.config.js)
+- **No client framework** — vanilla TS modules at [src/scripts/](./src/scripts). The interactive funnel and the Luminous Equation animation are hand-rolled SVG + IntersectionObserver.
+- **Sitemap** generated automatically via `@astrojs/sitemap` (`dist/sitemap-index.xml`).
 
 ## Layout
 
-| Section | File / anchor | Notes |
-|---|---|---|
-| Nav | `index.html` top | Brand mark + 4 anchor links + Book demo CTA |
-| Hero | `#top` | text-7xl headline, italicized "revenue" in kinetic yellow |
-| Comprehensive capabilities | `#capabilities` | 3-col feature grid, 6 blocks, internal card-glow |
-| Easy to integrate | `#integrations` | 2-col layout, list + 6-cell integration grid |
-| Funnel benchmark | `#benchmark` | Interactive funnel ([src/funnel.ts](./src/funnel.ts)) + Old/New/Improvement table |
-| Compound growth | `#growth` | 5-bar chart ([src/growth-chart.ts](./src/growth-chart.ts)), final bar in kinetic yellow |
-| CTA / Footer | `#contact` | Final conversion block + thin footer |
+```
+src/
+├── layouts/
+│   └── BaseLayout.astro    ← shared head, fonts, ambient grid, header, footer, script tag
+├── pages/
+│   ├── index.astro         ← marketing landing (hero + leaks + Luminous Eq + funnel + modules + code + stats)
+│   └── blog/
+│       ├── index.astro     ← chronological post list
+│       └── [...slug].astro ← post detail (renders Markdown with prose-blog styles)
+├── content/
+│   ├── blog/               ← drop a .md file here to publish a post
+│   └── ...
+├── content.config.ts       ← blog collection schema (title, description, pubDate, author, tags[], draft)
+├── scripts/
+│   ├── main.ts             ← entry: particles, reveal-on-scroll, mouse glow, scroll progress, equation reveal
+│   └── funnel.ts           ← interactive funnel SVG renderer
+└── styles/
+    └── global.css          ← Tailwind base + custom classes (glass-card, ambient-grid, funnel-info, etc.)
+```
+
+## Publishing a blog post
+
+1. Create `src/content/blog/<slug>.md` with frontmatter:
+   ```yaml
+   ---
+   title: Your post title
+   description: One-line summary (used in <meta description> and the index card)
+   pubDate: 2026-05-22
+   author: GroLabs        # optional, defaults to "GroLabs"
+   tags: [search, aeo]    # optional
+   draft: false           # optional; set true to hide from production
+   ---
+   ```
+2. Write the post in Markdown below the frontmatter.
+3. Commit + push. Vercel rebuilds and the post appears at `/blog/<slug>`.
+
+No code changes needed per post.
 
 ## Custom Tailwind tokens
 
+Token highlights (full list in [tailwind.config.js](./tailwind.config.js)):
+
 | Token | Value |
 |---|---|
-| `bg-zinc-black` | `#131316` (page canvas) |
-| `bg-zinc-card` | `#1b1b1e` (feature blocks, panels) |
-| `bg-zinc-card-soft` | `#212126` |
-| `text-kinetic-yellow` | `#fae194` (accents + active state) |
-| `font-sans` | Hanken Grotesk → system-ui |
-| `font-marker` | Caveat → Permanent Marker (brand mark only) |
-| `py-stack-3x` | 160 px section padding |
-| `py-stack-4x` | 200 px (used on Funnel + Growth) |
-| `max-w-page` | 1280 px (matches 1920-optimized design) |
+| `text-primary` / `bg-primary` | `#fae194` (kinetic yellow accent) |
+| `text-success-emerald` | `#10b981` |
+| `font-page-title` | Hanken Grotesk 48/56 |
+| `font-section-header` | Hanken Grotesk 12/16, +0.15em tracking |
+| `p-margin-mobile` / `p-margin-desktop` | 16 px / 48 px page gutters |
+| spacing scale: `xs` `sm` `md` `lg` `xl` | 4 / 8 / 16 / 24 / 40 px |
 
 ## Interactive funnel
 
-[src/funnel.ts](./src/funnel.ts) renders the funnel diagram you see in the screenshot reference: Traffic → Home → (Search / Browsing) → Product detail page → Cart → Checkout, plus a 12% direct-to-PDP shortcut and red dashed leak arrows at every stage (bounce, home exit, no results, exit, abandoned cart, returns).
+[src/scripts/funnel.ts](./src/scripts/funnel.ts) renders the funnel diagram: Home → Search → Browsing → Product page → Cart → Checkout, with red leak columns at every stage and a dotted shortcut from Search/Browsing into Cart. Hover any stage row in the table below to highlight the matching SVG stage; the info panel on the right swaps to the drop-off drivers for that stage.
 
-- Hover any stage to dim the rest of the diagram and highlight the transitions and leaks tied to that stage.
-- All geometry comes from one `STAGES` / `TRANSITIONS` / `LEAKS` array — adjust those to retune the diagram without touching DOM code.
-- Transition pills sit on a `#1b1b1e` background with a hairline border (kinetic yellow on the shortcut arrow).
-
-## Compound growth chart
-
-[src/growth-chart.ts](./src/growth-chart.ts) renders 5 vertical bars at 1.00× → 1.10× → 1.21× → 1.46× → 1.85×. Only the final bar is filled with kinetic yellow; the rest are neutral zinc so the eye lands on the compounded result.
+All geometry comes from `STAGES` / `TRANSITIONS` / `LEAKS` arrays — adjust those to retune without touching DOM code.
 
 ## Scripts
 
 ```bash
 npm install        # one-time
-npm run dev        # local dev server with HMR
-npm run build      # tsc + vite build → dist/
+npm run dev        # astro dev server → http://localhost:4321
+npm run build      # astro check + astro build → dist/
 npm run preview    # serve the production build locally
 ```
 
-## Deploy
+## Deployment
 
-The `dist/` directory is a fully static bundle. Any static host works:
+Connected to **Vercel** with auto-deploy from `main` (same pattern as the Scout admin). Each push to `main` triggers a Vercel build; preview deploys for every PR.
 
-- **Vercel:** `npx vercel --prod` from the repo root
-- **Netlify:** point at the repo, build command `npm run build`, publish directory `dist`
-- **Cloudflare Pages:** same config as Netlify
+If the connection is ever lost:
+
+1. `vercel.com/new` → Import Git Repository → `grolabsai/grolabs-landing`
+2. Vercel auto-detects Astro (framework preset: Astro, build command `astro build`, output `dist/`) — accept defaults.
+3. Deploy. Subsequent pushes to `main` redeploy automatically.
+
+The production `site` URL is set in [astro.config.mjs](./astro.config.mjs) as `https://grolabs.io` — update if the canonical domain changes.
 
 ## Why this is separate from Scout
 
