@@ -1,4 +1,11 @@
 import './style.css';
+import { renderFunnel } from './funnel';
+
+// ============================================================
+// Funnel diagram (Funnel Benchmark section)
+// ============================================================
+const funnelRoot = document.getElementById('funnel-root');
+if (funnelRoot) renderFunnel(funnelRoot);
 
 // ============================================================
 // Footer year

@@ -337,63 +337,21 @@
           </p>
         </div>
         <!-- Interactive Funnel Flow -->
-        <div class="glass-card p-xl rounded-xl mb-xl flex flex-col items-center">
-          <div class="w-full max-w-4xl relative aspect-[16/9]">
-            <svg class="w-full h-full" viewBox="0 0 800 400">
-              <!-- Default Path (Gray) -->
-              <path
-                d="M50,50 L750,50 L700,350 L100,350 Z"
-                fill="none"
-                stroke="#3f3f46"
-                stroke-dasharray="4 4"
-                stroke-width="1"
-              ></path>
-              <path
-                d="M50,50 Q400,60 750,50 L720,150 Q400,160 80,150 Z"
-                fill="#27272a"
-                fill-opacity="0.3"
-              ></path>
-              <text
-                class="font-mono text-[10px] tracking-widest uppercase"
-                fill="#71717a"
-                text-anchor="middle"
-                x="400"
-                y="100"
-              >
-                Default Flow (40% Bounce)
-              </text>
-              <!-- GRO Optimized Path (Yellow) -->
-              <path
-                class="transition-all hover:fill-opacity-40 cursor-pointer"
-                d="M50,50 Q400,40 750,50 L735,100 Q400,110 65,100 Z"
-                fill="#fae194"
-                fill-opacity="0.2"
-              ></path>
-              <path
-                class="transition-all hover:fill-opacity-30 cursor-pointer"
-                d="M65,100 Q400,110 735,100 L710,200 Q400,210 90,200 Z"
-                fill="#fae194"
-                fill-opacity="0.15"
-              ></path>
-              <g class="group cursor-help">
-                <circle cx="400" cy="50" fill="#fae194" r="4"></circle>
-                <text
-                  class="font-mono text-[12px] font-bold"
-                  fill="#fae194"
-                  text-anchor="middle"
-                  x="400"
-                  y="35"
-                >
-                  GRO OPTIMIZED (25% BOUNCE)
-                </text>
-              </g>
-              <!-- Stages Labels -->
-              <g class="font-label-caps text-[10px]" fill="#71717a" transform="translate(50, 40)">
-                <text x="0" y="0">TRAFFIC</text>
-                <text text-anchor="end" x="700" y="0">CHECKOUT</text>
-              </g>
-            </svg>
+        <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
+          <div id="funnel-root" class="w-full overflow-x-auto"></div>
+
+          <!-- Leak row banner -->
+          <div class="mt-lg rounded-xl border border-[#e87b6b]/30 bg-[#e87b6b]/[0.06] p-lg">
+            <div class="font-button-text text-[#f3a99e]">Leak row — lost revenue at every stage</div>
+            <p class="mt-1 text-body-sm text-[#e8b4ab]/80">
+              Each red arrow represents revenue that left the funnel before reaching checkout.
+            </p>
           </div>
+
+          <p class="mt-md text-body-sm text-zinc-500">
+            Percentages reflect typical e-commerce benchmarks. Real numbers come from each merchant's
+            GA4 + store analytics. Hover any stage to isolate its transitions and leaks.
+          </p>
         </div>
         <!-- Diagnostic Table -->
         <div class="glass-card overflow-hidden rounded-xl border border-zinc-800">
