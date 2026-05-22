@@ -46,17 +46,17 @@ const STAGES: Stage[] = [
     tooltip:
       "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for." },
   // Search/Browsing sit in the (wider) Home–PDP gap with breathing room.
-  { id: 'search',   label: 'Search',       icon: 'search',        x: 240,  y: 20,
+  { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 400,  y: 90,
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 490,  y: 90,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  // Main-row continuation. PDP→Cart and Cart→Checkout gaps are equal (175 px each).
-  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 630,  y: 55,
+  // Main-row continuation. PDP→Cart and Cart→Checkout gaps shrink to 120 px to feed the wider Home→PDP gap above.
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 740,  y: 55,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
-  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 935,  y: 55,
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 990,  y: 55,
     tooltip:
       "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
   // Checkout flush right (right edge at viewBox.w - 30 = 1370).
@@ -234,7 +234,7 @@ export function renderFunnel(root: HTMLElement): void {
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Constant fall speed + target spacing keeps drops visually consistent across leak lengths.
-  const DROP_SPEED = 70;      // px / second
+  const DROP_SPEED = 50;      // px / second
   const DROP_SPACING = 40;    // target px between drops in the column
 
   function makeDroplet(cx: number, cy: number, leakId: string): SVGEllipseElement {
@@ -344,6 +344,51 @@ export function renderFunnel(root: HTMLElement): void {
     edgeGroup.appendChild(labelGroup);
   });
   svg.appendChild(edgeGroup);
+
+  // ---- Secondary dotted connectors from 35% / 25% pills to Cart ----
+  // These suggest the onward flow into Cart without their own label.
+  const connectorGroup = document.createElementNS(svgNS, 'g');
+  connectorGroup.setAttribute('class', 'funnel-connectors');
+
+  const cartStage = stageById('cart');
+  const searchPdpPill = transitionPath(TRANSITIONS.find((t) => t.id === 't-search-pdp')!);
+  const browsingPdpPill = transitionPath(TRANSITIONS.find((t) => t.id === 't-browsing-pdp')!);
+
+  // 35% (above the main line) — arcs over PDP, lands on Cart's top centre.
+  const cartTopX = cartStage.x + STAGE_W / 2;
+  const cartTopY = cartStage.y;
+  const cartBottomY = cartStage.y + STAGE_H;
+
+  const connector35 = document.createElementNS(svgNS, 'path');
+  connector35.setAttribute(
+    'd',
+    `M ${searchPdpPill.midX} ${searchPdpPill.midY} ` +
+      `C ${searchPdpPill.midX} 15, ${cartTopX} 15, ${cartTopX} ${cartTopY}`,
+  );
+  connector35.setAttribute('stroke', FORWARD_STROKE);
+  connector35.setAttribute('stroke-width', '1.5');
+  connector35.setAttribute('stroke-dasharray', '2 5');
+  connector35.setAttribute('stroke-linecap', 'round');
+  connector35.setAttribute('fill', 'none');
+  connector35.setAttribute('opacity', '0.45');
+  connectorGroup.appendChild(connector35);
+
+  // 25% (below the main line) — dips under PDP, lands on Cart's bottom centre.
+  const connector25 = document.createElementNS(svgNS, 'path');
+  connector25.setAttribute(
+    'd',
+    `M ${browsingPdpPill.midX} ${browsingPdpPill.midY} ` +
+      `C ${browsingPdpPill.midX} 150, ${cartTopX} 150, ${cartTopX} ${cartBottomY}`,
+  );
+  connector25.setAttribute('stroke', FORWARD_STROKE);
+  connector25.setAttribute('stroke-width', '1.5');
+  connector25.setAttribute('stroke-dasharray', '2 5');
+  connector25.setAttribute('stroke-linecap', 'round');
+  connector25.setAttribute('fill', 'none');
+  connector25.setAttribute('opacity', '0.45');
+  connectorGroup.appendChild(connector25);
+
+  svg.appendChild(connectorGroup);
 
   // ---- Stage cards (dark fill, small icon LEFT + label to its RIGHT, both centered as a pair) ----
   const stageGroup = document.createElementNS(svgNS, 'g');
@@ -464,7 +509,7 @@ export function renderFunnel(root: HTMLElement): void {
   barTitle.setAttribute('y', String(BAR_Y + 90));
   barTitle.setAttribute('text-anchor', 'middle');
   barTitle.setAttribute('fill', '#ffffff');
-  barTitle.setAttribute('font-size', '22');
+  barTitle.setAttribute('font-size', '26');
   barTitle.setAttribute('font-weight', '700');
   barTitle.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
   barTitle.setAttribute('letter-spacing', '-0.01em');
