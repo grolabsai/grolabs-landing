@@ -163,10 +163,10 @@ body {
   font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
 }
 
-/* Hover info panel — sits in the slab above PDP/Cart/Checkout */
+/* Hover info panel — sits between the funnel diagram and the red banner */
 .funnel-info {
-  height: 100%;
-  padding: 22px 26px;
+  min-height: 88px;
+  padding: 18px 22px;
   border-radius: 14px;
   background: linear-gradient(
     135deg,
@@ -180,7 +180,6 @@ body {
   justify-content: center;
   color: #d4d4d4;
   transition: border-color 0.3s ease;
-  box-sizing: border-box;
 }
 .funnel-info.is-active {
   border-color: rgba(250, 225, 148, 0.28);

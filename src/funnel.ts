@@ -38,34 +38,31 @@ type Leak = {
 };
 
 const STAGES: Stage[] = [
-  { id: 'traffic',  label: 'Traffic',      icon: 'public',        x: 60,   y: 130,
-    tooltip:
-      "Drop-offs at the entry point are driven by ad/landing-page mismatch, slow first-paint, and search-intent misreads. Most bouncers leave in under 10 seconds." },
-  { id: 'home',     label: 'Home',         icon: 'home',          x: 320,  y: 130,
+  // Home is the entry point now — Traffic removed. Middle row at y=55 (midline y=80).
+  { id: 'home',     label: 'Home',         icon: 'home',          x: 60,   y: 55,
     tooltip:
       "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for." },
-  { id: 'search',   label: 'Search',       icon: 'search',        x: 540,  y: 40,
+  // Search 10 px above Home midline → bottom y=70.
+  { id: 'search',   label: 'Search',       icon: 'search',        x: 290,  y: 20,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 610,  y: 230,
+  // Browsing 10 px below Home midline → top y=90. Search-Browsing vertical gap = 20 px.
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 360,  y: 90,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 800,  y: 230,
+  // PDP / Cart / Checkout share Home's row.
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 540,  y: 55,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
-  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 1030, y: 230,
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 770,  y: 55,
     tooltip:
       "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
-  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1250, y: 230,
+  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 990,  y: 55,
     tooltip:
       "Returns are driven by image vs. product mismatch, sizing/fit ambiguity, and missing detail photographs (texture, scale, packaging). Better PDPs reduce returns 30-50%." },
 ];
 
 const TRANSITIONS: Transition[] = [
-  { id: 't-traffic-home',  from: 'traffic',  to: 'home',     pct: 62, variant: 'forward' },
-  { id: 't-traffic-pdp',   from: 'traffic',  to: 'pdp',      pct: 12, variant: 'shortcut',
-    labelOverride: '12% direct to PDP',
-    cubicCurve: { c1x: 300, c1y: -100, c2x: 700, c2y: -100 } },
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward', toAttach: 'top' },
@@ -75,7 +72,6 @@ const TRANSITIONS: Transition[] = [
 ];
 
 const LEAKS: Leak[] = [
-  { id: 'leak-traffic',  fromStageId: 'traffic',  label: 'bounce' },
   { id: 'leak-home',     fromStageId: 'home',     label: 'home exit' },
   // Nudged right of Search's left edge so the line clears Browsing without aligning to either box edge
   { id: 'leak-search',   fromStageId: 'search',   label: 'no results', xOffset: 35 },
@@ -88,11 +84,11 @@ const LEAKS: Leak[] = [
 // Geometry — short horizontal boxes (icon-left, label-right)
 const STAGE_W = 130;
 const STAGE_H = 50;
-const LEAK_Y = 380;
+const LEAK_Y = 220;
 const LEAK_ARROW_START_DY = 8;     // arrow starts just below box
 const LABEL_PCT_DY = -22;          // % position relative to LEAK_Y (above arrowhead)
 const LABEL_CAUSE_DY = -6;         // cause label position relative to LEAK_Y (just above arrowhead)
-const VIEWBOX = { x: 0, y: -55, w: 1400, h: 455 };
+const VIEWBOX = { x: 0, y: 0, w: 1400, h: 235 };
 
 const STAGE_FILL = '#1b1b1e';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
@@ -185,7 +181,6 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
 
 export function renderFunnel(root: HTMLElement): void {
   const svgNS = 'http://www.w3.org/2000/svg';
-  const xhtmlNS = 'http://www.w3.org/1999/xhtml';
 
   const svg = document.createElementNS(svgNS, 'svg');
   svg.setAttribute('viewBox', `${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.w} ${VIEWBOX.h}`);
@@ -207,35 +202,11 @@ export function renderFunnel(root: HTMLElement): void {
   `;
   svg.appendChild(defs);
 
-  // ---- Info panel (foreignObject in the freed upper-right slab) ----
-  const fo = document.createElementNS(svgNS, 'foreignObject');
-  fo.setAttribute('x', '940');
-  fo.setAttribute('y', '-20');
-  fo.setAttribute('width', '440');
-  fo.setAttribute('height', '230');
-
-  const panel = document.createElementNS(xhtmlNS, 'div') as HTMLDivElement;
-  panel.setAttribute('class', 'funnel-info');
-  panel.innerHTML = `
-    <div class="funnel-info-default">
-      <span class="material-symbols-outlined">touch_app</span>
-      <span>Hover any stage to see what typically causes drop-offs there.</span>
-    </div>
-    <div class="funnel-info-content">
-      <div class="funnel-info-eyebrow">
-        <span class="material-symbols-outlined" data-info-icon>info</span>
-        <span data-info-tag>Drop-off drivers</span>
-      </div>
-      <div class="funnel-info-title" data-info-title></div>
-      <div class="funnel-info-body" data-info-body></div>
-    </div>
-  `;
-  fo.appendChild(panel);
-  svg.appendChild(fo);
-
-  const infoIcon = panel.querySelector<HTMLElement>('[data-info-icon]')!;
-  const infoTitle = panel.querySelector<HTMLElement>('[data-info-title]')!;
-  const infoBody = panel.querySelector<HTMLElement>('[data-info-body]')!;
+  // Info panel lives in HTML now (below the SVG). Look it up if present.
+  const panel = document.getElementById('funnel-info');
+  const infoIcon = panel?.querySelector<HTMLElement>('[data-info-icon]') ?? null;
+  const infoTitle = panel?.querySelector<HTMLElement>('[data-info-title]') ?? null;
+  const infoBody = panel?.querySelector<HTMLElement>('[data-info-body]') ?? null;
 
   // ---- Leak droplets + bottom-of-line labels ----
   const leakGroup = document.createElementNS(svgNS, 'g');
@@ -455,15 +426,18 @@ export function renderFunnel(root: HTMLElement): void {
   root.appendChild(svg);
 
   function showInfo(stage: Stage) {
+    if (!panel) return;
     panel.classList.add('is-active');
-    infoIcon.textContent = stage.icon;
-    infoTitle.textContent = stage.label;
-    infoBody.textContent =
-      stage.tooltip ?? 'No detail captured for this stage yet. Add your hypothesis or analytics finding here.';
+    if (infoIcon) infoIcon.textContent = stage.icon;
+    if (infoTitle) infoTitle.textContent = stage.label;
+    if (infoBody) {
+      infoBody.textContent =
+        stage.tooltip ?? 'No detail captured for this stage yet. Add your hypothesis or analytics finding here.';
+    }
   }
 
   function resetInfo() {
-    panel.classList.remove('is-active');
+    panel?.classList.remove('is-active');
   }
 
   function highlightStage(stageId: string) {

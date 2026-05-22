@@ -340,6 +340,22 @@
         <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
           <div id="funnel-root" class="w-full overflow-x-auto"></div>
 
+          <!-- Hover info panel (HTML, lives between diagram and banner) -->
+          <div id="funnel-info" class="funnel-info mt-md">
+            <div class="funnel-info-default">
+              <span class="material-symbols-outlined">touch_app</span>
+              <span>Hover any stage to see what typically causes drop-offs there.</span>
+            </div>
+            <div class="funnel-info-content">
+              <div class="funnel-info-eyebrow">
+                <span class="material-symbols-outlined" data-info-icon>info</span>
+                <span>Drop-off drivers</span>
+              </div>
+              <div class="funnel-info-title" data-info-title></div>
+              <div class="funnel-info-body" data-info-body></div>
+            </div>
+          </div>
+
           <!-- Leak row banner — deep red, title only -->
           <div class="mt-md rounded-xl border border-red-900/50 bg-red-950 px-lg py-md">
             <div class="text-2xl font-bold text-white tracking-tight">
