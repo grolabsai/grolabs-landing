@@ -1,11 +1,16 @@
-// Interactive funnel diagram — uniform kinetic-yellow stages, top-arc shortcut,
-// leak labels above each leak arrow, animated leak lines pouring into the red banner.
+// Interactive funnel diagram — dark stage cards with kinetic-yellow icon + text,
+// PDP/Cart/Checkout aligned with Browsing, leak labels at the foot of each arrow,
+// and a hover info panel in the freed slab above the bottom row.
 
 type Stage = {
   id: string;
   label: string;
+  /** Material Symbols Outlined glyph name */
+  icon: string;
   x: number;
   y: number;
+  /** Descriptive text shown in the info panel on hover */
+  tooltip?: string;
 };
 
 type Transition = {
@@ -15,7 +20,7 @@ type Transition = {
   pct: number;
   labelOverride?: string;
   curve?: { cx: number; cy: number };
-  /** 'forward' = standard right→left midline; 'shortcut' = top→top arc-over. Visual styling is identical. */
+  /** 'forward' = straight midline; 'shortcut' = top→top arc-over. Visual styling identical. */
   variant: 'forward' | 'shortcut';
 };
 
@@ -23,27 +28,39 @@ type Leak = {
   id: string;
   fromStageId: string;
   label: string;
-  /** Override the computed dropout (used for terminal stages where 100 − sum(forwards) is meaningless). */
   pctOverride?: number;
-  /** Horizontal offset of the leak column from `stage.x`. Default = STAGE_W / 2 (centered). */
   xOffset?: number;
 };
 
 const STAGES: Stage[] = [
-  { id: 'traffic',  label: 'Traffic',        x: 60,   y: 200 },
-  { id: 'home',     label: 'Home',           x: 320,  y: 200 },
-  { id: 'search',   label: 'Search',         x: 540,  y: 60  },
-  { id: 'browsing', label: 'Browsing',       x: 610,  y: 320 },
-  { id: 'pdp',      label: 'Product detail', x: 800,  y: 200 },
-  { id: 'cart',     label: 'Cart',           x: 1030, y: 200 },
-  { id: 'checkout', label: 'Checkout',       x: 1250, y: 200 },
+  { id: 'traffic',  label: 'Traffic',      icon: 'public',        x: 60,   y: 200,
+    tooltip:
+      "Drop-offs at the entry point are driven by ad/landing-page mismatch, slow first-paint, and search-intent misreads. Most bouncers leave in under 10 seconds." },
+  { id: 'home',     label: 'Home',         icon: 'home',          x: 320,  y: 200,
+    tooltip:
+      "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for." },
+  { id: 'search',   label: 'Search',       icon: 'search',        x: 540,  y: 60,
+    tooltip:
+      "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 610,  y: 320,
+    tooltip:
+      "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
+  { id: 'pdp',      label: 'Product page', icon: 'shopping_bag',  x: 800,  y: 320,
+    tooltip:
+      "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 1030, y: 320,
+    tooltip:
+      "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
+  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1250, y: 320,
+    tooltip:
+      "Returns are driven by image vs. product mismatch, sizing/fit ambiguity, and missing detail photographs (texture, scale, packaging). Better PDPs reduce returns 30-50%." },
 ];
 
 const TRANSITIONS: Transition[] = [
   { id: 't-traffic-home',  from: 'traffic',  to: 'home',     pct: 62, variant: 'forward' },
   { id: 't-traffic-pdp',   from: 'traffic',  to: 'pdp',      pct: 12, variant: 'shortcut',
     labelOverride: '12% direct to PDP',
-    curve: { cx: 495, cy: -240 } },
+    curve: { cx: 495, cy: -360 } },
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
@@ -55,7 +72,6 @@ const TRANSITIONS: Transition[] = [
 const LEAKS: Leak[] = [
   { id: 'leak-traffic',  fromStageId: 'traffic',  label: 'bounce' },
   { id: 'leak-home',     fromStageId: 'home',     label: 'home exit' },
-  // Search's leak column drops from the LEFT edge so it passes to the left of Browsing
   { id: 'leak-search',   fromStageId: 'search',   label: 'no results', xOffset: 0 },
   { id: 'leak-browsing', fromStageId: 'browsing', label: 'no results' },
   { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'exit' },
@@ -67,17 +83,15 @@ const LEAKS: Leak[] = [
 const STAGE_W = 130;
 const STAGE_H = 50;
 const LEAK_Y = 460;
-const PCT_LABEL_DY = 14;          // px below stage bottom — dropout %
-const CAUSE_LABEL_DY = 30;        // px below stage bottom — cause text (bounce / no results / …)
-const LEAK_ARROW_START_DY = 46;   // px below stage bottom — arrow starts here, leaves room for labels above
-const VIEWBOX = { x: 0, y: -40, w: 1400, h: 510 };
+const LEAK_ARROW_START_DY = 8;     // arrow starts just below box
+const LABEL_PCT_DY = -22;          // % position relative to LEAK_Y (above arrowhead)
+const LABEL_CAUSE_DY = -6;         // cause label position relative to LEAK_Y (just above arrowhead)
+const VIEWBOX = { x: 0, y: -80, w: 1400, h: 540 };
 
-// Uniform kinetic-yellow palette for every box
-const STAGE_FILL = '#fae194';
-const STAGE_BORDER = '#d4af37';
-const STAGE_TEXT = '#18181b';
+const STAGE_FILL = '#1b1b1e';
+const STAGE_BORDER = 'rgba(255, 255, 255, 0.08)';
+const STAGE_ACCENT = '#fae194'; // text + icon
 
-// Forward / shortcut arrow + pill share one visual style (the shortcut is just curved)
 const FORWARD_STROKE = '#7ad196';
 
 function stageById(id: string): Stage {
@@ -138,6 +152,7 @@ function leakPath(l: Leak): string {
 
 export function renderFunnel(root: HTMLElement): void {
   const svgNS = 'http://www.w3.org/2000/svg';
+  const xhtmlNS = 'http://www.w3.org/1999/xhtml';
 
   const svg = document.createElementNS(svgNS, 'svg');
   svg.setAttribute('viewBox', `${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.w} ${VIEWBOX.h}`);
@@ -146,11 +161,11 @@ export function renderFunnel(root: HTMLElement): void {
   svg.setAttribute('role', 'img');
   svg.setAttribute(
     'aria-label',
-    'E-commerce funnel: Traffic → Home → Search/Browsing → Product detail → Cart → Checkout, with leak arrows at every stage',
+    'E-commerce funnel: Traffic → Home → Search/Browsing → Product page → Cart → Checkout, with leak arrows at every stage',
   );
   svg.classList.add('select-none');
 
-  // ---- Arrowhead markers ----
+  // ---- Defs (arrowhead markers) ----
   const defs = document.createElementNS(svgNS, 'defs');
   defs.innerHTML = `
     <marker id="arrow-forward" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -162,12 +177,41 @@ export function renderFunnel(root: HTMLElement): void {
   `;
   svg.appendChild(defs);
 
-  // ---- Leak arrows + dropout % + cause label (stacked just below each box) ----
+  // ---- Info panel (foreignObject in the freed upper-right slab) ----
+  const fo = document.createElementNS(svgNS, 'foreignObject');
+  fo.setAttribute('x', '900');
+  fo.setAttribute('y', '0');
+  fo.setAttribute('width', '480');
+  fo.setAttribute('height', '300');
+
+  const panel = document.createElementNS(xhtmlNS, 'div') as HTMLDivElement;
+  panel.setAttribute('class', 'funnel-info');
+  panel.innerHTML = `
+    <div class="funnel-info-default">
+      <span class="material-symbols-outlined">touch_app</span>
+      <span>Hover any stage to see what typically causes drop-offs there.</span>
+    </div>
+    <div class="funnel-info-content">
+      <div class="funnel-info-eyebrow">
+        <span class="material-symbols-outlined" data-info-icon>info</span>
+        <span data-info-tag>Drop-off drivers</span>
+      </div>
+      <div class="funnel-info-title" data-info-title></div>
+      <div class="funnel-info-body" data-info-body></div>
+    </div>
+  `;
+  fo.appendChild(panel);
+  svg.appendChild(fo);
+
+  const infoIcon = panel.querySelector<HTMLElement>('[data-info-icon]')!;
+  const infoTitle = panel.querySelector<HTMLElement>('[data-info-title]')!;
+  const infoBody = panel.querySelector<HTMLElement>('[data-info-body]')!;
+
+  // ---- Leak arrows + bottom-of-line labels ----
   const leakGroup = document.createElementNS(svgNS, 'g');
   leakGroup.setAttribute('class', 'funnel-leaks');
 
   LEAKS.forEach((leak) => {
-    const stage = stageById(leak.fromStageId);
     const cx = leakX(leak);
     const pct = leakPctFor(leak);
 
@@ -184,10 +228,21 @@ export function renderFunnel(root: HTMLElement): void {
     path.dataset.leakId = leak.id;
     leakGroup.appendChild(path);
 
-    // Dropout % — closer to the box
+    // Mask rect — paints over the arrow behind the labels so dashes don't poke through
+    const mask = document.createElementNS(svgNS, 'rect');
+    mask.setAttribute('x', String(cx - 48));
+    mask.setAttribute('y', String(LEAK_Y - 34));
+    mask.setAttribute('width', '96');
+    mask.setAttribute('height', '32');
+    mask.setAttribute('fill', '#16161a');
+    mask.setAttribute('rx', '4');
+    mask.dataset.leakId = leak.id;
+    leakGroup.appendChild(mask);
+
+    // Dropout % — closer to the arrowhead, above the cause label
     const pctLabel = document.createElementNS(svgNS, 'text');
     pctLabel.setAttribute('x', String(cx));
-    pctLabel.setAttribute('y', String(stage.y + STAGE_H + PCT_LABEL_DY));
+    pctLabel.setAttribute('y', String(LEAK_Y + LABEL_PCT_DY));
     pctLabel.setAttribute('text-anchor', 'middle');
     pctLabel.setAttribute('fill', '#e87b6b');
     pctLabel.setAttribute('font-size', '12');
@@ -197,10 +252,10 @@ export function renderFunnel(root: HTMLElement): void {
     pctLabel.textContent = `${pct}%`;
     leakGroup.appendChild(pctLabel);
 
-    // Cause label — just above the arrow
+    // Cause label — just above the arrowhead
     const causeLabel = document.createElementNS(svgNS, 'text');
     causeLabel.setAttribute('x', String(cx));
-    causeLabel.setAttribute('y', String(stage.y + STAGE_H + CAUSE_LABEL_DY));
+    causeLabel.setAttribute('y', String(LEAK_Y + LABEL_CAUSE_DY));
     causeLabel.setAttribute('text-anchor', 'middle');
     causeLabel.setAttribute('fill', '#e87b6b');
     causeLabel.setAttribute('font-size', '12');
@@ -211,7 +266,7 @@ export function renderFunnel(root: HTMLElement): void {
   });
   svg.appendChild(leakGroup);
 
-  // ---- Forward / shortcut transitions (identical styling — green stroke, dark pill) ----
+  // ---- Forward / shortcut transitions ----
   const edgeGroup = document.createElementNS(svgNS, 'g');
   edgeGroup.setAttribute('class', 'funnel-edges');
 
@@ -230,7 +285,6 @@ export function renderFunnel(root: HTMLElement): void {
     path.style.transition = 'opacity 200ms ease, stroke-width 200ms ease';
     edgeGroup.appendChild(path);
 
-    // Percentage pill — uniform dark style for every transition (forward + shortcut)
     const labelText = t.labelOverride ?? `${t.pct}%`;
     const padX = 12;
     const estimatedWidth = labelText.length * 7.5 + padX * 2;
@@ -265,9 +319,14 @@ export function renderFunnel(root: HTMLElement): void {
   });
   svg.appendChild(edgeGroup);
 
-  // ---- Stage cards (uniform kinetic yellow) ----
+  // ---- Stage cards (dark fill, yellow icon + text, both LEFT-aligned + centered) ----
   const stageGroup = document.createElementNS(svgNS, 'g');
   stageGroup.setAttribute('class', 'funnel-stages');
+
+  const ICON_SIZE = 16;
+  const LABEL_FS = 14;
+  const ICON_LABEL_GAP = 6;
+  const CHAR_W = 7.0;
 
   STAGES.forEach((stage) => {
     const group = document.createElementNS(svgNS, 'g');
@@ -281,23 +340,45 @@ export function renderFunnel(root: HTMLElement): void {
     rect.setAttribute('rx', '10');
     rect.setAttribute('fill', STAGE_FILL);
     rect.setAttribute('stroke', STAGE_BORDER);
-    rect.setAttribute('stroke-width', '1.5');
-    rect.style.transition = 'filter 180ms ease';
+    rect.setAttribute('stroke-width', '1');
+    rect.style.transition = 'filter 180ms ease, stroke 180ms ease';
     group.appendChild(rect);
 
-    const text = document.createElementNS(svgNS, 'text');
-    text.setAttribute('x', String(STAGE_W / 2));
-    text.setAttribute('y', String(STAGE_H / 2 + 5));
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('fill', STAGE_TEXT);
-    text.setAttribute('font-size', '15');
-    text.setAttribute('font-weight', '500');
-    text.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
-    text.textContent = stage.label;
-    group.appendChild(text);
+    // Center the icon+label combo horizontally within the box
+    const labelWidth = stage.label.length * CHAR_W;
+    const totalWidth = ICON_SIZE + ICON_LABEL_GAP + labelWidth;
+    const startX = Math.max(10, (STAGE_W - totalWidth) / 2);
+    const baselineY = STAGE_H / 2 + 5; // vertically centered baseline
 
-    group.addEventListener('mouseenter', () => highlightStage(stage.id));
-    group.addEventListener('mouseleave', () => clearHighlight());
+    const iconText = document.createElementNS(svgNS, 'text');
+    iconText.setAttribute('x', String(startX));
+    iconText.setAttribute('y', String(baselineY));
+    iconText.setAttribute('text-anchor', 'start');
+    iconText.setAttribute('fill', STAGE_ACCENT);
+    iconText.setAttribute('font-size', String(ICON_SIZE));
+    iconText.setAttribute('class', 'funnel-icon');
+    iconText.textContent = stage.icon;
+    group.appendChild(iconText);
+
+    const labelText = document.createElementNS(svgNS, 'text');
+    labelText.setAttribute('x', String(startX + ICON_SIZE + ICON_LABEL_GAP));
+    labelText.setAttribute('y', String(baselineY));
+    labelText.setAttribute('text-anchor', 'start');
+    labelText.setAttribute('fill', STAGE_ACCENT);
+    labelText.setAttribute('font-size', String(LABEL_FS));
+    labelText.setAttribute('font-weight', '500');
+    labelText.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+    labelText.textContent = stage.label;
+    group.appendChild(labelText);
+
+    group.addEventListener('mouseenter', () => {
+      highlightStage(stage.id);
+      showInfo(stage);
+    });
+    group.addEventListener('mouseleave', () => {
+      clearHighlight();
+      resetInfo();
+    });
 
     stageGroup.appendChild(group);
   });
@@ -305,6 +386,18 @@ export function renderFunnel(root: HTMLElement): void {
 
   root.innerHTML = '';
   root.appendChild(svg);
+
+  function showInfo(stage: Stage) {
+    panel.classList.add('is-active');
+    infoIcon.textContent = stage.icon;
+    infoTitle.textContent = stage.label;
+    infoBody.textContent =
+      stage.tooltip ?? 'No detail captured for this stage yet. Add your hypothesis or analytics finding here.';
+  }
+
+  function resetInfo() {
+    panel.classList.remove('is-active');
+  }
 
   function highlightStage(stageId: string) {
     edgeGroup.querySelectorAll<SVGPathElement>('[data-transition-id]').forEach((p) => {
@@ -321,10 +414,10 @@ export function renderFunnel(root: HTMLElement): void {
       el.setAttribute('opacity', involved ? '1' : '0.18');
     });
     stageGroup.querySelectorAll<SVGGElement>('[data-stage-id]').forEach((g) => {
-      const dimmed = g.dataset.stageId !== stageId;
-      (g.firstChild as SVGRectElement).style.filter = dimmed
-        ? 'saturate(0.3) brightness(0.7)'
-        : 'none';
+      const isTarget = g.dataset.stageId === stageId;
+      const rectEl = g.firstChild as SVGRectElement;
+      rectEl.style.stroke = isTarget ? STAGE_ACCENT : STAGE_BORDER;
+      rectEl.style.filter = isTarget ? 'none' : 'brightness(0.7)';
     });
   }
 
@@ -335,10 +428,14 @@ export function renderFunnel(root: HTMLElement): void {
     });
     leakGroup.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
       const tag = el.tagName.toLowerCase();
-      el.setAttribute('opacity', tag === 'path' ? '0.85' : '1');
+      if (tag === 'path') el.setAttribute('opacity', '0.85');
+      else if (tag === 'rect') el.setAttribute('opacity', '1');
+      else el.setAttribute('opacity', '1');
     });
     stageGroup.querySelectorAll<SVGGElement>('[data-stage-id]').forEach((g) => {
-      (g.firstChild as SVGRectElement).style.filter = 'none';
+      const rectEl = g.firstChild as SVGRectElement;
+      rectEl.style.stroke = STAGE_BORDER;
+      rectEl.style.filter = 'none';
     });
   }
 }

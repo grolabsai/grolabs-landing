@@ -162,6 +162,90 @@ body {
   animation: leak-flow 2.8s linear infinite;
 }
 
+/* Material Symbols inside SVG <text> — match the in-page icon weight */
+.funnel-icon {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Hover info panel — sits in the slab above PDP/Cart/Checkout */
+.funnel-info {
+  height: 100%;
+  padding: 22px 26px;
+  border-radius: 14px;
+  background: linear-gradient(
+    135deg,
+    rgba(250, 225, 148, 0.05) 0%,
+    rgba(250, 225, 148, 0.01) 100%
+  );
+  border: 1px solid rgba(250, 225, 148, 0.12);
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #d4d4d4;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+.funnel-info.is-active {
+  border-color: rgba(250, 225, 148, 0.28);
+}
+
+.funnel-info-default {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #71717a;
+  font-size: 14px;
+  line-height: 1.5;
+  font-style: italic;
+}
+.funnel-info-default .material-symbols-outlined {
+  font-size: 28px;
+  color: rgba(250, 225, 148, 0.55);
+  flex-shrink: 0;
+}
+
+.funnel-info-content {
+  display: none;
+}
+.funnel-info.is-active .funnel-info-default {
+  display: none;
+}
+.funnel-info.is-active .funnel-info-content {
+  display: block;
+}
+
+.funnel-info-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(250, 225, 148, 0.6);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.funnel-info-eyebrow .material-symbols-outlined {
+  font-size: 16px;
+  color: #fae194;
+}
+
+.funnel-info-title {
+  color: #fae194;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+
+.funnel-info-body {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #b4b4b8;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .glass-card,
