@@ -94,7 +94,7 @@ const BAR_Y = 180;                 // red bar top edge (drops meet it)
 const BAR_H = 105;                 // red bar height (% + cause + title fit inside)
 const VIEWBOX = { x: 0, y: 0, w: 1400, h: BAR_Y + BAR_H };
 
-const STAGE_FILL = '#1b1b1e';
+const STAGE_FILL = '#000000';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
 const STAGE_BORDER_W = 1.5;
 const STAGE_ACCENT = '#fae194'; // text + icon
@@ -329,7 +329,7 @@ export function renderFunnel(root: HTMLElement): void {
     label.setAttribute('x', String(estimatedWidth / 2));
     label.setAttribute('y', '18');
     label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('fill', '#ffffff');
+    label.setAttribute('fill', FORWARD_STROKE);
     label.setAttribute('font-size', '12');
     label.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
     label.setAttribute('font-weight', '500');
@@ -392,14 +392,8 @@ export function renderFunnel(root: HTMLElement): void {
     labelText.textContent = stage.label;
     group.appendChild(labelText);
 
-    group.addEventListener('mouseenter', () => {
-      highlightStage(stage.id);
-      showInfo(stage);
-    });
-    group.addEventListener('mouseleave', () => {
-      clearHighlight();
-      resetInfo();
-    });
+    group.addEventListener('mouseenter', () => highlightStage(stage.id));
+    group.addEventListener('mouseleave', () => clearHighlight());
 
     stageGroup.appendChild(group);
   });
@@ -468,6 +462,14 @@ export function renderFunnel(root: HTMLElement): void {
   root.innerHTML = '';
   root.appendChild(svg);
 
+  // Bind hover on the table rows so they trigger the same highlight/info flow.
+  document.querySelectorAll<HTMLElement>('.stage-row').forEach((row) => {
+    const stageId = row.dataset.stageId;
+    if (!stageId) return;
+    row.addEventListener('mouseenter', () => highlightStage(stageId));
+    row.addEventListener('mouseleave', () => clearHighlight());
+  });
+
   function showInfo(stage: Stage) {
     if (!panel) return;
     panel.classList.add('is-active');
@@ -503,6 +505,11 @@ export function renderFunnel(root: HTMLElement): void {
       rectEl.style.stroke = isTarget ? STAGE_ACCENT : STAGE_BORDER;
       rectEl.style.filter = isTarget ? 'none' : 'brightness(0.7)';
     });
+    document.querySelectorAll<HTMLElement>('.stage-row').forEach((row) => {
+      row.classList.toggle('is-active', row.dataset.stageId === stageId);
+    });
+    const stage = STAGES.find((s) => s.id === stageId);
+    if (stage) showInfo(stage);
   }
 
   function clearHighlight() {
@@ -520,6 +527,10 @@ export function renderFunnel(root: HTMLElement): void {
       rectEl.style.stroke = STAGE_BORDER;
       rectEl.style.filter = 'none';
     });
+    document.querySelectorAll<HTMLElement>('.stage-row').forEach((row) => {
+      row.classList.remove('is-active');
+    });
+    resetInfo();
   }
 }
 
