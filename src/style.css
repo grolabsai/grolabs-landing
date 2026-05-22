@@ -154,7 +154,7 @@ body {
 
 /* Leak droplets — falling drops convey the funnel bleeding revenue */
 .funnel-droplet {
-  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.45));
+  filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4));
 }
 
 /* Material Symbols inside SVG <text> — medium-thin stroke at the smaller stage icon size */

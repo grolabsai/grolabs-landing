@@ -45,18 +45,18 @@ const STAGES: Stage[] = [
   { id: 'home',     label: 'Home',         icon: 'home',          x: 30,   y: 55,
     tooltip:
       "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for." },
-  // Search and Browsing sit in the gap between Home and PDP, at separate x so neither overlaps the other.
-  { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20,
+  // Search/Browsing sit in the (wider) Home–PDP gap with breathing room.
+  { id: 'search',   label: 'Search',       icon: 'search',        x: 240,  y: 20,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 420,  y: 90,
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 400,  y: 90,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  // Main-row continuation. PDP→Cart and Cart→Checkout gaps are equal (200 px each).
-  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 580,  y: 55,
+  // Main-row continuation. PDP→Cart and Cart→Checkout gaps are equal (175 px each).
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 630,  y: 55,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
-  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 910,  y: 55,
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 935,  y: 55,
     tooltip:
       "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
   // Checkout flush right (right edge at viewBox.w - 30 = 1370).
@@ -68,10 +68,9 @@ const STAGES: Stage[] = [
 const TRANSITIONS: Transition[] = [
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
-  // Search → PDP: out of the top of Search, into the top of PDP (arcs over).
-  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward', fromAttach: 'top',    toAttach: 'top' },
-  // Browsing → PDP: out of the bottom of Browsing, into the bottom of PDP (arcs under).
-  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward', fromAttach: 'bottom', toAttach: 'bottom' },
+  // Search → PDP and Browsing → PDP both run right→left, keeping the space above Search free.
+  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
+  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward' },
   { id: 't-pdp-cart',      from: 'pdp',      to: 'cart',     pct: 12, variant: 'forward' },
   { id: 't-cart-checkout', from: 'cart',     to: 'checkout', pct: 30, variant: 'forward' },
 ];
@@ -89,11 +88,11 @@ const LEAKS: Leak[] = [
 // Geometry — short horizontal boxes (icon-left, label-right)
 const STAGE_W = 130;
 const STAGE_H = 50;
-const LEAK_Y = 220;
-const LEAK_ARROW_START_DY = 8;     // arrow starts just below box
-const LABEL_PCT_DY = -22;          // % position relative to LEAK_Y (above arrowhead)
-const LABEL_CAUSE_DY = -6;         // cause label position relative to LEAK_Y (just above arrowhead)
-const VIEWBOX = { x: 0, y: -65, w: 1400, h: 300 };
+const LEAK_Y = 180;                // drops end at the top of the red bar
+const LEAK_ARROW_START_DY = 8;     // drop column starts just below stage box
+const BAR_Y = 180;                 // red bar top edge (drops meet it)
+const BAR_H = 105;                 // red bar height (% + cause + title fit inside)
+const VIEWBOX = { x: 0, y: 0, w: 1400, h: BAR_Y + BAR_H };
 
 const STAGE_FILL = '#1b1b1e';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
@@ -221,7 +220,7 @@ export function renderFunnel(root: HTMLElement): void {
   const infoTitle = panel?.querySelector<HTMLElement>('[data-info-title]') ?? null;
   const infoBody = panel?.querySelector<HTMLElement>('[data-info-body]') ?? null;
 
-  // ---- Leak droplets + bottom-of-line labels ----
+  // ---- Leak droplets ----
   const leakGroup = document.createElementNS(svgNS, 'g');
   leakGroup.setAttribute('class', 'funnel-leaks');
 
@@ -229,11 +228,9 @@ export function renderFunnel(root: HTMLElement): void {
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Constant fall speed + constant spatial spacing keeps drops visually consistent
-  // across leak lengths. Short bottom-row leaks get 1 drop; long Search leak gets 4.
+  // Constant fall speed + target spacing keeps drops visually consistent across leak lengths.
   const DROP_SPEED = 70;      // px / second
-  const DROP_SPACING = 70;    // target px between drops in the column
-  const DROP_END_DY = -36;    // drops stop this far above LEAK_Y, well clear of the labels
+  const DROP_SPACING = 40;    // target px between drops in the column
 
   function makeDroplet(cx: number, cy: number, leakId: string): SVGEllipseElement {
     const drop = document.createElementNS(svgNS, 'ellipse');
@@ -241,7 +238,7 @@ export function renderFunnel(root: HTMLElement): void {
     drop.setAttribute('cy', String(cy));
     drop.setAttribute('rx', '3');
     drop.setAttribute('ry', '4.5');
-    drop.setAttribute('fill', '#ef4444');
+    drop.setAttribute('fill', '#dc2626');
     drop.setAttribute('opacity', '0.92');
     drop.setAttribute('class', 'funnel-droplet');
     drop.dataset.leakId = leakId;
@@ -251,15 +248,13 @@ export function renderFunnel(root: HTMLElement): void {
   LEAKS.forEach((leak) => {
     const stage = stageById(leak.fromStageId);
     const cx = leakX(leak);
-    const pct = leakPctFor(leak);
     const yStart = stage.y + STAGE_H + LEAK_ARROW_START_DY;
-    const yEnd = LEAK_Y + DROP_END_DY;
-    const dropDist = yEnd - yStart;
+    const yEnd = LEAK_Y;                     // drops fall right to the top of the red bar
+    const dropDist = Math.max(0, yEnd - yStart);
 
-    // Count of drops per leak — keeps drops ~DROP_SPACING px apart spatially
     const dropCount = Math.max(1, Math.round(dropDist / DROP_SPACING));
-    const dropDuration = dropDist / DROP_SPEED;   // per-drop fall time (varies, speed constant)
-    const stagger = dropDuration / dropCount;     // drops evenly distributed through the cycle
+    const dropDuration = dropDist / DROP_SPEED;
+    const stagger = dropDuration / dropCount;
 
     if (reduceMotion || dropDist <= 0) {
       for (let i = 0; i < dropCount; i++) {
@@ -289,31 +284,6 @@ export function renderFunnel(root: HTMLElement): void {
         leakGroup.appendChild(drop);
       }
     }
-
-    // Dropout %
-    const pctLabel = document.createElementNS(svgNS, 'text');
-    pctLabel.setAttribute('x', String(cx));
-    pctLabel.setAttribute('y', String(LEAK_Y + LABEL_PCT_DY));
-    pctLabel.setAttribute('text-anchor', 'middle');
-    pctLabel.setAttribute('fill', '#ef4444');
-    pctLabel.setAttribute('font-size', '12');
-    pctLabel.setAttribute('font-weight', '600');
-    pctLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
-    pctLabel.dataset.leakId = leak.id;
-    pctLabel.textContent = `${pct}%`;
-    leakGroup.appendChild(pctLabel);
-
-    // Cause label
-    const causeLabel = document.createElementNS(svgNS, 'text');
-    causeLabel.setAttribute('x', String(cx));
-    causeLabel.setAttribute('y', String(LEAK_Y + LABEL_CAUSE_DY));
-    causeLabel.setAttribute('text-anchor', 'middle');
-    causeLabel.setAttribute('fill', '#ef4444');
-    causeLabel.setAttribute('font-size', '12');
-    causeLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
-    causeLabel.dataset.leakId = leak.id;
-    causeLabel.textContent = leak.label;
-    leakGroup.appendChild(causeLabel);
   });
   svg.appendChild(leakGroup);
 
@@ -435,6 +405,66 @@ export function renderFunnel(root: HTMLElement): void {
   });
   svg.appendChild(stageGroup);
 
+  // ---- Red leak bar (background + per-stage %/cause labels + title) ----
+  // Drops fall into the top of this bar; labels and the "Leaking funnel = Lost revenue" headline sit inside.
+  const barGroup = document.createElementNS(svgNS, 'g');
+  barGroup.setAttribute('class', 'funnel-bar');
+
+  const barRect = document.createElementNS(svgNS, 'rect');
+  barRect.setAttribute('x', '0');
+  barRect.setAttribute('y', String(BAR_Y));
+  barRect.setAttribute('width', String(VIEWBOX.w));
+  barRect.setAttribute('height', String(BAR_H));
+  barRect.setAttribute('rx', '12');
+  barRect.setAttribute('fill', '#3a0a0a');
+  barRect.setAttribute('stroke', 'rgba(127, 29, 29, 0.5)');
+  barRect.setAttribute('stroke-width', '1');
+  barGroup.appendChild(barRect);
+
+  // Per-stage labels (% in white, cause label below in soft white)
+  LEAKS.forEach((leak) => {
+    const cx = leakX(leak);
+    const pct = leakPctFor(leak);
+
+    const pctLabel = document.createElementNS(svgNS, 'text');
+    pctLabel.setAttribute('x', String(cx));
+    pctLabel.setAttribute('y', String(BAR_Y + 32));
+    pctLabel.setAttribute('text-anchor', 'middle');
+    pctLabel.setAttribute('fill', '#ffffff');
+    pctLabel.setAttribute('font-size', '24');
+    pctLabel.setAttribute('font-weight', '700');
+    pctLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+    pctLabel.dataset.leakId = leak.id;
+    pctLabel.textContent = `${pct}%`;
+    barGroup.appendChild(pctLabel);
+
+    const causeLabel = document.createElementNS(svgNS, 'text');
+    causeLabel.setAttribute('x', String(cx));
+    causeLabel.setAttribute('y', String(BAR_Y + 50));
+    causeLabel.setAttribute('text-anchor', 'middle');
+    causeLabel.setAttribute('fill', 'rgba(255, 255, 255, 0.65)');
+    causeLabel.setAttribute('font-size', '12');
+    causeLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+    causeLabel.dataset.leakId = leak.id;
+    causeLabel.textContent = leak.label;
+    barGroup.appendChild(causeLabel);
+  });
+
+  // Title at the bottom of the bar
+  const barTitle = document.createElementNS(svgNS, 'text');
+  barTitle.setAttribute('x', String(VIEWBOX.w / 2));
+  barTitle.setAttribute('y', String(BAR_Y + 90));
+  barTitle.setAttribute('text-anchor', 'middle');
+  barTitle.setAttribute('fill', '#ffffff');
+  barTitle.setAttribute('font-size', '22');
+  barTitle.setAttribute('font-weight', '700');
+  barTitle.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+  barTitle.setAttribute('letter-spacing', '-0.01em');
+  barTitle.textContent = 'Leaking funnel = Lost revenue';
+  barGroup.appendChild(barTitle);
+
+  svg.appendChild(barGroup);
+
   root.innerHTML = '';
   root.appendChild(svg);
 
@@ -461,7 +491,7 @@ export function renderFunnel(root: HTMLElement): void {
       p.setAttribute('opacity', involved ? '1' : '0.18');
       p.setAttribute('stroke-width', involved ? '3' : '2');
     });
-    leakGroup.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
+    svg.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
       const lid = el.dataset.leakId!;
       const l = LEAKS.find((x) => x.id === lid)!;
       const involved = l.fromStageId === stageId;
@@ -480,10 +510,9 @@ export function renderFunnel(root: HTMLElement): void {
       p.setAttribute('opacity', FORWARD_STROKE_OPACITY);
       p.setAttribute('stroke-width', '2');
     });
-    leakGroup.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
+    svg.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
       const tag = el.tagName.toLowerCase();
-      if (tag === 'path') el.setAttribute('opacity', '0.85');
-      else if (tag === 'rect') el.setAttribute('opacity', '1');
+      if (tag === 'ellipse') el.setAttribute('opacity', '0.92');
       else el.setAttribute('opacity', '1');
     });
     stageGroup.querySelectorAll<SVGGElement>('[data-stage-id]').forEach((g) => {
