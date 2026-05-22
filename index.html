@@ -340,107 +340,76 @@
         <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
           <div id="funnel-root" class="w-full overflow-x-auto"></div>
 
-          <!-- Leak row banner — deep red so the falling drops "bleed" into it -->
-          <div class="mt-md rounded-xl border border-red-900/50 bg-red-950 p-lg">
+          <!-- Leak row banner — deep red, title only -->
+          <div class="mt-md rounded-xl border border-red-900/50 bg-red-950 px-lg py-md">
             <div class="text-2xl font-bold text-white tracking-tight">
               Leaking funnel = Lost revenue
             </div>
-            <p class="mt-2 text-body-sm text-red-300/70">
-              Every drop is revenue bleeding out before checkout.
-            </p>
           </div>
 
-          <p class="mt-md text-body-sm text-zinc-500">
-            Percentages reflect typical e-commerce benchmarks. Real numbers come from each merchant's
-            GA4 + store analytics. Hover any stage to isolate its transitions and leaks.
-          </p>
+          <!-- Stage diagnostic table — flows from the banner inside the same card -->
+          <table class="mt-md w-full text-left text-body-sm">
+            <thead>
+              <tr class="border-b border-white/10">
+                <th class="py-md font-label-caps text-zinc-400 text-[11px]">STAGE</th>
+                <th class="py-md font-label-caps text-[#ef4444] text-[11px]">LOST REVENUE</th>
+                <th class="py-md font-label-caps text-success-emerald text-[11px]">RECOVERY POTENTIAL</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5 text-zinc-200">
+              <tr>
+                <td class="py-md">
+                  <div class="flex items-center gap-md">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">search</span>
+                    <span>Search</span>
+                  </div>
+                </td>
+                <td class="py-md text-[#ef4444] font-semibold">65%</td>
+                <td class="py-md text-success-emerald font-semibold">+25%</td>
+              </tr>
+              <tr>
+                <td class="py-md">
+                  <div class="flex items-center gap-md">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">grid_view</span>
+                    <span>Browsing</span>
+                  </div>
+                </td>
+                <td class="py-md text-[#ef4444] font-semibold">75%</td>
+                <td class="py-md text-success-emerald font-semibold">+30%</td>
+              </tr>
+              <tr>
+                <td class="py-md">
+                  <div class="flex items-center gap-md">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">description</span>
+                    <span>Product page</span>
+                  </div>
+                </td>
+                <td class="py-md text-[#ef4444] font-semibold">88%</td>
+                <td class="py-md text-success-emerald font-semibold">+25%</td>
+              </tr>
+              <tr>
+                <td class="py-md">
+                  <div class="flex items-center gap-md">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">shopping_cart</span>
+                    <span>Cart</span>
+                  </div>
+                </td>
+                <td class="py-md text-[#ef4444] font-semibold">70%</td>
+                <td class="py-md text-success-emerald font-semibold">+20%</td>
+              </tr>
+              <tr>
+                <td class="py-md">
+                  <div class="flex items-center gap-md">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">payments</span>
+                    <span>Checkout</span>
+                  </div>
+                </td>
+                <td class="py-md text-[#ef4444] font-semibold">17%</td>
+                <td class="py-md text-success-emerald font-semibold">+7%</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <!-- Diagnostic Table -->
-        <div class="glass-card overflow-hidden rounded-xl border border-zinc-800">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead class="bg-zinc-900/50">
-                <tr>
-                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">EDGE</th>
-                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">OLD %</th>
-                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">NEW %</th>
-                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">GRO IMPROVEMENT</th>
-                  <th class="px-lg py-md font-label-caps text-zinc-400 text-[11px] border-b border-zinc-800">WHY</th>
-                </tr>
-              </thead>
-              <tbody class="text-body-sm text-zinc-300 divide-y divide-zinc-800/50">
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Traffic → bounce</td>
-                  <td class="px-lg py-md text-zinc-600">40%</td>
-                  <td class="px-lg py-md text-primary font-bold">~25%</td>
-                  <td class="px-lg py-md text-success-emerald">-15%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Industry average bounce for ecommerce sits around 20-45%.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Traffic → Home</td>
-                  <td class="px-lg py-md text-zinc-600">45%</td>
-                  <td class="px-lg py-md text-primary font-bold">62%</td>
-                  <td class="px-lg py-md text-success-emerald">+17%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Majority of non-bounced traffic lands on home/category.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Traffic → PDP (bypass)</td>
-                  <td class="px-lg py-md text-zinc-600">15%</td>
-                  <td class="px-lg py-md text-primary font-bold">12%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">-3%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Paid product ads and deep-linked SEO.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Home → Search</td>
-                  <td class="px-lg py-md text-zinc-600">50%</td>
-                  <td class="px-lg py-md text-primary font-bold">40%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">-10%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Site search adoption is typically 30-45% of homepage visitors.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Home → Browsing</td>
-                  <td class="px-lg py-md text-zinc-600">50%</td>
-                  <td class="px-lg py-md text-primary font-bold">45%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">-5%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">The rest navigate via categories, promos, menus.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Search → PDP</td>
-                  <td class="px-lg py-md text-zinc-600">30%</td>
-                  <td class="px-lg py-md text-primary font-bold">35%</td>
-                  <td class="px-lg py-md text-success-emerald">+5%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Search users are higher-intent — they click through to PDPs more often.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Browsing → PDP</td>
-                  <td class="px-lg py-md text-zinc-600">30%</td>
-                  <td class="px-lg py-md text-primary font-bold">25%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">-5%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Lower intent than searchers.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">PDP → Cart</td>
-                  <td class="px-lg py-md text-zinc-600">10%</td>
-                  <td class="px-lg py-md text-primary font-bold">12%</td>
-                  <td class="px-lg py-md text-success-emerald">+2%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Typical add-to-cart rate sits 8-15% for most categories.</td>
-                </tr>
-                <tr class="hover:bg-white/[0.02] transition-colors">
-                  <td class="px-lg py-md font-medium">Cart → Checkout</td>
-                  <td class="px-lg py-md text-zinc-600">30%</td>
-                  <td class="px-lg py-md text-primary font-bold">30%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">0%</td>
-                  <td class="px-lg py-md text-zinc-500 italic">Inverse of the Baymard 70% cart abandonment baseline — unchanged.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <p class="mt-xl text-body-md text-zinc-500 max-w-4xl">
-          The implicit dropouts now add up correctly: from Home, 40% search + 45% browse = 85% progress,
-          15% exit. From Search, 35% reach PDP, 65% leak. From Browsing, 25% reach PDP, 75% leak. These
-          match the spread of realistic numbers without inflating any single stage.
-        </p>
         <!-- Section Glow -->
         <div
           class="absolute -left-1/4 bottom-0 w-[600px] h-[600px] ambient-glow-yellow blur-[150px] opacity-20 pointer-events-none"

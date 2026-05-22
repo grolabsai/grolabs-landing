@@ -19,7 +19,10 @@ type Transition = {
   to: string;
   pct: number;
   labelOverride?: string;
+  /** Quadratic Bézier control point */
   curve?: { cx: number; cy: number };
+  /** Cubic Bézier control points (overrides `curve` if both set) */
+  cubicCurve?: { c1x: number; c1y: number; c2x: number; c2y: number };
   /** 'forward' = straight midline; 'shortcut' = top→top arc-over. Visual styling identical. */
   variant: 'forward' | 'shortcut';
   /** Target attachment override for forward variant ('top' = land on top edge instead of left edge). */
@@ -35,25 +38,25 @@ type Leak = {
 };
 
 const STAGES: Stage[] = [
-  { id: 'traffic',  label: 'Traffic',      icon: 'public',        x: 60,   y: 200,
+  { id: 'traffic',  label: 'Traffic',      icon: 'public',        x: 60,   y: 180,
     tooltip:
       "Drop-offs at the entry point are driven by ad/landing-page mismatch, slow first-paint, and search-intent misreads. Most bouncers leave in under 10 seconds." },
-  { id: 'home',     label: 'Home',         icon: 'home',          x: 320,  y: 200,
+  { id: 'home',     label: 'Home',         icon: 'home',          x: 320,  y: 180,
     tooltip:
       "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for." },
   { id: 'search',   label: 'Search',       icon: 'search',        x: 540,  y: 60,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 610,  y: 380,
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 610,  y: 270,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 800,  y: 380,
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 800,  y: 270,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
-  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 1030, y: 380,
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 1030, y: 270,
     tooltip:
       "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
-  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1250, y: 380,
+  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1250, y: 270,
     tooltip:
       "Returns are driven by image vs. product mismatch, sizing/fit ambiguity, and missing detail photographs (texture, scale, packaging). Better PDPs reduce returns 30-50%." },
 ];
@@ -62,7 +65,7 @@ const TRANSITIONS: Transition[] = [
   { id: 't-traffic-home',  from: 'traffic',  to: 'home',     pct: 62, variant: 'forward' },
   { id: 't-traffic-pdp',   from: 'traffic',  to: 'pdp',      pct: 12, variant: 'shortcut',
     labelOverride: '12% direct to PDP',
-    curve: { cx: 495, cy: -450 } },
+    cubicCurve: { c1x: 300, c1y: -50, c2x: 700, c2y: -50 } },
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward', toAttach: 'top' },
@@ -85,11 +88,11 @@ const LEAKS: Leak[] = [
 // Geometry
 const STAGE_W = 130;
 const STAGE_H = 74;                // grew to fit stacked icon + label
-const LEAK_Y = 540;
+const LEAK_Y = 420;
 const LEAK_ARROW_START_DY = 8;     // arrow starts just below box
 const LABEL_PCT_DY = -22;          // % position relative to LEAK_Y (above arrowhead)
 const LABEL_CAUSE_DY = -6;         // cause label position relative to LEAK_Y (just above arrowhead)
-const VIEWBOX = { x: 0, y: -100, w: 1400, h: 680 };
+const VIEWBOX = { x: 0, y: -30, w: 1400, h: 470 };
 
 const STAGE_FILL = '#1b1b1e';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
@@ -145,6 +148,15 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
     mode = 'horizontal';
   }
 
+  if (t.cubicCurve) {
+    const c = t.cubicCurve;
+    const d = `M ${x1} ${y1} C ${c.c1x} ${c.c1y}, ${c.c2x} ${c.c2y}, ${x2} ${y2}`;
+    // Cubic Bézier point at t=0.5: B(0.5) = 0.125 P0 + 0.375 P1 + 0.375 P2 + 0.125 P3
+    const midX = 0.125 * x1 + 0.375 * c.c1x + 0.375 * c.c2x + 0.125 * x2;
+    const midY = 0.125 * y1 + 0.375 * c.c1y + 0.375 * c.c2y + 0.125 * y2;
+    return { d, midX, midY };
+  }
+
   if (t.curve) {
     const d = `M ${x1} ${y1} Q ${t.curve.cx} ${t.curve.cy} ${x2} ${y2}`;
     const midX = 0.25 * x1 + 0.5 * t.curve.cx + 0.25 * x2;
@@ -195,10 +207,10 @@ export function renderFunnel(root: HTMLElement): void {
 
   // ---- Info panel (foreignObject in the freed upper-right slab) ----
   const fo = document.createElementNS(svgNS, 'foreignObject');
-  fo.setAttribute('x', '900');
+  fo.setAttribute('x', '940');
   fo.setAttribute('y', '0');
-  fo.setAttribute('width', '480');
-  fo.setAttribute('height', '360');
+  fo.setAttribute('width', '440');
+  fo.setAttribute('height', '250');
 
   const panel = document.createElementNS(xhtmlNS, 'div') as HTMLDivElement;
   panel.setAttribute('class', 'funnel-info');
@@ -231,7 +243,7 @@ export function renderFunnel(root: HTMLElement): void {
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const DROP_DURATION = 1.5;
+  const DROP_DURATION = 3.0;
   const DROP_COUNT = 3;
   const DROP_STAGGER = DROP_DURATION / DROP_COUNT;
   const DROP_END_DY = -36; // drops stop this far above LEAK_Y, well clear of the labels
