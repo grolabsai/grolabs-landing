@@ -30,6 +30,8 @@ type Transition = {
   fromAttach?: AttachSide;
   /** Which edge to arrive at the target on. Default: 'left' (left midline). */
   toAttach?: AttachSide;
+  /** Shift the percentage pill from its natural midpoint (e.g. to dodge a leak column). */
+  labelOffset?: { dx?: number; dy?: number };
 };
 
 type Leak = {
@@ -67,7 +69,9 @@ const STAGES: Stage[] = [
 
 const TRANSITIONS: Transition[] = [
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
-  { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
+  // labelOffset shifts the 45% pill RIGHT of the Search leak column (which falls at x≈315).
+  { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward',
+    labelOffset: { dx: 80 } },
   // Search → PDP and Browsing → PDP both run right→left, keeping the space above Search free.
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
   { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward' },
@@ -153,40 +157,47 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
   const start = attachPoint(from, fromAttach);
   const end   = attachPoint(to,   toAttach);
 
-  // Explicit cubic curve overrides auto-controls (kept for backward compat).
+  let d: string;
+  let midX: number;
+  let midY: number;
+
   if (t.cubicCurve) {
+    // Explicit cubic curve overrides auto-controls (kept for backward compat).
     const c = t.cubicCurve;
-    const d = `M ${start.x} ${start.y} C ${c.c1x} ${c.c1y}, ${c.c2x} ${c.c2y}, ${end.x} ${end.y}`;
-    const midX = 0.125 * start.x + 0.375 * c.c1x + 0.375 * c.c2x + 0.125 * end.x;
-    const midY = 0.125 * start.y + 0.375 * c.c1y + 0.375 * c.c2y + 0.125 * end.y;
-    return { d, midX, midY };
+    d = `M ${start.x} ${start.y} C ${c.c1x} ${c.c1y}, ${c.c2x} ${c.c2y}, ${end.x} ${end.y}`;
+    midX = 0.125 * start.x + 0.375 * c.c1x + 0.375 * c.c2x + 0.125 * end.x;
+    midY = 0.125 * start.y + 0.375 * c.c1y + 0.375 * c.c2y + 0.125 * end.y;
+  } else if (t.curve) {
+    // Legacy quadratic.
+    d = `M ${start.x} ${start.y} Q ${t.curve.cx} ${t.curve.cy} ${end.x} ${end.y}`;
+    midX = 0.25 * start.x + 0.5 * t.curve.cx + 0.25 * end.x;
+    midY = 0.25 * start.y + 0.5 * t.curve.cy + 0.25 * end.y;
+  } else {
+    // Auto cubic — control points push out perpendicular to each attachment edge.
+    // Shallower factor (0.3) for top/bottom attachments to keep arcs from over-extending.
+    const euclidean = Math.hypot(end.x - start.x, end.y - start.y);
+    const verticalAttach = (s: AttachSide) => s === 'top' || s === 'bottom';
+    const factor = (verticalAttach(fromAttach) || verticalAttach(toAttach)) ? 0.3 : 0.5;
+    const dist = euclidean * factor;
+
+    const c1Off = controlOffset(fromAttach, dist);
+    const c2Off = controlOffset(toAttach,   dist);
+    const c1x = start.x + c1Off.dx;
+    const c1y = start.y + c1Off.dy;
+    const c2x = end.x   + c2Off.dx;
+    const c2y = end.y   + c2Off.dy;
+
+    d = `M ${start.x} ${start.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${end.x} ${end.y}`;
+    midX = 0.125 * start.x + 0.375 * c1x + 0.375 * c2x + 0.125 * end.x;
+    midY = 0.125 * start.y + 0.375 * c1y + 0.375 * c2y + 0.125 * end.y;
   }
 
-  // Legacy quadratic.
-  if (t.curve) {
-    const d = `M ${start.x} ${start.y} Q ${t.curve.cx} ${t.curve.cy} ${end.x} ${end.y}`;
-    const midX = 0.25 * start.x + 0.5 * t.curve.cx + 0.25 * end.x;
-    const midY = 0.25 * start.y + 0.5 * t.curve.cy + 0.25 * end.y;
-    return { d, midX, midY };
+  // Apply per-transition label offset so pills can dodge leak columns etc.
+  if (t.labelOffset) {
+    midX += t.labelOffset.dx ?? 0;
+    midY += t.labelOffset.dy ?? 0;
   }
 
-  // Auto cubic — control points push out perpendicular to each attachment edge.
-  // Shallower factor (0.3) for top/bottom attachments to keep arcs from over-extending.
-  const euclidean = Math.hypot(end.x - start.x, end.y - start.y);
-  const verticalAttach = (s: AttachSide) => s === 'top' || s === 'bottom';
-  const factor = (verticalAttach(fromAttach) || verticalAttach(toAttach)) ? 0.3 : 0.5;
-  const dist = euclidean * factor;
-
-  const c1Off = controlOffset(fromAttach, dist);
-  const c2Off = controlOffset(toAttach,   dist);
-  const c1x = start.x + c1Off.dx;
-  const c1y = start.y + c1Off.dy;
-  const c2x = end.x   + c2Off.dx;
-  const c2y = end.y   + c2Off.dy;
-
-  const d = `M ${start.x} ${start.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${end.x} ${end.y}`;
-  const midX = 0.125 * start.x + 0.375 * c1x + 0.375 * c2x + 0.125 * end.x;
-  const midY = 0.125 * start.y + 0.375 * c1y + 0.375 * c2y + 0.125 * end.y;
   return { d, midX, midY };
 }
 
@@ -353,38 +364,42 @@ export function renderFunnel(root: HTMLElement): void {
   const searchPdpPill = transitionPath(TRANSITIONS.find((t) => t.id === 't-search-pdp')!);
   const browsingPdpPill = transitionPath(TRANSITIONS.find((t) => t.id === 't-browsing-pdp')!);
 
-  // 35% (above the main line) — arcs over PDP, lands on Cart's top centre.
-  const cartTopX = cartStage.x + STAGE_W / 2;
+  // Endpoints on Cart. Both shifted IN from Cart's left edge so the lines don't conflict
+  // with Cart's leak column (which falls from Cart's centre).
+  const connectorEndX = cartStage.x + 30;     // 30 px inside Cart's left edge
   const cartTopY = cartStage.y;
   const cartBottomY = cartStage.y + STAGE_H;
 
+  // 35% (above the main line) — arcs over PDP, lands on Cart's top edge just inside the left side.
   const connector35 = document.createElementNS(svgNS, 'path');
   connector35.setAttribute(
     'd',
     `M ${searchPdpPill.midX} ${searchPdpPill.midY} ` +
-      `C ${searchPdpPill.midX} 15, ${cartTopX} 15, ${cartTopX} ${cartTopY}`,
+      `C ${searchPdpPill.midX} 15, ${connectorEndX} 15, ${connectorEndX} ${cartTopY}`,
   );
   connector35.setAttribute('stroke', FORWARD_STROKE);
   connector35.setAttribute('stroke-width', '1.5');
   connector35.setAttribute('stroke-dasharray', '2 5');
   connector35.setAttribute('stroke-linecap', 'round');
   connector35.setAttribute('fill', 'none');
-  connector35.setAttribute('opacity', '0.45');
+  connector35.setAttribute('opacity', '0.6');
+  connector35.setAttribute('marker-end', 'url(#arrow-forward)');
   connectorGroup.appendChild(connector35);
 
-  // 25% (below the main line) — dips under PDP, lands on Cart's bottom centre.
+  // 25% (below the main line) — dips under PDP, lands on Cart's bottom edge just inside the left side.
   const connector25 = document.createElementNS(svgNS, 'path');
   connector25.setAttribute(
     'd',
     `M ${browsingPdpPill.midX} ${browsingPdpPill.midY} ` +
-      `C ${browsingPdpPill.midX} 150, ${cartTopX} 150, ${cartTopX} ${cartBottomY}`,
+      `C ${browsingPdpPill.midX} 150, ${connectorEndX} 150, ${connectorEndX} ${cartBottomY}`,
   );
   connector25.setAttribute('stroke', FORWARD_STROKE);
   connector25.setAttribute('stroke-width', '1.5');
   connector25.setAttribute('stroke-dasharray', '2 5');
   connector25.setAttribute('stroke-linecap', 'round');
   connector25.setAttribute('fill', 'none');
-  connector25.setAttribute('opacity', '0.45');
+  connector25.setAttribute('opacity', '0.6');
+  connector25.setAttribute('marker-end', 'url(#arrow-forward)');
   connectorGroup.appendChild(connector25);
 
   svg.appendChild(connectorGroup);
