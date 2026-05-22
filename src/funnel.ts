@@ -205,12 +205,17 @@ export function renderFunnel(root: HTMLElement): void {
   );
   svg.classList.add('select-none');
 
-  // ---- Defs (only forward arrow marker; leaks render as falling droplets) ----
+  // ---- Defs (forward arrow marker + leak-bar horizontal gradient) ----
   const defs = document.createElementNS(svgNS, 'defs');
   defs.innerHTML = `
     <marker id="arrow-forward" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="${FORWARD_STROKE}" />
     </marker>
+    <linearGradient id="leak-bar-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7F1D1D" />
+      <stop offset="50%" stop-color="#991B1B" />
+      <stop offset="100%" stop-color="#7F1D1D" />
+    </linearGradient>
   `;
   svg.appendChild(defs);
 
@@ -410,10 +415,19 @@ export function renderFunnel(root: HTMLElement): void {
   barRect.setAttribute('width', String(VIEWBOX.w));
   barRect.setAttribute('height', String(BAR_H));
   barRect.setAttribute('rx', '12');
-  barRect.setAttribute('fill', '#3a0a0a');
-  barRect.setAttribute('stroke', 'rgba(127, 29, 29, 0.5)');
-  barRect.setAttribute('stroke-width', '1');
+  barRect.setAttribute('fill', 'url(#leak-bar-gradient)');
+  barRect.setAttribute('stroke', 'none');
   barGroup.appendChild(barRect);
+
+  // Top border only — subtle red glow at the top edge, no bottom or side borders.
+  const barTopBorder = document.createElementNS(svgNS, 'line');
+  barTopBorder.setAttribute('x1', '12');
+  barTopBorder.setAttribute('y1', String(BAR_Y + 0.5));
+  barTopBorder.setAttribute('x2', String(VIEWBOX.w - 12));
+  barTopBorder.setAttribute('y2', String(BAR_Y + 0.5));
+  barTopBorder.setAttribute('stroke', 'rgba(239, 68, 68, 0.3)');
+  barTopBorder.setAttribute('stroke-width', '1');
+  barGroup.appendChild(barTopBorder);
 
   // Per-stage labels (% in white, cause label below in soft white)
   LEAKS.forEach((leak) => {
@@ -436,7 +450,7 @@ export function renderFunnel(root: HTMLElement): void {
     causeLabel.setAttribute('x', String(cx));
     causeLabel.setAttribute('y', String(BAR_Y + 50));
     causeLabel.setAttribute('text-anchor', 'middle');
-    causeLabel.setAttribute('fill', 'rgba(255, 255, 255, 0.65)');
+    causeLabel.setAttribute('fill', 'rgba(254, 226, 226, 0.8)');
     causeLabel.setAttribute('font-size', '12');
     causeLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
     causeLabel.dataset.leakId = leak.id;

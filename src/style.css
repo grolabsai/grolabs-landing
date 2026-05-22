@@ -170,11 +170,7 @@ body {
 }
 .stage-row:hover,
 .stage-row.is-active {
-  background: linear-gradient(
-    135deg,
-    rgba(250, 225, 148, 0.05) 0%,
-    rgba(250, 225, 148, 0.01) 100%
-  );
+  background: #1b1b1e;
 }
 .stage-row.is-active > td:first-child {
   border-top-left-radius: 10px;
