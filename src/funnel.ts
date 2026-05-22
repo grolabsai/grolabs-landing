@@ -71,18 +71,17 @@ const TRANSITIONS: Transition[] = [
   // Search → PDP and Browsing → PDP both run right→left, keeping the space above Search free.
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
   { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward' },
-  { id: 't-pdp-cart',      from: 'pdp',      to: 'cart',     pct: 12, variant: 'forward' },
+  { id: 't-pdp-cart',      from: 'pdp',      to: 'cart',     pct: 20, variant: 'forward' },
   { id: 't-cart-checkout', from: 'cart',     to: 'checkout', pct: 30, variant: 'forward' },
 ];
 
 const LEAKS: Leak[] = [
-  { id: 'leak-home',     fromStageId: 'home',     label: 'home exit' },
-  // Search and Browsing now sit at different x, so Search's leak can drop from its centre — no xOffset needed.
-  { id: 'leak-search',   fromStageId: 'search',   label: 'no results' },
-  { id: 'leak-browsing', fromStageId: 'browsing', label: 'no results' },
-  { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'exit' },
-  { id: 'leak-cart',     fromStageId: 'cart',     label: 'abandoned cart' },
-  { id: 'leak-checkout', fromStageId: 'checkout', label: 'returns', pctOverride: 17 },
+  // Home no longer surfaces a leak — the entry stage just feeds Search / Browsing.
+  { id: 'leak-search',   fromStageId: 'search',   label: 'UNABLE TO FIND PRODUCT' },
+  { id: 'leak-browsing', fromStageId: 'browsing', label: 'UNABLE TO FIND PRODUCT' },
+  { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'LACK OF CONVINCING INFO' },
+  { id: 'leak-cart',     fromStageId: 'cart',     label: 'ABANDONED CART' },
+  { id: 'leak-checkout', fromStageId: 'checkout', label: 'RETURNS', pctOverride: 17 },
 ];
 
 // Geometry — short horizontal boxes (icon-left, label-right)
@@ -394,11 +393,11 @@ export function renderFunnel(root: HTMLElement): void {
   const stageGroup = document.createElementNS(svgNS, 'g');
   stageGroup.setAttribute('class', 'funnel-stages');
 
-  const ICON_FS = 18;
-  const LABEL_FS = 14;
-  const ICON_LABEL_GAP = 6;
-  const CHAR_W = 7;
-  const BASELINE_Y = STAGE_H / 2 + 5;
+  const ICON_FS = 22;
+  const LABEL_FS = 17;
+  const ICON_LABEL_GAP = 8;
+  const CHAR_W = 7.6;
+  const CENTER_Y = STAGE_H / 2;   // both icon and label use dominant-baseline=central
 
   STAGES.forEach((stage) => {
     const group = document.createElementNS(svgNS, 'g');
@@ -423,8 +422,9 @@ export function renderFunnel(root: HTMLElement): void {
 
     const iconText = document.createElementNS(svgNS, 'text');
     iconText.setAttribute('x', String(startX));
-    iconText.setAttribute('y', String(BASELINE_Y));
+    iconText.setAttribute('y', String(CENTER_Y));
     iconText.setAttribute('text-anchor', 'start');
+    iconText.setAttribute('dominant-baseline', 'central');
     iconText.setAttribute('fill', STAGE_ACCENT);
     iconText.setAttribute('font-size', String(ICON_FS));
     iconText.setAttribute('class', 'funnel-icon');
@@ -433,9 +433,10 @@ export function renderFunnel(root: HTMLElement): void {
 
     const labelText = document.createElementNS(svgNS, 'text');
     labelText.setAttribute('x', String(startX + ICON_FS + ICON_LABEL_GAP));
-    labelText.setAttribute('y', String(BASELINE_Y));
+    labelText.setAttribute('y', String(CENTER_Y));
     labelText.setAttribute('text-anchor', 'start');
-    labelText.setAttribute('fill', STAGE_ACCENT);
+    labelText.setAttribute('dominant-baseline', 'central');
+    labelText.setAttribute('fill', '#ffffff');
     labelText.setAttribute('font-size', String(LABEL_FS));
     labelText.setAttribute('font-weight', '500');
     labelText.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
