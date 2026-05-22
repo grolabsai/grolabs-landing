@@ -52,18 +52,69 @@ src/
 
 No code changes needed per post.
 
-## Custom Tailwind tokens
+## Design system — use tokens, not inline values
 
-Token highlights (full list in [tailwind.config.js](./tailwind.config.js)):
+**Rule:** never write `text-[20px]`, `bg-[#131316]`, or `style="font-size: 16px"`. If the value isn't already a token, add it to [tailwind.config.js](./tailwind.config.js) or to a custom class in [src/styles/global.css](./src/styles/global.css), then reference the name. Inline arbitrary values fork the design system; named tokens centralise it.
 
-| Token | Value |
+The only legitimate exception is **em-relative scaling** (`text-[0.92em]`, `text-[0.75em]`) — those depend on the parent context, not the global scale.
+
+### Colours
+
+| Token | Value | When to use |
+|---|---|---|
+| `bg-canvas` | `#131316` | Page background, header glass tint |
+| `bg-canvas-deeper` | `#131313` | Sectional dark stripe (Luminous Equation) |
+| `text-primary` / `bg-primary` | `#fae194` | Kinetic-yellow accent — headlines, icons, badges |
+| `text-error-red` / `bg-error-red` / `border-error-red` | `#ef4444` | Leak / loss / Returns red |
+| `text-success-emerald` | `#10b981` | Recovery / positive deltas |
+
+### Typography
+
+| Token | Size / line / tracking | When to use |
+|---|---|---|
+| `text-hero` | 64 / 72 / -0.02em | Hero headline (desktop) |
+| `text-page-title` | 48 / 56 / -0.02em | Section H2 (desktop) |
+| `text-page-title-mobile` | 32 / 40 / -0.01em | Section H2 (mobile) |
+| `text-card-title-lg` | 32 / 40 | Featured card title |
+| `text-card-title` | 24 / 32 | Secondary card titles |
+| `text-body-lg` | 18 / 28 | Lede paragraphs under section headings |
+| `text-body-md` | 16 / 24 | Body copy default |
+| `text-body-sm` | 14 / 20 | Compact body, table cells |
+| `text-button-text` | 14 / 20, weight 600 | All button labels |
+| `text-section-header` | 12 / 16, +0.15em tracking | Eyebrow above section H2 |
+| `text-meta-md` | 12 / 16 | Inline meta labels |
+| `text-meta-sm` | 11 / 14, +0.05em | Diagnostic table column headers |
+| `text-meta-xs` | 10 / 14, +0.05em | Corner badges (CONFIDENCE: HIGH) |
+| `text-label-caps` | 11 / 12, +0.05em, weight 600 | All-caps section/footer labels |
+
+### Layout
+
+| Token | Value | When to use |
+|---|---|---|
+| `max-w-page` | 1440 px | Page-wide containers |
+| `min-h-hero` | 85vh | Hero section |
+| `min-h-section` | 800 px | Tall feature sections (Luminous Equation) |
+| `min-h-card-featured` | 320 px | Featured leak card so it dominates the row |
+| spacing scale `xs` `sm` `md` `lg` `xl` | 4 / 8 / 16 / 24 / 40 px | Use over arbitrary `p-3`, `gap-5` etc. |
+| `p-margin-mobile` / `p-margin-desktop` | 16 / 48 px | Page gutter |
+
+### Custom CSS classes (in `global.css`)
+
+| Class | What it does |
 |---|---|
-| `text-primary` / `bg-primary` | `#fae194` (kinetic yellow accent) |
-| `text-success-emerald` | `#10b981` |
-| `font-page-title` | Hanken Grotesk 48/56 |
-| `font-section-header` | Hanken Grotesk 12/16, +0.15em tracking |
-| `p-margin-mobile` / `p-margin-desktop` | 16 px / 48 px page gutters |
-| spacing scale: `xs` `sm` `md` `lg` `xl` | 4 / 8 / 16 / 24 / 40 px |
+| `.glass-card` | Glass surface with hover lift + radial mouse glow |
+| `.ambient-grid` | Fixed background grid masked to the cursor |
+| `.shimmer-btn` | Buttons with the left-to-right shimmer hover |
+| `.equation-card` / `.equation-card--returns` | Luminous Equation cards (base + red variant) |
+| `.equation-operator` | The ×, −, = between equation cards |
+| `.funnel-icon` | Material Symbols inside the funnel SVG (opsz 20) |
+| `.funnel-icon-table` | Material Symbols in the funnel diagnostic table (22 px, opsz 24) |
+| `.icon-inline-sm` / `.icon-inline-xs` | Inline Material Symbols at 16 px / 14 px |
+| `.stage-row` / `.funnel-info` | Funnel hover-state row + info panel binding |
+| `.hidden-element` / `.revealed` | Luminous Equation Returns reveal animation |
+| `.reveal` | IntersectionObserver staggered fade/lift on scroll |
+| `.code-block` | Yellow-bordered dark code panel |
+| `.particle` / `#particles-container` | Hero particle layer |
 
 ## Interactive funnel
 

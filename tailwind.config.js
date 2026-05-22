@@ -8,6 +8,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        // ── Engineered Luxury canvas palette ─────────────────────────────
+        // Use these for backgrounds, never raw hex.
+        canvas: '#131316',          // page background, header glass tint
+        'canvas-deeper': '#131313', // sectional dark stripe (Luminous Equation)
+        // ─────────────────────────────────────────────────────────────────
         'secondary-fixed-dim': '#c8c5ca',
         'on-background': '#1a1c1c',
         'surface-bright': '#f9f9f9',
@@ -97,6 +102,21 @@ export default {
         'body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
         'page-title-mobile': ['32px', { lineHeight: '40px', letterSpacing: '-0.01em', fontWeight: '400' }],
         'button-text': ['14px', { lineHeight: '20px', fontWeight: '600' }],
+        // ── Marketing-page extensions on top of the design system ────────
+        hero: ['64px', { lineHeight: '72px', letterSpacing: '-0.02em', fontWeight: '400' }],
+        'card-title-lg': ['32px', { lineHeight: '40px', fontWeight: '400' }],
+        'card-title': ['24px', { lineHeight: '32px', fontWeight: '400' }],
+        'meta-xs': ['10px', { lineHeight: '14px', letterSpacing: '0.05em', fontWeight: '400' }],
+        'meta-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.05em', fontWeight: '400' }],
+        'meta-md': ['12px', { lineHeight: '16px', fontWeight: '400' }],
+      },
+      maxWidth: {
+        page: '1440px',
+      },
+      minHeight: {
+        hero: '85vh',
+        section: '800px',
+        'card-featured': '320px',
       },
     },
   },

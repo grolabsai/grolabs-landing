@@ -173,19 +173,49 @@ body {
   transform: translateX(0);
   margin-right: 2rem;
 }
+/* Luminous Equation cards — base composition (used 4× on the landing).
+   The Returns variant overrides the dark surface with a red tint via
+   .equation-card--returns. Keep card sizing here so templates only
+   reference the class name. */
 .equation-card {
+  @apply flex flex-col items-center gap-6 p-10 rounded-sm border border-white/5 bg-zinc-900/50;
+  min-width: 250px;
   transition: transform 0.3s ease, background 0.3s ease;
 }
 .equation-card:hover {
   transform: translateY(-4px);
   background: rgba(255, 255, 255, 0.08);
 }
+.equation-card--returns {
+  @apply border-error-red/20 bg-error-red/5;
+}
+
+/* The ×, −, = operators between equation cards — single source of truth
+   so future weight/colour tweaks land in one place. */
+.equation-operator {
+  @apply text-zinc-300 text-4xl font-light;
+}
 
 
-/* Material Symbols inside SVG <text> — medium-thin stroke at the smaller stage icon size */
+/* Material Symbols variants used by the funnel.
+   .funnel-icon: inside the SVG (smaller, opsz 20). Used by funnel.ts.
+   .funnel-icon-table: the diagnostic table rows below the SVG (22 px, opsz 24). */
 .funnel-icon {
   font-family: 'Material Symbols Outlined';
   font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+}
+.funnel-icon-table {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  font-size: 22px;
+}
+
+/* Inline icons embedded in body copy — material symbols inherit font-size,
+   so these set both the size and the optical-size axis. */
+.icon-inline-sm {
+  font-size: 16px;
+}
+.icon-inline-xs {
+  font-size: 14px;
 }
 
 /* Interactive stage rows — share the info panel's tint when active so the row and the panel read as one block */
