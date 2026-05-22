@@ -1,3 +1,7 @@
+---
+import '../styles/global.css';
+---
+
 <!DOCTYPE html>
 <html class="scroll-smooth" lang="en">
   <head>
@@ -581,9 +585,9 @@
 <pre><code class="text-zinc-400"><span class="text-primary">const</span> client = <span class="text-primary">new</span> MeiliSearch(<span class="text-success-emerald">'http://localhost:7700'</span>, <span class="text-success-emerald">'masterKey'</span>)
 
 <span class="text-primary">await</span> client.index(<span class="text-success-emerald">'movies'</span>).addDocuments([
-  { <span class="text-primary-fixed-dim">'id'</span>: 1, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Carol'</span> },
-  { <span class="text-primary-fixed-dim">'id'</span>: 2, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Wonder Woman'</span> },
-  { <span class="text-primary-fixed-dim">'id'</span>: 3, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Life of Pi'</span> }
+  &lbrace; <span class="text-primary-fixed-dim">'id'</span>: 1, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Carol'</span> &rbrace;,
+  &lbrace; <span class="text-primary-fixed-dim">'id'</span>: 2, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Wonder Woman'</span> &rbrace;,
+  &lbrace; <span class="text-primary-fixed-dim">'id'</span>: 3, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Life of Pi'</span> &rbrace;
 ])
 
 <span class="text-zinc-600">// Highly performant AI-retrieval call</span>
@@ -686,6 +690,8 @@ console.log(search)</code></pre>
       </footer>
     </main>
 
-    <script type="module" src="/src/main.ts"></script>
+    <script>
+      import '../scripts/main.ts';
+    </script>
   </body>
 </html>

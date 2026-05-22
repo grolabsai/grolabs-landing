@@ -628,12 +628,3 @@ export function renderFunnel(root: HTMLElement): void {
     resetInfo();
   }
 }
-
-// Vite HMR — hot-swap the funnel in place without reloading the whole page
-if (import.meta.hot) {
-  import.meta.hot.accept((newModule) => {
-    if (!newModule) return;
-    const root = document.getElementById('funnel-root');
-    if (root) (newModule as unknown as { renderFunnel: typeof renderFunnel }).renderFunnel(root);
-  });
-}
