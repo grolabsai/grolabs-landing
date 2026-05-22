@@ -18,13 +18,15 @@ const dateFmt = new Intl.DateTimeFormat('en-US', {
   month: 'long',
   day: 'numeric',
 });
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <BaseLayout title={`${post.data.title} | GroLabs`} description={post.data.description}>
   <article class="max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop pt-xl pb-xl">
     <header class="mb-xl reveal active">
       <a
-        href="/blog"
+        href={`${base}/blog`}
         class="inline-flex items-center gap-1 font-mono text-primary text-xs tracking-tighter hover:gap-2 transition-all mb-lg"
       >
         <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back</span>

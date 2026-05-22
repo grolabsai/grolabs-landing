@@ -10,6 +10,9 @@ const {
   title = 'GroLabs | Engineered Luxury AI Search',
   description = 'Recover lost revenue and grow your business without paying for more traffic. AI-assisted search, catalog, and conversion tooling for small e-commerce stores.',
 } = Astro.props;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = base || '/';
 ---
 
 <!DOCTYPE html>
@@ -19,7 +22,7 @@ const {
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -45,18 +48,18 @@ const {
     >
       <div class="max-w-[1440px] mx-auto w-full flex justify-between items-center">
         <div class="flex items-center gap-xl">
-          <a href="/" class="flex flex-col group">
+          <a href={home} class="flex flex-col group">
             <h1 class="font-page-title-mobile text-2xl font-bold text-primary leading-none group-hover:brightness-110 transition-all">GroLabs</h1>
             <p class="font-section-header text-[10px] text-secondary-fixed-dim tracking-[0.2em] mt-1">
               ENGINEERED LUXURY
             </p>
           </a>
           <nav class="hidden lg:flex items-center gap-lg ml-xl">
-            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="/">Solutions</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href={home}>Solutions</a>
             <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Documentation</a>
             <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Cloud</a>
             <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Pricing</a>
-            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="/blog">Blog</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href={`${base}/blog`}>Blog</a>
           </nav>
         </div>
         <div class="flex items-center gap-md">
@@ -123,7 +126,7 @@ const {
             <div class="space-y-md">
               <h5 class="font-label-caps text-label-caps text-white">RESOURCES</h5>
               <ul class="space-y-sm text-body-sm text-zinc-500">
-                <li><a class="hover:text-primary transition-colors" href="/blog">Blog</a></li>
+                <li><a class="hover:text-primary transition-colors" href={`${base}/blog`}>Blog</a></li>
                 <li><a class="hover:text-primary transition-colors" href="#">Customers</a></li>
                 <li><a class="hover:text-primary transition-colors" href="#">Newsletter</a></li>
               </ul>
