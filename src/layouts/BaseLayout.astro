@@ -1,0 +1,154 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'GroLabs | Engineered Luxury AI Search',
+  description = 'Recover lost revenue and grow your business without paying for more traffic. AI-assisted search, catalog, and conversion tooling for small e-commerce stores.',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="font-body-md text-body-md selection:bg-primary selection:text-zinc-950 overflow-x-hidden">
+    <div class="ambient-grid"></div>
+
+    <!-- Scroll Progress -->
+    <div class="hidden md:block" id="scroll-progress">
+      <div id="scroll-indicator"></div>
+    </div>
+
+    <!-- TopNavBar -->
+    <header
+      class="fixed top-0 left-0 w-full backdrop-blur-md h-20 flex items-center px-margin-mobile md:px-margin-desktop border-b border-zinc-800 z-50 bg-[#131316]/80"
+    >
+      <div class="max-w-[1440px] mx-auto w-full flex justify-between items-center">
+        <div class="flex items-center gap-xl">
+          <a href="/" class="flex flex-col group">
+            <h1 class="font-page-title-mobile text-2xl font-bold text-primary leading-none group-hover:brightness-110 transition-all">GroLabs</h1>
+            <p class="font-section-header text-[10px] text-secondary-fixed-dim tracking-[0.2em] mt-1">
+              ENGINEERED LUXURY
+            </p>
+          </a>
+          <nav class="hidden lg:flex items-center gap-lg ml-xl">
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="/">Solutions</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Documentation</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Cloud</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Pricing</a>
+            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="/blog">Blog</a>
+          </nav>
+        </div>
+        <div class="flex items-center gap-md">
+          <div class="relative hidden xl:block mr-md">
+            <span
+              class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm"
+              >search</span
+            >
+            <input
+              class="bg-zinc-900 border-zinc-800 text-body-sm px-xl py-xs rounded w-48 focus:border-primary focus:ring-0 transition-all focus:w-64"
+              placeholder="Search docs..."
+              type="text"
+            />
+          </div>
+          <button class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors px-sm">
+            Log In
+          </button>
+          <button
+            class="bg-primary text-on-primary font-button-text px-md py-sm rounded hover:brightness-110 transition-all shadow-[0_0_20px_rgba(250,225,148,0.2)] shimmer-btn"
+          >
+            Get Started
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="relative z-10 pt-20 min-h-screen bg-transparent">
+      <slot />
+
+      <!-- Footer -->
+      <footer class="bg-zinc-950 py-xl border-t border-zinc-800">
+        <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-xl">
+            <div>
+              <div class="font-label-caps text-label-caps text-primary mb-md">GROLABS AI</div>
+              <p class="font-body-sm text-body-sm text-zinc-500">
+                © <span id="footer-year"></span> GroLabs AI. Engineered Luxury. All rights reserved.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-lg">
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Terms of Service</a>
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Security</a>
+            </div>
+          </div>
+          <div class="mt-xl pt-xl border-t border-zinc-900 grid grid-cols-2 md:grid-cols-5 gap-xl">
+            <div class="space-y-md">
+              <h5 class="font-label-caps text-label-caps text-white">PRODUCT</h5>
+              <ul class="space-y-sm text-body-sm text-zinc-500">
+                <li><a class="hover:text-primary transition-colors" href="#">Search Engine</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">AI Hybrid</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Cloud Platform</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
+              </ul>
+            </div>
+            <div class="space-y-md">
+              <h5 class="font-label-caps text-label-caps text-white">DEVELOPERS</h5>
+              <ul class="space-y-sm text-body-sm text-zinc-500">
+                <li><a class="hover:text-primary transition-colors" href="#">Docs</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">API Reference</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">GitHub</a></li>
+              </ul>
+            </div>
+            <div class="space-y-md">
+              <h5 class="font-label-caps text-label-caps text-white">RESOURCES</h5>
+              <ul class="space-y-sm text-body-sm text-zinc-500">
+                <li><a class="hover:text-primary transition-colors" href="/blog">Blog</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Customers</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#">Newsletter</a></li>
+              </ul>
+            </div>
+            <div class="space-y-md col-span-2">
+              <h5 class="font-label-caps text-label-caps text-white">NEWSLETTER</h5>
+              <p class="text-body-sm text-zinc-500 mb-md">Get the latest on AI retrieval tech.</p>
+              <div class="flex gap-sm">
+                <input
+                  class="bg-zinc-900 border-zinc-800 rounded px-md py-xs text-body-sm w-full focus:ring-primary focus:border-primary text-white transition-all"
+                  placeholder="email@grolabs.ai"
+                  type="email"
+                />
+                <button class="bg-zinc-800 text-primary font-button-text px-md py-xs rounded hover:bg-zinc-700 transition-colors">
+                  Join
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>

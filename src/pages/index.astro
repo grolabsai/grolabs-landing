@@ -1,587 +1,504 @@
 ---
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<!DOCTYPE html>
-<html class="scroll-smooth" lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>GroLabs | Engineered Luxury AI Search</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body class="font-body-md text-body-md selection:bg-primary selection:text-zinc-950 overflow-x-hidden">
-    <div class="ambient-grid"></div>
+<BaseLayout>
+  <!-- Hero Section -->
+  <section
+    class="relative px-margin-mobile md:px-margin-desktop py-xl overflow-hidden min-h-[85vh] flex flex-col justify-center items-center text-center"
+  >
+    <div id="particles-container"></div>
 
-    <!-- Scroll Progress -->
-    <div class="hidden md:block" id="scroll-progress">
-      <div id="scroll-indicator"></div>
+    <!-- Cinematic Background Glow -->
+    <div
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none z-0 transition-transform duration-700 ease-out"
+      id="hero-glow"
+    >
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ambient-glow-yellow-sharp blur-[100px] opacity-70"
+      ></div>
+      <div
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1000px] ambient-glow-yellow blur-[160px] opacity-100"
+      ></div>
+      <div
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] ambient-glow-yellow blur-[200px] opacity-30"
+      ></div>
     </div>
 
-    <!-- TopNavBar -->
-    <header
-      class="fixed top-0 left-0 w-full backdrop-blur-md h-20 flex items-center px-margin-mobile md:px-margin-desktop border-b border-zinc-800 z-50 bg-[#131316]/80"
-    >
-      <div class="max-w-[1440px] mx-auto w-full flex justify-between items-center">
-        <div class="flex items-center gap-xl">
-          <div class="flex flex-col">
-            <h1 class="font-page-title-mobile text-2xl font-bold text-primary leading-none">GroLabs</h1>
-            <p class="font-section-header text-[10px] text-secondary-fixed-dim tracking-[0.2em] mt-1">
-              ENGINEERED LUXURY
-            </p>
-          </div>
-          <nav class="hidden lg:flex items-center gap-lg ml-xl">
-            <a class="font-button-text text-white hover:text-primary transition-colors" href="#">Solutions</a>
-            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Documentation</a>
-            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Cloud</a>
-            <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href="#">Pricing</a>
-          </nav>
+    <div class="relative z-10 max-w-5xl reveal active">
+      <h1
+        class="font-page-title text-page-title-mobile md:text-[64px] text-white leading-tight drop-shadow-2xl"
+      >
+        Recover <span class="text-primary italic">lost revenue</span><br />
+        &amp;<br />
+        <span class="text-[0.92em]"><span class="text-primary">grow</span> your business</span><br />
+        <span class="italic text-[0.75em]"><span class="text-primary">without paying</span> for more traffic</span>
+      </h1>
+    </div>
+  </section>
+
+  <!-- Leak Numbers Section -->
+  <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-xl my-xl mt-48">
+    <div class="text-center mb-xl reveal">
+      <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md leading-tight">
+        Five places small e-commerce stores quietly bleed revenue — every day.
+      </h2>
+      <p class="text-body-lg text-secondary-fixed-dim max-w-3xl mx-auto">
+        Small leaks sink large ships. In the high-velocity world of online commerce, these friction
+        points represent the difference between scaling and stagnating.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg mb-xl">
+      <!-- Card 1: Internal Site Search (Featured) -->
+      <div
+        class="glass-card p-xl rounded-xl group transition-all md:col-span-6 lg:col-span-8 flex flex-col reveal relative min-h-[320px]"
+      >
+        <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+          CONFIDENCE: HIGH // SOURCE: FORRESTER
         </div>
-        <div class="flex items-center gap-md">
-          <div class="relative hidden xl:block mr-md">
-            <span
-              class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant text-sm"
-              >search</span
-            >
-            <input
-              class="bg-zinc-900 border-zinc-800 text-body-sm px-xl py-xs rounded w-48 focus:border-primary focus:ring-0 transition-all focus:w-64"
-              placeholder="Search docs..."
-              type="text"
-            />
-          </div>
-          <button class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-colors px-sm">
-            Log In
-          </button>
-          <button
-            class="bg-primary text-on-primary font-button-text px-md py-sm rounded hover:brightness-110 transition-all shadow-[0_0_20px_rgba(250,225,148,0.2)] shimmer-btn"
-          >
-            Get Started
-          </button>
+        <div class="mb-lg">
+          <span class="font-mono text-primary text-xs tracking-tighter bg-primary/10 px-2 py-1 rounded">
+            01 / Highest impact
+          </span>
+          <h3 class="font-page-title-mobile text-[32px] text-white mt-md">Internal site search</h3>
+        </div>
+        <div class="flex flex-col md:flex-row md:items-end gap-xl mt-auto">
+          <div class="font-page-title text-primary text-6xl md:text-7xl leading-none whitespace-nowrap">2–3×</div>
+          <p class="text-3xl text-secondary-fixed-dim italic mb-2 border-l border-primary/30 pl-md leading-snug">
+            "Users who search convert 2–3× more often than those who don't—<span class="text-primary">if they find what they want</span>."
+          </p>
         </div>
       </div>
-    </header>
-
-    <main class="relative z-10 pt-20 min-h-screen bg-transparent">
-      <!-- Hero Section -->
-      <section
-        class="relative px-margin-mobile md:px-margin-desktop py-xl overflow-hidden min-h-[85vh] flex flex-col justify-center items-center text-center"
-      >
-        <div id="particles-container"></div>
-
-        <!-- Cinematic Background Glow -->
-        <div
-          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none z-0 transition-transform duration-700 ease-out"
-          id="hero-glow"
-        >
-          <div
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ambient-glow-yellow-sharp blur-[100px] opacity-70"
-          ></div>
-          <div
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1000px] ambient-glow-yellow blur-[160px] opacity-100"
-          ></div>
-          <div
-            class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] ambient-glow-yellow blur-[200px] opacity-30"
-          ></div>
+      <!-- Card 2: SEO -->
+      <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
+        <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+          CONFIDENCE: MED
         </div>
-
-        <div class="relative z-10 max-w-5xl reveal active">
-          <h1
-            class="font-page-title text-page-title-mobile md:text-[64px] text-white leading-tight drop-shadow-2xl"
-          >
-            Recover <span class="text-primary italic">lost revenue</span><br />
-            &amp;<br />
-            <span class="text-[0.92em]"><span class="text-primary">grow</span> your business</span><br />
-            <span class="italic text-[0.75em]"><span class="text-primary">without paying</span> for more traffic</span>
-          </h1>
+        <div class="mb-lg">
+          <span class="font-mono text-zinc-500 text-xs tracking-tighter">02</span>
+          <h3 class="font-page-title-mobile text-[24px] text-white mt-md">Product description SEO</h3>
         </div>
-      </section>
-
-      <!-- Leak Numbers Section -->
-      <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-xl my-xl mt-48">
-        <div class="text-center mb-xl reveal">
-          <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md leading-tight">
-            Five places small e-commerce stores quietly bleed revenue — every day.
-          </h2>
-          <p class="text-body-lg text-secondary-fixed-dim max-w-3xl mx-auto">
-            Small leaks sink large ships. In the high-velocity world of online commerce, these friction
-            points represent the difference between scaling and stagnating.
+        <div class="mt-auto">
+          <div class="font-page-title text-primary text-6xl mb-md">53%</div>
+          <p class="text-body-sm text-secondary-fixed-dim">
+            More than half of all organic traffic is lost to thin, unoptimized content.
           </p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg mb-xl">
-          <!-- Card 1: Internal Site Search (Featured) -->
-          <div
-            class="glass-card p-xl rounded-xl group transition-all md:col-span-6 lg:col-span-8 flex flex-col reveal relative min-h-[320px]"
-          >
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
-              CONFIDENCE: HIGH // SOURCE: FORRESTER
-            </div>
-            <div class="mb-lg">
-              <span class="font-mono text-primary text-xs tracking-tighter bg-primary/10 px-2 py-1 rounded">
-                01 / Highest impact
-              </span>
-              <h3 class="font-page-title-mobile text-[32px] text-white mt-md">Internal site search</h3>
-            </div>
-            <div class="flex flex-col md:flex-row md:items-end gap-xl mt-auto">
-              <div class="font-page-title text-primary text-6xl md:text-7xl leading-none whitespace-nowrap">2–3×</div>
-              <p class="text-3xl text-secondary-fixed-dim italic mb-2 border-l border-primary/30 pl-md leading-snug">
-                "Users who search convert 2–3× more often than those who don't—<span class="text-primary">if they find what they want</span>."
-              </p>
-            </div>
+      </div>
+      <!-- Card 3: Checkout -->
+      <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
+        <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+          SOURCE: BAYMARD
+        </div>
+        <div class="mb-lg">
+          <span class="font-mono text-zinc-500 text-xs tracking-tighter">03</span>
+          <h3 class="font-page-title-mobile text-[24px] text-white mt-md">Checkout friction</h3>
+        </div>
+        <div class="mt-auto">
+          <div class="font-page-title text-primary text-6xl mb-md">70%</div>
+          <p class="text-body-sm text-secondary-fixed-dim">
+            Cart abandonment remains the single largest "unforced error" in retail.
+          </p>
+        </div>
+      </div>
+      <!-- Card 4: Returns -->
+      <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
+        <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+          CONFIDENCE: HIGH
+        </div>
+        <div class="mb-lg">
+          <span class="font-mono text-zinc-500 text-xs tracking-tighter">04</span>
+          <h3 class="font-page-title-mobile text-[24px] text-white mt-md">
+            Returns from mismatched expectations
+          </h3>
+        </div>
+        <div class="mt-auto">
+          <div class="font-page-title text-primary text-6xl mb-md">17–20%</div>
+          <p class="text-body-sm text-secondary-fixed-dim">
+            Revenue lost to returns caused by search/image disconnect.
+          </p>
+        </div>
+      </div>
+      <!-- Card 5: AEO -->
+      <div
+        class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative border-primary/20"
+      >
+        <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
+          SOURCE: GARTNER
+        </div>
+        <div class="mb-lg">
+          <span class="font-mono text-primary/60 text-xs tracking-tighter">05 / Emerging</span>
+          <h3 class="font-page-title-mobile text-[24px] text-white mt-md">
+            Answer Engine Optimization (AEO)
+          </h3>
+        </div>
+        <div class="mt-auto">
+          <div class="font-page-title text-primary text-6xl mb-md">25%</div>
+          <p class="text-body-sm text-secondary-fixed-dim">
+            "By 2026, traditional search volume will drop 25%, shifting to AI-powered answers."
+          </p>
+        </div>
+      </div>
+    </div>
+    <!-- Footer Note -->
+    <div
+      class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-lg"
+    >
+      <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
+        <span class="material-symbols-outlined text-primary">info</span>
+      </div>
+      <div>
+        <h4 class="font-label-caps text-label-caps text-primary mb-1">A NOTE ON THESE NUMBERS</h4>
+        <p class="font-mono text-[11px] text-zinc-500 leading-tight">
+          These benchmarks represent industry averages for mid-market merchants. While your specific
+          "leakage" may vary, the compound effect of solving just two of these points often results
+          in a 15–20% immediate lift in Net Revenue.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Luminous Equation -->
+  <section
+    id="revenue-equation"
+    class="relative py-32 px-10 bg-[#131313] overflow-hidden min-h-[800px] flex flex-col justify-center items-center"
+  >
+    <div class="max-w-7xl w-full mb-24">
+      <span class="text-[#fae194] font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Precision Retrieval Systems
+      </span>
+      <h2 class="text-white text-7xl font-light mb-8">Luminous Equation</h2>
+      <p class="text-zinc-400 max-w-xl text-lg leading-relaxed">
+        Quantify the architectural efficiency of your data pipeline with our high-density
+        revenue modeling framework.
+      </p>
+    </div>
+
+    <div
+      id="equation-container"
+      class="flex items-center justify-center gap-6 w-full max-w-7xl transition-all duration-700 ease-out"
+    >
+      <!-- Traffic -->
+      <div class="equation-card bg-zinc-900/50 p-10 border border-white/5 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
+        <span class="material-symbols-outlined text-4xl text-[#fae194]">groups</span>
+        <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Traffic</h3>
+      </div>
+
+      <div class="text-zinc-300 text-4xl font-light">×</div>
+
+      <!-- Conversion -->
+      <div class="equation-card bg-zinc-900/50 p-10 border border-white/5 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
+        <span class="material-symbols-outlined text-4xl text-[#fae194]">percent</span>
+        <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Conversion</h3>
+      </div>
+
+      <!-- Returns — hidden until the section enters viewport at 50% -->
+      <div id="returns-reveal" class="hidden-element flex items-center gap-6">
+        <div class="text-zinc-300 text-4xl font-light">−</div>
+        <div class="equation-card bg-[#ef4444]/5 p-10 border border-[#ef4444]/20 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
+          <span class="material-symbols-outlined text-4xl text-[#ef4444]">keyboard_return</span>
+          <h3 class="text-[#ef4444] text-2xl font-bold tracking-tighter uppercase">Returns</h3>
+        </div>
+      </div>
+
+      <div class="text-zinc-300 text-4xl font-light">=</div>
+
+      <!-- Revenue -->
+      <div class="equation-card bg-zinc-900/50 p-10 border border-white/5 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
+        <span class="material-symbols-outlined text-4xl text-[#fae194]">attach_money</span>
+        <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Revenue</h3>
+      </div>
+    </div>
+
+    <p class="max-w-3xl text-zinc-400 text-base leading-relaxed text-center mt-16">
+      There are experts who can increase traffic — we won't get into that discipline. We can
+      increase traffic to your site by enhancing product data attributes and enabling your
+      website for agentic searches. Our focus is on conversion, to make sure you recover the
+      lost revenue without paying for more traffic.
+    </p>
+  </section>
+
+  <!-- Funnel Benchmark -->
+  <section
+    class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl relative my-xl reveal"
+  >
+    <div class="text-center mb-xl">
+      <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md">Funnel benchmark</h2>
+      <p class="text-body-lg text-secondary-fixed-dim max-w-2xl mx-auto">
+        Quantifying the compound impact of search precision across the entire user journey.
+      </p>
+    </div>
+    <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
+      <div id="funnel-root" class="w-full overflow-x-auto"></div>
+
+      <div class="mt-md flex gap-xl items-stretch">
+        <table class="text-left text-body-sm flex-shrink-0">
+          <thead>
+            <tr class="border-b border-white/10">
+              <th class="py-md pr-xl font-label-caps text-zinc-400 text-[11px] leading-tight align-bottom">
+                FUNNEL<br />STAGE
+              </th>
+              <th class="py-md pr-xl font-label-caps text-[#ef4444] text-[11px] leading-tight align-bottom text-left">
+                LOST<br />REVENUE
+              </th>
+              <th class="py-md font-label-caps text-success-emerald text-[11px] leading-tight align-bottom text-left">
+                RECOVERY<br />POTENTIAL
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-zinc-200">
+            <tr class="stage-row" data-stage-id="search">
+              <td class="py-md pr-xl">
+                <div class="flex items-center gap-md">
+                  <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">search</span>
+                  <span>Search</span>
+                </div>
+              </td>
+              <td class="py-md pr-xl text-[#ef4444] font-semibold">65%</td>
+              <td class="py-md text-success-emerald font-semibold">+25%</td>
+            </tr>
+            <tr class="stage-row" data-stage-id="browsing">
+              <td class="py-md pr-xl">
+                <div class="flex items-center gap-md">
+                  <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">grid_view</span>
+                  <span>Browsing</span>
+                </div>
+              </td>
+              <td class="py-md pr-xl text-[#ef4444] font-semibold">75%</td>
+              <td class="py-md text-success-emerald font-semibold">+30%</td>
+            </tr>
+            <tr class="stage-row" data-stage-id="pdp">
+              <td class="py-md pr-xl">
+                <div class="flex items-center gap-md">
+                  <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">description</span>
+                  <span>Product page</span>
+                </div>
+              </td>
+              <td class="py-md pr-xl text-[#ef4444] font-semibold">80%</td>
+              <td class="py-md text-success-emerald font-semibold">+25%</td>
+            </tr>
+            <tr class="stage-row" data-stage-id="cart">
+              <td class="py-md pr-xl">
+                <div class="flex items-center gap-md">
+                  <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">shopping_cart</span>
+                  <span>Cart</span>
+                </div>
+              </td>
+              <td class="py-md pr-xl text-[#ef4444] font-semibold">70%</td>
+              <td class="py-md text-success-emerald font-semibold">+20%</td>
+            </tr>
+            <tr class="stage-row" data-stage-id="checkout">
+              <td class="py-md pr-xl">
+                <div class="flex items-center gap-md">
+                  <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">payments</span>
+                  <span>Checkout</span>
+                </div>
+              </td>
+              <td class="py-md pr-xl text-[#ef4444] font-semibold">17%</td>
+              <td class="py-md text-success-emerald font-semibold">+7%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div id="funnel-info" class="funnel-info flex-1">
+          <div class="funnel-info-default">
+            <span class="material-symbols-outlined">touch_app</span>
+            <span>Hover any stage to see what typically causes drop-offs there.</span>
           </div>
-          <!-- Card 2: SEO -->
-          <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
-              CONFIDENCE: MED
+          <div class="funnel-info-content">
+            <div class="funnel-info-eyebrow">
+              <span class="material-symbols-outlined" data-info-icon>info</span>
+              <span>Drop-off drivers</span>
             </div>
-            <div class="mb-lg">
-              <span class="font-mono text-zinc-500 text-xs tracking-tighter">02</span>
-              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">Product description SEO</h3>
-            </div>
-            <div class="mt-auto">
-              <div class="font-page-title text-primary text-6xl mb-md">53%</div>
-              <p class="text-body-sm text-secondary-fixed-dim">
-                More than half of all organic traffic is lost to thin, unoptimized content.
-              </p>
-            </div>
-          </div>
-          <!-- Card 3: Checkout -->
-          <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
-              SOURCE: BAYMARD
-            </div>
-            <div class="mb-lg">
-              <span class="font-mono text-zinc-500 text-xs tracking-tighter">03</span>
-              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">Checkout friction</h3>
-            </div>
-            <div class="mt-auto">
-              <div class="font-page-title text-primary text-6xl mb-md">70%</div>
-              <p class="text-body-sm text-secondary-fixed-dim">
-                Cart abandonment remains the single largest "unforced error" in retail.
-              </p>
-            </div>
-          </div>
-          <!-- Card 4: Returns -->
-          <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
-              CONFIDENCE: HIGH
-            </div>
-            <div class="mb-lg">
-              <span class="font-mono text-zinc-500 text-xs tracking-tighter">04</span>
-              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">
-                Returns from mismatched expectations
-              </h3>
-            </div>
-            <div class="mt-auto">
-              <div class="font-page-title text-primary text-6xl mb-md">17–20%</div>
-              <p class="text-body-sm text-secondary-fixed-dim">
-                Revenue lost to returns caused by search/image disconnect.
-              </p>
-            </div>
-          </div>
-          <!-- Card 5: AEO -->
-          <div
-            class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative border-primary/20"
-          >
-            <div class="absolute top-md right-md text-[10px] font-mono text-primary/30 tracking-widest">
-              SOURCE: GARTNER
-            </div>
-            <div class="mb-lg">
-              <span class="font-mono text-primary/60 text-xs tracking-tighter">05 / Emerging</span>
-              <h3 class="font-page-title-mobile text-[24px] text-white mt-md">
-                Answer Engine Optimization (AEO)
-              </h3>
-            </div>
-            <div class="mt-auto">
-              <div class="font-page-title text-primary text-6xl mb-md">25%</div>
-              <p class="text-body-sm text-secondary-fixed-dim">
-                "By 2026, traditional search volume will drop 25%, shifting to AI-powered answers."
-              </p>
-            </div>
+            <div class="funnel-info-title" data-info-title></div>
+            <div class="funnel-info-body" data-info-body></div>
           </div>
         </div>
-        <!-- Footer Note -->
-        <div
-          class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-lg"
-        >
-          <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
-            <span class="material-symbols-outlined text-primary">info</span>
+      </div>
+    </div>
+    <div
+      class="absolute -left-1/4 bottom-0 w-[600px] h-[600px] ambient-glow-yellow blur-[150px] opacity-20 pointer-events-none"
+    ></div>
+  </section>
+
+  <!-- AI-assisted modules -->
+  <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-40 pb-xl relative my-xl">
+    <h2 class="font-page-title text-4xl md:text-6xl text-white mb-xl text-center reveal">
+      AI-assisted modules
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">inventory_2</span>
+          <h4 class="text-xl font-normal text-white">Product catalog enhancement</h4>
+        </div>
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          Audit every product for missing attributes, weak descriptions, and broken images.
+          AI-generated copy and metadata match your brand voice while respecting category rules.
+          Continuous quality scoring surfaces problems before customers ever notice them.
+        </p>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">search_check</span>
+          <h4 class="text-xl font-normal text-white">Enhanced search</h4>
+        </div>
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          Synonym expansion, typo tolerance, and brand-aware ranking out of the box.
+          Merchandisers promote stock, new arrivals, and sale items with inline boost rules.
+          Sub-50 ms response times even on catalogs north of one million products.
+        </p>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">bolt</span>
+          <h4 class="text-xl font-normal text-white">Fast checkout</h4>
+        </div>
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          One-tap checkout that remembers shipping, payment, and address. The average flow
+          collapses from seven form fields to a single confirm screen. Mobile abandonment falls
+          40–60% in the first week of release.
+        </p>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">auto_awesome</span>
+          <h4 class="text-xl font-normal text-white">Agentic search</h4>
+        </div>
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          AI agents understand shopper intent, not just keywords. Conversational follow-ups
+          progressively refine the result set. Every answer plugs into your catalog so the
+          recommendations reflect your store's actual stock and brand voice.
+        </p>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">monitoring</span>
+          <h4 class="text-xl font-normal text-white">Traffic monitor</h4>
+        </div>
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          Daily GA4 snapshots with anomaly detection on every traffic source. Alerts fire the
+          moment a channel, campaign, or geo deviates from your baseline. One dashboard ties
+          sessions, conversions, and revenue back to the funnel that produced them.
+        </p>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">person_search</span>
+          <h4 class="text-xl font-normal text-white">User analytics tracking</h4>
+        </div>
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          First-party event capture for clicks, searches, filters, and conversions — all stored
+          in your stack. Per-shopper journeys show the full path before a purchase, not just
+          last-click. Anonymized cohort exports feed retargeting, lookalike, and loyalty models.
+        </p>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">track_changes</span>
+          <h4 class="text-xl font-normal text-white">Diagnose · Fix · Verify</h4>
+        </div>
+        <div class="space-y-md mb-lg text-base text-white/60 leading-relaxed">
+          <div>
+            <span class="font-button-text text-zinc-200">Diagnose.</span>
+            Pinpoint where revenue is leaking with funnel data + analytics — no more vague hunches.
           </div>
           <div>
-            <h4 class="font-label-caps text-label-caps text-primary mb-1">A NOTE ON THESE NUMBERS</h4>
-            <p class="font-mono text-[11px] text-zinc-500 leading-tight">
-              These benchmarks represent industry averages for mid-market merchants. While your specific
-              "leakage" may vary, the compound effect of solving just two of these points often results
-              in a 15–20% immediate lift in Net Revenue.
-            </p>
+            <span class="font-button-text text-zinc-200">Fix.</span>
+            Apply a targeted change at the specific stage that's losing customers.
+          </div>
+          <div>
+            <span class="font-button-text text-zinc-200">Verify.</span>
+            Re-measure within hours; the loop reopens automatically if the fix didn't hold.
           </div>
         </div>
-      </section>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
 
-      <!-- Luminous Equation — replaces the old Apps & sites section. -->
-      <section
-        id="revenue-equation"
-        class="relative py-32 px-10 bg-[#131313] overflow-hidden min-h-[800px] flex flex-col justify-center items-center"
-      >
-        <div class="max-w-7xl w-full mb-24">
-          <span class="text-[#fae194] font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-            Precision Retrieval Systems
-          </span>
-          <h2 class="text-white text-7xl font-light mb-8">Luminous Equation</h2>
-          <p class="text-zinc-400 max-w-xl text-lg leading-relaxed">
-            Quantify the architectural efficiency of your data pipeline with our high-density
-            revenue modeling framework.
-          </p>
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">notifications_active</span>
+          <h4 class="text-xl font-normal text-white">Automated monitoring &amp; alerts</h4>
         </div>
-
-        <div
-          id="equation-container"
-          class="flex items-center justify-center gap-6 w-full max-w-7xl transition-all duration-700 ease-out"
-        >
-          <!-- Traffic -->
-          <div class="equation-card bg-zinc-900/50 p-10 border border-white/5 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
-            <span class="material-symbols-outlined text-4xl text-[#fae194]">groups</span>
-            <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Traffic</h3>
-          </div>
-
-          <div class="text-zinc-300 text-4xl font-light">×</div>
-
-          <!-- Conversion -->
-          <div class="equation-card bg-zinc-900/50 p-10 border border-white/5 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
-            <span class="material-symbols-outlined text-4xl text-[#fae194]">percent</span>
-            <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Conversion</h3>
-          </div>
-
-          <!-- Returns — hidden until the section enters viewport at 50% -->
-          <div id="returns-reveal" class="hidden-element flex items-center gap-6">
-            <div class="text-zinc-300 text-4xl font-light">−</div>
-            <div class="equation-card bg-[#ef4444]/5 p-10 border border-[#ef4444]/20 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
-              <span class="material-symbols-outlined text-4xl text-[#ef4444]">keyboard_return</span>
-              <h3 class="text-[#ef4444] text-2xl font-bold tracking-tighter uppercase">Returns</h3>
-            </div>
-          </div>
-
-          <div class="text-zinc-300 text-4xl font-light">=</div>
-
-          <!-- Revenue -->
-          <div class="equation-card bg-zinc-900/50 p-10 border border-white/5 rounded-sm flex flex-col items-center gap-6 min-w-[250px]">
-            <span class="material-symbols-outlined text-4xl text-[#fae194]">attach_money</span>
-            <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Revenue</h3>
-          </div>
-        </div>
-
-        <p class="max-w-3xl text-zinc-400 text-base leading-relaxed text-center mt-16">
-          There are experts who can increase traffic — we won't get into that discipline. We can
-          increase traffic to your site by enhancing product data attributes and enabling your
-          website for agentic searches. Our focus is on conversion, to make sure you recover the
-          lost revenue without paying for more traffic.
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          Real-time anomaly detection across every funnel stage and traffic source. Alerts route
+          to Slack, email, or your incident tool of choice within seconds of a deviation.
+          Threshold rules tune per stage, channel, device, and geo segment.
         </p>
-      </section>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
 
-      <!-- Funnel Benchmark -->
-      <section
-        class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl relative my-xl reveal"
-      >
-        <div class="text-center mb-xl">
-          <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md">Funnel benchmark</h2>
-          <p class="text-body-lg text-secondary-fixed-dim max-w-2xl mx-auto">
-            Quantifying the compound impact of search precision across the entire user journey.
-          </p>
+      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+        <div class="flex items-center gap-md mb-lg">
+          <span class="material-symbols-outlined text-primary">smart_toy</span>
+          <h4 class="text-xl font-normal text-white">AI catalog &amp; pricing</h4>
         </div>
-        <!-- Interactive Funnel Flow -->
-        <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
-          <div id="funnel-root" class="w-full overflow-x-auto"></div>
+        <p class="text-base text-white/60 leading-relaxed mb-lg">
+          AI proposes product copy, attribute fills, and category mappings — you approve before
+          anything ships. Pricing rules adapt to competitor moves and inventory levels in real
+          time. Manual overrides on every recommendation; never autopilot without you.
+        </p>
+        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
+          More
+          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
 
-          <!-- Compact 3-column table on the left + dynamic info panel on the right -->
-          <div class="mt-md flex gap-xl items-stretch">
-            <table class="text-left text-body-sm flex-shrink-0">
-              <thead>
-                <tr class="border-b border-white/10">
-                  <th class="py-md pr-xl font-label-caps text-zinc-400 text-[11px] leading-tight align-bottom">
-                    FUNNEL<br />STAGE
-                  </th>
-                  <th class="py-md pr-xl font-label-caps text-[#ef4444] text-[11px] leading-tight align-bottom text-left">
-                    LOST<br />REVENUE
-                  </th>
-                  <th class="py-md font-label-caps text-success-emerald text-[11px] leading-tight align-bottom text-left">
-                    RECOVERY<br />POTENTIAL
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-white/5 text-zinc-200">
-                <tr class="stage-row" data-stage-id="search">
-                  <td class="py-md pr-xl">
-                    <div class="flex items-center gap-md">
-                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">search</span>
-                      <span>Search</span>
-                    </div>
-                  </td>
-                  <td class="py-md pr-xl text-[#ef4444] font-semibold">65%</td>
-                  <td class="py-md text-success-emerald font-semibold">+25%</td>
-                </tr>
-                <tr class="stage-row" data-stage-id="browsing">
-                  <td class="py-md pr-xl">
-                    <div class="flex items-center gap-md">
-                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">grid_view</span>
-                      <span>Browsing</span>
-                    </div>
-                  </td>
-                  <td class="py-md pr-xl text-[#ef4444] font-semibold">75%</td>
-                  <td class="py-md text-success-emerald font-semibold">+30%</td>
-                </tr>
-                <tr class="stage-row" data-stage-id="pdp">
-                  <td class="py-md pr-xl">
-                    <div class="flex items-center gap-md">
-                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">description</span>
-                      <span>Product page</span>
-                    </div>
-                  </td>
-                  <td class="py-md pr-xl text-[#ef4444] font-semibold">80%</td>
-                  <td class="py-md text-success-emerald font-semibold">+25%</td>
-                </tr>
-                <tr class="stage-row" data-stage-id="cart">
-                  <td class="py-md pr-xl">
-                    <div class="flex items-center gap-md">
-                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">shopping_cart</span>
-                      <span>Cart</span>
-                    </div>
-                  </td>
-                  <td class="py-md pr-xl text-[#ef4444] font-semibold">70%</td>
-                  <td class="py-md text-success-emerald font-semibold">+20%</td>
-                </tr>
-                <tr class="stage-row" data-stage-id="checkout">
-                  <td class="py-md pr-xl">
-                    <div class="flex items-center gap-md">
-                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">payments</span>
-                      <span>Checkout</span>
-                    </div>
-                  </td>
-                  <td class="py-md pr-xl text-[#ef4444] font-semibold">17%</td>
-                  <td class="py-md text-success-emerald font-semibold">+7%</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <!-- Dynamic info panel — fills the remaining horizontal space, updates on stage hover -->
-            <div id="funnel-info" class="funnel-info flex-1">
-              <div class="funnel-info-default">
-                <span class="material-symbols-outlined">touch_app</span>
-                <span>Hover any stage to see what typically causes drop-offs there.</span>
-              </div>
-              <div class="funnel-info-content">
-                <div class="funnel-info-eyebrow">
-                  <span class="material-symbols-outlined" data-info-icon>info</span>
-                  <span>Drop-off drivers</span>
-                </div>
-                <div class="funnel-info-title" data-info-title></div>
-                <div class="funnel-info-body" data-info-body></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Section Glow -->
-        <div
-          class="absolute -left-1/4 bottom-0 w-[600px] h-[600px] ambient-glow-yellow blur-[150px] opacity-20 pointer-events-none"
-        ></div>
-      </section>
-
-      <!-- AI-assisted modules -->
-      <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-40 pb-xl relative my-xl">
-        <h2 class="font-page-title text-4xl md:text-6xl text-white mb-xl text-center reveal">
-          AI-assisted modules
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
-          <!-- Each capability card "More" → routes to /capabilities/<slug> (pages TBD). -->
-
-          <!-- 1 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">inventory_2</span>
-              <h4 class="text-xl font-normal text-white">Product catalog enhancement</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              Audit every product for missing attributes, weak descriptions, and broken images.
-              AI-generated copy and metadata match your brand voice while respecting category rules.
-              Continuous quality scoring surfaces problems before customers ever notice them.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 2 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">search_check</span>
-              <h4 class="text-xl font-normal text-white">Enhanced search</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              Synonym expansion, typo tolerance, and brand-aware ranking out of the box.
-              Merchandisers promote stock, new arrivals, and sale items with inline boost rules.
-              Sub-50 ms response times even on catalogs north of one million products.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 3 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">bolt</span>
-              <h4 class="text-xl font-normal text-white">Fast checkout</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              One-tap checkout that remembers shipping, payment, and address. The average flow
-              collapses from seven form fields to a single confirm screen. Mobile abandonment falls
-              40–60% in the first week of release.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 4 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">auto_awesome</span>
-              <h4 class="text-xl font-normal text-white">Agentic search</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              AI agents understand shopper intent, not just keywords. Conversational follow-ups
-              progressively refine the result set. Every answer plugs into your catalog so the
-              recommendations reflect your store's actual stock and brand voice.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 5 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">monitoring</span>
-              <h4 class="text-xl font-normal text-white">Traffic monitor</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              Daily GA4 snapshots with anomaly detection on every traffic source. Alerts fire the
-              moment a channel, campaign, or geo deviates from your baseline. One dashboard ties
-              sessions, conversions, and revenue back to the funnel that produced them.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 6 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">person_search</span>
-              <h4 class="text-xl font-normal text-white">User analytics tracking</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              First-party event capture for clicks, searches, filters, and conversions — all stored
-              in your stack. Per-shopper journeys show the full path before a purchase, not just
-              last-click. Anonymized cohort exports feed retargeting, lookalike, and loyalty models.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 7 — three-phase card: Diagnose / Fix / Verify in a single block -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">track_changes</span>
-              <h4 class="text-xl font-normal text-white">Diagnose · Fix · Verify</h4>
-            </div>
-            <div class="space-y-md mb-lg text-base text-white/60 leading-relaxed">
-              <div>
-                <span class="font-button-text text-zinc-200">Diagnose.</span>
-                Pinpoint where revenue is leaking with funnel data + analytics — no more vague hunches.
-              </div>
-              <div>
-                <span class="font-button-text text-zinc-200">Fix.</span>
-                Apply a targeted change at the specific stage that's losing customers.
-              </div>
-              <div>
-                <span class="font-button-text text-zinc-200">Verify.</span>
-                Re-measure within hours; the loop reopens automatically if the fix didn't hold.
-              </div>
-            </div>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 8 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">notifications_active</span>
-              <h4 class="text-xl font-normal text-white">Automated monitoring &amp; alerts</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              Real-time anomaly detection across every funnel stage and traffic source. Alerts route
-              to Slack, email, or your incident tool of choice within seconds of a deviation.
-              Threshold rules tune per stage, channel, device, and geo segment.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-
-          <!-- 9 -->
-          <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-            <div class="flex items-center gap-md mb-lg">
-              <span class="material-symbols-outlined text-primary">smart_toy</span>
-              <h4 class="text-xl font-normal text-white">AI catalog &amp; pricing</h4>
-            </div>
-            <p class="text-base text-white/60 leading-relaxed mb-lg">
-              AI proposes product copy, attribute fills, and category mappings — you approve before
-              anything ships. Pricing rules adapt to competitor moves and inventory levels in real
-              time. Manual overrides on every recommendation; never autopilot without you.
-            </p>
-            <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-              More
-              <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <!-- Code Section -->
-      <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl my-xl">
-        <div class="flex flex-col items-center text-center mb-xl reveal">
-          <h2 class="font-page-title text-4xl md:text-6xl text-white mb-md">Easy to integrate</h2>
-          <p class="text-body-lg text-secondary-fixed-dim max-w-2xl">
-            Engineered luxury for developers. Our API is self-explanatory, allowing you to focus on
-            high-impact product features.
-          </p>
-        </div>
-        <div
-          class="code-block p-lg md:p-xl rounded-xl shadow-inner border border-zinc-800 font-mono text-body-sm relative reveal group"
-        >
-          <div class="absolute top-md right-md flex gap-md">
-            <span class="text-zinc-600 font-mono text-[10px]">JS_SDK // v4.0.2</span>
-            <span class="text-primary hover:cursor-pointer text-[12px] opacity-60 group-hover:opacity-100 transition-opacity">Copy Code</span>
-          </div>
-          <div class="overflow-x-auto">
+  <!-- Code Section -->
+  <section class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl my-xl">
+    <div class="flex flex-col items-center text-center mb-xl reveal">
+      <h2 class="font-page-title text-4xl md:text-6xl text-white mb-md">Easy to integrate</h2>
+      <p class="text-body-lg text-secondary-fixed-dim max-w-2xl">
+        Engineered luxury for developers. Our API is self-explanatory, allowing you to focus on
+        high-impact product features.
+      </p>
+    </div>
+    <div
+      class="code-block p-lg md:p-xl rounded-xl shadow-inner border border-zinc-800 font-mono text-body-sm relative reveal group"
+    >
+      <div class="absolute top-md right-md flex gap-md">
+        <span class="text-zinc-600 font-mono text-[10px]">JS_SDK // v4.0.2</span>
+        <span class="text-primary hover:cursor-pointer text-[12px] opacity-60 group-hover:opacity-100 transition-opacity">Copy Code</span>
+      </div>
+      <div class="overflow-x-auto">
 <pre><code class="text-zinc-400"><span class="text-primary">const</span> client = <span class="text-primary">new</span> MeiliSearch(<span class="text-success-emerald">'http://localhost:7700'</span>, <span class="text-success-emerald">'masterKey'</span>)
 
 <span class="text-primary">await</span> client.index(<span class="text-success-emerald">'movies'</span>).addDocuments([
@@ -593,105 +510,39 @@ import '../styles/global.css';
 <span class="text-zinc-600">// Highly performant AI-retrieval call</span>
 <span class="text-primary">const</span> search = <span class="text-primary">await</span> index.search(<span class="text-success-emerald">'philadelphia'</span>)
 console.log(search)</code></pre>
-          </div>
-        </div>
-        <div class="mt-xl flex justify-center gap-md flex-wrap reveal">
-          <button class="px-xl py-sm bg-primary text-on-primary font-button-text rounded-lg hover:brightness-110 shadow-[0_0_20px_rgba(250,225,148,0.15)] shimmer-btn">
-            Full Documentation
-          </button>
-          <button class="px-xl py-sm border border-zinc-700 text-primary font-button-text rounded-lg hover:border-primary transition-all shimmer-btn">
-            See Integrations
-          </button>
-        </div>
-      </section>
+      </div>
+    </div>
+    <div class="mt-xl flex justify-center gap-md flex-wrap reveal">
+      <button class="px-xl py-sm bg-primary text-on-primary font-button-text rounded-lg hover:brightness-110 shadow-[0_0_20px_rgba(250,225,148,0.15)] shimmer-btn">
+        Full Documentation
+      </button>
+      <button class="px-xl py-sm border border-zinc-700 text-primary font-button-text rounded-lg hover:border-primary transition-all shimmer-btn">
+        See Integrations
+      </button>
+    </div>
+  </section>
 
-      <!-- Stats Section -->
-      <section class="py-xl bg-zinc-900/30 my-xl">
-        <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-xl reveal">
-            <div class="text-center group">
-              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">2.4M</div>
-              <div class="font-label-caps text-label-caps text-zinc-400">DOWNLOADS</div>
-            </div>
-            <div class="text-center group">
-              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">15k+</div>
-              <div class="font-label-caps text-label-caps text-zinc-400">SERVERS</div>
-            </div>
-            <div class="text-center group">
-              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">800+</div>
-              <div class="font-label-caps text-label-caps text-zinc-400">CONTRIBUTORS</div>
-            </div>
-            <div class="text-center group">
-              <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">57.6k</div>
-              <div class="font-label-caps text-label-caps text-zinc-400">GITHUB STARS</div>
-            </div>
-          </div>
+  <!-- Stats Section -->
+  <section class="py-xl bg-zinc-900/30 my-xl">
+    <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-xl reveal">
+        <div class="text-center group">
+          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">2.4M</div>
+          <div class="font-label-caps text-label-caps text-zinc-400">DOWNLOADS</div>
         </div>
-      </section>
-
-      <!-- Footer -->
-      <footer class="bg-zinc-950 py-xl border-t border-zinc-800">
-        <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
-          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-xl">
-            <div>
-              <div class="font-label-caps text-label-caps text-primary mb-md">GROLABS AI</div>
-              <p class="font-body-sm text-body-sm text-zinc-500">
-                © <span id="footer-year"></span> GroLabs AI. Engineered Luxury. All rights reserved.
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-lg">
-              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
-              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Terms of Service</a>
-              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Security</a>
-            </div>
-          </div>
-          <div class="mt-xl pt-xl border-t border-zinc-900 grid grid-cols-2 md:grid-cols-5 gap-xl">
-            <div class="space-y-md">
-              <h5 class="font-label-caps text-label-caps text-white">PRODUCT</h5>
-              <ul class="space-y-sm text-body-sm text-zinc-500">
-                <li><a class="hover:text-primary transition-colors" href="#">Search Engine</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">AI Hybrid</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Cloud Platform</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
-              </ul>
-            </div>
-            <div class="space-y-md">
-              <h5 class="font-label-caps text-label-caps text-white">DEVELOPERS</h5>
-              <ul class="space-y-sm text-body-sm text-zinc-500">
-                <li><a class="hover:text-primary transition-colors" href="#">Docs</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">API Reference</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">GitHub</a></li>
-              </ul>
-            </div>
-            <div class="space-y-md">
-              <h5 class="font-label-caps text-label-caps text-white">RESOURCES</h5>
-              <ul class="space-y-sm text-body-sm text-zinc-500">
-                <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Customers</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Newsletter</a></li>
-              </ul>
-            </div>
-            <div class="space-y-md col-span-2">
-              <h5 class="font-label-caps text-label-caps text-white">NEWSLETTER</h5>
-              <p class="text-body-sm text-zinc-500 mb-md">Get the latest on AI retrieval tech.</p>
-              <div class="flex gap-sm">
-                <input
-                  class="bg-zinc-900 border-zinc-800 rounded px-md py-xs text-body-sm w-full focus:ring-primary focus:border-primary text-white transition-all"
-                  placeholder="email@grolabs.ai"
-                  type="email"
-                />
-                <button class="bg-zinc-800 text-primary font-button-text px-md py-xs rounded hover:bg-zinc-700 transition-colors">
-                  Join
-                </button>
-              </div>
-            </div>
-          </div>
+        <div class="text-center group">
+          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">15k+</div>
+          <div class="font-label-caps text-label-caps text-zinc-400">SERVERS</div>
         </div>
-      </footer>
-    </main>
-
-    <script>
-      import '../scripts/main.ts';
-    </script>
-  </body>
-</html>
+        <div class="text-center group">
+          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">800+</div>
+          <div class="font-label-caps text-label-caps text-zinc-400">CONTRIBUTORS</div>
+        </div>
+        <div class="text-center group">
+          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">57.6k</div>
+          <div class="font-label-caps text-label-caps text-zinc-400">GITHUB STARS</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

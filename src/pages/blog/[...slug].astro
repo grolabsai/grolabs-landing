@@ -1,0 +1,134 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const dateFmt = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={`${post.data.title} | GroLabs`} description={post.data.description}>
+  <article class="max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop pt-xl pb-xl">
+    <header class="mb-xl reveal active">
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-1 font-mono text-primary text-xs tracking-tighter hover:gap-2 transition-all mb-lg"
+      >
+        <span class="material-symbols-outlined" style="font-size: 14px;">arrow_back</span>
+        Back to journal
+      </a>
+      <div class="flex items-baseline gap-md mb-sm">
+        <span class="font-mono text-primary text-xs tracking-tighter">
+          {dateFmt.format(post.data.pubDate)}
+        </span>
+        <span class="font-mono text-zinc-500 text-xs tracking-tighter">
+          {post.data.author}
+        </span>
+      </div>
+      <h1 class="font-page-title text-4xl md:text-5xl text-white leading-tight mb-md">
+        {post.data.title}
+      </h1>
+      <p class="text-body-lg text-secondary-fixed-dim leading-relaxed">
+        {post.data.description}
+      </p>
+    </header>
+
+    <div class="prose-blog text-body-md text-zinc-200 leading-relaxed reveal active">
+      <Content />
+    </div>
+
+    {
+      post.data.tags.length > 0 && (
+        <footer class="mt-xl pt-xl border-t border-zinc-800 flex flex-wrap gap-sm">
+          {post.data.tags.map((tag) => (
+            <span class="font-mono text-xs tracking-tighter text-zinc-500 bg-zinc-900 px-2 py-1 rounded">
+              {tag}
+            </span>
+          ))}
+        </footer>
+      )
+    }
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .prose-blog p {
+    margin-bottom: 1.5rem;
+  }
+  .prose-blog ul,
+  .prose-blog ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  .prose-blog li {
+    margin-bottom: 0.5rem;
+    list-style: disc;
+  }
+  .prose-blog h2 {
+    color: #ffffff;
+    font-size: 1.75rem;
+    line-height: 1.2;
+    font-weight: 500;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .prose-blog h3 {
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 500;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+  }
+  .prose-blog a {
+    color: #fae194;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-blog a:hover {
+    filter: brightness(1.1);
+  }
+  .prose-blog code {
+    background: #0c0c0e;
+    color: #fae194;
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  .prose-blog pre {
+    background: #0c0c0e;
+    border-left: 2px solid #fae194;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
+  .prose-blog pre code {
+    background: transparent;
+    padding: 0;
+    color: #d4d4d4;
+  }
+  .prose-blog blockquote {
+    border-left: 2px solid rgba(250, 225, 148, 0.3);
+    padding-left: 1.25rem;
+    color: #c8c5ca;
+    font-style: italic;
+    margin: 1.5rem 0;
+  }
+  .prose-blog strong {
+    color: #ffffff;
+    font-weight: 600;
+  }
+</style>
