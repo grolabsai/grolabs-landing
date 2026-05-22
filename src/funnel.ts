@@ -13,20 +13,23 @@ type Stage = {
   tooltip?: string;
 };
 
+type AttachSide = 'right' | 'left' | 'top' | 'bottom';
+
 type Transition = {
   id: string;
   from: string;
   to: string;
   pct: number;
   labelOverride?: string;
-  /** Quadratic Bézier control point */
+  /** Quadratic Bézier control point (legacy) */
   curve?: { cx: number; cy: number };
-  /** Cubic Bézier control points (overrides `curve` if both set) */
+  /** Cubic Bézier control points (overrides auto control points if set) */
   cubicCurve?: { c1x: number; c1y: number; c2x: number; c2y: number };
-  /** 'forward' = straight midline; 'shortcut' = top→top arc-over. Visual styling identical. */
   variant: 'forward' | 'shortcut';
-  /** Target attachment override for forward variant ('top' = land on top edge instead of left edge). */
-  toAttach?: 'top';
+  /** Which edge to leave the source from. Default: 'right' (right midline). */
+  fromAttach?: AttachSide;
+  /** Which edge to arrive at the target on. Default: 'left' (left midline). */
+  toAttach?: AttachSide;
 };
 
 type Leak = {
@@ -38,26 +41,26 @@ type Leak = {
 };
 
 const STAGES: Stage[] = [
-  // Home is the entry point now — Traffic removed. Middle row at y=55 (midline y=80).
-  { id: 'home',     label: 'Home',         icon: 'home',          x: 60,   y: 55,
+  // Home flush left at x=30 (30 px viewBox padding).
+  { id: 'home',     label: 'Home',         icon: 'home',          x: 30,   y: 55,
     tooltip:
       "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for." },
-  // Search 10 px above Home midline → bottom y=70.
-  { id: 'search',   label: 'Search',       icon: 'search',        x: 290,  y: 20,
+  // Search and Browsing sit in the gap between Home and PDP, at separate x so neither overlaps the other.
+  { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  // Browsing 10 px below Home midline → top y=90. Search-Browsing vertical gap = 20 px.
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 360,  y: 90,
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 420,  y: 90,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  // PDP / Cart / Checkout share Home's row.
-  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 540,  y: 55,
+  // Main-row continuation. PDP→Cart and Cart→Checkout gaps are equal (200 px each).
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 580,  y: 55,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
-  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 770,  y: 55,
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 910,  y: 55,
     tooltip:
       "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
-  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 990,  y: 55,
+  // Checkout flush right (right edge at viewBox.w - 30 = 1370).
+  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1240, y: 55,
     tooltip:
       "Returns are driven by image vs. product mismatch, sizing/fit ambiguity, and missing detail photographs (texture, scale, packaging). Better PDPs reduce returns 30-50%." },
 ];
@@ -65,16 +68,18 @@ const STAGES: Stage[] = [
 const TRANSITIONS: Transition[] = [
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
-  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward', toAttach: 'top' },
-  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward' },
+  // Search → PDP: out of the top of Search, into the top of PDP (arcs over).
+  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward', fromAttach: 'top',    toAttach: 'top' },
+  // Browsing → PDP: out of the bottom of Browsing, into the bottom of PDP (arcs under).
+  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward', fromAttach: 'bottom', toAttach: 'bottom' },
   { id: 't-pdp-cart',      from: 'pdp',      to: 'cart',     pct: 12, variant: 'forward' },
   { id: 't-cart-checkout', from: 'cart',     to: 'checkout', pct: 30, variant: 'forward' },
 ];
 
 const LEAKS: Leak[] = [
   { id: 'leak-home',     fromStageId: 'home',     label: 'home exit' },
-  // Nudged right of Search's left edge so the line clears Browsing without aligning to either box edge
-  { id: 'leak-search',   fromStageId: 'search',   label: 'no results', xOffset: 35 },
+  // Search and Browsing now sit at different x, so Search's leak can drop from its centre — no xOffset needed.
+  { id: 'leak-search',   fromStageId: 'search',   label: 'no results' },
   { id: 'leak-browsing', fromStageId: 'browsing', label: 'no results' },
   { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'exit' },
   { id: 'leak-cart',     fromStageId: 'cart',     label: 'abandoned cart' },
@@ -88,7 +93,7 @@ const LEAK_Y = 220;
 const LEAK_ARROW_START_DY = 8;     // arrow starts just below box
 const LABEL_PCT_DY = -22;          // % position relative to LEAK_Y (above arrowhead)
 const LABEL_CAUSE_DY = -6;         // cause label position relative to LEAK_Y (just above arrowhead)
-const VIEWBOX = { x: 0, y: 0, w: 1400, h: 235 };
+const VIEWBOX = { x: 0, y: -65, w: 1400, h: 300 };
 
 const STAGE_FILL = '#1b1b1e';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
@@ -119,64 +124,72 @@ function leakX(l: Leak): number {
   return stage.x + offset;
 }
 
+function attachPoint(stage: Stage, side: AttachSide): { x: number; y: number } {
+  switch (side) {
+    case 'right':  return { x: stage.x + STAGE_W,     y: stage.y + STAGE_H / 2 };
+    case 'left':   return { x: stage.x,               y: stage.y + STAGE_H / 2 };
+    case 'top':    return { x: stage.x + STAGE_W / 2, y: stage.y };
+    case 'bottom': return { x: stage.x + STAGE_W / 2, y: stage.y + STAGE_H };
+  }
+}
+
+function controlOffset(side: AttachSide, dist: number): { dx: number; dy: number } {
+  switch (side) {
+    case 'right':  return { dx:  dist, dy: 0     };
+    case 'left':   return { dx: -dist, dy: 0     };
+    case 'top':    return { dx: 0,     dy: -dist };
+    case 'bottom': return { dx: 0,     dy:  dist };
+  }
+}
+
 function transitionPath(t: Transition): { d: string; midX: number; midY: number } {
   const from = stageById(t.from);
   const to = stageById(t.to);
 
-  let x1: number, y1: number, x2: number, y2: number;
-  let mode: 'horizontal' | 'right-to-top' | 'shortcut';
+  // Shortcut variant defaults to top↔top; forward defaults to right→left.
+  const defaultFrom: AttachSide = t.variant === 'shortcut' ? 'top'  : 'right';
+  const defaultTo:   AttachSide = t.variant === 'shortcut' ? 'top'  : 'left';
+  const fromAttach = t.fromAttach ?? defaultFrom;
+  const toAttach   = t.toAttach   ?? defaultTo;
 
-  if (t.variant === 'shortcut') {
-    x1 = from.x + STAGE_W / 2;
-    y1 = from.y;
-    x2 = to.x + STAGE_W / 2;
-    y2 = to.y;
-    mode = 'shortcut';
-  } else if (t.toAttach === 'top') {
-    x1 = from.x + STAGE_W;
-    y1 = from.y + STAGE_H / 2;
-    x2 = to.x + STAGE_W / 2;
-    y2 = to.y;
-    mode = 'right-to-top';
-  } else {
-    x1 = from.x + STAGE_W;
-    y1 = from.y + STAGE_H / 2;
-    x2 = to.x;
-    y2 = to.y + STAGE_H / 2;
-    mode = 'horizontal';
-  }
+  const start = attachPoint(from, fromAttach);
+  const end   = attachPoint(to,   toAttach);
 
+  // Explicit cubic curve overrides auto-controls (kept for backward compat).
   if (t.cubicCurve) {
     const c = t.cubicCurve;
-    const d = `M ${x1} ${y1} C ${c.c1x} ${c.c1y}, ${c.c2x} ${c.c2y}, ${x2} ${y2}`;
-    // Cubic Bézier point at t=0.5: B(0.5) = 0.125 P0 + 0.375 P1 + 0.375 P2 + 0.125 P3
-    const midX = 0.125 * x1 + 0.375 * c.c1x + 0.375 * c.c2x + 0.125 * x2;
-    const midY = 0.125 * y1 + 0.375 * c.c1y + 0.375 * c.c2y + 0.125 * y2;
+    const d = `M ${start.x} ${start.y} C ${c.c1x} ${c.c1y}, ${c.c2x} ${c.c2y}, ${end.x} ${end.y}`;
+    const midX = 0.125 * start.x + 0.375 * c.c1x + 0.375 * c.c2x + 0.125 * end.x;
+    const midY = 0.125 * start.y + 0.375 * c.c1y + 0.375 * c.c2y + 0.125 * end.y;
     return { d, midX, midY };
   }
 
+  // Legacy quadratic.
   if (t.curve) {
-    const d = `M ${x1} ${y1} Q ${t.curve.cx} ${t.curve.cy} ${x2} ${y2}`;
-    const midX = 0.25 * x1 + 0.5 * t.curve.cx + 0.25 * x2;
-    const midY = 0.25 * y1 + 0.5 * t.curve.cy + 0.25 * y2;
+    const d = `M ${start.x} ${start.y} Q ${t.curve.cx} ${t.curve.cy} ${end.x} ${end.y}`;
+    const midX = 0.25 * start.x + 0.5 * t.curve.cx + 0.25 * end.x;
+    const midY = 0.25 * start.y + 0.5 * t.curve.cy + 0.25 * end.y;
     return { d, midX, midY };
   }
 
-  if (mode === 'right-to-top') {
-    // Cubic: depart horizontally from source, arrive vertically into target top
-    const dxAbs = Math.abs(x2 - x1);
-    const dyAbs = Math.abs(y2 - y1);
-    const c1x = x1 + dxAbs * 0.7;
-    const c1y = y1;
-    const c2x = x2;
-    const c2y = y2 - dyAbs * 0.7;
-    const d = `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
-    return { d, midX: (x1 + x2) / 2, midY: (y1 + y2) / 2 };
-  }
+  // Auto cubic — control points push out perpendicular to each attachment edge.
+  // Shallower factor (0.3) for top/bottom attachments to keep arcs from over-extending.
+  const euclidean = Math.hypot(end.x - start.x, end.y - start.y);
+  const verticalAttach = (s: AttachSide) => s === 'top' || s === 'bottom';
+  const factor = (verticalAttach(fromAttach) || verticalAttach(toAttach)) ? 0.3 : 0.5;
+  const dist = euclidean * factor;
 
-  const dx = (x2 - x1) * 0.5;
-  const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-  return { d, midX: (x1 + x2) / 2, midY: (y1 + y2) / 2 };
+  const c1Off = controlOffset(fromAttach, dist);
+  const c2Off = controlOffset(toAttach,   dist);
+  const c1x = start.x + c1Off.dx;
+  const c1y = start.y + c1Off.dy;
+  const c2x = end.x   + c2Off.dx;
+  const c2y = end.y   + c2Off.dy;
+
+  const d = `M ${start.x} ${start.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${end.x} ${end.y}`;
+  const midX = 0.125 * start.x + 0.375 * c1x + 0.375 * c2x + 0.125 * end.x;
+  const midY = 0.125 * start.y + 0.375 * c1y + 0.375 * c2y + 0.125 * end.y;
+  return { d, midX, midY };
 }
 
 export function renderFunnel(root: HTMLElement): void {
@@ -228,7 +241,7 @@ export function renderFunnel(root: HTMLElement): void {
     drop.setAttribute('cy', String(cy));
     drop.setAttribute('rx', '3');
     drop.setAttribute('ry', '4.5');
-    drop.setAttribute('fill', '#e87b6b');
+    drop.setAttribute('fill', '#ef4444');
     drop.setAttribute('opacity', '0.92');
     drop.setAttribute('class', 'funnel-droplet');
     drop.dataset.leakId = leakId;
@@ -282,7 +295,7 @@ export function renderFunnel(root: HTMLElement): void {
     pctLabel.setAttribute('x', String(cx));
     pctLabel.setAttribute('y', String(LEAK_Y + LABEL_PCT_DY));
     pctLabel.setAttribute('text-anchor', 'middle');
-    pctLabel.setAttribute('fill', '#e87b6b');
+    pctLabel.setAttribute('fill', '#ef4444');
     pctLabel.setAttribute('font-size', '12');
     pctLabel.setAttribute('font-weight', '600');
     pctLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
@@ -295,7 +308,7 @@ export function renderFunnel(root: HTMLElement): void {
     causeLabel.setAttribute('x', String(cx));
     causeLabel.setAttribute('y', String(LEAK_Y + LABEL_CAUSE_DY));
     causeLabel.setAttribute('text-anchor', 'middle');
-    causeLabel.setAttribute('fill', '#e87b6b');
+    causeLabel.setAttribute('fill', '#ef4444');
     causeLabel.setAttribute('font-size', '12');
     causeLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
     causeLabel.dataset.leakId = leak.id;
