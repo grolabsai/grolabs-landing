@@ -183,6 +183,24 @@ body {
 .stage-row.is-active > td:last-child {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
+  position: relative;
+}
+
+/* Right-pointing chevron at the end of the active row → makes the visual
+   link between the row and the info panel obvious. Sits in the flex gap. */
+.stage-row.is-active > td:last-child::after {
+  content: '';
+  position: absolute;
+  right: -28px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 12px solid rgba(250, 225, 148, 0.55);
+  filter: drop-shadow(0 0 6px rgba(250, 225, 148, 0.25));
+  pointer-events: none;
 }
 
 /* Hover info panel — sits between the funnel diagram and the red banner */
