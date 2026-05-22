@@ -9,6 +9,8 @@ type Stage = {
   icon: string;
   x: number;
   y: number;
+  /** Override the default STAGE_W. Useful for stages with longer labels (e.g. Product page). */
+  width?: number;
   /** Descriptive text shown in the info panel on hover */
   tooltip?: string;
 };
@@ -51,11 +53,12 @@ const STAGES: Stage[] = [
   { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 490,  y: 90,
+  // Browsing shifted left so the 25% pill can sit close to its right edge.
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 400,  y: 90,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  // Main-row continuation. PDP→Cart and Cart→Checkout gaps shrink to 120 px to feed the wider Home→PDP gap above.
-  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 740,  y: 55,
+  // Main-row continuation. PDP gets a wider box so the "Product page" label fits comfortably.
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 740,  y: 55,  width: 160,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
   { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 990,  y: 55,
@@ -72,9 +75,12 @@ const TRANSITIONS: Transition[] = [
   // labelOffset shifts the 45% pill RIGHT of the Search leak column (which falls at x≈315).
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward',
     labelOffset: { dx: 80 } },
-  // Search → PDP and Browsing → PDP both run right→left, keeping the space above Search free.
-  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
-  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward' },
+  // 35% pill lifted up to the level of Search's top edge — breathing room above the cluster.
+  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward',
+    labelOffset: { dy: -55 } },
+  // 25% pill pulled LEFT to sit close to Browsing's (new) right edge instead of mid-arrow.
+  { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward',
+    labelOffset: { dx: -75 } },
   { id: 't-pdp-cart',      from: 'pdp',      to: 'cart',     pct: 20, variant: 'forward' },
   { id: 't-cart-checkout', from: 'cart',     to: 'checkout', pct: 30, variant: 'forward' },
 ];
@@ -95,7 +101,8 @@ const LEAK_Y = 180;                // drops end at the top of the red bar
 const LEAK_ARROW_START_DY = 8;     // drop column starts just below stage box
 const BAR_Y = 180;                 // red bar top edge (drops meet it)
 const BAR_H = 105;                 // red bar height (% + cause + title fit inside)
-const VIEWBOX = { x: 0, y: 0, w: 1400, h: BAR_Y + BAR_H };
+// Top extends to -15 so the 35% pill (lifted to the level of Search's top edge) has clearance.
+const VIEWBOX = { x: 0, y: -15, w: 1400, h: BAR_Y + BAR_H + 15 };
 
 const STAGE_FILL = '#000000';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
@@ -122,16 +129,21 @@ function leakPctFor(leak: Leak): number {
 
 function leakX(l: Leak): number {
   const stage = stageById(l.fromStageId);
-  const offset = l.xOffset ?? STAGE_W / 2;
+  const offset = l.xOffset ?? stageWidth(stage) / 2;
   return stage.x + offset;
 }
 
+function stageWidth(stage: Stage): number {
+  return stage.width ?? STAGE_W;
+}
+
 function attachPoint(stage: Stage, side: AttachSide): { x: number; y: number } {
+  const w = stageWidth(stage);
   switch (side) {
-    case 'right':  return { x: stage.x + STAGE_W,     y: stage.y + STAGE_H / 2 };
-    case 'left':   return { x: stage.x,               y: stage.y + STAGE_H / 2 };
-    case 'top':    return { x: stage.x + STAGE_W / 2, y: stage.y };
-    case 'bottom': return { x: stage.x + STAGE_W / 2, y: stage.y + STAGE_H };
+    case 'right':  return { x: stage.x + w,     y: stage.y + STAGE_H / 2 };
+    case 'left':   return { x: stage.x,         y: stage.y + STAGE_H / 2 };
+    case 'top':    return { x: stage.x + w / 2, y: stage.y };
+    case 'bottom': return { x: stage.x + w / 2, y: stage.y + STAGE_H };
   }
 }
 
@@ -370,12 +382,17 @@ export function renderFunnel(root: HTMLElement): void {
   const cartTopY = cartStage.y;
   const cartBottomY = cartStage.y + STAGE_H;
 
-  // 35% (above the main line) — arcs over PDP, lands on Cart's top edge just inside the left side.
+  // C2 offset chosen so the end tangent at Cart lands at a 45° angle (instead of
+  // a perpendicular vertical/horizontal approach) — the auto-rotating arrow marker
+  // then naturally tilts to match the line's diagonal.
+  const TANGENT_OFFSET = 40;
+
+  // 35% (above the main line) — arcs over PDP, lands on Cart's top edge at 45° down-right.
   const connector35 = document.createElementNS(svgNS, 'path');
   connector35.setAttribute(
     'd',
     `M ${searchPdpPill.midX} ${searchPdpPill.midY} ` +
-      `C ${searchPdpPill.midX} 15, ${connectorEndX} 15, ${connectorEndX} ${cartTopY}`,
+      `C ${searchPdpPill.midX} 15, ${connectorEndX - TANGENT_OFFSET} 15, ${connectorEndX} ${cartTopY}`,
   );
   connector35.setAttribute('stroke', FORWARD_STROKE);
   connector35.setAttribute('stroke-width', '1.5');
@@ -386,12 +403,12 @@ export function renderFunnel(root: HTMLElement): void {
   connector35.setAttribute('marker-end', 'url(#arrow-forward)');
   connectorGroup.appendChild(connector35);
 
-  // 25% (below the main line) — dips under PDP, lands on Cart's bottom edge just inside the left side.
+  // 25% (below the main line) — dips under PDP, lands on Cart's bottom edge at 45° up-right.
   const connector25 = document.createElementNS(svgNS, 'path');
   connector25.setAttribute(
     'd',
     `M ${browsingPdpPill.midX} ${browsingPdpPill.midY} ` +
-      `C ${browsingPdpPill.midX} 150, ${connectorEndX} 150, ${connectorEndX} ${cartBottomY}`,
+      `C ${browsingPdpPill.midX} 150, ${connectorEndX - TANGENT_OFFSET} ${cartBottomY + TANGENT_OFFSET}, ${connectorEndX} ${cartBottomY}`,
   );
   connector25.setAttribute('stroke', FORWARD_STROKE);
   connector25.setAttribute('stroke-width', '1.5');
@@ -415,13 +432,14 @@ export function renderFunnel(root: HTMLElement): void {
   const CENTER_Y = STAGE_H / 2;   // both icon and label use dominant-baseline=central
 
   STAGES.forEach((stage) => {
+    const w = stageWidth(stage);
     const group = document.createElementNS(svgNS, 'g');
     group.setAttribute('transform', `translate(${stage.x}, ${stage.y})`);
     group.style.cursor = 'pointer';
     group.dataset.stageId = stage.id;
 
     const rect = document.createElementNS(svgNS, 'rect');
-    rect.setAttribute('width', String(STAGE_W));
+    rect.setAttribute('width', String(w));
     rect.setAttribute('height', String(STAGE_H));
     rect.setAttribute('rx', '10');
     rect.setAttribute('fill', STAGE_FILL);
@@ -430,10 +448,10 @@ export function renderFunnel(root: HTMLElement): void {
     rect.style.transition = 'filter 180ms ease, stroke 180ms ease';
     group.appendChild(rect);
 
-    // Center the icon+label combo horizontally within the box
+    // Center the icon+label combo horizontally within the box's width
     const labelWidth = stage.label.length * CHAR_W;
     const totalWidth = ICON_FS + ICON_LABEL_GAP + labelWidth;
-    const startX = Math.max(10, (STAGE_W - totalWidth) / 2);
+    const startX = Math.max(10, (w - totalWidth) / 2);
 
     const iconText = document.createElementNS(svgNS, 'text');
     iconText.setAttribute('x', String(startX));
