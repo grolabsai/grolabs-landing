@@ -1,16 +1,14 @@
-// Interactive funnel diagram — matches the second-screenshot reference:
-// Traffic → Home → (Search / Browsing) → Product detail page → Cart → Checkout
-// plus 12% direct-to-PDP shortcut and red dashed leak arrows at every stage.
-// Hover any stage to isolate the transitions and leaks tied to it.
+// Interactive funnel diagram — uniform kinetic-yellow stage cards.
+// Traffic → Home → (Search / Browsing) → Product detail → Cart → Checkout
+// + 12% direct-to-PDP shortcut arcing high above the diagram (clears Search)
+// + dropout % labels above every red leak arrow (sum of arrows out of each stage = 100)
+// Hover any stage to isolate its transitions and leaks.
 
 type Stage = {
   id: string;
   label: string;
   x: number;
   y: number;
-  fill: string;
-  border: string;
-  text: string;
 };
 
 type Transition = {
@@ -27,23 +25,25 @@ type Leak = {
   id: string;
   fromStageId: string;
   label: string;
+  /** Override the computed dropout (used for terminal stages where 100 − sum(forwards) is meaningless). */
+  pctOverride?: number;
 };
 
 const STAGES: Stage[] = [
-  { id: 'traffic',  label: 'Traffic',         x: 60,   y: 240, fill: '#f5efe4', border: '#d8c79a', text: '#3a2f12' },
-  { id: 'home',     label: 'Home',            x: 260,  y: 240, fill: '#eae6f5', border: '#9c95c5', text: '#241f4d' },
-  { id: 'search',   label: 'Search',          x: 470,  y: 120, fill: '#e2f3df', border: '#79b46b', text: '#1d3a18' },
-  { id: 'browsing', label: 'Browsing',        x: 470,  y: 360, fill: '#fae1c7', border: '#d49866', text: '#3d2410' },
-  { id: 'pdp',      label: 'Product detail',  x: 690,  y: 240, fill: '#f5d8cf', border: '#cd7666', text: '#3d1610' },
-  { id: 'cart',     label: 'Cart',            x: 920,  y: 240, fill: '#f3cfdc', border: '#c66b8d', text: '#3a0f1f' },
-  { id: 'checkout', label: 'Checkout',        x: 1130, y: 240, fill: '#d0f0d5', border: '#5fa370', text: '#0f3318' },
+  { id: 'traffic',  label: 'Traffic',        x: 60,   y: 200 },
+  { id: 'home',     label: 'Home',           x: 260,  y: 200 },
+  { id: 'search',   label: 'Search',         x: 470,  y: 60  },
+  { id: 'browsing', label: 'Browsing',       x: 470,  y: 320 },
+  { id: 'pdp',      label: 'Product detail', x: 690,  y: 200 },
+  { id: 'cart',     label: 'Cart',           x: 920,  y: 200 },
+  { id: 'checkout', label: 'Checkout',       x: 1130, y: 200 },
 ];
 
 const TRANSITIONS: Transition[] = [
   { id: 't-traffic-home',  from: 'traffic',  to: 'home',     pct: 62, variant: 'forward' },
   { id: 't-traffic-pdp',   from: 'traffic',  to: 'pdp',      pct: 12, variant: 'shortcut',
     labelOverride: '12% direct to PDP',
-    curve: { cx: 600, cy: -20 } },
+    curve: { cx: 440, cy: -240 } },
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
@@ -59,12 +59,22 @@ const LEAKS: Leak[] = [
   { id: 'leak-browsing', fromStageId: 'browsing', label: 'no results' },
   { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'exit' },
   { id: 'leak-cart',     fromStageId: 'cart',     label: 'abandoned cart' },
-  { id: 'leak-checkout', fromStageId: 'checkout', label: 'returns' },
+  { id: 'leak-checkout', fromStageId: 'checkout', label: 'returns', pctOverride: 17 },
 ];
 
+// Geometry
 const STAGE_W = 130;
 const STAGE_H = 50;
-const LEAK_Y = 540;
+const LEAK_Y = 430;
+const LEAK_LABEL_Y = 455;
+const DROPOUT_LABEL_DY = 14; // px below stage bottom
+const LEAK_ARROW_START_DY = 26; // px below stage bottom — leaves space for the % label
+const VIEWBOX = { x: 0, y: -40, w: 1300, h: 510 };
+
+// Uniform kinetic-yellow palette for every box
+const STAGE_FILL = '#fae194';
+const STAGE_BORDER = '#d4af37';
+const STAGE_TEXT = '#18181b';
 
 function stageById(id: string): Stage {
   const s = STAGES.find((x) => x.id === id);
@@ -72,14 +82,32 @@ function stageById(id: string): Stage {
   return s;
 }
 
+function leakPctFor(leak: Leak): number {
+  if (leak.pctOverride !== undefined) return leak.pctOverride;
+  const totalForward = TRANSITIONS
+    .filter((t) => t.from === leak.fromStageId)
+    .reduce((sum, t) => sum + t.pct, 0);
+  return 100 - totalForward;
+}
+
 function transitionPath(t: Transition): { d: string; midX: number; midY: number } {
   const from = stageById(t.from);
   const to = stageById(t.to);
 
-  const x1 = from.x + STAGE_W;
-  const y1 = from.y + STAGE_H / 2;
-  const x2 = to.x;
-  const y2 = to.y + STAGE_H / 2;
+  let x1: number, y1: number, x2: number, y2: number;
+  if (t.variant === 'shortcut') {
+    // Attach to top-center of source and target — arc rides above
+    x1 = from.x + STAGE_W / 2;
+    y1 = from.y;
+    x2 = to.x + STAGE_W / 2;
+    y2 = to.y;
+  } else {
+    // Normal forward: right edge → left edge, midline-to-midline
+    x1 = from.x + STAGE_W;
+    y1 = from.y + STAGE_H / 2;
+    x2 = to.x;
+    y2 = to.y + STAGE_H / 2;
+  }
 
   if (t.curve) {
     const d = `M ${x1} ${y1} Q ${t.curve.cx} ${t.curve.cy} ${x2} ${y2}`;
@@ -96,17 +124,15 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
 function leakPath(l: Leak): string {
   const stage = stageById(l.fromStageId);
   const x = stage.x + STAGE_W / 2;
-  const yTop = stage.y + STAGE_H;
+  const yTop = stage.y + STAGE_H + LEAK_ARROW_START_DY;
   return `M ${x} ${yTop} L ${x} ${LEAK_Y}`;
 }
 
 export function renderFunnel(root: HTMLElement): void {
-  const VIEWBOX_W = 1300;
-  const VIEWBOX_H = 620;
   const svgNS = 'http://www.w3.org/2000/svg';
 
   const svg = document.createElementNS(svgNS, 'svg');
-  svg.setAttribute('viewBox', `0 0 ${VIEWBOX_W} ${VIEWBOX_H}`);
+  svg.setAttribute('viewBox', `${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.w} ${VIEWBOX.h}`);
   svg.setAttribute('width', '100%');
   svg.setAttribute('height', 'auto');
   svg.setAttribute('role', 'img');
@@ -131,10 +157,15 @@ export function renderFunnel(root: HTMLElement): void {
   `;
   svg.appendChild(defs);
 
-  // ---- Leak arrows (behind everything) ----
+  // ---- Leak arrows + dropout % labels + bottom leak labels ----
   const leakGroup = document.createElementNS(svgNS, 'g');
   leakGroup.setAttribute('class', 'funnel-leaks');
   LEAKS.forEach((leak) => {
+    const stage = stageById(leak.fromStageId);
+    const cx = stage.x + STAGE_W / 2;
+    const pct = leakPctFor(leak);
+
+    // Vertical dashed leak arrow
     const path = document.createElementNS(svgNS, 'path');
     path.setAttribute('d', leakPath(leak));
     path.setAttribute('stroke', '#e87b6b');
@@ -147,14 +178,28 @@ export function renderFunnel(root: HTMLElement): void {
     path.style.transition = 'opacity 200ms ease';
     leakGroup.appendChild(path);
 
-    const stage = stageById(leak.fromStageId);
+    // Dropout % label — sits just below the box, above the arrow body
+    const pctLabel = document.createElementNS(svgNS, 'text');
+    pctLabel.setAttribute('x', String(cx));
+    pctLabel.setAttribute('y', String(stage.y + STAGE_H + DROPOUT_LABEL_DY));
+    pctLabel.setAttribute('text-anchor', 'middle');
+    pctLabel.setAttribute('fill', '#e87b6b');
+    pctLabel.setAttribute('font-size', '12');
+    pctLabel.setAttribute('font-weight', '600');
+    pctLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+    pctLabel.dataset.leakId = leak.id;
+    pctLabel.textContent = `${pct}%`;
+    leakGroup.appendChild(pctLabel);
+
+    // Bottom leak label (bounce / no results / abandoned cart / …)
     const label = document.createElementNS(svgNS, 'text');
-    label.setAttribute('x', String(stage.x + STAGE_W / 2));
-    label.setAttribute('y', String(LEAK_Y + 25));
+    label.setAttribute('x', String(cx));
+    label.setAttribute('y', String(LEAK_LABEL_Y));
     label.setAttribute('text-anchor', 'middle');
     label.setAttribute('fill', '#e87b6b');
     label.setAttribute('font-size', '13');
     label.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+    label.dataset.leakId = leak.id;
     label.textContent = leak.label;
     leakGroup.appendChild(label);
   });
@@ -182,7 +227,7 @@ export function renderFunnel(root: HTMLElement): void {
     path.style.transition = 'opacity 200ms ease, stroke-width 200ms ease';
     edgeGroup.appendChild(path);
 
-    // Percentage label in a rounded pill
+    // Percentage pill at midpoint (for shortcut, that's the arc apex)
     const labelText = t.labelOverride ?? `${t.pct}%`;
     const padX = 12;
     const estimatedWidth = labelText.length * 7.5 + padX * 2;
@@ -217,7 +262,7 @@ export function renderFunnel(root: HTMLElement): void {
   });
   svg.appendChild(edgeGroup);
 
-  // ---- Stage cards ----
+  // ---- Stage cards (uniform kinetic yellow) ----
   const stageGroup = document.createElementNS(svgNS, 'g');
   stageGroup.setAttribute('class', 'funnel-stages');
 
@@ -231,8 +276,8 @@ export function renderFunnel(root: HTMLElement): void {
     rect.setAttribute('width', String(STAGE_W));
     rect.setAttribute('height', String(STAGE_H));
     rect.setAttribute('rx', '10');
-    rect.setAttribute('fill', stage.fill);
-    rect.setAttribute('stroke', stage.border);
+    rect.setAttribute('fill', STAGE_FILL);
+    rect.setAttribute('stroke', STAGE_BORDER);
     rect.setAttribute('stroke-width', '1.5');
     rect.style.transition = 'filter 180ms ease';
     group.appendChild(rect);
@@ -241,7 +286,7 @@ export function renderFunnel(root: HTMLElement): void {
     text.setAttribute('x', String(STAGE_W / 2));
     text.setAttribute('y', String(STAGE_H / 2 + 5));
     text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('fill', stage.text);
+    text.setAttribute('fill', STAGE_TEXT);
     text.setAttribute('font-size', '15');
     text.setAttribute('font-weight', '500');
     text.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
@@ -266,11 +311,11 @@ export function renderFunnel(root: HTMLElement): void {
       p.setAttribute('opacity', involved ? '1' : '0.18');
       p.setAttribute('stroke-width', involved ? '3' : '2');
     });
-    leakGroup.querySelectorAll<SVGPathElement>('[data-leak-id]').forEach((p) => {
-      const lid = p.dataset.leakId!;
+    leakGroup.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
+      const lid = el.dataset.leakId!;
       const l = LEAKS.find((x) => x.id === lid)!;
       const involved = l.fromStageId === stageId;
-      p.setAttribute('opacity', involved ? '1' : '0.18');
+      el.setAttribute('opacity', involved ? '1' : '0.18');
     });
     stageGroup.querySelectorAll<SVGGElement>('[data-stage-id]').forEach((g) => {
       const dimmed = g.dataset.stageId !== stageId;
@@ -285,8 +330,11 @@ export function renderFunnel(root: HTMLElement): void {
       p.setAttribute('opacity', '0.9');
       p.setAttribute('stroke-width', '2');
     });
-    leakGroup.querySelectorAll<SVGPathElement>('[data-leak-id]').forEach((p) => {
-      p.setAttribute('opacity', '0.7');
+    leakGroup.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
+      // Path strokes / text fills get the same opacity treatment
+      const tag = el.tagName.toLowerCase();
+      if (tag === 'path') el.setAttribute('opacity', '0.7');
+      else el.setAttribute('opacity', '1');
     });
     stageGroup.querySelectorAll<SVGGElement>('[data-stage-id]').forEach((g) => {
       (g.firstChild as SVGRectElement).style.filter = 'none';
