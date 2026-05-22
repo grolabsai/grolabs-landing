@@ -22,6 +22,8 @@ type Transition = {
   curve?: { cx: number; cy: number };
   /** 'forward' = straight midline; 'shortcut' = top→top arc-over. Visual styling identical. */
   variant: 'forward' | 'shortcut';
+  /** Target attachment override for forward variant ('top' = land on top edge instead of left edge). */
+  toAttach?: 'top';
 };
 
 type Leak = {
@@ -45,7 +47,7 @@ const STAGES: Stage[] = [
   { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 610,  y: 380,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  { id: 'pdp',      label: 'Product page', icon: 'shopping_bag',  x: 800,  y: 380,
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 800,  y: 380,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
   { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 1030, y: 380,
@@ -63,7 +65,7 @@ const TRANSITIONS: Transition[] = [
     curve: { cx: 495, cy: -450 } },
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
-  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
+  { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward', toAttach: 'top' },
   { id: 't-browsing-pdp',  from: 'browsing', to: 'pdp',      pct: 25, variant: 'forward' },
   { id: 't-pdp-cart',      from: 'pdp',      to: 'cart',     pct: 12, variant: 'forward' },
   { id: 't-cart-checkout', from: 'cart',     to: 'checkout', pct: 30, variant: 'forward' },
@@ -121,16 +123,26 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
   const to = stageById(t.to);
 
   let x1: number, y1: number, x2: number, y2: number;
+  let mode: 'horizontal' | 'right-to-top' | 'shortcut';
+
   if (t.variant === 'shortcut') {
     x1 = from.x + STAGE_W / 2;
     y1 = from.y;
     x2 = to.x + STAGE_W / 2;
     y2 = to.y;
+    mode = 'shortcut';
+  } else if (t.toAttach === 'top') {
+    x1 = from.x + STAGE_W;
+    y1 = from.y + STAGE_H / 2;
+    x2 = to.x + STAGE_W / 2;
+    y2 = to.y;
+    mode = 'right-to-top';
   } else {
     x1 = from.x + STAGE_W;
     y1 = from.y + STAGE_H / 2;
     x2 = to.x;
     y2 = to.y + STAGE_H / 2;
+    mode = 'horizontal';
   }
 
   if (t.curve) {
@@ -140,16 +152,21 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
     return { d, midX, midY };
   }
 
+  if (mode === 'right-to-top') {
+    // Cubic: depart horizontally from source, arrive vertically into target top
+    const dxAbs = Math.abs(x2 - x1);
+    const dyAbs = Math.abs(y2 - y1);
+    const c1x = x1 + dxAbs * 0.7;
+    const c1y = y1;
+    const c2x = x2;
+    const c2y = y2 - dyAbs * 0.7;
+    const d = `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
+    return { d, midX: (x1 + x2) / 2, midY: (y1 + y2) / 2 };
+  }
+
   const dx = (x2 - x1) * 0.5;
   const d = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
   return { d, midX: (x1 + x2) / 2, midY: (y1 + y2) / 2 };
-}
-
-function leakPath(l: Leak): string {
-  const stage = stageById(l.fromStageId);
-  const x = leakX(l);
-  const yTop = stage.y + STAGE_H + LEAK_ARROW_START_DY;
-  return `M ${x} ${yTop} L ${x} ${LEAK_Y}`;
 }
 
 export function renderFunnel(root: HTMLElement): void {
@@ -167,14 +184,11 @@ export function renderFunnel(root: HTMLElement): void {
   );
   svg.classList.add('select-none');
 
-  // ---- Defs (arrowhead markers) ----
+  // ---- Defs (only forward arrow marker; leaks render as falling droplets) ----
   const defs = document.createElementNS(svgNS, 'defs');
   defs.innerHTML = `
     <marker id="arrow-forward" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="${FORWARD_STROKE}" />
-    </marker>
-    <marker id="arrow-leak" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e87b6b" />
     </marker>
   `;
   svg.appendChild(defs);
@@ -209,39 +223,71 @@ export function renderFunnel(root: HTMLElement): void {
   const infoTitle = panel.querySelector<HTMLElement>('[data-info-title]')!;
   const infoBody = panel.querySelector<HTMLElement>('[data-info-body]')!;
 
-  // ---- Leak arrows + bottom-of-line labels ----
+  // ---- Leak droplets + bottom-of-line labels ----
   const leakGroup = document.createElementNS(svgNS, 'g');
   leakGroup.setAttribute('class', 'funnel-leaks');
 
+  const reduceMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const DROP_DURATION = 1.5;
+  const DROP_COUNT = 3;
+  const DROP_STAGGER = DROP_DURATION / DROP_COUNT;
+  const DROP_END_DY = -36; // drops stop this far above LEAK_Y, well clear of the labels
+
+  function makeDroplet(cx: number, cy: number, leakId: string): SVGEllipseElement {
+    const drop = document.createElementNS(svgNS, 'ellipse');
+    drop.setAttribute('cx', String(cx));
+    drop.setAttribute('cy', String(cy));
+    drop.setAttribute('rx', '3');
+    drop.setAttribute('ry', '4.5');
+    drop.setAttribute('fill', '#e87b6b');
+    drop.setAttribute('opacity', '0.92');
+    drop.setAttribute('class', 'funnel-droplet');
+    drop.dataset.leakId = leakId;
+    return drop;
+  }
+
   LEAKS.forEach((leak) => {
+    const stage = stageById(leak.fromStageId);
     const cx = leakX(leak);
     const pct = leakPctFor(leak);
+    const yStart = stage.y + STAGE_H + LEAK_ARROW_START_DY;
+    const yEnd = LEAK_Y + DROP_END_DY;
+    const dropDist = yEnd - yStart;
 
-    // Vertical dashed leak arrow (animated)
-    const path = document.createElementNS(svgNS, 'path');
-    path.setAttribute('d', leakPath(leak));
-    path.setAttribute('stroke', '#e87b6b');
-    path.setAttribute('stroke-width', '1.5');
-    path.setAttribute('stroke-dasharray', '4 4');
-    path.setAttribute('fill', 'none');
-    path.setAttribute('marker-end', 'url(#arrow-leak)');
-    path.setAttribute('opacity', '0.85');
-    path.setAttribute('class', 'funnel-leak-path');
-    path.dataset.leakId = leak.id;
-    leakGroup.appendChild(path);
+    if (reduceMotion || dropDist <= 0) {
+      // Static drops evenly along the column — no animation
+      for (let i = 0; i < 3; i++) {
+        const cy = yStart + (dropDist * (i + 0.5)) / 3;
+        leakGroup.appendChild(makeDroplet(cx, cy, leak.id));
+      }
+    } else {
+      for (let i = 0; i < DROP_COUNT; i++) {
+        const drop = makeDroplet(cx, yStart, leak.id);
 
-    // Mask rect — paints over the arrow behind the labels so dashes don't poke through
-    const mask = document.createElementNS(svgNS, 'rect');
-    mask.setAttribute('x', String(cx - 48));
-    mask.setAttribute('y', String(LEAK_Y - 34));
-    mask.setAttribute('width', '96');
-    mask.setAttribute('height', '32');
-    mask.setAttribute('fill', '#16161a');
-    mask.setAttribute('rx', '4');
-    mask.dataset.leakId = leak.id;
-    leakGroup.appendChild(mask);
+        const motion = document.createElementNS(svgNS, 'animateMotion');
+        motion.setAttribute('path', `M 0 0 L 0 ${dropDist}`);
+        motion.setAttribute('dur', `${DROP_DURATION}s`);
+        motion.setAttribute('repeatCount', 'indefinite');
+        motion.setAttribute('begin', `-${i * DROP_STAGGER}s`);
+        drop.appendChild(motion);
 
-    // Dropout % — closer to the arrowhead, above the cause label
+        const fade = document.createElementNS(svgNS, 'animate');
+        fade.setAttribute('attributeName', 'opacity');
+        fade.setAttribute('values', '0; 0.95; 0.95; 0');
+        fade.setAttribute('keyTimes', '0; 0.18; 0.82; 1');
+        fade.setAttribute('dur', `${DROP_DURATION}s`);
+        fade.setAttribute('repeatCount', 'indefinite');
+        fade.setAttribute('begin', `-${i * DROP_STAGGER}s`);
+        drop.appendChild(fade);
+
+        leakGroup.appendChild(drop);
+      }
+    }
+
+    // Dropout %
     const pctLabel = document.createElementNS(svgNS, 'text');
     pctLabel.setAttribute('x', String(cx));
     pctLabel.setAttribute('y', String(LEAK_Y + LABEL_PCT_DY));
@@ -254,7 +300,7 @@ export function renderFunnel(root: HTMLElement): void {
     pctLabel.textContent = `${pct}%`;
     leakGroup.appendChild(pctLabel);
 
-    // Cause label — just above the arrowhead
+    // Cause label
     const causeLabel = document.createElementNS(svgNS, 'text');
     causeLabel.setAttribute('x', String(cx));
     causeLabel.setAttribute('y', String(LEAK_Y + LABEL_CAUSE_DY));
