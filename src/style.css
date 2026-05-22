@@ -157,6 +157,30 @@ body {
   filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4));
 }
 
+/* Luminous Equation — Returns block slides in horizontally when the section
+   crosses 50% into the viewport. The "transition: all 800ms" was 800px in
+   the spec; corrected to ms. */
+.hidden-element {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transform: translateX(20px);
+  transition: all 800ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hidden-element.revealed {
+  opacity: 1;
+  max-width: 500px;
+  transform: translateX(0);
+  margin-right: 2rem;
+}
+.equation-card {
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.equation-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 
 /* Material Symbols inside SVG <text> — medium-thin stroke at the smaller stage icon size */
 .funnel-icon {

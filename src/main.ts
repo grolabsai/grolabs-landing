@@ -137,16 +137,24 @@ if (particlesContainer) {
 }
 
 // ============================================================
-// Interactive Tab Buttons (Apps & sites tab strip)
+// Luminous Equation — reveal the Returns block once the section is 50%
+// into the viewport. 400 ms delay so the user reads the baseline equation
+// (Traffic × Conversion = Revenue) before the disruption injects "− Returns".
 // ============================================================
-const tabButtons = document.querySelectorAll<HTMLButtonElement>('button.rounded-full');
-tabButtons.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    tabButtons.forEach((b) => {
-      b.classList.remove('bg-primary', 'text-on-primary', 'scale-105');
-      b.classList.add('border', 'border-zinc-700', 'text-zinc-400');
-    });
-    btn.classList.add('bg-primary', 'text-on-primary', 'scale-105');
-    btn.classList.remove('border', 'border-zinc-700', 'text-zinc-400');
-  });
-});
+const revenueEquation = document.getElementById('revenue-equation');
+const returnsReveal = document.getElementById('returns-reveal');
+if (revenueEquation && returnsReveal) {
+  const equationObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        setTimeout(() => {
+          returnsReveal.classList.add('revealed');
+        }, 400);
+        equationObserver.unobserve(entry.target);
+      });
+    },
+    { root: null, threshold: 0.5 },
+  );
+  equationObserver.observe(revenueEquation);
+}
