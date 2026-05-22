@@ -138,9 +138,11 @@ if (particlesContainer) {
 
 // ============================================================
 // "if they find what they want" — scroll-pinned highlight animation.
-// First time the Internal Site Search card crosses ~60% into view,
-// scroll is locked, the phrase turns yellow, a hand-drawn ellipse strokes
-// in around it, then scroll resumes. Fires once per page load.
+// Triggers only when the Internal Site Search card's vertical centre is at
+// the viewport's vertical centre (within 40 px). Locks scroll, paints the
+// yellow swap + hand-drawn ellipse, then restores scroll (with
+// scroll-behavior temporarily set to 'auto' so smooth-scroll doesn't
+// animate a visible jump back). Fires once per page load.
 // ============================================================
 const searchQuote = document.querySelector<HTMLElement>('[data-search-quote]');
 if (searchQuote) {
@@ -159,40 +161,50 @@ if (searchQuote) {
 
   const unlockScroll = () => {
     const scrollY = parseInt(document.body.dataset.scrollY ?? '0', 10);
+    const html = document.documentElement;
+    const prevBehavior = html.style.scrollBehavior;
+    // html.scroll-smooth would animate the scrollTo below — bypass it.
+    html.style.scrollBehavior = 'auto';
+
     document.body.classList.remove('is-scroll-locked');
     document.body.style.top = '';
     delete document.body.dataset.scrollY;
     window.scrollTo(0, scrollY);
+
+    requestAnimationFrame(() => {
+      html.style.scrollBehavior = prevBehavior;
+    });
   };
 
-  const quoteObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting || triggered) return;
-        triggered = true;
-        quoteObserver.disconnect();
+  const fire = () => {
+    if (reduceMotion) {
+      phrase?.classList.add('is-highlighted');
+      circle?.classList.add('is-drawn');
+      return;
+    }
+    lockScroll();
+    requestAnimationFrame(() => {
+      phrase?.classList.add('is-highlighted');
+      circle?.classList.add('is-drawn');
+    });
+    setTimeout(unlockScroll, 1700);
+  };
 
-        if (reduceMotion) {
-          phrase?.classList.add('is-highlighted');
-          circle?.classList.add('is-drawn');
-          return;
-        }
+  const handleQuoteScroll = () => {
+    if (triggered) return;
+    const rect = searchQuote.getBoundingClientRect();
+    const targetCenter = rect.top + rect.height / 2;
+    const viewportCenter = window.innerHeight / 2;
+    if (Math.abs(targetCenter - viewportCenter) < 40) {
+      triggered = true;
+      window.removeEventListener('scroll', handleQuoteScroll);
+      fire();
+    }
+  };
 
-        // Tiny grace period so the lock doesn't fight the scroll gesture mid-flight
-        setTimeout(() => {
-          lockScroll();
-          requestAnimationFrame(() => {
-            phrase?.classList.add('is-highlighted');
-            circle?.classList.add('is-drawn');
-          });
-          setTimeout(unlockScroll, 1700);
-        }, 80);
-      });
-    },
-    { threshold: 0.6 },
-  );
-
-  quoteObserver.observe(searchQuote);
+  window.addEventListener('scroll', handleQuoteScroll, { passive: true });
+  // Also evaluate once on load in case the card is already centred at load time.
+  handleQuoteScroll();
 }
 
 // ============================================================
