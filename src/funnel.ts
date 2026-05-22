@@ -42,16 +42,16 @@ const STAGES: Stage[] = [
   { id: 'search',   label: 'Search',       icon: 'search',        x: 540,  y: 60,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 610,  y: 320,
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 610,  y: 380,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
-  { id: 'pdp',      label: 'Product page', icon: 'shopping_bag',  x: 800,  y: 320,
+  { id: 'pdp',      label: 'Product page', icon: 'shopping_bag',  x: 800,  y: 380,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
-  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 1030, y: 320,
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 1030, y: 380,
     tooltip:
       "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
-  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1250, y: 320,
+  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1250, y: 380,
     tooltip:
       "Returns are driven by image vs. product mismatch, sizing/fit ambiguity, and missing detail photographs (texture, scale, packaging). Better PDPs reduce returns 30-50%." },
 ];
@@ -60,7 +60,7 @@ const TRANSITIONS: Transition[] = [
   { id: 't-traffic-home',  from: 'traffic',  to: 'home',     pct: 62, variant: 'forward' },
   { id: 't-traffic-pdp',   from: 'traffic',  to: 'pdp',      pct: 12, variant: 'shortcut',
     labelOverride: '12% direct to PDP',
-    curve: { cx: 495, cy: -360 } },
+    curve: { cx: 495, cy: -450 } },
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
@@ -72,7 +72,8 @@ const TRANSITIONS: Transition[] = [
 const LEAKS: Leak[] = [
   { id: 'leak-traffic',  fromStageId: 'traffic',  label: 'bounce' },
   { id: 'leak-home',     fromStageId: 'home',     label: 'home exit' },
-  { id: 'leak-search',   fromStageId: 'search',   label: 'no results', xOffset: 0 },
+  // Nudged right of Search's left edge so the line clears Browsing without aligning to either box edge
+  { id: 'leak-search',   fromStageId: 'search',   label: 'no results', xOffset: 35 },
   { id: 'leak-browsing', fromStageId: 'browsing', label: 'no results' },
   { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'exit' },
   { id: 'leak-cart',     fromStageId: 'cart',     label: 'abandoned cart' },
@@ -81,15 +82,16 @@ const LEAKS: Leak[] = [
 
 // Geometry
 const STAGE_W = 130;
-const STAGE_H = 50;
-const LEAK_Y = 460;
+const STAGE_H = 74;                // grew to fit stacked icon + label
+const LEAK_Y = 540;
 const LEAK_ARROW_START_DY = 8;     // arrow starts just below box
 const LABEL_PCT_DY = -22;          // % position relative to LEAK_Y (above arrowhead)
 const LABEL_CAUSE_DY = -6;         // cause label position relative to LEAK_Y (just above arrowhead)
-const VIEWBOX = { x: 0, y: -80, w: 1400, h: 540 };
+const VIEWBOX = { x: 0, y: -100, w: 1400, h: 680 };
 
 const STAGE_FILL = '#1b1b1e';
-const STAGE_BORDER = 'rgba(255, 255, 255, 0.08)';
+const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
+const STAGE_BORDER_W = 1.5;
 const STAGE_ACCENT = '#fae194'; // text + icon
 
 const FORWARD_STROKE = '#7ad196';
@@ -182,7 +184,7 @@ export function renderFunnel(root: HTMLElement): void {
   fo.setAttribute('x', '900');
   fo.setAttribute('y', '0');
   fo.setAttribute('width', '480');
-  fo.setAttribute('height', '300');
+  fo.setAttribute('height', '360');
 
   const panel = document.createElementNS(xhtmlNS, 'div') as HTMLDivElement;
   panel.setAttribute('class', 'funnel-info');
@@ -319,14 +321,14 @@ export function renderFunnel(root: HTMLElement): void {
   });
   svg.appendChild(edgeGroup);
 
-  // ---- Stage cards (dark fill, yellow icon + text, both LEFT-aligned + centered) ----
+  // ---- Stage cards (dark fill, large icon on top + label below, both centered) ----
   const stageGroup = document.createElementNS(svgNS, 'g');
   stageGroup.setAttribute('class', 'funnel-stages');
 
-  const ICON_SIZE = 16;
+  const ICON_FS = 32;
   const LABEL_FS = 14;
-  const ICON_LABEL_GAP = 6;
-  const CHAR_W = 7.0;
+  const ICON_BASELINE_Y = 42;
+  const LABEL_BASELINE_Y = 64;
 
   STAGES.forEach((stage) => {
     const group = document.createElementNS(svgNS, 'g');
@@ -337,33 +339,29 @@ export function renderFunnel(root: HTMLElement): void {
     const rect = document.createElementNS(svgNS, 'rect');
     rect.setAttribute('width', String(STAGE_W));
     rect.setAttribute('height', String(STAGE_H));
-    rect.setAttribute('rx', '10');
+    rect.setAttribute('rx', '12');
     rect.setAttribute('fill', STAGE_FILL);
     rect.setAttribute('stroke', STAGE_BORDER);
-    rect.setAttribute('stroke-width', '1');
+    rect.setAttribute('stroke-width', String(STAGE_BORDER_W));
     rect.style.transition = 'filter 180ms ease, stroke 180ms ease';
     group.appendChild(rect);
 
-    // Center the icon+label combo horizontally within the box
-    const labelWidth = stage.label.length * CHAR_W;
-    const totalWidth = ICON_SIZE + ICON_LABEL_GAP + labelWidth;
-    const startX = Math.max(10, (STAGE_W - totalWidth) / 2);
-    const baselineY = STAGE_H / 2 + 5; // vertically centered baseline
+    const cx = STAGE_W / 2;
 
     const iconText = document.createElementNS(svgNS, 'text');
-    iconText.setAttribute('x', String(startX));
-    iconText.setAttribute('y', String(baselineY));
-    iconText.setAttribute('text-anchor', 'start');
+    iconText.setAttribute('x', String(cx));
+    iconText.setAttribute('y', String(ICON_BASELINE_Y));
+    iconText.setAttribute('text-anchor', 'middle');
     iconText.setAttribute('fill', STAGE_ACCENT);
-    iconText.setAttribute('font-size', String(ICON_SIZE));
+    iconText.setAttribute('font-size', String(ICON_FS));
     iconText.setAttribute('class', 'funnel-icon');
     iconText.textContent = stage.icon;
     group.appendChild(iconText);
 
     const labelText = document.createElementNS(svgNS, 'text');
-    labelText.setAttribute('x', String(startX + ICON_SIZE + ICON_LABEL_GAP));
-    labelText.setAttribute('y', String(baselineY));
-    labelText.setAttribute('text-anchor', 'start');
+    labelText.setAttribute('x', String(cx));
+    labelText.setAttribute('y', String(LABEL_BASELINE_Y));
+    labelText.setAttribute('text-anchor', 'middle');
     labelText.setAttribute('fill', STAGE_ACCENT);
     labelText.setAttribute('font-size', String(LABEL_FS));
     labelText.setAttribute('font-weight', '500');
@@ -438,4 +436,13 @@ export function renderFunnel(root: HTMLElement): void {
       rectEl.style.filter = 'none';
     });
   }
+}
+
+// Vite HMR — hot-swap the funnel in place without reloading the whole page
+if (import.meta.hot) {
+  import.meta.hot.accept((newModule) => {
+    if (!newModule) return;
+    const root = document.getElementById('funnel-root');
+    if (root) (newModule as unknown as { renderFunnel: typeof renderFunnel }).renderFunnel(root);
+  });
 }

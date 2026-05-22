@@ -159,7 +159,7 @@ body {
   }
 }
 .funnel-leak-path {
-  animation: leak-flow 2.8s linear infinite;
+  animation: leak-flow 1.5s linear infinite;
 }
 
 /* Material Symbols inside SVG <text> — match the in-page icon weight */
