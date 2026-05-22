@@ -137,34 +137,6 @@ if (particlesContainer) {
 }
 
 // ============================================================
-// "if they find what they want" — fades to yellow when the Internal Site
-// Search card's vertical centre passes the viewport's vertical centre.
-// Doesn't lock scroll; just flips the .is-highlighted class once and lets
-// the CSS color transition handle the fade.
-// ============================================================
-const searchQuote = document.querySelector<HTMLElement>('[data-search-quote]');
-if (searchQuote) {
-  const phrase = searchQuote.querySelector<HTMLElement>('.highlight-phrase');
-  let triggered = false;
-
-  const handleQuoteScroll = () => {
-    if (triggered) return;
-    const rect = searchQuote.getBoundingClientRect();
-    const targetCenter = rect.top + rect.height / 2;
-    const viewportCenter = window.innerHeight / 2;
-    if (Math.abs(targetCenter - viewportCenter) < 40) {
-      triggered = true;
-      window.removeEventListener('scroll', handleQuoteScroll);
-      phrase?.classList.add('is-highlighted');
-    }
-  };
-
-  window.addEventListener('scroll', handleQuoteScroll, { passive: true });
-  // Initial check covers the card already being centred at load time.
-  handleQuoteScroll();
-}
-
-// ============================================================
 // Interactive Tab Buttons (Apps & sites tab strip)
 // ============================================================
 const tabButtons = document.querySelectorAll<HTMLButtonElement>('button.rounded-full');

@@ -157,10 +157,6 @@ body {
   filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4));
 }
 
-/* "if they find what they want" — yellow color swap when the card scrolls past viewport centre */
-.highlight-phrase.is-highlighted {
-  color: #fae194;
-}
 
 /* Material Symbols inside SVG <text> — medium-thin stroke at the smaller stage icon size */
 .funnel-icon {
