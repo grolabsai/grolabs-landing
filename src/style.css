@@ -152,11 +152,22 @@ body {
   transition: height 0.1s linear;
 }
 
+/* Leak arrows — slow downward dash flow, suggests revenue draining */
+@keyframes leak-flow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.funnel-leak-path {
+  animation: leak-flow 2.8s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .glass-card,
   .shimmer-btn,
-  .particle {
+  .particle,
+  .funnel-leak-path {
     transition: none !important;
     animation: none !important;
     transform: none !important;

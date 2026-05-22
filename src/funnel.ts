@@ -1,8 +1,5 @@
-// Interactive funnel diagram — uniform kinetic-yellow stage cards.
-// Traffic → Home → (Search / Browsing) → Product detail → Cart → Checkout
-// + 12% direct-to-PDP shortcut arcing high above the diagram (clears Search)
-// + dropout % labels above every red leak arrow (sum of arrows out of each stage = 100)
-// Hover any stage to isolate its transitions and leaks.
+// Interactive funnel diagram — uniform kinetic-yellow stages, top-arc shortcut,
+// leak labels above each leak arrow, animated leak lines pouring into the red banner.
 
 type Stage = {
   id: string;
@@ -18,6 +15,7 @@ type Transition = {
   pct: number;
   labelOverride?: string;
   curve?: { cx: number; cy: number };
+  /** 'forward' = standard right→left midline; 'shortcut' = top→top arc-over. Visual styling is identical. */
   variant: 'forward' | 'shortcut';
 };
 
@@ -27,23 +25,25 @@ type Leak = {
   label: string;
   /** Override the computed dropout (used for terminal stages where 100 − sum(forwards) is meaningless). */
   pctOverride?: number;
+  /** Horizontal offset of the leak column from `stage.x`. Default = STAGE_W / 2 (centered). */
+  xOffset?: number;
 };
 
 const STAGES: Stage[] = [
   { id: 'traffic',  label: 'Traffic',        x: 60,   y: 200 },
-  { id: 'home',     label: 'Home',           x: 260,  y: 200 },
-  { id: 'search',   label: 'Search',         x: 470,  y: 60  },
-  { id: 'browsing', label: 'Browsing',       x: 470,  y: 320 },
-  { id: 'pdp',      label: 'Product detail', x: 690,  y: 200 },
-  { id: 'cart',     label: 'Cart',           x: 920,  y: 200 },
-  { id: 'checkout', label: 'Checkout',       x: 1130, y: 200 },
+  { id: 'home',     label: 'Home',           x: 320,  y: 200 },
+  { id: 'search',   label: 'Search',         x: 540,  y: 60  },
+  { id: 'browsing', label: 'Browsing',       x: 610,  y: 320 },
+  { id: 'pdp',      label: 'Product detail', x: 800,  y: 200 },
+  { id: 'cart',     label: 'Cart',           x: 1030, y: 200 },
+  { id: 'checkout', label: 'Checkout',       x: 1250, y: 200 },
 ];
 
 const TRANSITIONS: Transition[] = [
   { id: 't-traffic-home',  from: 'traffic',  to: 'home',     pct: 62, variant: 'forward' },
   { id: 't-traffic-pdp',   from: 'traffic',  to: 'pdp',      pct: 12, variant: 'shortcut',
     labelOverride: '12% direct to PDP',
-    curve: { cx: 440, cy: -240 } },
+    curve: { cx: 495, cy: -240 } },
   { id: 't-home-search',   from: 'home',     to: 'search',   pct: 40, variant: 'forward' },
   { id: 't-home-browsing', from: 'home',     to: 'browsing', pct: 45, variant: 'forward' },
   { id: 't-search-pdp',    from: 'search',   to: 'pdp',      pct: 35, variant: 'forward' },
@@ -55,7 +55,8 @@ const TRANSITIONS: Transition[] = [
 const LEAKS: Leak[] = [
   { id: 'leak-traffic',  fromStageId: 'traffic',  label: 'bounce' },
   { id: 'leak-home',     fromStageId: 'home',     label: 'home exit' },
-  { id: 'leak-search',   fromStageId: 'search',   label: 'no results' },
+  // Search's leak column drops from the LEFT edge so it passes to the left of Browsing
+  { id: 'leak-search',   fromStageId: 'search',   label: 'no results', xOffset: 0 },
   { id: 'leak-browsing', fromStageId: 'browsing', label: 'no results' },
   { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'exit' },
   { id: 'leak-cart',     fromStageId: 'cart',     label: 'abandoned cart' },
@@ -65,16 +66,19 @@ const LEAKS: Leak[] = [
 // Geometry
 const STAGE_W = 130;
 const STAGE_H = 50;
-const LEAK_Y = 430;
-const LEAK_LABEL_Y = 455;
-const DROPOUT_LABEL_DY = 14; // px below stage bottom
-const LEAK_ARROW_START_DY = 26; // px below stage bottom — leaves space for the % label
-const VIEWBOX = { x: 0, y: -40, w: 1300, h: 510 };
+const LEAK_Y = 460;
+const PCT_LABEL_DY = 14;          // px below stage bottom — dropout %
+const CAUSE_LABEL_DY = 30;        // px below stage bottom — cause text (bounce / no results / …)
+const LEAK_ARROW_START_DY = 46;   // px below stage bottom — arrow starts here, leaves room for labels above
+const VIEWBOX = { x: 0, y: -40, w: 1400, h: 510 };
 
 // Uniform kinetic-yellow palette for every box
 const STAGE_FILL = '#fae194';
 const STAGE_BORDER = '#d4af37';
 const STAGE_TEXT = '#18181b';
+
+// Forward / shortcut arrow + pill share one visual style (the shortcut is just curved)
+const FORWARD_STROKE = '#7ad196';
 
 function stageById(id: string): Stage {
   const s = STAGES.find((x) => x.id === id);
@@ -90,19 +94,23 @@ function leakPctFor(leak: Leak): number {
   return 100 - totalForward;
 }
 
+function leakX(l: Leak): number {
+  const stage = stageById(l.fromStageId);
+  const offset = l.xOffset ?? STAGE_W / 2;
+  return stage.x + offset;
+}
+
 function transitionPath(t: Transition): { d: string; midX: number; midY: number } {
   const from = stageById(t.from);
   const to = stageById(t.to);
 
   let x1: number, y1: number, x2: number, y2: number;
   if (t.variant === 'shortcut') {
-    // Attach to top-center of source and target — arc rides above
     x1 = from.x + STAGE_W / 2;
     y1 = from.y;
     x2 = to.x + STAGE_W / 2;
     y2 = to.y;
   } else {
-    // Normal forward: right edge → left edge, midline-to-midline
     x1 = from.x + STAGE_W;
     y1 = from.y + STAGE_H / 2;
     x2 = to.x;
@@ -123,7 +131,7 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
 
 function leakPath(l: Leak): string {
   const stage = stageById(l.fromStageId);
-  const x = stage.x + STAGE_W / 2;
+  const x = leakX(l);
   const yTop = stage.y + STAGE_H + LEAK_ARROW_START_DY;
   return `M ${x} ${yTop} L ${x} ${LEAK_Y}`;
 }
@@ -146,10 +154,7 @@ export function renderFunnel(root: HTMLElement): void {
   const defs = document.createElementNS(svgNS, 'defs');
   defs.innerHTML = `
     <marker id="arrow-forward" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7ad196" />
-    </marker>
-    <marker id="arrow-shortcut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#fae194" />
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="${FORWARD_STROKE}" />
     </marker>
     <marker id="arrow-leak" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#e87b6b" />
@@ -157,15 +162,16 @@ export function renderFunnel(root: HTMLElement): void {
   `;
   svg.appendChild(defs);
 
-  // ---- Leak arrows + dropout % labels + bottom leak labels ----
+  // ---- Leak arrows + dropout % + cause label (stacked just below each box) ----
   const leakGroup = document.createElementNS(svgNS, 'g');
   leakGroup.setAttribute('class', 'funnel-leaks');
+
   LEAKS.forEach((leak) => {
     const stage = stageById(leak.fromStageId);
-    const cx = stage.x + STAGE_W / 2;
+    const cx = leakX(leak);
     const pct = leakPctFor(leak);
 
-    // Vertical dashed leak arrow
+    // Vertical dashed leak arrow (animated)
     const path = document.createElementNS(svgNS, 'path');
     path.setAttribute('d', leakPath(leak));
     path.setAttribute('stroke', '#e87b6b');
@@ -173,15 +179,15 @@ export function renderFunnel(root: HTMLElement): void {
     path.setAttribute('stroke-dasharray', '4 4');
     path.setAttribute('fill', 'none');
     path.setAttribute('marker-end', 'url(#arrow-leak)');
-    path.setAttribute('opacity', '0.7');
+    path.setAttribute('opacity', '0.85');
+    path.setAttribute('class', 'funnel-leak-path');
     path.dataset.leakId = leak.id;
-    path.style.transition = 'opacity 200ms ease';
     leakGroup.appendChild(path);
 
-    // Dropout % label — sits just below the box, above the arrow body
+    // Dropout % — closer to the box
     const pctLabel = document.createElementNS(svgNS, 'text');
     pctLabel.setAttribute('x', String(cx));
-    pctLabel.setAttribute('y', String(stage.y + STAGE_H + DROPOUT_LABEL_DY));
+    pctLabel.setAttribute('y', String(stage.y + STAGE_H + PCT_LABEL_DY));
     pctLabel.setAttribute('text-anchor', 'middle');
     pctLabel.setAttribute('fill', '#e87b6b');
     pctLabel.setAttribute('font-size', '12');
@@ -191,43 +197,40 @@ export function renderFunnel(root: HTMLElement): void {
     pctLabel.textContent = `${pct}%`;
     leakGroup.appendChild(pctLabel);
 
-    // Bottom leak label (bounce / no results / abandoned cart / …)
-    const label = document.createElementNS(svgNS, 'text');
-    label.setAttribute('x', String(cx));
-    label.setAttribute('y', String(LEAK_LABEL_Y));
-    label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('fill', '#e87b6b');
-    label.setAttribute('font-size', '13');
-    label.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
-    label.dataset.leakId = leak.id;
-    label.textContent = leak.label;
-    leakGroup.appendChild(label);
+    // Cause label — just above the arrow
+    const causeLabel = document.createElementNS(svgNS, 'text');
+    causeLabel.setAttribute('x', String(cx));
+    causeLabel.setAttribute('y', String(stage.y + STAGE_H + CAUSE_LABEL_DY));
+    causeLabel.setAttribute('text-anchor', 'middle');
+    causeLabel.setAttribute('fill', '#e87b6b');
+    causeLabel.setAttribute('font-size', '12');
+    causeLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+    causeLabel.dataset.leakId = leak.id;
+    causeLabel.textContent = leak.label;
+    leakGroup.appendChild(causeLabel);
   });
   svg.appendChild(leakGroup);
 
-  // ---- Forward / shortcut transitions ----
+  // ---- Forward / shortcut transitions (identical styling — green stroke, dark pill) ----
   const edgeGroup = document.createElementNS(svgNS, 'g');
   edgeGroup.setAttribute('class', 'funnel-edges');
 
   TRANSITIONS.forEach((t) => {
     const { d, midX, midY } = transitionPath(t);
-    const isShortcut = t.variant === 'shortcut';
-    const stroke = isShortcut ? '#fae194' : '#7ad196';
-    const marker = isShortcut ? 'url(#arrow-shortcut)' : 'url(#arrow-forward)';
 
     const path = document.createElementNS(svgNS, 'path');
     path.setAttribute('d', d);
-    path.setAttribute('stroke', stroke);
+    path.setAttribute('stroke', FORWARD_STROKE);
     path.setAttribute('stroke-width', '2');
-    path.setAttribute('stroke-dasharray', isShortcut ? '6 6' : '5 5');
+    path.setAttribute('stroke-dasharray', '5 5');
     path.setAttribute('fill', 'none');
-    path.setAttribute('marker-end', marker);
+    path.setAttribute('marker-end', 'url(#arrow-forward)');
     path.setAttribute('opacity', '0.9');
     path.dataset.transitionId = t.id;
     path.style.transition = 'opacity 200ms ease, stroke-width 200ms ease';
     edgeGroup.appendChild(path);
 
-    // Percentage pill at midpoint (for shortcut, that's the arc apex)
+    // Percentage pill — uniform dark style for every transition (forward + shortcut)
     const labelText = t.labelOverride ?? `${t.pct}%`;
     const padX = 12;
     const estimatedWidth = labelText.length * 7.5 + padX * 2;
@@ -243,7 +246,7 @@ export function renderFunnel(root: HTMLElement): void {
     labelBg.setAttribute('height', '28');
     labelBg.setAttribute('rx', '14');
     labelBg.setAttribute('fill', '#1b1b1e');
-    labelBg.setAttribute('stroke', isShortcut ? '#fae194' : '#3a3a3f');
+    labelBg.setAttribute('stroke', '#3a3a3f');
     labelBg.setAttribute('stroke-width', '1');
     labelGroup.appendChild(labelBg);
 
@@ -251,7 +254,7 @@ export function renderFunnel(root: HTMLElement): void {
     label.setAttribute('x', String(estimatedWidth / 2));
     label.setAttribute('y', '18');
     label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('fill', isShortcut ? '#fae194' : '#e5e5e5');
+    label.setAttribute('fill', '#ffffff');
     label.setAttribute('font-size', '12');
     label.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
     label.setAttribute('font-weight', '500');
@@ -331,10 +334,8 @@ export function renderFunnel(root: HTMLElement): void {
       p.setAttribute('stroke-width', '2');
     });
     leakGroup.querySelectorAll<SVGElement>('[data-leak-id]').forEach((el) => {
-      // Path strokes / text fills get the same opacity treatment
       const tag = el.tagName.toLowerCase();
-      if (tag === 'path') el.setAttribute('opacity', '0.7');
-      else el.setAttribute('opacity', '1');
+      el.setAttribute('opacity', tag === 'path' ? '0.85' : '1');
     });
     stageGroup.querySelectorAll<SVGGElement>('[data-stage-id]').forEach((g) => {
       (g.firstChild as SVGRectElement).style.filter = 'none';
