@@ -137,6 +137,65 @@ if (particlesContainer) {
 }
 
 // ============================================================
+// "if they find what they want" — scroll-pinned highlight animation.
+// First time the Internal Site Search card crosses ~60% into view,
+// scroll is locked, the phrase turns yellow, a hand-drawn ellipse strokes
+// in around it, then scroll resumes. Fires once per page load.
+// ============================================================
+const searchQuote = document.querySelector<HTMLElement>('[data-search-quote]');
+if (searchQuote) {
+  const phrase = searchQuote.querySelector<HTMLElement>('.highlight-phrase');
+  const circle = searchQuote.querySelector<SVGElement>('.handdrawn-circle');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let triggered = false;
+
+  const lockScroll = () => {
+    const scrollY = window.scrollY;
+    document.body.dataset.scrollY = String(scrollY);
+    document.body.style.top = `-${scrollY}px`;
+    document.body.classList.add('is-scroll-locked');
+  };
+
+  const unlockScroll = () => {
+    const scrollY = parseInt(document.body.dataset.scrollY ?? '0', 10);
+    document.body.classList.remove('is-scroll-locked');
+    document.body.style.top = '';
+    delete document.body.dataset.scrollY;
+    window.scrollTo(0, scrollY);
+  };
+
+  const quoteObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting || triggered) return;
+        triggered = true;
+        quoteObserver.disconnect();
+
+        if (reduceMotion) {
+          phrase?.classList.add('is-highlighted');
+          circle?.classList.add('is-drawn');
+          return;
+        }
+
+        // Tiny grace period so the lock doesn't fight the scroll gesture mid-flight
+        setTimeout(() => {
+          lockScroll();
+          requestAnimationFrame(() => {
+            phrase?.classList.add('is-highlighted');
+            circle?.classList.add('is-drawn');
+          });
+          setTimeout(unlockScroll, 1700);
+        }, 80);
+      });
+    },
+    { threshold: 0.6 },
+  );
+
+  quoteObserver.observe(searchQuote);
+}
+
+// ============================================================
 // Interactive Tab Buttons (Apps & sites tab strip)
 // ============================================================
 const tabButtons = document.querySelectorAll<HTMLButtonElement>('button.rounded-full');
