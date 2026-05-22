@@ -340,22 +340,6 @@
         <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
           <div id="funnel-root" class="w-full overflow-x-auto"></div>
 
-          <!-- Hover info panel (HTML, lives between diagram and banner) -->
-          <div id="funnel-info" class="funnel-info mt-md">
-            <div class="funnel-info-default">
-              <span class="material-symbols-outlined">touch_app</span>
-              <span>Hover any stage to see what typically causes drop-offs there.</span>
-            </div>
-            <div class="funnel-info-content">
-              <div class="funnel-info-eyebrow">
-                <span class="material-symbols-outlined" data-info-icon>info</span>
-                <span>Drop-off drivers</span>
-              </div>
-              <div class="funnel-info-title" data-info-title></div>
-              <div class="funnel-info-body" data-info-body></div>
-            </div>
-          </div>
-
           <!-- Leak row banner — deep red, title only -->
           <div class="mt-md rounded-xl border border-red-900/50 bg-red-950 px-lg py-md">
             <div class="text-2xl font-bold text-white tracking-tight">
@@ -363,68 +347,92 @@
             </div>
           </div>
 
-          <!-- Stage diagnostic table — flows from the banner inside the same card -->
-          <table class="mt-md w-full text-left text-body-sm">
-            <thead>
-              <tr class="border-b border-white/10">
-                <th class="py-md font-label-caps text-zinc-400 text-[11px]">STAGE</th>
-                <th class="py-md font-label-caps text-[#ef4444] text-[11px]">LOST REVENUE</th>
-                <th class="py-md font-label-caps text-success-emerald text-[11px]">RECOVERY POTENTIAL</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-white/5 text-zinc-200">
-              <tr>
-                <td class="py-md">
-                  <div class="flex items-center gap-md">
-                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">search</span>
-                    <span>Search</span>
-                  </div>
-                </td>
-                <td class="py-md text-[#ef4444] font-semibold">65%</td>
-                <td class="py-md text-success-emerald font-semibold">+25%</td>
-              </tr>
-              <tr>
-                <td class="py-md">
-                  <div class="flex items-center gap-md">
-                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">grid_view</span>
-                    <span>Browsing</span>
-                  </div>
-                </td>
-                <td class="py-md text-[#ef4444] font-semibold">75%</td>
-                <td class="py-md text-success-emerald font-semibold">+30%</td>
-              </tr>
-              <tr>
-                <td class="py-md">
-                  <div class="flex items-center gap-md">
-                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">description</span>
-                    <span>Product page</span>
-                  </div>
-                </td>
-                <td class="py-md text-[#ef4444] font-semibold">88%</td>
-                <td class="py-md text-success-emerald font-semibold">+25%</td>
-              </tr>
-              <tr>
-                <td class="py-md">
-                  <div class="flex items-center gap-md">
-                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">shopping_cart</span>
-                    <span>Cart</span>
-                  </div>
-                </td>
-                <td class="py-md text-[#ef4444] font-semibold">70%</td>
-                <td class="py-md text-success-emerald font-semibold">+20%</td>
-              </tr>
-              <tr>
-                <td class="py-md">
-                  <div class="flex items-center gap-md">
-                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">payments</span>
-                    <span>Checkout</span>
-                  </div>
-                </td>
-                <td class="py-md text-[#ef4444] font-semibold">17%</td>
-                <td class="py-md text-success-emerald font-semibold">+7%</td>
-              </tr>
-            </tbody>
-          </table>
+          <!-- Compact 3-column table on the left + dynamic info panel on the right -->
+          <div class="mt-md flex gap-xl items-stretch">
+            <table class="text-left text-body-sm flex-shrink-0">
+              <thead>
+                <tr class="border-b border-white/10">
+                  <th class="py-md pr-xl font-label-caps text-zinc-400 text-[11px] leading-tight align-bottom">
+                    FUNNEL<br />STAGE
+                  </th>
+                  <th class="py-md pr-xl font-label-caps text-[#ef4444] text-[11px] leading-tight align-bottom text-left">
+                    LOST<br />REVENUE
+                  </th>
+                  <th class="py-md font-label-caps text-success-emerald text-[11px] leading-tight align-bottom text-left">
+                    RECOVERY<br />POTENTIAL
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-white/5 text-zinc-200">
+                <tr>
+                  <td class="py-md pr-xl">
+                    <div class="flex items-center gap-md">
+                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">search</span>
+                      <span>Search</span>
+                    </div>
+                  </td>
+                  <td class="py-md pr-xl text-[#ef4444] font-semibold">65%</td>
+                  <td class="py-md text-success-emerald font-semibold">+25%</td>
+                </tr>
+                <tr>
+                  <td class="py-md pr-xl">
+                    <div class="flex items-center gap-md">
+                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">grid_view</span>
+                      <span>Browsing</span>
+                    </div>
+                  </td>
+                  <td class="py-md pr-xl text-[#ef4444] font-semibold">75%</td>
+                  <td class="py-md text-success-emerald font-semibold">+30%</td>
+                </tr>
+                <tr>
+                  <td class="py-md pr-xl">
+                    <div class="flex items-center gap-md">
+                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">description</span>
+                      <span>Product page</span>
+                    </div>
+                  </td>
+                  <td class="py-md pr-xl text-[#ef4444] font-semibold">88%</td>
+                  <td class="py-md text-success-emerald font-semibold">+25%</td>
+                </tr>
+                <tr>
+                  <td class="py-md pr-xl">
+                    <div class="flex items-center gap-md">
+                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">shopping_cart</span>
+                      <span>Cart</span>
+                    </div>
+                  </td>
+                  <td class="py-md pr-xl text-[#ef4444] font-semibold">70%</td>
+                  <td class="py-md text-success-emerald font-semibold">+20%</td>
+                </tr>
+                <tr>
+                  <td class="py-md pr-xl">
+                    <div class="flex items-center gap-md">
+                      <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; font-size: 22px;">payments</span>
+                      <span>Checkout</span>
+                    </div>
+                  </td>
+                  <td class="py-md pr-xl text-[#ef4444] font-semibold">17%</td>
+                  <td class="py-md text-success-emerald font-semibold">+7%</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Dynamic info panel — fills the remaining horizontal space, updates on stage hover -->
+            <div id="funnel-info" class="funnel-info flex-1">
+              <div class="funnel-info-default">
+                <span class="material-symbols-outlined">touch_app</span>
+                <span>Hover any stage to see what typically causes drop-offs there.</span>
+              </div>
+              <div class="funnel-info-content">
+                <div class="funnel-info-eyebrow">
+                  <span class="material-symbols-outlined" data-info-icon>info</span>
+                  <span>Drop-off drivers</span>
+                </div>
+                <div class="funnel-info-title" data-info-title></div>
+                <div class="funnel-info-body" data-info-body></div>
+              </div>
+            </div>
+          </div>
         </div>
         <!-- Section Glow -->
         <div
