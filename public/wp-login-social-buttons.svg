@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  GroLabs WP Login plugin — social-sign-in layout demo.
+
+  Phone-screen-styled artifact in the landing-page tone family:
+  · 3 full-width primary buttons stacked top-to-bottom in highest-
+    probability-of-use order: Google → Microsoft → Apple.
+  · 5 small circular secondary buttons in a row below for the next
+    tier (Facebook, Instagram, TikTok, X, LinkedIn).
+
+  Reusable in blog posts and other landing-page slots. Same screen-
+  frame recipe as agent-notification.svg so the family reads coherent.
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 320 640"
+     preserveAspectRatio="xMidYMid meet"
+     role="img"
+     aria-label="A mobile login screen showing three large social sign-in buttons (Google, Microsoft, Apple) followed by a row of five smaller social icon buttons.">
+  <defs>
+    <linearGradient id="screenLit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#1a1a1f"/>
+      <stop offset="100%" stop-color="#131316"/>
+    </linearGradient>
+    <linearGradient id="instaGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#f09433"/>
+      <stop offset="25%"  stop-color="#e6683c"/>
+      <stop offset="50%"  stop-color="#dc2743"/>
+      <stop offset="75%"  stop-color="#cc2366"/>
+      <stop offset="100%" stop-color="#bc1888"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Flat screen frame + hairline border -->
+  <rect x="0.75" y="0.75" width="318.5" height="638.5" rx="22"
+        fill="url(#screenLit)"
+        stroke="rgba(237,234,224,0.22)" stroke-width="1.5"/>
+
+  <!-- Dynamic-island camera pill -->
+  <rect x="130" y="34" width="60" height="22" rx="11" fill="#000000"/>
+  <circle cx="178" cy="45" r="2" fill="#1F1F23"/>
+
+  <!-- Status bar -->
+  <text x="44" y="80"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif"
+        font-size="15" font-weight="600" fill="#EDEAE0">9:41</text>
+
+  <g transform="translate(220, 70)">
+    <rect x="0"  y="6" width="3" height="4"  rx="0.5" fill="rgba(237,234,224,0.9)"/>
+    <rect x="5"  y="4" width="3" height="6"  rx="0.5" fill="rgba(237,234,224,0.9)"/>
+    <rect x="10" y="2" width="3" height="8"  rx="0.5" fill="rgba(237,234,224,0.9)"/>
+    <rect x="15" y="0" width="3" height="10" rx="0.5" fill="rgba(237,234,224,0.9)"/>
+    <g transform="translate(24, 0)">
+      <path d="M 0 8 Q 7 0 14 8" fill="none" stroke="rgba(237,234,224,0.9)" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M 3 9 Q 7 5 11 9" fill="none" stroke="rgba(237,234,224,0.9)" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="7" cy="10" r="1" fill="rgba(237,234,224,0.9)"/>
+    </g>
+    <g transform="translate(46, 1)">
+      <rect x="0" y="0" width="24" height="11" rx="2.5" fill="none" stroke="rgba(237,234,224,0.9)" stroke-width="1"/>
+      <rect x="25" y="3.5" width="2" height="4" rx="0.5" fill="rgba(237,234,224,0.9)"/>
+      <rect x="2"  y="2"   width="18" height="7" rx="1"  fill="rgba(237,234,224,0.9)"/>
+    </g>
+  </g>
+
+  <!-- Brand-mark + title -->
+  <text x="160" y="130"
+        font-family="'Permanent Marker', 'Marker Felt', cursive"
+        font-size="22" fill="#fae194" text-anchor="middle"
+        letter-spacing="3">GROLABS</text>
+  <text x="160" y="170"
+        font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+        font-size="20" font-weight="700" fill="#EDEAE0" text-anchor="middle">Sign in</text>
+  <text x="160" y="194"
+        font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+        font-size="12" fill="rgba(237,234,224,0.5)" text-anchor="middle">Choose your account</text>
+
+  <!-- ── Primary providers (3 full-width buttons) ─────────────── -->
+
+  <!-- Google -->
+  <g transform="translate(24, 220)">
+    <rect width="272" height="44" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <g transform="translate(14, 13)">
+      <svg x="0" y="0" width="18" height="18" viewBox="0 0 48 48">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.5 6.3 29.5 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 18.9 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7C34.5 6.3 29.5 4 24 4 16.1 4 9.3 8.5 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.4 0 10.3-2.1 14-5.4l-6.5-5.5c-2 1.5-4.6 2.4-7.5 2.4-5.2 0-9.6-3.3-11.3-8L6.2 33.4C9.1 39.5 16 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.4l6.5 5.5c-.5.4 6.2-4.5 6.2-14.4 0-1.3-.1-2.3-.4-3.5z"/>
+      </svg>
+    </g>
+    <text x="136" y="28"
+          font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+          font-size="14" font-weight="500" fill="#1f1f1f" text-anchor="middle">Continue with Google</text>
+  </g>
+
+  <!-- Microsoft -->
+  <g transform="translate(24, 272)">
+    <rect width="272" height="44" rx="8" fill="#ffffff" stroke="#dcdcdc"/>
+    <g transform="translate(14, 13)">
+      <svg x="0" y="0" width="18" height="18" viewBox="0 0 23 23">
+        <path fill="#f25022" d="M1 1h10v10H1z"/>
+        <path fill="#7fba00" d="M12 1h10v10H12z"/>
+        <path fill="#00a4ef" d="M1 12h10v10H1z"/>
+        <path fill="#ffb900" d="M12 12h10v10H12z"/>
+      </svg>
+    </g>
+    <text x="136" y="28"
+          font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+          font-size="14" font-weight="500" fill="#1f1f1f" text-anchor="middle">Continue with Microsoft</text>
+  </g>
+
+  <!-- Apple -->
+  <g transform="translate(24, 324)">
+    <rect width="272" height="44" rx="8" fill="#000000"/>
+    <g transform="translate(14, 13)">
+      <svg x="0" y="0" width="18" height="18" viewBox="0 0 24 24" fill="white">
+        <path d="M16.365 1.43c0 1.14-.46 2.23-1.22 3.02-.82.85-2.16 1.5-3.27 1.41-.14-1.1.43-2.23 1.18-3.02.84-.9 2.27-1.55 3.31-1.41zM20.5 17.06c-.55 1.28-.81 1.85-1.52 2.98-1 1.57-2.42 3.52-4.17 3.54-1.55.02-1.95-1-4.06-.99-2.11.01-2.55 1.01-4.1.99-1.75-.02-3.1-1.8-4.1-3.37C-1 16.07-.31 9.7 2.43 6.91c1.5-1.51 3.4-2.39 5.19-2.39 1.83 0 2.98.98 4.49.98 1.46 0 2.36-.98 4.47-.98 1.6 0 3.29.87 4.5 2.38-3.96 2.17-3.32 7.83 1.42 9.96z"/>
+      </svg>
+    </g>
+    <text x="136" y="28"
+          font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+          font-size="14" font-weight="500" fill="#ffffff" text-anchor="middle">Continue with Apple</text>
+  </g>
+
+  <!-- "or" divider -->
+  <line x1="40"  y1="400" x2="135" y2="400" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+  <text x="160" y="404"
+        font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+        font-size="11" fill="rgba(237,234,224,0.45)" text-anchor="middle">or</text>
+  <line x1="185" y1="400" x2="280" y2="400" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+
+  <!-- ── Secondary providers (5 circular icon buttons) ─────────── -->
+  <g transform="translate(40, 425)">
+    <!-- Facebook -->
+    <circle cx="20" cy="20" r="20" fill="#1877f2"/>
+    <text x="20" y="29"
+          font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+          font-size="22" font-weight="900" fill="#ffffff" text-anchor="middle">f</text>
+
+    <!-- Instagram -->
+    <circle cx="80" cy="20" r="20" fill="url(#instaGrad)"/>
+    <g transform="translate(70, 10)">
+      <rect x="0" y="0" width="20" height="20" rx="6" fill="none" stroke="#ffffff" stroke-width="1.8"/>
+      <circle cx="10" cy="10" r="4" fill="none" stroke="#ffffff" stroke-width="1.8"/>
+      <circle cx="15" cy="5" r="1" fill="#ffffff"/>
+    </g>
+
+    <!-- TikTok -->
+    <circle cx="140" cy="20" r="20" fill="#000000"/>
+    <g transform="translate(132, 10)">
+      <path d="M 12 0 v 9 c 2 1.6 4 2 6 2 v 3 c -2 0 -4 -0.5 -6 -1.5 v 5 c 0 2.5 -2 4.5 -4.5 4.5 s -4.5 -2 -4.5 -4.5 s 2 -4.5 4.5 -4.5 v 3 c -0.8 0 -1.5 0.7 -1.5 1.5 s 0.7 1.5 1.5 1.5 s 1.5 -0.7 1.5 -1.5 v -19 z"
+            fill="#ffffff"/>
+    </g>
+
+    <!-- X (Twitter) -->
+    <circle cx="200" cy="20" r="20" fill="#000000"/>
+    <text x="200" y="27"
+          font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+          font-size="18" font-weight="900" fill="#ffffff" text-anchor="middle">𝕏</text>
+
+    <!-- LinkedIn -->
+    <circle cx="260" cy="20" r="20" fill="#0a66c2"/>
+    <text x="260" y="27"
+          font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+          font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">in</text>
+  </g>
+
+  <!-- Footer link -->
+  <text x="160" y="510"
+        font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+        font-size="12" fill="rgba(237,234,224,0.5)" text-anchor="middle">Use email instead</text>
+
+  <!-- Home indicator -->
+  <rect x="125" y="600" width="70" height="5" rx="2.5" fill="rgba(237,234,224,0.45)"/>
+</svg>
