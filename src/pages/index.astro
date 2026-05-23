@@ -232,10 +232,21 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- How? / Catalog and Search Optimization. Placeholder section —
-       body content lands in a follow-up pass. canvas-deeper bg so it
-       alternates with the lighter Revenue leaks above. -->
-  <section class="relative mt-2xl py-2xl bg-canvas-deeper overflow-hidden reveal">
+  <!-- Section spacing standard (use these on every new full-width section):
+         bg-canvas (lighter):       mt-2xl py-2xl  → mt blends with body bg
+                                                     (canvas), so mt + py read
+                                                     as ~160px of continuous
+                                                     canvas around content.
+         bg-canvas-deeper (darker): mt-2xl py-3xl  → mt is canvas (different
+                                                     from section bg), so only
+                                                     py counts as "in-section"
+                                                     space. py-3xl ≈ 160px
+                                                     matches the lighter
+                                                     section's perceived feel.
+       Keep this calibration so all sections look balanced regardless of bg. -->
+
+  <!-- How? / Catalog and Search Optimization. Placeholder section. -->
+  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         How?
@@ -246,9 +257,7 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Entrepreneurs' Priority / Grow a company. Placeholder. Lighter
-       canvas bg so it alternates with the canvas-deeper How section
-       above. -->
+  <!-- Entrepreneurs' Priority / Grow a company. Placeholder. -->
   <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
@@ -260,13 +269,11 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Implementation / Next → Next → Finish. Placeholder. canvas-deeper
-       bg so it alternates with the lighter Entrepreneurs' Priority
-       section above. -->
-  <section class="relative mt-2xl py-2xl bg-canvas-deeper overflow-hidden reveal">
+  <!-- Simple Installation / Next → Next → Finish. Placeholder. -->
+  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Implementation
+        Simple Installation
       </span>
       <h2 class="font-marker uppercase text-white text-4xl md:text-5xl">
         Next → Next → Finish
