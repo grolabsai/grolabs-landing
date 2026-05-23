@@ -6,7 +6,6 @@ import SearchCopyHelper from '../components/SearchCopyHelper.astro';
 import HowWeDoItDiagram from '../components/HowWeDoItDiagram.astro';
 import EquationCard from '../components/EquationCard.astro';
 import CapabilityCard from '../components/CapabilityCard.astro';
-import StatBlock from '../components/StatBlock.astro';
 import FunnelStageRow from '../components/FunnelStageRow.astro';
 ---
 
@@ -443,55 +442,4 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Code Section -->
-  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl my-xl">
-    <div class="flex flex-col items-center text-center mb-xl reveal">
-      <h2 class="font-page-title text-4xl md:text-6xl text-white mb-md">Easy to integrate</h2>
-      <p class="text-body-lg text-secondary-fixed-dim max-w-2xl">
-        Engineered luxury for developers. Our API is self-explanatory, allowing you to focus on
-        high-impact product features.
-      </p>
-    </div>
-    <div
-      class="code-block p-lg md:p-xl rounded-xl shadow-inner border border-zinc-800 font-mono text-body-sm relative reveal group"
-    >
-      <div class="absolute top-md right-md flex gap-md">
-        <span class="text-zinc-600 font-mono text-meta-xs">JS_SDK // v4.0.2</span>
-        <span class="text-primary hover:cursor-pointer text-meta-md opacity-60 group-hover:opacity-100 transition-opacity">Copy Code</span>
-      </div>
-      <div class="overflow-x-auto">
-<pre><code class="text-zinc-400"><span class="text-primary">const</span> client = <span class="text-primary">new</span> MeiliSearch(<span class="text-success-emerald">'http://localhost:7700'</span>, <span class="text-success-emerald">'masterKey'</span>)
-
-<span class="text-primary">await</span> client.index(<span class="text-success-emerald">'movies'</span>).addDocuments([
-  &lbrace; <span class="text-primary-fixed-dim">'id'</span>: 1, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Carol'</span> &rbrace;,
-  &lbrace; <span class="text-primary-fixed-dim">'id'</span>: 2, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Wonder Woman'</span> &rbrace;,
-  &lbrace; <span class="text-primary-fixed-dim">'id'</span>: 3, <span class="text-primary-fixed-dim">'title'</span>: <span class="text-success-emerald">'Life of Pi'</span> &rbrace;
-])
-
-<span class="text-zinc-600">// Highly performant AI-retrieval call</span>
-<span class="text-primary">const</span> search = <span class="text-primary">await</span> index.search(<span class="text-success-emerald">'philadelphia'</span>)
-console.log(search)</code></pre>
-      </div>
-    </div>
-    <div class="mt-xl flex justify-center gap-md flex-wrap reveal">
-      <button class="px-xl py-sm bg-primary text-on-primary font-button-text rounded-lg hover:brightness-110 shadow-[0_0_20px_rgba(250,225,148,0.15)] shimmer-btn">
-        Full Documentation
-      </button>
-      <button class="px-xl py-sm border border-zinc-700 text-primary font-button-text rounded-lg hover:border-primary transition-all shimmer-btn">
-        See Integrations
-      </button>
-    </div>
-  </section>
-
-  <!-- Stats Section -->
-  <section class="py-xl bg-zinc-900/30 my-xl">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-xl reveal">
-        <StatBlock value="2.4M" label="DOWNLOADS" />
-        <StatBlock value="15k+" label="SERVERS" />
-        <StatBlock value="800+" label="CONTRIBUTORS" />
-        <StatBlock value="57.6k" label="GITHUB STARS" />
-      </div>
-    </div>
-  </section>
 </BaseLayout>
