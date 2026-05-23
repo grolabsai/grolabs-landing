@@ -1,0 +1,383 @@
+---
+/**
+ * SPANISH MIRROR of src/pages/index.astro.
+ *
+ * Structure-for-structure copy with localized strings. When the English
+ * homepage's content evolves, this file needs to be updated in lockstep
+ * — keep them paired. Components that accept a `locale` prop (Search
+ * panel, copy helper, How-section diagram, FunnelStageRow labels, etc.)
+ * receive `locale="es"` here so their internal copy switches with the
+ * page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LeakCard from '../../components/LeakCard.astro';
+import SearchDemo from '../../components/SearchDemo.astro';
+import SearchCopyHelper from '../../components/SearchCopyHelper.astro';
+import HowWeDoItDiagram from '../../components/HowWeDoItDiagram.astro';
+import EquationCard from '../../components/EquationCard.astro';
+import FunnelStageRow from '../../components/FunnelStageRow.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <section
+    class="relative px-margin-mobile md:px-margin-desktop pt-3xl pb-2xl overflow-hidden flex flex-col items-center text-center"
+  >
+    <div id="particles-container"></div>
+
+    <div class="relative z-10 max-w-5xl reveal active">
+      <h1
+        class="font-marker text-page-title-mobile md:text-hero text-white leading-tight drop-shadow-2xl"
+      >
+        Recupera <span class="text-primary">ingresos perdidos</span><br />
+        &amp;<br />
+        <span class="text-[0.92em]"><span class="text-primary">haz crecer</span> tu negocio</span><br />
+        <span class="font-typewriter text-white text-[0.4em]">
+          sin pagar por más tráfico
+        </span>
+      </h1>
+
+      <div class="flex flex-wrap justify-center gap-md mt-xl">
+        <a href="mailto:hello@grolabs.ai" class="hero-btn hero-btn--primary hero-btn--text-only shimmer-btn">
+          Iniciar conversación
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="hero-stats-band"></div>
+
+  <!-- Leak Numbers Section -->
+  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop stats-overlap">
+    <div class="stats-section-surface">
+    <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg">
+      <LeakCard
+        variant="featured"
+        title="Búsqueda interna del sitio"
+        statValue="2–3×"
+        icon="search"
+        description={`&ldquo;Quienes buscan convierten 2&ndash;3&times; más que quienes no &mdash;<span class="text-primary">siempre que encuentren lo que buscan</span>.&rdquo;`}
+      />
+      <LeakCard
+        title="SEO"
+        statValue="53%"
+        icon="search"
+        description={`Más de la mitad del tráfico orgánico se pierde por catálogos de baja calidad.<br/><br/>Los resultados de SEO siempre estarán limitados por la información del catálogo de productos.`}
+      />
+      <LeakCard
+        title="Abandono del carrito"
+        statValue="70%"
+        icon="shopping_cart"
+        description="El abandono del carrito se debe en gran parte al registro obligatorio que pide email y contraseña."
+      />
+      <LeakCard
+        title="Devoluciones"
+        statValue="17–20%"
+        icon="arrow_back"
+        description="Ingresos perdidos por devoluciones causadas por resultados imprecisos en la búsqueda por palabras clave."
+      />
+      <LeakCard
+        variant="emerging"
+        title="AEO"
+        statValue="25%"
+        icon="search"
+        description={`Las respuestas impulsadas por agentes de IA aumentarán un 25% para finales de 2026 &mdash; el SEO de la era moderna de <span class="text-primary">ChatGPT</span>, <span class="text-primary">Claude</span>, <span class="text-primary">Gemini</span>, etc.`}
+      />
+    </div>
+    <div class="reveal mt-xl flex items-start gap-md group cursor-default">
+      <span class="material-symbols-outlined icon-inline-sm text-primary flex-shrink-0 mt-1">info</span>
+      <div>
+        <h4 class="font-label-caps text-label-caps text-zinc-500 group-hover:text-white transition-colors mb-1">UNA NOTA SOBRE ESTOS NÚMEROS</h4>
+        <p class="font-mono text-meta-sm text-zinc-600 group-hover:text-white transition-colors leading-tight">
+          Estos benchmarks representan promedios de la industria para comerciantes medianos. Aunque tu
+          "fuga" específica puede variar, el efecto compuesto de resolver solo dos de estos puntos
+          suele resultar en un incremento inmediato del 15-20% en los ingresos netos.
+        </p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Revenue equation -->
+  <section id="revenue-equation" class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="mb-2xl">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+          Aumento de ingresos
+        </span>
+        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">
+          Más dinero en tu bolsillo
+        </h2>
+        <p class="text-zinc-400 text-lg leading-relaxed">
+          O aumentas tráfico o aumentas conversión, ¿cierto?
+          <span class="text-primary">Nosotros nos especializamos en conversión.</span>
+        </p>
+      </div>
+
+      <div
+        id="equation-container"
+        class="flex items-stretch gap-6 w-full transition-all duration-700 ease-out"
+      >
+        <EquationCard icon="groups" label="Tráfico">
+          <p>No manejamos tu publicidad ni generamos leads, pero sí podemos:</p>
+          <ul>
+            <li>Más tráfico <span class="text-primary">SEO</span>, gracias a datos de producto más ricos.</li>
+            <li>Más <span class="text-primary">referencias de agentes IA</span>, preparando tu tienda para los agentes.</li>
+          </ul>
+        </EquationCard>
+        <div class="equation-operator">×</div>
+        <EquationCard icon="percent" label="Conversión">
+          <p>Mejoramos la conversión en los tres puntos donde normalmente se rompe:</p>
+          <ul>
+            <li><span class="text-primary">Búsqueda</span> que encuentra lo que el cliente realmente pidió.</li>
+            <li><span class="text-primary">Datos de catálogo</span> lo suficientemente ricos para que la búsqueda funcione — gestionados por nosotros, no por ti.</li>
+            <li><span class="text-primary">Checkout</span> sin la barrera de crear cuenta.</li>
+          </ul>
+        </EquationCard>
+        <div class="equation-operator">=</div>
+        <EquationCard size="compact" icon="attach_money" label="Ingresos">
+          <p>Es un poco más complicado que esto, pero lo simplificamos con fines ilustrativos.</p>
+        </EquationCard>
+      </div>
+    </div>
+  </section>
+
+  <!-- Funnel / Revenue leaks -->
+  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+    <div class="mb-xs grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+      <div>
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+          Embudo de Conversión
+        </span>
+        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">Fugas de ingresos</h2>
+        <p class="text-body-lg text-secondary-fixed-dim">
+          Identificamos las causas más probables de la pérdida de ingresos en cada etapa. Estos
+          son porcentajes estándar del e-commerce, pero puedes cambiar los valores para evaluar
+          tu situación particular.
+        </p>
+      </div>
+      <div class="bg-canvas-deeper border border-white/5 rounded-xl p-xl">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+          Escenario
+        </span>
+        <p class="text-body-lg text-secondary-fixed-dim leading-relaxed">
+          El embudo de abajo usa los números con los que la mayoría de nuestros clientes llegan:
+          <span class="text-primary">5,000 sesiones mensuales</span> con un
+          <span class="text-primary">AOV de $100</span>. Catálogo gestionado en Excel o en el
+          admin de WooCommerce. Búsqueda predeterminada. Checkout estándar con email y
+          contraseña. GA4 instalado, pero nunca monitoreado.
+        </p>
+      </div>
+    </div>
+    <div class="bg-canvas-deeper border border-white/5 p-md md:p-xl rounded-xl mb-xl flex flex-col overflow-hidden">
+      <div id="funnel-root" data-locale="es" class="w-full overflow-x-auto"></div>
+
+      <div class="mt-md flex gap-xl items-stretch">
+        <table class="text-left text-body-sm flex-shrink-0">
+          <thead>
+            <tr class="border-b border-white/10">
+              <th class="py-md pr-xl font-label-caps text-zinc-400 text-meta-sm leading-tight align-bottom">
+                ETAPA DEL<br />EMBUDO
+              </th>
+              <th class="py-md pr-xl font-label-caps text-error-red text-meta-sm leading-tight align-bottom text-left">
+                INGRESOS<br />PERDIDOS
+              </th>
+              <th class="py-md pr-xl font-label-caps text-white text-meta-sm leading-tight align-bottom text-left">
+                POTENCIAL DE<br />RECUPERACIÓN
+              </th>
+              <th class="py-md font-label-caps text-success-emerald text-meta-sm leading-tight align-bottom text-left">
+                POTENCIAL DE<br />RECUPERACIÓN
+              </th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-zinc-200">
+            <FunnelStageRow stageId="search"   icon="search"         label="Búsqueda"          loss="65%" recovery="+25%" recoveryAmount="+$1,250" />
+            <FunnelStageRow stageId="browsing" icon="grid_view"      label="Navegación"        loss="75%" recovery="+30%" recoveryAmount="+$1,500" />
+            <FunnelStageRow stageId="pdp"      icon="description"    label="Página de producto" loss="80%" recovery="+25%" recoveryAmount="+$1,250" />
+            <FunnelStageRow stageId="cart"     icon="shopping_cart"  label="Carrito"           loss="70%" recovery="+20%" recoveryAmount="+$1,000" />
+            <FunnelStageRow stageId="checkout" icon="payments"       label="Checkout"          loss="17%" recovery="+7%"  recoveryAmount="+$350"   />
+          </tbody>
+        </table>
+
+        <div id="funnel-info" class="funnel-info flex-1">
+          <div class="funnel-info-default">
+            <span class="material-symbols-outlined">touch_app</span>
+            <span>Pasa el cursor sobre cualquier etapa para ver qué suele causar los abandonos.</span>
+          </div>
+          <div class="funnel-info-content">
+            <div class="funnel-info-eyebrow">
+              <span class="material-symbols-outlined" data-info-icon>info</span>
+              <span>Causas del abandono</span>
+            </div>
+            <div class="funnel-info-title" data-info-title></div>
+            <div class="funnel-info-body" data-info-body></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- How we do it -->
+  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        ¿Cómo lo hacemos?
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+        Optimiza el catálogo y el motor de búsqueda
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-xl items-start mb-2xl">
+        <p class="text-secondary-fixed-dim text-body-md leading-relaxed">
+          La mayoría de tiendas abordan el descubrimiento personalizando el motor
+          de búsqueda y mejorando los datos del producto por separado.
+        </p>
+        <p class="text-primary text-body-lg leading-relaxed md:border-l md:border-white/10 md:pl-xl">
+          GroLabs combina ambos en una sola capa de optimización.
+        </p>
+      </div>
+
+      <HowWeDoItDiagram locale="es" />
+    </div>
+  </section>
+
+  <!-- Connector arrow -->
+  <div class="relative max-w-page mx-auto px-margin-mobile md:px-margin-desktop pointer-events-none" aria-hidden="true">
+    <svg
+      class="hidden lg:block absolute right-12 xl:right-20 z-20"
+      style="top: -180px;"
+      width="80"
+      height="320"
+      viewBox="0 0 80 320"
+      fill="none"
+    >
+      <path
+        d="M 40 4 C 64 70 64 220 40 286"
+        stroke="rgba(237, 234, 224, 0.42)"
+        stroke-width="2.5"
+        stroke-dasharray="2 8"
+        stroke-linecap="round"
+        fill="none"
+      />
+      <path
+        d="M 28 278 L 40 296 L 52 278"
+        stroke="rgba(237, 234, 224, 0.6)"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+      />
+    </svg>
+  </div>
+
+  <!-- Grow a Company -->
+  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-xl items-start">
+        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
+          <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+            Prioridad del emprendedor
+          </span>
+          <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
+            Hacer crecer una empresa
+          </h2>
+
+          <blockquote class="border-l border-primary/30 pl-md mb-xl">
+            <p class="text-white text-body-lg italic leading-snug mb-sm">
+              &ldquo;La mayoría de los emprendedores fracasan porque están trabajando
+              <span class="text-primary font-medium not-italic">en su negocio</span>
+              en lugar de trabajar
+              <span class="text-primary font-medium not-italic">sobre su negocio</span>.&rdquo;
+            </p>
+            <footer class="text-body-sm text-zinc-500 not-italic">
+              — Michael Gerber, <cite class="not-italic">El Mito del Emprendedor</cite>
+            </footer>
+          </blockquote>
+
+          <p class="mb-md">
+            Monitorear embudos. Cazar fugas. Leer GA4 a medianoche. Cada hora que
+            pasas en el dashboard es una hora que no estás invirtiendo en la
+            compañía — en la estrategia, el equipo, el siguiente producto, las
+            alianzas que solo tú puedes construir.
+          </p>
+
+          <p>
+            <span class="text-primary font-medium">Sin noticias = buenas noticias.</span>
+            <span class="text-white">Si algo requiere tu atención, te avisaremos.</span>
+          </p>
+        </div>
+
+        <div class="flex justify-center lg:justify-end">
+          <img
+            src={`${base}/agent-notification.svg`}
+            alt="Notificación push de GroLabs: Hola Peter, me temo que el tráfico bajó 6% ayer. Con un enlace de Más información."
+            class="w-full max-w-[180px] h-auto"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Try it out -->
+  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Pruébalo
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+        Demo de Búsqueda
+      </h2>
+
+      <SearchCopyHelper locale="es" />
+
+      <div class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-xl items-start">
+        <SearchDemo locale="es" />
+
+        <ul class="space-y-md">
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">bolt</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Resultados ultrarrápidos
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">check_box</span>
+            <div class="text-body-md leading-relaxed">
+              <div class="text-white">Visibilidad de coincidencia de atributos</div>
+              <div class="text-primary font-mono text-xs uppercase tracking-[0.18em] mt-1">Reduce devoluciones</div>
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">person</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Resultados personalizados
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">record_voice_over</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Búsqueda semántica
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">location_on</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Geo-búsqueda
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">spellcheck</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Tolerancia a errores y sinónimos
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

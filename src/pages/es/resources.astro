@@ -1,40 +1,36 @@
 ---
 /**
- * /resources (English) — curated reading and citations.
- *
- * Build-time fetch from the wwwGroLabs Supabase project via the shared
- * helper in src/lib/resources-data.ts. The Spanish mirror lives at
- * /es/resources.
+ * /es/resources — versión en español. Mirror de /resources con título +
+ * eyebrow + CTAs traducidos. Los datos vienen del mismo fetch
+ * compartido en src/lib/resources-data.ts; cuando un artículo tiene
+ * title_es lo usa, si no, cae al title_en.
  */
 
-import BaseLayout from '../layouts/BaseLayout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
   fetchResourceGroups,
   localizedTitle,
   ctaForCategory,
-} from '../lib/resources-data';
+} from '../../lib/resources-data';
 
 const groups = await fetchResourceGroups();
-const locale = 'en' as const;
+const locale = 'es' as const;
 ---
 
-<BaseLayout
-  title="Resources | GroLabs"
-  description="The books, articles, and citations that shape how GroLabs thinks about catalog, search, and conversion."
->
+<BaseLayout>
   <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Resources
+        Recursos
       </span>
       <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
-        The reading list
+        La lista de lectura
       </h2>
 
       {
         groups.length === 0 ? (
           <p class="text-secondary-fixed-dim italic">
-            New resources are on the way — check back soon.
+            Pronto habrá nuevos recursos — vuelve a revisar.
           </p>
         ) : (
           groups.map(({ category, items }) => (
@@ -93,107 +89,3 @@ const locale = 'en' as const;
     </div>
   </section>
 </BaseLayout>
-
-<style is:global>
-  .resource-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 16px;
-  }
-  @media (min-width: 640px) {
-    .resource-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 900px) {
-    .resource-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 1200px) {
-    .resource-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  .resource-card {
-    background: #131316;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: border-color 200ms ease, transform 200ms ease;
-  }
-  .resource-card:hover {
-    border-color: rgba(250, 225, 148, 0.25);
-    transform: translateY(-2px);
-  }
-
-  .resource-card-image-link {
-    display: block;
-    line-height: 0;
-  }
-  .resource-card-image {
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    object-fit: cover;
-    background: #0e0e11;
-    display: block;
-  }
-  .resource-card-image--placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(250, 225, 148, 0.35);
-    font-size: 48px;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-  }
-
-  .resource-card-body {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
-  }
-  .resource-card-title {
-    color: #EDEAE0;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.3;
-    margin: 0;
-  }
-  .resource-card-author {
-    color: rgba(237, 234, 224, 0.6);
-    font-size: 13px;
-    margin: 0;
-  }
-  .resource-card-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11px;
-    color: rgba(237, 234, 224, 0.45);
-    letter-spacing: 0.05em;
-    margin-top: 4px;
-  }
-  .resource-card-rating {
-    color: rgba(250, 225, 148, 0.7);
-  }
-  .resource-card-link {
-    margin-top: auto;
-    padding-top: 12px;
-    color: #fae194;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: color 180ms;
-  }
-  .resource-card-link:hover {
-    color: #ffffff;
-  }
-</style>

@@ -19,7 +19,56 @@
  * eyebrow class on box titles mirrors the section eyebrows verbatim.
  */
 
+interface Props {
+  locale?: 'en' | 'es';
+}
+const { locale = 'en' } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const t = {
+  en: {
+    seo: 'SEO',
+    aeo: 'AEO',
+    search: 'Search',
+    searchBody: 'Typo tolerance, synonyms, and ranking that adapt to how your customers actually shop.',
+    searchMonitoring: 'Continuous monitoring of search conversion rate, time to click, average click position, searches with no results, and top searched keywords.',
+    productCatalog: 'Product catalog',
+    productCatalogBody: 'AI-assisted catalog enhancement. Including import of new products and pricing updates. No more Excel files.',
+    userAnalytics: 'User analytics &amp; conversion events',
+    userAnalyticsBody: 'Recording key events that allow the AI agent to learn patterns and understand drop-out risks easily.',
+    ga4: 'GA4 traffic',
+    ga4Body: 'Traffic sources, sessions, and behavior pulled from your GA4.',
+    monitor: 'Monitor',
+    monitorDesc: 'Found keyword<br />with no results',
+    fix: 'Fix',
+    fixDesc: 'Automatically add synonym<br />to search engine',
+    verifyUplift: 'Verify uplift',
+    verifyUpliftDesc: 'Track conversion of that keyword in the next days',
+    alertBand: 'If a threshold is met, you will get a message in your preferred channel.',
+    dashboardAlt: 'An abstract analytics dashboard with KPI tiles, a line chart, and horizontal bars. A small yellow indicator in the top-right corner pulses to signal monitoring is live.',
+  },
+  es: {
+    seo: 'SEO',
+    aeo: 'AEO',
+    search: 'Búsqueda',
+    searchBody: 'Tolerancia a errores, sinónimos y ranking que se adaptan a cómo realmente compran tus clientes.',
+    searchMonitoring: 'Monitoreo continuo de la tasa de conversión de búsqueda, tiempo hasta el clic, posición promedio del clic, búsquedas sin resultados y palabras clave más buscadas.',
+    productCatalog: 'Catálogo de productos',
+    productCatalogBody: 'Mejora del catálogo asistida por IA. Incluye importación de nuevos productos y actualización de precios. Adiós a los archivos de Excel.',
+    userAnalytics: 'Analítica de usuario y eventos de conversión',
+    userAnalyticsBody: 'Registro de eventos clave que permiten al agente de IA aprender patrones y entender los riesgos de abandono fácilmente.',
+    ga4: 'Tráfico de GA4',
+    ga4Body: 'Fuentes de tráfico, sesiones y comportamiento extraídos de tu GA4.',
+    monitor: 'Monitorear',
+    monitorDesc: 'Palabra clave<br />sin resultados',
+    fix: 'Corregir',
+    fixDesc: 'Agregar sinónimo<br />automáticamente al motor',
+    verifyUplift: 'Verificar mejora',
+    verifyUpliftDesc: 'Seguir la conversión de esa palabra clave los siguientes días',
+    alertBand: 'Si se alcanza un umbral, recibirás un mensaje en tu canal preferido.',
+    dashboardAlt: 'Un dashboard de analítica abstracto con tarjetas de KPI, un gráfico de líneas y barras horizontales. Un pequeño indicador amarillo en la esquina superior derecha pulsa para indicar que el monitoreo está activo.',
+  },
+}[locale];
 ---
 
 <div class="how-diagram">
@@ -27,26 +76,19 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   <div class="how-diagram-col">
     <div class="how-diagram-trio">
       <div class="how-box how-box--narrow">
-        <span class="how-box-eyebrow">SEO</span>
+        <span class="how-box-eyebrow">{t.seo}</span>
       </div>
       <div class="how-box how-box--narrow">
-        <span class="how-box-eyebrow">AEO</span>
+        <span class="how-box-eyebrow">{t.aeo}</span>
       </div>
       <div class="how-box how-box--search">
-        <span class="how-box-eyebrow">Search</span>
+        <span class="how-box-eyebrow">{t.search}</span>
         <div class="how-search-split">
           <div class="how-search-half">
-            <p class="how-box-body">
-              Typo tolerance, synonyms, and ranking that adapt to how your
-              customers actually shop.
-            </p>
+            <p class="how-box-body">{t.searchBody}</p>
           </div>
           <div class="how-search-half how-search-half--right">
-            <p class="how-box-body">
-              Continuous monitoring of search conversion rate, time to click,
-              average click position, searches with no results, and top
-              searched keywords.
-            </p>
+            <p class="how-box-body">{t.searchMonitoring}</p>
           </div>
         </div>
       </div>
@@ -64,26 +106,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
 
     <div class="how-box">
-      <span class="how-box-eyebrow">Product catalog</span>
-      <p class="how-box-body">
-        AI-assisted catalog enhancement. Including import of new products
-        and pricing updates. No more Excel files.
-      </p>
+      <span class="how-box-eyebrow">{t.productCatalog}</span>
+      <p class="how-box-body">{t.productCatalogBody}</p>
     </div>
 
     <div class="how-box">
-      <span class="how-box-eyebrow">User analytics &amp; conversion events</span>
-      <p class="how-box-body">
-        Recording key events that allow the AI agent to learn patterns
-        and understand drop-out risks easily.
-      </p>
+      <span class="how-box-eyebrow" set:html={t.userAnalytics} />
+      <p class="how-box-body">{t.userAnalyticsBody}</p>
     </div>
 
     <div class="how-box">
-      <span class="how-box-eyebrow">GA4 traffic</span>
-      <p class="how-box-body">
-        Traffic sources, sessions, and behavior pulled from your GA4.
-      </p>
+      <span class="how-box-eyebrow">{t.ga4}</span>
+      <p class="how-box-body">{t.ga4Body}</p>
     </div>
   </div>
 
@@ -101,7 +135,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <div class="how-right-stack">
       <img
         src={`${base}/grow-dashboard.svg`}
-        alt="An abstract analytics dashboard with KPI tiles, a line chart, and horizontal bars. A small yellow indicator in the top-right corner pulses to signal monitoring is live."
+        alt={t.dashboardAlt}
         class="how-diagram-image"
         loading="lazy"
       />
@@ -110,9 +144,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="how-phase how-phase--narrow">
           <div class="how-phase-head">
             <span class="material-symbols-outlined how-phase-icon" aria-hidden="true">visibility</span>
-            <span class="how-phase-title">Monitor</span>
+            <span class="how-phase-title">{t.monitor}</span>
           </div>
-          <p class="how-phase-desc">Found keyword<br />with no results</p>
+          <p class="how-phase-desc" set:html={t.monitorDesc} />
         </div>
 
         <svg class="how-phase-sep" viewBox="0 0 16 100" preserveAspectRatio="none" aria-hidden="true">
@@ -122,9 +156,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="how-phase">
           <div class="how-phase-head">
             <span class="material-symbols-outlined how-phase-icon" aria-hidden="true">build</span>
-            <span class="how-phase-title">Fix</span>
+            <span class="how-phase-title">{t.fix}</span>
           </div>
-          <p class="how-phase-desc">Automatically add synonym<br />to search engine</p>
+          <p class="how-phase-desc" set:html={t.fixDesc} />
         </div>
 
         <svg class="how-phase-sep" viewBox="0 0 16 100" preserveAspectRatio="none" aria-hidden="true">
@@ -134,15 +168,15 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         <div class="how-phase">
           <div class="how-phase-head">
             <span class="material-symbols-outlined how-phase-icon" aria-hidden="true">search</span>
-            <span class="how-phase-title">Verify uplift</span>
+            <span class="how-phase-title">{t.verifyUplift}</span>
           </div>
-          <p class="how-phase-desc">Track conversion of that keyword in the next days</p>
+          <p class="how-phase-desc">{t.verifyUpliftDesc}</p>
         </div>
       </div>
 
       <div class="how-band how-band--alert">
         <span class="material-symbols-outlined how-band-icon" aria-hidden="true">warning</span>
-        <span>If a threshold is met, you will get a message in your preferred channel.</span>
+        <span>{t.alertBand}</span>
       </div>
     </div>
   </div>

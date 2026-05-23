@@ -27,6 +27,28 @@ const CATEGORY = 'Snack Bars';
 
 const TRACKED_TAGS = ['gluten-free', 'sugar-free', 'dairy-free'] as const;
 
+type Locale = 'en' | 'es';
+const STRINGS = {
+  en: {
+    hiddenTag: 'Hidden · attributes missing',
+    resultsSingular: 'result',
+    resultsPlural: 'results',
+    in: 'in',
+    hiddenByAttrs: 'hidden by missing attributes',
+    noMatch: 'No products matched your search.',
+    unavailable: 'Search is temporarily unavailable. Please try again in a moment.',
+  },
+  es: {
+    hiddenTag: 'Oculto · faltan atributos',
+    resultsSingular: 'resultado',
+    resultsPlural: 'resultados',
+    in: 'en',
+    hiddenByAttrs: 'ocultos por atributos faltantes',
+    noMatch: 'Ningún producto coincide con tu búsqueda.',
+    unavailable: 'La búsqueda no está disponible temporalmente. Inténtalo de nuevo en un momento.',
+  },
+} satisfies Record<Locale, Record<string, string>>;
+
 type Product = {
   id: number;
   name: string;
@@ -73,10 +95,10 @@ function pillsHtml(product: Product, query: string): string {
   }).join('');
 }
 
-function rowHtml(product: Product, query: string, hidden: boolean): string {
+function rowHtml(product: Product, query: string, hidden: boolean, t: typeof STRINGS['en']): string {
   const hiddenClass = hidden ? ' search-demo-row--hidden' : '';
   const hiddenTag = hidden
-    ? '<span class="search-demo-hidden-tag">Hidden · attributes missing</span>'
+    ? `<span class="search-demo-hidden-tag">${t.hiddenTag}</span>`
     : '';
   return `
     <div class="search-demo-row${hiddenClass}">
@@ -97,20 +119,21 @@ function emptyStateHtml(message: string): string {
   return `<div class="search-demo-empty">${message}</div>`;
 }
 
-function statusHtml(visibleCount: number, hiddenCount: number, ms: number): string {
+function statusHtml(visibleCount: number, hiddenCount: number, ms: number, t: typeof STRINGS['en']): string {
   const total = visibleCount + hiddenCount;
   const hiddenNote =
     hiddenCount > 0
-      ? ` · <span class="search-demo-status-hidden">${hiddenCount} hidden by missing attributes</span>`
+      ? ` · <span class="search-demo-status-hidden">${hiddenCount} ${t.hiddenByAttrs}</span>`
       : '';
+  const word = total === 1 ? t.resultsSingular : t.resultsPlural;
   return `
     <div class="search-demo-status">
-      ${total} result${total === 1 ? '' : 's'} in ${ms}ms${hiddenNote}
+      ${total} ${word} ${t.in} ${ms}ms${hiddenNote}
     </div>
   `;
 }
 
-async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
+async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement, t: typeof STRINGS['en']): Promise<void> {
   const query = input.value.trim();
   if (!query) {
     // No staged results before the visitor has actually searched —
@@ -137,17 +160,15 @@ async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement): Promi
 
     const parts: string[] = [];
     if (keywordRes.hits.length === 0 && hiddenHits.length === 0) {
-      parts.push(emptyStateHtml('No products matched your search.'));
+      parts.push(emptyStateHtml(t.noMatch));
     } else {
-      for (const p of keywordRes.hits) parts.push(rowHtml(p, query, false));
-      for (const p of hiddenHits) parts.push(rowHtml(p, query, true));
-      parts.push(statusHtml(keywordRes.hits.length, hiddenHits.length, elapsed));
+      for (const p of keywordRes.hits) parts.push(rowHtml(p, query, false, t));
+      for (const p of hiddenHits) parts.push(rowHtml(p, query, true, t));
+      parts.push(statusHtml(keywordRes.hits.length, hiddenHits.length, elapsed, t));
     }
     resultsEl.innerHTML = parts.join('');
   } catch (err) {
-    resultsEl.innerHTML = emptyStateHtml(
-      'Search is temporarily unavailable. Please try again in a moment.',
-    );
+    resultsEl.innerHTML = emptyStateHtml(t.unavailable);
     console.error('[search-demo] meili call failed', err);
   } finally {
     resultsEl.removeAttribute('aria-busy');
@@ -167,7 +188,12 @@ export function initSearchDemo(root: HTMLElement): void {
   const results = root.querySelector<HTMLElement>('[data-search-results]');
   if (!input || !results) return;
 
-  const trigger = () => void runSearch(input, results);
+  // Pick locale strings from the panel's data-locale attribute. Falls
+  // back to English if absent or unrecognised.
+  const localeAttr = root.dataset.locale as Locale | undefined;
+  const t = (localeAttr && STRINGS[localeAttr]) || STRINGS.en;
+
+  const trigger = () => void runSearch(input, results, t);
   const debounced = debounce(trigger, 180);
 
   input.addEventListener('input', debounced);

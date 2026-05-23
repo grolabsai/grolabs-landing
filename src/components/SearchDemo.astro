@@ -1,27 +1,30 @@
 ---
 /**
- * Live Meilisearch demo embedded in the landing page.
- *
- * The outer `.search-demo` div is the panel that groups the search
- * input + result rows visually — bg-canvas (one step lighter than the
- * section's canvas-deeper bg), 1 px hairline border, rounded-xl
- * corners matching every other inner block on the page.
- *
- * Script wires the input + results container after hydration (see
- * src/scripts/search-demo.ts). Styling lives in the <style is:global>
- * block — the row classes are injected by the script, so they need to
- * survive Astro's scoped-style hashing.
+ * Live Meilisearch demo embedded in the landing page. Locale-aware
+ * via the `locale` prop ('en' | 'es'). The search index data itself
+ * stays English (snack-bar fixture in the demo Meilisearch index);
+ * only the surrounding UI chrome localizes.
  */
+
+interface Props {
+  locale?: 'en' | 'es';
+}
+const { locale = 'en' } = Astro.props;
+
+const STRINGS = {
+  en: { placeholder: 'Paste the search criteria here...' },
+  es: { placeholder: 'Pega los criterios de búsqueda aquí...' },
+}[locale];
 ---
 
-<div class="search-demo" data-search-demo>
+<div class="search-demo" data-search-demo data-locale={locale}>
   <label class="search-demo-input-wrap">
     <span class="material-symbols-outlined search-demo-input-icon">search</span>
     <input
       type="search"
       data-search-input
       class="search-demo-input"
-      placeholder="Paste the search criteria here..."
+      placeholder={STRINGS.placeholder}
       autocomplete="off"
       spellcheck="false"
     />

@@ -46,33 +46,91 @@ type Leak = {
   xOffset?: number;
 };
 
+// Localised string tables. Picked at render time from the `data-locale`
+// attribute on `#funnel-root` (set by index.astro per page locale).
+type Locale = 'en' | 'es';
+const STAGE_LABELS: Record<Locale, Record<string, string>> = {
+  en: {
+    home: 'Home',
+    search: 'Search',
+    browsing: 'Browsing',
+    pdp: 'Product page',
+    cart: 'Cart',
+    checkout: 'Checkout',
+  },
+  es: {
+    home: 'Inicio',
+    search: 'Búsqueda',
+    browsing: 'Navegación',
+    pdp: 'Página de producto',
+    cart: 'Carrito',
+    checkout: 'Checkout',
+  },
+};
+const STAGE_TOOLTIPS: Record<Locale, Record<string, string>> = {
+  en: {
+    home: "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for.",
+    search: "Search drop-offs are usually a compound problem: misconfigured typo tolerance, missing synonyms, and — underneath both of those — patchy catalog data the engine has nothing rich to match against. Once the product data is clean, semantic search becomes the next lever to push discovery further: matching by meaning, not just keywords.",
+    browsing: "Browsing leaks when the category taxonomy doesn't follow industry best practice and when products lack the attributes needed to power relevant faceted filtering. Without those facets, shoppers can't narrow a ten-thousand-item shelf down to the handful that actually match how they decide.",
+    pdp: "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't.",
+    cart: "The single biggest source of cart abandonment is the login wall — a required email-and-password account that has to be created and email-confirmed before the first purchase can close. It kills most first orders outright. And on the second visit it punishes returning shoppers who don't remember the password they set months ago, adding fresh friction every time.",
+    checkout: "Returns trace back to opaque search results. Most engines rank probabilistically and never tell the shopper which keywords matched which product attributes — so the buyer commits to something they think matches, gets it home, and finds out it doesn't. Show the matches and the mismatches up front and returns drop sharply.",
+  },
+  es: {
+    home: "Las salidas desde la home se deben a heros confusos, propuestas de valor poco claras y navegación que esconde lo que el comprador realmente vino a buscar.",
+    search: "Los abandonos en la búsqueda suelen ser un problema compuesto: tolerancia a errores mal configurada, sinónimos faltantes y — por debajo de ambos — datos de catálogo pobres con los que el motor no tiene nada rico que asociar. Una vez que los datos del producto están limpios, la búsqueda semántica se convierte en la siguiente palanca para mejorar el descubrimiento: buscar por significado, no solo por palabras clave.",
+    browsing: "La navegación falla cuando la taxonomía de categorías no sigue las mejores prácticas de la industria y cuando los productos carecen de los atributos necesarios para tener filtros facetados relevantes. Sin esos filtros, los compradores no pueden reducir una estantería de diez mil ítems a la decena que realmente coincide con cómo deciden.",
+    pdp: "La falta de imágenes de alta calidad, atributos faltantes o especificaciones clave y descripciones débiles aumentan el abandono aquí. La página de producto es donde la intención se convierte en acción — o no.",
+    cart: "La principal fuente de abandono del carrito es el muro de login — la cuenta obligatoria con email y contraseña que hay que crear y confirmar antes de cerrar la primera compra. Mata la mayoría de las primeras órdenes. Y en la segunda visita castiga a los clientes recurrentes que no recuerdan la contraseña que crearon hace meses.",
+    checkout: "Las devoluciones se originan en resultados de búsqueda opacos. La mayoría de los motores rankean probabilísticamente y nunca le dicen al comprador qué palabras clave coincidieron con qué atributos del producto — así que el comprador se compromete con algo que cree que coincide, lo recibe y descubre que no. Muestra las coincidencias y las no-coincidencias por adelantado y las devoluciones bajan considerablemente.",
+  },
+};
+const LEAK_LABELS: Record<Locale, Record<string, { label: string; sublabel?: string }>> = {
+  en: {
+    'leak-home':     { label: 'BOUNCE' },
+    'leak-search':   { label: 'UNABLE TO FIND PRODUCT' },
+    'leak-browsing': { label: 'UNABLE TO FIND PRODUCT' },
+    'leak-pdp':      { label: 'LACK OF CONVINCING INFO' },
+    'leak-cart':     { label: 'ABANDONED CART', sublabel: 'USER REGISTRATION FRICTION' },
+    'leak-checkout': { label: 'RETURNS',        sublabel: 'PRODUCT MISMATCH' },
+  },
+  es: {
+    'leak-home':     { label: 'REBOTE' },
+    'leak-search':   { label: 'NO ENCUENTRA EL PRODUCTO' },
+    'leak-browsing': { label: 'NO ENCUENTRA EL PRODUCTO' },
+    'leak-pdp':      { label: 'INFO POCO CONVINCENTE' },
+    'leak-cart':     { label: 'CARRITO ABANDONADO', sublabel: 'FRICCIÓN POR REGISTRO' },
+    'leak-checkout': { label: 'DEVOLUCIONES',       sublabel: 'PRODUCTO NO COINCIDE' },
+  },
+};
+const UI_STRINGS: Record<Locale, { barTitle: string; dropOffDrivers: string; hint: string; noDetail: string }> = {
+  en: {
+    barTitle: 'LEAKING FUNNEL = LOST REVENUE',
+    dropOffDrivers: 'Drop-off drivers',
+    hint: 'Hover any stage to see what typically causes drop-offs there.',
+    noDetail: 'No detail captured for this stage yet. Add your hypothesis or analytics finding here.',
+  },
+  es: {
+    barTitle: 'EMBUDO CON FUGAS = INGRESOS PERDIDOS',
+    dropOffDrivers: 'Causas del abandono',
+    hint: 'Pasa el cursor sobre cualquier etapa para ver qué suele causar abandonos ahí.',
+    noDetail: 'Aún no hay detalle capturado para esta etapa. Agrega tu hipótesis o hallazgo de analítica aquí.',
+  },
+};
+
 const STAGES: Stage[] = [
   // Home flush left at x=30 (30 px viewBox padding).
-  { id: 'home',     label: 'Home',         icon: 'home',          x: 30,   y: 55,
-    tooltip:
-      "Homepage exits trace back to weak hero clarity, no obvious value proposition, and navigation that hides what shoppers actually came for." },
+  { id: 'home',     label: 'Home',         icon: 'home',          x: 30,   y: 55 },
   // Search/Browsing sit in the (wider) Home–PDP gap with breathing room.
-  { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20,
-    tooltip:
-      "Search drop-offs are usually a compound problem: misconfigured typo tolerance, missing synonyms, and — underneath both of those — patchy catalog data the engine has nothing rich to match against. Once the product data is clean, semantic search becomes the next lever to push discovery further: matching by meaning, not just keywords." },
+  { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20 },
   // Browsing centered between Search (ends x=380) and PDP (starts x=740)
   // so its leak label in the red bar doesn't crowd Search's leak label.
-  // y=70 (was 90) leaves enough vertical room for the leak drop column to
-  // read as a clear red line rather than a short stub.
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 500,  y: 70,
-    tooltip:
-      "Browsing leaks when the category taxonomy doesn't follow industry best practice and when products lack the attributes needed to power relevant faceted filtering. Without those facets, shoppers can't narrow a ten-thousand-item shelf down to the handful that actually match how they decide." },
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 500,  y: 70 },
   // Main-row continuation. PDP gets a wider box so the "Product page" label fits comfortably.
-  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 740,  y: 55,  width: 160,
-    tooltip:
-      "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
-  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 990,  y: 55,
-    tooltip:
-      "The single biggest source of cart abandonment is the login wall — a required email-and-password account that has to be created and email-confirmed before the first purchase can close. It kills most first orders outright. And on the second visit it punishes returning shoppers who don't remember the password they set months ago, adding fresh friction every time." },
+  { id: 'pdp',      label: 'Product page', icon: 'description',   x: 740,  y: 55,  width: 160 },
+  { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 990,  y: 55 },
   // Checkout flush right (right edge at viewBox.w - 30 = 1370).
-  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1240, y: 55,
-    tooltip:
-      "Returns trace back to opaque search results. Most engines rank probabilistically and never tell the shopper which keywords matched which product attributes — so the buyer commits to something they think matches, gets it home, and finds out it doesn't. Show the matches and the mismatches up front and returns drop sharply." },
+  { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1240, y: 55 },
 ];
 
 const TRANSITIONS: Transition[] = [
@@ -94,12 +152,12 @@ const TRANSITIONS: Transition[] = [
 
 const LEAKS: Leak[] = [
   // Home → bounce leak. pct computes from 100 - (40% to Search + 45% to Browsing) = 15%.
-  { id: 'leak-home',     fromStageId: 'home',     label: 'BOUNCE' },
-  { id: 'leak-search',   fromStageId: 'search',   label: 'UNABLE TO FIND PRODUCT' },
-  { id: 'leak-browsing', fromStageId: 'browsing', label: 'UNABLE TO FIND PRODUCT' },
-  { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'LACK OF CONVINCING INFO' },
-  { id: 'leak-cart',     fromStageId: 'cart',     label: 'ABANDONED CART', sublabel: 'USER REGISTRATION FRICTION' },
-  { id: 'leak-checkout', fromStageId: 'checkout', label: 'RETURNS',        sublabel: 'PRODUCT MISMATCH', pctOverride: 17 },
+  { id: 'leak-home',     fromStageId: 'home',     label: '' },
+  { id: 'leak-search',   fromStageId: 'search',   label: '' },
+  { id: 'leak-browsing', fromStageId: 'browsing', label: '' },
+  { id: 'leak-pdp',      fromStageId: 'pdp',      label: '' },
+  { id: 'leak-cart',     fromStageId: 'cart',     label: '' },
+  { id: 'leak-checkout', fromStageId: 'checkout', label: '',                                   pctOverride: 17 },
 ];
 
 // Geometry — taller boxes now that icon is on top, label centered below.
@@ -240,6 +298,15 @@ function transitionPath(t: Transition): { d: string; midX: number; midY: number 
 
 export function renderFunnel(root: HTMLElement): void {
   const svgNS = 'http://www.w3.org/2000/svg';
+
+  // Resolve locale from the root element's data-attribute. Default
+  // to English if absent or unrecognised.
+  const localeAttr = (root.dataset.locale as Locale | undefined);
+  const locale: Locale = localeAttr === 'es' ? 'es' : 'en';
+  const STAGE_LABEL = STAGE_LABELS[locale];
+  const STAGE_TIP = STAGE_TOOLTIPS[locale];
+  const LEAK_LABEL = LEAK_LABELS[locale];
+  const UI = UI_STRINGS[locale];
 
   const svg = document.createElementNS(svgNS, 'svg');
   svg.setAttribute('viewBox', `${VIEWBOX.x} ${VIEWBOX.y} ${VIEWBOX.w} ${VIEWBOX.h}`);
@@ -481,7 +548,7 @@ export function renderFunnel(root: HTMLElement): void {
     // "Product page" → two lines ("PRODUCT" / "PAGE"); everything else
     // is a single line. ICON_Y / LABEL_Y are chosen per layout so the
     // pair stays vertically centered within the 80-px tall box.
-    const labelLines = stage.label.toUpperCase().split(' ');
+    const labelLines = (STAGE_LABEL[stage.id] ?? stage.label).toUpperCase().split(' ');
     const isMultiLine = labelLines.length > 1;
     const centerX = w / 2;
 
@@ -577,14 +644,15 @@ export function renderFunnel(root: HTMLElement): void {
     // descriptor render as two centered lines without misaligning.
     const labelLine = document.createElementNS(svgNS, 'tspan');
     labelLine.setAttribute('x', String(cx));
-    labelLine.textContent = leak.label;
+    const leakStrings = LEAK_LABEL[leak.id] ?? { label: leak.label, sublabel: leak.sublabel };
+    labelLine.textContent = leakStrings.label;
     causeLabel.appendChild(labelLine);
 
-    if (leak.sublabel) {
+    if (leakStrings.sublabel) {
       const sublabelLine = document.createElementNS(svgNS, 'tspan');
       sublabelLine.setAttribute('x', String(cx));
       sublabelLine.setAttribute('dy', '14');
-      sublabelLine.textContent = leak.sublabel;
+      sublabelLine.textContent = leakStrings.sublabel;
       causeLabel.appendChild(sublabelLine);
     }
 
@@ -601,7 +669,7 @@ export function renderFunnel(root: HTMLElement): void {
   barTitle.setAttribute('font-weight', '700');
   barTitle.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
   barTitle.setAttribute('letter-spacing', '0.04em');
-  barTitle.textContent = 'LEAKING FUNNEL = LOST REVENUE';
+  barTitle.textContent = UI.barTitle;
   barGroup.appendChild(barTitle);
 
   svg.appendChild(barGroup);
@@ -626,10 +694,9 @@ export function renderFunnel(root: HTMLElement): void {
     // and the hint becomes visible again.
     panel.classList.add('is-engaged');
     if (infoIcon) infoIcon.textContent = stage.icon;
-    if (infoTitle) infoTitle.textContent = stage.label;
+    if (infoTitle) infoTitle.textContent = STAGE_LABEL[stage.id] ?? stage.label;
     if (infoBody) {
-      infoBody.textContent =
-        stage.tooltip ?? 'No detail captured for this stage yet. Add your hypothesis or analytics finding here.';
+      infoBody.textContent = STAGE_TIP[stage.id] ?? UI.noDetail;
     }
   }
 
