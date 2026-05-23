@@ -49,11 +49,11 @@
     </g>
   </g>
 
-  <!-- Brand + title -->
-  <text x="160" y="120"
-        font-family="'Permanent Marker', 'Marker Felt', cursive"
-        font-size="20" fill="#fae194" text-anchor="middle"
-        letter-spacing="3">GROLABS</text>
+  <!-- Brand + title. Wordmark rendered from the canonical
+       grolabs-wordmark asset (Satori-baked Permanent Marker paths). -->
+  <image x="90" y="92" width="140" height="34"
+         href="grolabs-wordmark.png"
+         preserveAspectRatio="xMidYMid meet"/>
   <text x="160" y="156"
         font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
         font-size="20" font-weight="700" fill="#EDEAE0" text-anchor="middle">Sign in</text>
