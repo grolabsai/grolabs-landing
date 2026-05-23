@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Abstract dashboard mockup for the Grow a Company section.
+
+  No text, no real data — the point is "this is the kind of screen you
+  used to spend evenings staring at; the agent watches it now so you
+  don't have to." Colour palette matches the landing tokens (canvas
+  / canvas-deeper / primary yellow) so the asset feels native to the
+  page. Subtle pulsing dot in the top-right of the window signals
+  "monitoring is live" without drawing the eye away from the page copy.
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 800 500"
+     role="img"
+     aria-label="Abstract dashboard with KPI tiles, a line chart, and a horizontal-bar block, signalling that a monitor is running.">
+  <defs>
+    <!-- Soft outer glow behind the window. -->
+    <radialGradient id="ambient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#fae194" stop-opacity="0.10"/>
+      <stop offset="60%" stop-color="#fae194" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#fae194" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Area fill under the main line chart. -->
+    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fae194" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#fae194" stop-opacity="0"/>
+    </linearGradient>
+    <!-- Subtle inner-bevel highlight along the window's top edge. -->
+    <linearGradient id="windowSheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ambient yellow glow behind everything. -->
+  <rect x="0" y="0" width="800" height="500" fill="url(#ambient)"/>
+
+  <!-- Window frame. -->
+  <g>
+    <rect x="20" y="20" width="760" height="460" rx="14"
+          fill="#0e0e11" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    <rect x="20" y="20" width="760" height="36" rx="14"
+          fill="#131316"/>
+    <rect x="20" y="40" width="760" height="16" fill="#131316"/>
+    <rect x="20" y="20" width="760" height="14" fill="url(#windowSheen)"/>
+    <line x1="20" y1="56" x2="780" y2="56"
+          stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+  </g>
+
+  <!-- Window chrome dots (calm zinc tones, not the macOS red/yellow/green). -->
+  <g>
+    <circle cx="40" cy="38" r="5" fill="#3a3a3f"/>
+    <circle cx="56" cy="38" r="5" fill="#3a3a3f"/>
+    <circle cx="72" cy="38" r="5" fill="#3a3a3f"/>
+    <!-- Address-bar hint. -->
+    <rect x="320" y="30" width="160" height="14" rx="7" fill="#0e0e11"/>
+  </g>
+
+  <!-- Sidebar. -->
+  <g>
+    <line x1="160" y1="56" x2="160" y2="480"
+          stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+    <!-- Nav item 1 -->
+    <g transform="translate(36, 80)">
+      <rect x="0" y="0" width="20" height="20" rx="4" fill="#1F1F23"/>
+      <rect x="28" y="7" width="76" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+    </g>
+    <!-- Nav item 2 -->
+    <g transform="translate(36, 116)">
+      <rect x="0" y="0" width="20" height="20" rx="4" fill="#1F1F23"/>
+      <rect x="28" y="7" width="60" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+    </g>
+    <!-- Nav item 3 -->
+    <g transform="translate(36, 152)">
+      <rect x="0" y="0" width="20" height="20" rx="4" fill="#1F1F23"/>
+      <rect x="28" y="7" width="84" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+    </g>
+    <!-- Nav item 4 — active (subtle yellow tint). -->
+    <g transform="translate(28, 188)">
+      <rect x="0" y="0" width="120" height="32" rx="6"
+            fill="rgba(250,225,148,0.12)"
+            stroke="rgba(250,225,148,0.25)" stroke-width="1"/>
+      <rect x="8" y="6" width="20" height="20" rx="4" fill="#fae194" fill-opacity="0.85"/>
+      <rect x="36" y="13" width="68" height="6" rx="3" fill="rgba(250,225,148,0.9)"/>
+    </g>
+    <!-- Nav item 5 -->
+    <g transform="translate(36, 240)">
+      <rect x="0" y="0" width="20" height="20" rx="4" fill="#1F1F23"/>
+      <rect x="28" y="7" width="52" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+    </g>
+    <!-- Nav item 6 -->
+    <g transform="translate(36, 276)">
+      <rect x="0" y="0" width="20" height="20" rx="4" fill="#1F1F23"/>
+      <rect x="28" y="7" width="70" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+    </g>
+
+    <!-- Footer-of-sidebar avatar + label. -->
+    <g transform="translate(36, 432)">
+      <circle cx="10" cy="10" r="10" fill="#1F1F23"/>
+      <rect x="28" y="6" width="60" height="4" rx="2" fill="rgba(237,234,224,0.35)"/>
+      <rect x="28" y="14" width="36" height="3" rx="1.5" fill="rgba(237,234,224,0.2)"/>
+    </g>
+  </g>
+
+  <!-- KPI cards (3) -->
+  <g>
+    <!-- Card 1 -->
+    <g transform="translate(180, 80)">
+      <rect x="0" y="0" width="180" height="92" rx="8"
+            fill="#131316" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="14" y="14" width="48" height="5" rx="2" fill="rgba(237,234,224,0.35)"/>
+      <rect x="14" y="28" width="90" height="20" rx="3" fill="rgba(237,234,224,0.85)"/>
+      <rect x="14" y="56" width="32" height="4" rx="2" fill="#fae194" fill-opacity="0.7"/>
+      <!-- Sparkline -->
+      <polyline points="14,80 30,72 46,76 62,68 78,74 94,66 110,70 126,60 142,64 158,58 166,62"
+                fill="none" stroke="rgba(250,225,148,0.55)" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- Card 2 -->
+    <g transform="translate(372, 80)">
+      <rect x="0" y="0" width="180" height="92" rx="8"
+            fill="#131316" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="14" y="14" width="60" height="5" rx="2" fill="rgba(237,234,224,0.35)"/>
+      <rect x="14" y="28" width="78" height="20" rx="3" fill="rgba(237,234,224,0.85)"/>
+      <rect x="14" y="56" width="28" height="4" rx="2" fill="#fae194" fill-opacity="0.7"/>
+      <polyline points="14,76 30,74 46,70 62,72 78,66 94,68 110,62 126,66 142,60 158,64 166,58"
+                fill="none" stroke="rgba(250,225,148,0.55)" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <!-- Card 3 -->
+    <g transform="translate(564, 80)">
+      <rect x="0" y="0" width="196" height="92" rx="8"
+            fill="#131316" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      <rect x="14" y="14" width="54" height="5" rx="2" fill="rgba(237,234,224,0.35)"/>
+      <rect x="14" y="28" width="100" height="20" rx="3" fill="rgba(237,234,224,0.85)"/>
+      <rect x="14" y="56" width="40" height="4" rx="2" fill="#fae194" fill-opacity="0.7"/>
+      <polyline points="14,72 32,70 50,66 68,68 86,62 104,64 122,60 140,62 158,56 176,60 182,54"
+                fill="none" stroke="rgba(250,225,148,0.55)" stroke-width="1.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Main chart card -->
+  <g transform="translate(180, 184)">
+    <rect x="0" y="0" width="580" height="160" rx="8"
+          fill="#131316" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+    <!-- Chart header (title + legend pills). -->
+    <rect x="16" y="14" width="92" height="6" rx="3" fill="rgba(237,234,224,0.5)"/>
+    <rect x="16" y="26" width="48" height="4" rx="2" fill="rgba(237,234,224,0.25)"/>
+    <g transform="translate(490, 14)">
+      <rect x="0" y="0" width="32" height="14" rx="7" fill="#1F1F23"/>
+      <rect x="40" y="0" width="32" height="14" rx="7" fill="rgba(250,225,148,0.18)"/>
+    </g>
+
+    <!-- Faint gridlines. -->
+    <g stroke="rgba(255,255,255,0.05)" stroke-width="1">
+      <line x1="16" y1="64" x2="564" y2="64"/>
+      <line x1="16" y1="92" x2="564" y2="92"/>
+      <line x1="16" y1="120" x2="564" y2="120"/>
+    </g>
+
+    <!-- Area fill under the curve. -->
+    <path d="M 16 116
+             C 60 100, 90 110, 130 96
+             S 200 76, 240 80
+             S 320 96, 360 84
+             S 440 60, 480 66
+             S 540 78, 564 74
+             L 564 144 L 16 144 Z"
+          fill="url(#chartFill)"/>
+
+    <!-- Main curve. -->
+    <path d="M 16 116
+             C 60 100, 90 110, 130 96
+             S 200 76, 240 80
+             S 320 96, 360 84
+             S 440 60, 480 66
+             S 540 78, 564 74"
+          fill="none" stroke="#fae194" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"
+          stroke-opacity="0.85"/>
+
+    <!-- Tip annotation. -->
+    <circle cx="480" cy="66" r="3.5" fill="#fae194"/>
+    <circle cx="480" cy="66" r="7" fill="none" stroke="#fae194" stroke-opacity="0.4" stroke-width="1"/>
+  </g>
+
+  <!-- Horizontal bar chart card -->
+  <g transform="translate(180, 356)">
+    <rect x="0" y="0" width="580" height="104" rx="8"
+          fill="#131316" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+    <!-- Header. -->
+    <rect x="16" y="14" width="72" height="6" rx="3" fill="rgba(237,234,224,0.5)"/>
+
+    <!-- Bars (label pill on the left, bar on the right). -->
+    <g transform="translate(16, 34)">
+      <rect x="0" y="0" width="56" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+      <rect x="80" y="-2" width="280" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+      <rect x="80" y="-2" width="218" height="10" rx="5" fill="rgba(250,225,148,0.7)"/>
+    </g>
+    <g transform="translate(16, 52)">
+      <rect x="0" y="0" width="48" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+      <rect x="80" y="-2" width="280" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+      <rect x="80" y="-2" width="164" height="10" rx="5" fill="rgba(250,225,148,0.55)"/>
+    </g>
+    <g transform="translate(16, 70)">
+      <rect x="0" y="0" width="60" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+      <rect x="80" y="-2" width="280" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+      <rect x="80" y="-2" width="244" height="10" rx="5" fill="rgba(250,225,148,0.85)"/>
+    </g>
+    <g transform="translate(16, 88)">
+      <rect x="0" y="0" width="52" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+      <rect x="80" y="-2" width="280" height="10" rx="5" fill="rgba(255,255,255,0.06)"/>
+      <rect x="80" y="-2" width="108" height="10" rx="5" fill="rgba(250,225,148,0.4)"/>
+    </g>
+
+    <!-- Side: tiny stacked tiles (visual texture so the right side
+         doesn't read empty). -->
+    <g transform="translate(400, 26)">
+      <rect x="0" y="0" width="160" height="22" rx="4" fill="#1F1F23"/>
+      <rect x="8" y="8" width="80" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+      <rect x="120" y="8" width="32" height="6" rx="3" fill="#fae194" fill-opacity="0.7"/>
+      <rect x="0" y="30" width="160" height="22" rx="4" fill="#1F1F23"/>
+      <rect x="8" y="38" width="100" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+      <rect x="120" y="38" width="24" height="6" rx="3" fill="#fae194" fill-opacity="0.5"/>
+      <rect x="0" y="60" width="160" height="22" rx="4" fill="#1F1F23"/>
+      <rect x="8" y="68" width="68" height="6" rx="3" fill="rgba(237,234,224,0.4)"/>
+      <rect x="120" y="68" width="40" height="6" rx="3" fill="#fae194" fill-opacity="0.85"/>
+    </g>
+  </g>
+
+  <!-- Live-monitor indicator — small pulsing dot in the top-right of the
+       window, paired with a softer outer halo. Carries the "the agent is
+       awake, you don't have to be" message. -->
+  <g transform="translate(744, 38)">
+    <circle r="5" fill="#fae194">
+      <animate attributeName="r"        values="3.5;5.5;3.5" dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="opacity"  values="0.85;1;0.85" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+    <circle r="6" fill="none" stroke="#fae194" stroke-width="1" stroke-opacity="0.4">
+      <animate attributeName="r"         values="6;14;6"  dur="2.4s" repeatCount="indefinite"/>
+      <animate attributeName="stroke-opacity" values="0.45;0;0.45" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

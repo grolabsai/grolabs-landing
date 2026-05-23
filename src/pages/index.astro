@@ -7,6 +7,8 @@ import HowWeDoItDiagram from '../components/HowWeDoItDiagram.astro';
 import EquationCard from '../components/EquationCard.astro';
 import CapabilityCard from '../components/CapabilityCard.astro';
 import FunnelStageRow from '../components/FunnelStageRow.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <BaseLayout>
@@ -300,11 +302,23 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
           </p>
         </div>
 
-        <!-- "No news = good news" callout: yellow inverted header on a
-             canvas-deeper body. Houses the agent's job description + the
-             four signal types it surfaces. Tone is "passive ops" — if
-             you don't hear from it, nothing's wrong. -->
-        <div class="bg-canvas-deeper border border-white/5 rounded-xl overflow-hidden">
+        <div class="flex flex-col gap-lg">
+          <!-- Dashboard mockup — visual hook that pairs with the
+               "no news = good news" callout below. Standalone SVG
+               (public/grow-dashboard.svg) so it's also reusable
+               outside the page. -->
+          <img
+            src={`${base}/grow-dashboard.svg`}
+            alt="An abstract analytics dashboard with KPI tiles, a line chart, and horizontal bars. A small yellow indicator in the top-right corner pulses to signal that monitoring is live."
+            class="w-full rounded-xl"
+            loading="lazy"
+          />
+
+          <!-- "No news = good news" callout: yellow inverted header on a
+               canvas-deeper body. Houses the agent's job description + the
+               four signal types it surfaces. Tone is "passive ops" — if
+               you don't hear from it, nothing's wrong. -->
+          <div class="bg-canvas-deeper border border-white/5 rounded-xl overflow-hidden">
           <div class="bg-primary text-[#0e0e11] font-mono text-xs tracking-[0.2em] uppercase font-semibold px-md py-sm">
             No news equals good news
           </div>
@@ -321,6 +335,7 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
               <li>funnel drop-offs and probable conversion leaks from analytics patterns</li>
               <li>traffic anomalies that should trigger a trust-and-safety alert</li>
             </ul>
+          </div>
           </div>
         </div>
       </div>
@@ -368,7 +383,11 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- AI-assisted modules / Tech stack -->
+  {/* AI-assisted modules / Tech stack — HIDDEN per latest spec. The
+      capability card set is preserved below inside `false && (…)` so
+      the markup is intact for when we bring this back; nothing renders
+      to the page until that guard flips to true (or gets removed). */}
+  {false && (
   <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop mt-3xl relative reveal">
     <div class="mb-2xl">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
@@ -433,5 +452,6 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
       />
     </div>
   </section>
+  )}
 
 </BaseLayout>
