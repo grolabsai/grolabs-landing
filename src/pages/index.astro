@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LeakCard from '../components/LeakCard.astro';
+import SearchDemo from '../components/SearchDemo.astro';
 import EquationCard from '../components/EquationCard.astro';
 import CapabilityCard from '../components/CapabilityCard.astro';
 import StatBlock from '../components/StatBlock.astro';
@@ -245,15 +246,27 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
                                                      section's perceived feel.
        Keep this calibration so all sections look balanced regardless of bg. -->
 
-  <!-- How? / Catalog and Search Optimization. Placeholder section. -->
+  <!-- How? / Catalog and Search Optimization. Live Meilisearch demo
+       against the `demo` index — 4 snack bars with a deliberate
+       data-quality gradient (3/3, 2/3, 1/3, 0/3 matches against the
+       gluten-free + sugar-free + dairy-free trio). The 0/3 product is
+       the punchline: it IS all three things, but the merchant never
+       tagged it, so search can't surface it by attribute. -->
   <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         How?
       </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl">
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">
         Catalog and Search Optimization
       </h2>
+      <p class="text-body-lg text-secondary-fixed-dim max-w-3xl mb-xl">
+        Search only finds what your catalog says is there. Three of these four
+        bars match the dietary keywords below; the fourth qualifies on every
+        count but was never tagged. Watch what surfaces — and what doesn't.
+      </p>
+
+      <SearchDemo />
     </div>
   </section>
 

@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "Hemp & Cacao Energy Bar",
+    "brand": "FuelLeaf",
+    "category": "Snack Bars",
+    "description": "Plant-based energy bar made with raw hemp seeds, dark cacao, and dates. Cold-pressed, no baking. 14g protein, 6g fiber, naturally sweetened with monk fruit.",
+    "image_url": "https://placehold.co/600x400/1F1F23/fae194?text=Hemp+%26+Cacao",
+    "price": 3.49,
+    "dietary_tags": ["gluten-free", "sugar-free", "dairy-free"],
+    "_data_quality_note": "Full attributes filled. Ranks 3/3 against the gluten-free + sugar-free + dairy-free query."
+  },
+  {
+    "id": 2,
+    "name": "Almond Joy Protein Bar",
+    "brand": "Northgrove",
+    "category": "Snack Bars",
+    "description": "Roasted almonds, vanilla whey isolate, and a hint of sea salt. 20g protein, low net carbs, zero added sugar.",
+    "image_url": "https://placehold.co/600x400/2A2118/fae194?text=Almond+Joy",
+    "price": 2.99,
+    "dietary_tags": ["gluten-free", "sugar-free"],
+    "_data_quality_note": "Whey isolate is dairy-derived, so dairy-free is genuinely missing — not a data gap. 2/3 against the trio is the honest answer."
+  },
+  {
+    "id": 3,
+    "name": "Cocoa Cluster Bar",
+    "brand": "FieldSnack Co",
+    "category": "Snack Bars",
+    "description": "Toasted oats, raw cocoa nibs, and a drizzle of wildflower honey. Crunchy and chocolatey.",
+    "image_url": "https://placehold.co/600x400/241712/fae194?text=Cocoa+Cluster",
+    "price": 2.49,
+    "dietary_tags": ["gluten-free"],
+    "_data_quality_note": "Honey-sweetened so sugar-free is correctly missing. Dairy-free is missing from the tags but the product IS dairy-free — that one is a data-quality gap."
+  },
+  {
+    "id": 4,
+    "name": "Original Granola Bar",
+    "brand": "HomeStyle",
+    "category": "Snack Bars",
+    "description": "Classic oat-and-honey granola bar. Homemade taste, just like grandma used to make.",
+    "image_url": "https://placehold.co/600x400/1A1612/fae194?text=Original+Granola",
+    "price": 1.79,
+    "dietary_tags": [],
+    "_data_quality_note": "The punchline. Same essential product, but the merchant never filled a single dietary attribute. Meilisearch can only find it via the word \"bar\" in the query — none of the three filters match. The card shows up last with all-gray pills."
+  }
+]

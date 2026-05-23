@@ -1,0 +1,227 @@
+---
+/**
+ * Live Meilisearch demo embedded in the landing page.
+ *
+ * Talks to the `demo` index over Meilisearch's REST API via a
+ * search-only key (see src/scripts/search-demo.ts). The script wires
+ * the input + results container after hydration. All styling lives in
+ * the <style> block at the bottom rather than scattered tailwind utilities
+ * — the card layout has enough custom geometry that bespoke CSS reads
+ * cleaner than Tailwind soup.
+ */
+---
+
+<div class="search-demo" data-search-demo>
+  <label class="search-demo-input-wrap">
+    <span class="material-symbols-outlined search-demo-input-icon">search</span>
+    <input
+      type="search"
+      data-search-input
+      class="search-demo-input"
+      placeholder="Try: gluten-free sugar-free dairy-free"
+      value="gluten-free sugar-free dairy-free"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </label>
+
+  <div class="search-demo-results" data-search-results aria-live="polite"></div>
+</div>
+
+<script>
+  import { initSearchDemo } from '../scripts/search-demo.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-search-demo]').forEach((el) => {
+    initSearchDemo(el);
+  });
+</script>
+
+<style is:global>
+  .search-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+  }
+
+  /* Input */
+  .search-demo-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: #0e0e11;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 0 20px;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+  .search-demo-input-wrap:focus-within {
+    border-color: rgba(250, 225, 148, 0.5);
+    box-shadow: 0 0 0 3px rgba(250, 225, 148, 0.12);
+  }
+  .search-demo-input-icon {
+    color: #fae194;
+    font-size: 22px;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .search-demo-input {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    color: #EDEAE0;
+    font-family: 'Hanken Grotesk', system-ui, sans-serif;
+    font-size: 18px;
+    padding: 18px 0;
+    width: 100%;
+  }
+  .search-demo-input::placeholder {
+    color: rgba(237, 234, 224, 0.35);
+  }
+
+  /* Results */
+  .search-demo-results[aria-busy='true'] {
+    opacity: 0.55;
+    transition: opacity 150ms ease;
+  }
+  .search-demo-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  @media (min-width: 768px) {
+    .search-demo-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .search-demo-empty {
+    color: rgba(237, 234, 224, 0.5);
+    font-style: italic;
+    padding: 24px 0;
+  }
+
+  /* Card */
+  .search-demo-card {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 20px;
+    background: #1f1f23;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    transition: border-color 200ms ease, transform 200ms ease;
+  }
+  .search-demo-card:hover {
+    border-color: rgba(250, 225, 148, 0.25);
+    transform: translateY(-2px);
+  }
+  .search-demo-card--hidden {
+    opacity: 0.78;
+    border-style: dashed;
+    border-color: rgba(239, 68, 68, 0.35);
+  }
+  .search-demo-card-image {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #131316;
+  }
+  .search-demo-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .search-demo-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .search-demo-card-brand {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(250, 225, 148, 0.7);
+  }
+  .search-demo-card-score {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: rgba(237, 234, 224, 0.5);
+  }
+  .search-demo-card-title {
+    font-family: 'Hanken Grotesk', system-ui, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #EDEAE0;
+    margin: 0;
+    line-height: 1.3;
+  }
+  .search-demo-card-price {
+    color: rgba(237, 234, 224, 0.7);
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* Pills */
+  .search-demo-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .search-demo-pill {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+  .search-demo-pill--match {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+  .search-demo-pill--miss {
+    color: rgba(237, 234, 224, 0.45);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* "Hidden in your catalog" section header + per-card badge */
+  .search-demo-hidden-header {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  }
+  .search-demo-hidden-eyebrow {
+    display: inline-block;
+    color: #ef4444;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  .search-demo-hidden-header p {
+    color: rgba(237, 234, 224, 0.55);
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0 0 16px 0;
+    max-width: 60ch;
+  }
+  .search-demo-card-hidden-badge {
+    margin-top: 8px;
+    color: rgba(239, 68, 68, 0.85);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+</style>
