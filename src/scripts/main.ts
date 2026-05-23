@@ -28,17 +28,6 @@ cards.forEach((card) => {
 });
 
 // ============================================================
-// Ambient grid follows the mouse
-// ============================================================
-document.addEventListener('mousemove', (e) => {
-  const xPercent = (e.clientX / window.innerWidth) * 100;
-  const yPercent = (e.clientY / window.innerHeight) * 100;
-
-  document.documentElement.style.setProperty('--grid-x', `${xPercent}%`);
-  document.documentElement.style.setProperty('--grid-y', `${yPercent}%`);
-});
-
-// ============================================================
 // Reveal on Scroll with Stagger
 // ============================================================
 const revealObserver = new IntersectionObserver(
