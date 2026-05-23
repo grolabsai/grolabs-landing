@@ -140,43 +140,62 @@ body {
   filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4));
 }
 
-/* Luminous Equation — Returns block slides in horizontally when the section
-   crosses 50% into the viewport. The "transition: all 800ms" was 800px in
-   the spec; corrected to ms. */
-.hidden-element {
-  opacity: 0;
-  max-width: 0;
-  overflow: hidden;
-  transform: translateX(20px);
-  transition: all 800ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.hidden-element.revealed {
-  opacity: 1;
-  max-width: 500px;
-  transform: translateX(0);
-  margin-right: 2rem;
-}
-/* Luminous Equation cards — base composition (used 4× on the landing).
-   The Returns variant overrides the dark surface with a red tint via
-   .equation-card--returns. Keep card sizing here so templates only
-   reference the class name. */
+/* Revenue equation cards — Traffic, Conversion, Revenue.
+   - .equation-card: base composition. Children stack column-wise; icon
+     + label centered, divider + body fill the card width.
+   - .equation-card--compact: fixed narrow width (Revenue), no body.
+   - All cards stretch to tallest sibling's height via the parent flex
+     row's default items-stretch — keeps the equation visually aligned
+     regardless of bullet density. */
 .equation-card {
-  @apply flex flex-col items-center gap-6 p-10 rounded-sm border border-white/5 bg-zinc-900/50;
-  min-width: 250px;
+  @apply flex flex-col gap-6 p-10 rounded-sm border border-white/5 bg-zinc-900/50;
   transition: transform 0.3s ease, background 0.3s ease;
 }
 .equation-card:hover {
   transform: translateY(-4px);
   background: rgba(255, 255, 255, 0.08);
 }
-.equation-card--returns {
-  @apply border-error-red/20 bg-error-red/5;
+.equation-card--compact {
+  width: 180px;
+  flex-shrink: 0;
 }
 
-/* The ×, −, = operators between equation cards — single source of truth
-   so future weight/colour tweaks land in one place. */
+/* Hairline divider under the label, separating it from the body bullets. */
+.equation-card-divider {
+  @apply border-t border-white/10 m-0 w-full;
+}
+
+/* Body region under the divider — bullets + intro copy. */
+.equation-card-body {
+  @apply text-zinc-300 text-sm leading-relaxed space-y-3;
+}
+.equation-card-body p {
+  @apply text-zinc-400;
+}
+.equation-card-body ul {
+  @apply space-y-2;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* Hanging-indent bullets — wrapped lines align to the text column,
+   not under the bullet glyph. The "–" en-dash matches the typewriter
+   character of the closer line in the hero. */
+.equation-card-body li {
+  position: relative;
+  padding-left: 1.25rem;
+}
+.equation-card-body li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: theme('colors.zinc.500');
+}
+
+/* The ×, =, etc. operators between equation cards. self-center keeps
+   them vertically centered within the stretched-tall card row. */
 .equation-operator {
-  @apply text-zinc-300 text-4xl font-light;
+  @apply text-zinc-300 text-4xl font-light self-center;
 }
 
 /* Hero pill buttons — "Start a conversation" + "Watch video".

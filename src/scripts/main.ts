@@ -118,25 +118,3 @@ if (particlesContainer) {
   }
 }
 
-// ============================================================
-// Luminous Equation — reveal the Returns block once the section is 50%
-// into the viewport. 400 ms delay so the user reads the baseline equation
-// (Traffic × Conversion = Revenue) before the disruption injects "− Returns".
-// ============================================================
-const revenueEquation = document.getElementById('revenue-equation');
-const returnsReveal = document.getElementById('returns-reveal');
-if (revenueEquation && returnsReveal) {
-  const equationObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        setTimeout(() => {
-          returnsReveal.classList.add('revealed');
-        }, 400);
-        equationObserver.unobserve(entry.target);
-      });
-    },
-    { root: null, threshold: 0.5 },
-  );
-  equationObserver.observe(revenueEquation);
-}

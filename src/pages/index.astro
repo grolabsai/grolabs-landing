@@ -133,31 +133,32 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         </p>
       </div>
 
-      <!-- Equation cards — centered as a unit. -->
+      <!-- Equation row — Traffic + Conversion flex 50/50, Revenue fixed
+           narrow. All three stretch to the tallest card's height. -->
       <div
         id="equation-container"
-        class="flex items-center justify-center gap-6 max-w-7xl mx-auto transition-all duration-700 ease-out"
+        class="flex items-stretch gap-6 w-full transition-all duration-700 ease-out"
       >
-        <EquationCard icon="groups" label="Traffic" />
+        <EquationCard icon="groups" label="Traffic">
+          <p>We don't run your ads or generate leads.</p>
+          <p>We will:</p>
+          <ul>
+            <li>More <span class="text-primary">SEO</span> traffic, from richer product data.</li>
+            <li>More <span class="text-primary">AI agent referrals</span>, from making your store agent-ready.</li>
+          </ul>
+        </EquationCard>
         <div class="equation-operator">×</div>
-        <EquationCard icon="percent" label="Conversion" />
-
-        <!-- Returns — hidden until the section enters viewport at 50% -->
-        <div id="returns-reveal" class="hidden-element flex items-center gap-6">
-          <div class="equation-operator">−</div>
-          <EquationCard variant="returns" icon="keyboard_return" label="Returns" />
-        </div>
-
+        <EquationCard icon="percent" label="Conversion">
+          <p>We lift conversion at the three points where it usually breaks:</p>
+          <ul>
+            <li><span class="text-primary">Search</span> that finds what customers actually asked for.</li>
+            <li><span class="text-primary">Catalog</span> data rich enough to make search work — managed for you, not by you.</li>
+            <li><span class="text-primary">Checkout</span> without the account-creation wall.</li>
+          </ul>
+        </EquationCard>
         <div class="equation-operator">=</div>
-        <EquationCard icon="attach_money" label="Revenue" />
+        <EquationCard size="compact" icon="attach_money" label="Revenue" />
       </div>
-
-      <p class="max-w-3xl text-zinc-400 text-base leading-relaxed text-center mx-auto mt-16">
-        There are experts who can increase traffic — we won't get into that discipline. We can
-        increase traffic to your site by enhancing product data attributes and enabling your
-        website for agentic searches. Our focus is on conversion, to make sure you recover the
-        lost revenue without paying for more traffic.
-      </p>
     </div>
   </section>
 

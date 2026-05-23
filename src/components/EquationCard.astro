@@ -1,28 +1,44 @@
 ---
 /**
- * Cards in the Luminous Equation row: Traffic, Conversion, Returns, Revenue.
- * Returns gets variant="returns" — red icon + label + red-tinted card surface.
- * The base styling lives in .equation-card / .equation-card--returns (global.css).
+ * Cards in the Revenue equation row: Traffic, Conversion, Revenue.
+ *
+ * Two sizes:
+ *   - "expand" (default): flexes to fill available width, has a slot
+ *     for bullets / body content under a hairline divider below the
+ *     label. Used by Traffic + Conversion.
+ *   - "compact": fixed narrow width (matches "REVENUE" with breathing
+ *     room), no body content, just icon + label. Used by Revenue.
+ *
+ * All cards stretch to the tallest sibling's height (via the parent
+ * flex container's default items-stretch) so the row always reads as
+ * one aligned unit, regardless of how much bullet copy any one card has.
  */
 export interface Props {
-  icon: string;            // Material Symbols glyph name
+  icon: string;
   label: string;
-  variant?: 'default' | 'returns';
+  size?: 'expand' | 'compact';
 }
 
-const { icon, label, variant = 'default' } = Astro.props;
-const isReturns = variant === 'returns';
+const { icon, label, size = 'expand' } = Astro.props;
+const isCompact = size === 'compact';
 ---
 
-<div class:list={['equation-card', isReturns && 'equation-card--returns']}>
-  <span
-    class:list={[
-      'material-symbols-outlined text-4xl',
-      isReturns ? 'text-error-red' : 'text-primary',
-    ]}>{icon}</span>
-  <h3
-    class:list={[
-      'text-2xl font-bold tracking-tighter uppercase',
-      isReturns ? 'text-error-red' : 'text-white',
-    ]}>{label}</h3>
+<div
+  class:list={[
+    'equation-card',
+    isCompact ? 'equation-card--compact' : 'flex-1',
+  ]}
+>
+  <span class="material-symbols-outlined text-4xl text-primary self-center">{icon}</span>
+  <h3 class="text-white text-2xl font-bold tracking-tighter uppercase text-center">{label}</h3>
+  {
+    !isCompact && (
+      <>
+        <hr class="equation-card-divider" />
+        <div class="equation-card-body">
+          <slot />
+        </div>
+      </>
+    )
+  }
 </div>
