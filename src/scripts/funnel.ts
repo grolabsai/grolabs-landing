@@ -557,7 +557,7 @@ export function renderFunnel(root: HTMLElement): void {
     pctLabel.setAttribute('y', String(BAR_Y + 44));
     pctLabel.setAttribute('text-anchor', 'middle');
     pctLabel.setAttribute('fill', '#ffffff');
-    pctLabel.setAttribute('font-size', '24');
+    pctLabel.setAttribute('font-size', '21');
     pctLabel.setAttribute('font-weight', '700');
     pctLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
     pctLabel.dataset.leakId = leak.id;
@@ -597,7 +597,7 @@ export function renderFunnel(root: HTMLElement): void {
   barTitle.setAttribute('y', String(BAR_Y + 118));
   barTitle.setAttribute('text-anchor', 'middle');
   barTitle.setAttribute('fill', '#ffffff');
-  barTitle.setAttribute('font-size', '26');
+  barTitle.setAttribute('font-size', '23');
   barTitle.setAttribute('font-weight', '700');
   barTitle.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
   barTitle.setAttribute('letter-spacing', '0.04em');
