@@ -114,17 +114,18 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
 
   <!-- Revenue equation section. Background is canvas-deeper (~4% darker
        than canvas) so it reads as a distinct section via tonal step,
-       not a hard divider line. mt-2xl + py-2xl give a clean breath
-       across the boundary. -->
+       not a hard divider line. mt-3xl + py-3xl give ~320 px from the
+       previous section's last element to this section's title — twice
+       the original 2xl breathing room, per design feedback. -->
   <section
     id="revenue-equation"
-    class="relative mt-2xl py-2xl px-10 bg-canvas-deeper overflow-hidden flex flex-col items-center"
+    class="relative mt-3xl py-3xl px-10 bg-canvas-deeper overflow-hidden flex flex-col items-center"
   >
     <div class="max-w-7xl w-full mb-2xl">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Precision Retrieval Systems
+        Revenue uplift
       </span>
-      <h2 class="text-white text-7xl font-light mb-8">Want to increase revenue?</h2>
+      <h2 class="font-marker text-white text-7xl mb-8">Want to increase revenue?</h2>
       <p class="text-zinc-400 max-w-xl text-lg leading-relaxed">
         Either increase traffic or increase conversion, right?
       </p>
