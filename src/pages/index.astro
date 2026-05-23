@@ -151,10 +151,11 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Funnel Benchmark / Revenue leaks. Same canvas-deeper bg + py-3xl
-       breathing pattern as the Revenue uplift section above — so the
-       page alternates dark-tone sections via background, not lines. -->
-  <section class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden reveal">
+  <!-- Funnel Benchmark / Revenue leaks. Sits on the lighter canvas bg
+       so it alternates with the canvas-deeper Revenue uplift section
+       above and the canvas-deeper How section below. Inner blocks
+       (scenario + funnel) go canvas-deeper to invert the contrast. -->
+  <section class="relative mt-3xl py-3xl bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
     <div class="mb-xs grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
       <div>
@@ -168,7 +169,7 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
           assess your particular situation.
         </p>
       </div>
-      <div class="bg-canvas border border-white/5 rounded-xl p-xl">
+      <div class="bg-canvas-deeper border border-white/5 rounded-xl p-xl">
         <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
           Scenario
         </span>
@@ -181,7 +182,7 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         </p>
       </div>
     </div>
-    <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
+    <div class="bg-canvas-deeper border border-white/5 p-md md:p-xl rounded-xl mb-xl flex flex-col overflow-hidden">
       <div id="funnel-root" class="w-full overflow-x-auto"></div>
 
       <div class="mt-md flex gap-xl items-stretch">
@@ -228,6 +229,20 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         </div>
       </div>
     </div>
+    </div>
+  </section>
+
+  <!-- How? / Catalog and Search Optimization. Placeholder section —
+       body content lands in a follow-up pass. canvas-deeper bg so it
+       alternates with the lighter Revenue leaks above. -->
+  <section class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        How?
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl">
+        Catalog and Search Optimization
+      </h2>
     </div>
   </section>
 

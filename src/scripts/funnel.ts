@@ -114,7 +114,10 @@ const VIEWBOX = { x: 0, y: -15, w: 1400, h: BAR_Y + BAR_H + 15 };
 // recessed "wells" in the canvas-deeper surface. Pure black gives the
 // strongest separation; the kinetic-yellow icons + bone-white labels
 // pop loudest against it. Border stays as a subtle hairline.
-const STAGE_FILL = '#000000';
+// Stage tiles now sit on a darker funnel container (canvas-deeper); use
+// the same #1F1F23 step-up tone used by .stats-section-surface so they
+// read as raised tiles rather than punched-out wells.
+const STAGE_FILL = '#1F1F23';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.08)';
 const STAGE_BORDER_W = 1;
 const STAGE_ACCENT = '#fae194'; // text + icon
