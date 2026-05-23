@@ -269,9 +269,12 @@ export function renderFunnel(root: HTMLElement): void {
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Constant fall speed + target spacing keeps drops visually consistent across leak lengths.
-  const DROP_SPEED = 50;      // px / second
-  const DROP_SPACING = 40;    // target px between drops in the column
+  // Drops are dense + crawl. Combined with the teardrop shape, the column
+  // reads as a slowly-drawn red dotted line rather than discrete drips —
+  // motion is just subtle enough to confirm "it's still happening" without
+  // pulling the eye.
+  const DROP_SPEED = 6;       // px / second — very slow; ~10 s per 60 px column
+  const DROP_SPACING = 8;     // px between drops — tight enough to read as a line
 
   function makeDroplet(cx: number, cy: number, leakId: string): SVGEllipseElement {
     const drop = document.createElementNS(svgNS, 'ellipse');
