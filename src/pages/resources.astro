@@ -103,14 +103,9 @@ function ctaFor(slug: string): string {
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Resources
       </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
         The reading list
       </h2>
-      <p class="text-secondary-fixed-dim text-body-md leading-relaxed max-w-3xl mb-2xl">
-        The books, articles, and citations behind how we think about catalog,
-        search, and conversion. Some links include affiliate codes — buying
-        through them helps fund the work, at no extra cost to you.
-      </p>
 
       {
         groups.length === 0 ? (
@@ -120,9 +115,6 @@ function ctaFor(slug: string): string {
         ) : (
           groups.map(({ category, items }) => (
             <div class="mb-2xl">
-              <h3 class="font-marker uppercase text-white text-2xl md:text-3xl mb-lg">
-                {category.name_en}
-              </h3>
               <div class="resource-grid">
                 {items.map((item) => (
                   <article class="resource-card">
