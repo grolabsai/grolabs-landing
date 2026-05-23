@@ -273,6 +273,45 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
   </section>
 
+  <!-- Decorative connector — light-gray dotted arrow bridging the red
+       alert band at the bottom of the How section above and the phone
+       notification at the top of the Grow section below. The arrow
+       lives in its own zero-height wrapper between the two sections;
+       the absolutely-positioned SVG overflows into both vertically.
+       z-index keeps it above the section backgrounds. Desktop only —
+       on narrow viewports the layout stacks and the spatial story
+       breaks down. -->
+  <div class="relative max-w-page mx-auto px-margin-mobile md:px-margin-desktop pointer-events-none" aria-hidden="true">
+    <svg
+      class="hidden lg:block absolute right-12 xl:right-20 z-20"
+      style="top: -180px;"
+      width="80"
+      height="320"
+      viewBox="0 0 80 320"
+      fill="none"
+    >
+      <!-- Dotted curve from the red band area downward, gently bowing
+           to the right before landing centred above the phone. -->
+      <path
+        d="M 40 4 C 64 70 64 220 40 286"
+        stroke="rgba(237, 234, 224, 0.42)"
+        stroke-width="2.5"
+        stroke-dasharray="2 8"
+        stroke-linecap="round"
+        fill="none"
+      />
+      <!-- Solid arrowhead pointing down at the phone. -->
+      <path
+        d="M 28 278 L 40 296 L 52 278"
+        stroke="rgba(237, 234, 224, 0.6)"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+      />
+    </svg>
+  </div>
+
   <!-- Entrepreneurs' Priority / Grow a company. Two-column layout
        where the LEFT column carries the entire section header +
        narrative; the RIGHT column hosts the phone-notification SVG
