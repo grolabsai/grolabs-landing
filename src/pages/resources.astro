@@ -1,0 +1,283 @@
+---
+/**
+ * /resources — curated reading and citations.
+ *
+ * Build-time fetch from the wwwGroLabs Supabase project (PostgREST
+ * REST API). Two tables read:
+ *
+ *   categories  → labels + ordering for the on-page groupings
+ *   articles    → individual entries (books, news, quotes…)
+ *
+ * RLS on wwwGroLabs is configured so the public role can SELECT
+ *   - categories: all rows
+ *   - articles:    only where status = 'published'
+ * so the publishable key embedded below cannot leak draft content or
+ * mutate anything. It's a safe build-time credential.
+ *
+ * Astro runs this frontmatter once per build, then pre-renders the
+ * HTML statically. New content lands on the live site after the next
+ * push (the GitHub Pages workflow rebuilds on push to main).
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const SUPABASE_URL = 'https://vymfzuvgfmnwlpugyumh.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_WqOPWG0AmqVDXaB4iGG50w_K6VsNPjH';
+
+type Category = {
+  id: string;
+  slug: string;
+  name_en: string;
+  name_es: string;
+  icon: string | null;
+  sort_order: number;
+};
+
+type Article = {
+  id: string;
+  slug: string;
+  title_en: string;
+  excerpt_en: string | null;
+  author: string | null;
+  external_url: string | null;
+  featured_image: string | null;
+  rating: number | null;
+  year: number | null;
+  category_id: string | null;
+  is_featured: boolean;
+  sort_order: number;
+};
+
+async function fetchTable<T>(path: string): Promise<T[]> {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      apikey: SUPABASE_PUBLISHABLE_KEY,
+      Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`wwwGroLabs ${path} → ${res.status} ${res.statusText}`);
+  }
+  return (await res.json()) as T[];
+}
+
+const categories = await fetchTable<Category>(
+  'categories?select=id,slug,name_en,name_es,icon,sort_order&order=sort_order.asc',
+);
+
+const articles = await fetchTable<Article>(
+  'articles' +
+    '?status=eq.published' +
+    '&select=id,slug,title_en,excerpt_en,author,external_url,featured_image,rating,year,category_id,is_featured,sort_order' +
+    '&order=is_featured.desc,sort_order.asc,year.desc',
+);
+
+// Group articles by category slug, in the order categories defines.
+const groups: { category: Category; items: Article[] }[] = categories
+  .map((cat) => ({
+    category: cat,
+    items: articles.filter((a) => a.category_id === cat.id),
+  }))
+  .filter((g) => g.items.length > 0);
+
+function ctaFor(slug: string): string {
+  switch (slug) {
+    case 'books':
+      return 'Get it on Amazon';
+    case 'news':
+      return 'Read article';
+    case 'quotes':
+      return 'View source';
+    default:
+      return 'Open';
+  }
+}
+---
+
+<BaseLayout
+  title="Resources | GroLabs"
+  description="The books, articles, and citations that shape how GroLabs thinks about catalog, search, and conversion."
+>
+  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Resources
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+        The reading list
+      </h2>
+      <p class="text-secondary-fixed-dim text-body-md leading-relaxed max-w-3xl mb-2xl">
+        The books, articles, and citations behind how we think about catalog,
+        search, and conversion. Some links include affiliate codes — buying
+        through them helps fund the work, at no extra cost to you.
+      </p>
+
+      {
+        groups.length === 0 ? (
+          <p class="text-secondary-fixed-dim italic">
+            New resources are on the way — check back soon.
+          </p>
+        ) : (
+          groups.map(({ category, items }) => (
+            <div class="mb-2xl">
+              <h3 class="font-marker uppercase text-white text-2xl md:text-3xl mb-lg">
+                {category.name_en}
+              </h3>
+              <div class="resource-grid">
+                {items.map((item) => (
+                  <article class="resource-card">
+                    {item.featured_image ? (
+                      <a
+                        href={item.external_url ?? '#'}
+                        target={item.external_url ? '_blank' : undefined}
+                        rel={item.external_url ? 'noopener noreferrer sponsored' : undefined}
+                        class="resource-card-image-link"
+                      >
+                        <img
+                          src={item.featured_image}
+                          alt={item.title_en}
+                          class="resource-card-image"
+                          loading="lazy"
+                        />
+                      </a>
+                    ) : (
+                      <div class="resource-card-image resource-card-image--placeholder" aria-hidden="true">
+                        <span>{category.icon ?? '·'}</span>
+                      </div>
+                    )}
+                    <div class="resource-card-body">
+                      <h4 class="resource-card-title">{item.title_en}</h4>
+                      {item.author && (
+                        <p class="resource-card-author">{item.author}</p>
+                      )}
+                      <div class="resource-card-meta">
+                        {item.year && <span>{item.year}</span>}
+                        {item.rating != null && (
+                          <span class="resource-card-rating">★ {Number(item.rating).toFixed(1)}</span>
+                        )}
+                      </div>
+                      {item.external_url && (
+                        <a
+                          href={item.external_url}
+                          target="_blank"
+                          rel="noopener noreferrer sponsored"
+                          class="resource-card-link"
+                        >
+                          {ctaFor(category.slug)} →
+                        </a>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .resource-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 16px;
+  }
+  @media (min-width: 640px) {
+    .resource-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 900px) {
+    .resource-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1200px) {
+    .resource-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .resource-card {
+    background: #131316;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 200ms ease, transform 200ms ease;
+  }
+  .resource-card:hover {
+    border-color: rgba(250, 225, 148, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .resource-card-image-link {
+    display: block;
+    line-height: 0;
+  }
+  .resource-card-image {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    background: #0e0e11;
+    display: block;
+  }
+  .resource-card-image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(250, 225, 148, 0.35);
+    font-size: 48px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  .resource-card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+  .resource-card-title {
+    color: #EDEAE0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 0;
+  }
+  .resource-card-author {
+    color: rgba(237, 234, 224, 0.6);
+    font-size: 13px;
+    margin: 0;
+  }
+  .resource-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: rgba(237, 234, 224, 0.45);
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+  .resource-card-rating {
+    color: rgba(250, 225, 148, 0.7);
+  }
+  .resource-card-link {
+    margin-top: auto;
+    padding-top: 12px;
+    color: #fae194;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 180ms;
+  }
+  .resource-card-link:hover {
+    color: #ffffff;
+  }
+</style>
