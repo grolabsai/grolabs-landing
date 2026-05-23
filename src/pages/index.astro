@@ -156,16 +156,30 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
        page alternates dark-tone sections via background, not lines. -->
   <section class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-    <div class="mb-2xl">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Conversion Funnel
-      </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">Revenue leaks</h2>
-      <p class="text-body-lg text-secondary-fixed-dim max-w-3xl">
-        We have identified the most likely causes of lost revenue at each stage. These are
-        general e-commerce standard percentages, but you can change the values in order to
-        assess your particular situation.
-      </p>
+    <div class="mb-2xl grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+      <div>
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+          Conversion Funnel
+        </span>
+        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">Revenue leaks</h2>
+        <p class="text-body-lg text-secondary-fixed-dim">
+          We have identified the most likely causes of lost revenue at each stage. These are
+          general e-commerce standard percentages, but you can change the values in order to
+          assess your particular situation.
+        </p>
+      </div>
+      <div class="border border-primary rounded-xl p-xl">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+          Scenario
+        </span>
+        <p class="text-body-lg text-secondary-fixed-dim leading-relaxed">
+          The funnel below uses the numbers most of our customers walk in with:
+          <span class="text-primary">5,000 monthly sessions</span> at a
+          <span class="text-primary">$100 AOV</span>. Catalog managed in Excel or the
+          WooCommerce admin. Default search. Standard email-and-password checkout.
+          GA4 installed, but never monitored.
+        </p>
+      </div>
     </div>
     <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
       <div id="funnel-root" class="w-full overflow-x-auto"></div>
@@ -180,17 +194,21 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
               <th class="py-md pr-xl font-label-caps text-error-red text-meta-sm leading-tight align-bottom text-left">
                 LOST<br />REVENUE
               </th>
-              <th class="py-md font-label-caps text-success-emerald text-meta-sm leading-tight align-bottom text-left">
+              <th class="py-md pr-xl font-label-caps text-success-emerald text-meta-sm leading-tight align-bottom text-left">
                 RECOVERY<br />POTENTIAL
+              </th>
+              <th class="py-md font-label-caps text-success-emerald text-meta-sm leading-tight align-bottom text-left">
+                $<br />RECOVERED
               </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/5 text-zinc-200">
-            <FunnelStageRow stageId="search" icon="search" label="Search" loss="65%" recovery="+25%" />
-            <FunnelStageRow stageId="browsing" icon="grid_view" label="Browsing" loss="75%" recovery="+30%" />
-            <FunnelStageRow stageId="pdp" icon="description" label="Product page" loss="80%" recovery="+25%" />
-            <FunnelStageRow stageId="cart" icon="shopping_cart" label="Cart" loss="70%" recovery="+20%" />
-            <FunnelStageRow stageId="checkout" icon="payments" label="Checkout" loss="17%" recovery="+7%" />
+            {/* recoveryAmount values are placeholders until the scenario math (sessions × AOV × recovery %) is finalized. */}
+            <FunnelStageRow stageId="search"   icon="search"         label="Search"        loss="65%" recovery="+25%" recoveryAmount="+$1,250" />
+            <FunnelStageRow stageId="browsing" icon="grid_view"      label="Browsing"      loss="75%" recovery="+30%" recoveryAmount="+$1,500" />
+            <FunnelStageRow stageId="pdp"      icon="description"    label="Product page"  loss="80%" recovery="+25%" recoveryAmount="+$1,250" />
+            <FunnelStageRow stageId="cart"     icon="shopping_cart"  label="Cart"          loss="70%" recovery="+20%" recoveryAmount="+$1,000" />
+            <FunnelStageRow stageId="checkout" icon="payments"       label="Checkout"      loss="17%" recovery="+7%"  recoveryAmount="+$350"   />
           </tbody>
         </table>
 

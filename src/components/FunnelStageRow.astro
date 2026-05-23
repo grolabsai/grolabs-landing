@@ -5,16 +5,20 @@
  * the row toggles .is-active on the corresponding SVG stage and swaps
  * the info-panel content. Keep the `stageId` values in sync with the
  * STAGES array in src/scripts/funnel.ts.
+ *
+ * Visual hierarchy: the dollar column is the eye-catching green; the
+ * recovery percentage sits beside it as supporting metadata in bone.
  */
 export interface Props {
   stageId: string;   // 'search' | 'browsing' | 'pdp' | 'cart' | 'checkout'
   icon: string;      // Material Symbols glyph name
   label: string;
-  loss: string;      // "65%", "+25%" etc.
+  loss: string;
   recovery: string;
+  recoveryAmount: string;
 }
 
-const { stageId, icon, label, loss, recovery } = Astro.props;
+const { stageId, icon, label, loss, recovery, recoveryAmount } = Astro.props;
 ---
 
 <tr class="stage-row" data-stage-id={stageId}>
@@ -25,5 +29,6 @@ const { stageId, icon, label, loss, recovery } = Astro.props;
     </div>
   </td>
   <td class="py-md pr-xl text-error-red font-semibold">{loss}</td>
-  <td class="py-md text-success-emerald font-semibold">{recovery}</td>
+  <td class="py-md pr-xl text-white font-semibold">{recovery}</td>
+  <td class="py-md text-success-emerald font-semibold">{recoveryAmount}</td>
 </tr>
