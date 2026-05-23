@@ -1,16 +1,20 @@
 ---
 /**
- * Architecture diagram for the "How we do it" section.
+ * Architecture diagram for the "Optimize catalog content and search
+ * engine" section.
  *
- * Two-column layout: data sources on the left feeding AI-agent
- * capabilities on the right. Built as semantic divs + Tailwind so the
- * grid reflows on mobile (columns stack, the horizontal arrows column
- * turns into a short vertical glyph row).
+ * Two-column layout: data sources on the left feed an AI agent on the
+ * right. The right side is one big "AI agent" container that visually
+ * wraps three sub-modules (Dashboard, Identify-fix-monitor, Threshold
+ * monitor) as recessed wells inside it — background tone alone carries
+ * the parent/child relationship, no extra chrome.
  *
- * Box surface treatment matches the rest of the inner blocks on the
- * page (bg-canvas with a 1 px hairline border + rounded-xl). Eyebrow
- * style on box titles is the same Tailwind class string used by every
- * section eyebrow on the page — see the `.how-box-eyebrow` rule below.
+ * Left side: SEO and AEO are compressed to narrow title-only pills so
+ * the Search box can claim the remaining width and split itself into
+ * two text columns separated by a thin vertical hairline.
+ *
+ * Box surfaces match the rest of the page's inner-block recipe; the
+ * eyebrow class on box titles mirrors the section eyebrows verbatim.
  */
 ---
 
@@ -18,18 +22,27 @@
   <!-- LEFT: data sources -->
   <div class="how-diagram-col">
     <div class="how-diagram-trio">
-      <div class="how-box how-box--small">
+      <div class="how-box how-box--narrow">
         <span class="how-box-eyebrow">SEO</span>
       </div>
-      <div class="how-box how-box--small">
+      <div class="how-box how-box--narrow">
         <span class="how-box-eyebrow">AEO</span>
       </div>
-      <div class="how-box how-box--small">
+      <div class="how-box how-box--search">
         <span class="how-box-eyebrow">Search</span>
-        <p class="how-box-body">
-          Typo tolerance, synonyms, and ranking that adapt to how your
-          customers actually shop.
-        </p>
+        <div class="how-search-split">
+          <div class="how-search-half">
+            <p class="how-box-body">
+              Typo tolerance, synonyms, and ranking that adapt to how your
+              customers actually shop.
+            </p>
+          </div>
+          <div class="how-search-half how-search-half--right">
+            <p class="how-box-body how-search-placeholder">
+              (right column content coming)
+            </p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -65,44 +78,46 @@
     </div>
   </div>
 
-  <!-- ARROWS: left-feeds-right. Three placements, not one per box —
-       the visual point is the gestalt, not a precise wiring diagram. -->
+  <!-- ARROWS: left-feeds-right. Three placements spread evenly. -->
   <div class="how-diagram-arrows" aria-hidden="true">
     <span class="how-arrow">→</span>
     <span class="how-arrow">→</span>
     <span class="how-arrow">→</span>
   </div>
 
-  <!-- RIGHT: AI agent capabilities -->
+  <!-- RIGHT: AI agent container wraps three sub-modules as nested wells. -->
   <div class="how-diagram-col">
-    <div class="how-box">
-      <span class="how-box-eyebrow">AI agent</span>
+    <div class="how-box how-box--container">
+      <span class="how-box-eyebrow how-box-eyebrow--container">AI agent</span>
       <p class="how-box-body">
         Reads every signal across catalog, search, and analytics. Finds
         the leak. Proposes the fix.
       </p>
-    </div>
-    <div class="how-box">
-      <span class="how-box-eyebrow">Dashboard</span>
-      <p class="how-box-body">
-        Surfaces the alerts and the numbers behind them — so you act on
-        findings, not on hunches.
-      </p>
-    </div>
-    <div class="how-box">
-      <span class="how-box-eyebrow">Identify, fix &amp; monitor</span>
-      <p class="how-box-body">
-        Spots missing attributes, weak product copy, and zero-result
-        queries. Proposes fixes. Tracks whether they worked.
-      </p>
-    </div>
-    <div class="how-box">
-      <span class="how-box-eyebrow">Threshold monitor</span>
-      <p class="how-box-body">
-        Watches traffic anomalies and trust signals. Alerts you when
-        something crosses the line — bot traffic, conversion collapse,
-        inventory drift.
-      </p>
+
+      <div class="how-nested-group">
+        <div class="how-box how-box--nested">
+          <span class="how-box-eyebrow">Dashboard</span>
+          <p class="how-box-body">
+            Surfaces the alerts and the numbers behind them — so you act on
+            findings, not on hunches.
+          </p>
+        </div>
+        <div class="how-box how-box--nested">
+          <span class="how-box-eyebrow">Identify, fix &amp; monitor</span>
+          <p class="how-box-body">
+            Spots missing attributes, weak product copy, and zero-result
+            queries. Proposes fixes. Tracks whether they worked.
+          </p>
+        </div>
+        <div class="how-box how-box--nested">
+          <span class="how-box-eyebrow">Threshold monitor</span>
+          <p class="how-box-body">
+            Watches traffic anomalies and trust signals. Alerts you when
+            something crosses the line — bot traffic, conversion collapse,
+            inventory drift.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -121,12 +136,12 @@
     gap: 12px;
   }
 
+  /* Trio row: SEO and AEO compressed to their content width, Search
+     takes everything else and splits internally. */
   .how-diagram-trio {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
     gap: 8px;
   }
-
   .how-diagram-trio-arrows {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -143,29 +158,85 @@
     justify-content: space-around;
     align-items: center;
   }
-
   .how-arrow {
     color: rgba(250, 225, 148, 0.5);
     font-size: 26px;
     line-height: 1;
   }
 
-  /* Inner-block surface — same recipe as the funnel container, scenario
-     box, and search-demo panel. */
+  /* Base box surface — same recipe as funnel container + scenario +
+     search panel. */
   .how-box {
     background: #131316;
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 16px;
   }
-  .how-box--small {
-    padding: 12px;
+
+  /* SEO / AEO: narrow title-only pills. Vertical layout means the
+     title sits centred against the tall Search box next to it. */
+  .how-box--narrow {
+    flex: 0 0 auto;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
   }
 
-  /* Eyebrow class string verbatim from the section eyebrows used in
-     index.astro: text-primary font-mono tracking-[0.2em] text-xs uppercase.
-     Reproducing it here as plain CSS so the diagram works as a single
-     component without depending on Tailwind utilities mid-content. */
+  /* Search box takes the rest of the trio row. */
+  .how-box--search {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* Two text columns inside Search, separated by a 1 px hairline. */
+  .how-search-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 10px;
+  }
+  .how-search-half {
+    min-width: 0;
+  }
+  .how-search-half--right {
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    padding-left: 16px;
+  }
+  .how-search-placeholder {
+    font-style: italic;
+    color: rgba(237, 234, 224, 0.32);
+  }
+
+  /* AI agent: parent container that wraps the three sub-modules. */
+  .how-box--container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  .how-box-eyebrow--container {
+    font-size: 13px;
+  }
+  .how-nested-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+    flex: 1;
+  }
+  /* Recessed sub-modules. Darker than the container so they read as
+     wells inside it. */
+  .how-box--nested {
+    background: #0e0e11;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 12px 14px;
+  }
+
+  /* Eyebrow — same Tailwind class string as every section eyebrow on
+     the page (text-primary font-mono tracking-[0.2em] text-xs
+     uppercase), inlined here so the diagram component is self-contained. */
   .how-box-eyebrow {
     display: block;
     color: #fae194;
@@ -184,8 +255,8 @@
     margin: 8px 0 0;
   }
 
-  /* Mobile: collapse to single column, arrows become a short horizontal
-     row of down-pointing glyphs between the source groups. */
+  /* Mobile: collapse to a single column; arrows pivot to a horizontal
+     row of down-pointing glyphs between the source and the agent. */
   @media (max-width: 900px) {
     .how-diagram {
       grid-template-columns: 1fr;
@@ -202,12 +273,21 @@
     }
   }
 
-  /* Tightest viewport: stack the SEO/AEO/Search trio and drop the
-     upward arrows — the spatial story doesn't survive at that width
-     and the arrows just create visual clutter. */
-  @media (max-width: 480px) {
+  /* Tightest viewport: stack the trio row + the search split. The
+     upward arrows disappear because they no longer point at anything
+     spatially meaningful. */
+  @media (max-width: 640px) {
     .how-diagram-trio {
+      flex-direction: column;
+    }
+    .how-search-split {
       grid-template-columns: 1fr;
+    }
+    .how-search-half--right {
+      border-left: 0;
+      padding-left: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 12px;
     }
     .how-diagram-trio-arrows {
       display: none;
