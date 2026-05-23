@@ -2,12 +2,15 @@
 /**
  * Live Meilisearch demo embedded in the landing page.
  *
- * Talks to the `demo` index over Meilisearch's REST API via a
- * search-only key (see src/scripts/search-demo.ts). The script wires
- * the input + results container after hydration. Styling lives in the
- * <style is:global> block — bespoke CSS reads cleaner here than the
- * equivalent Tailwind soup, and `is:global` means the classes survive
- * being injected by the runtime script.
+ * The outer `.search-demo` div is the panel that groups the search
+ * input + result rows visually — bg-canvas (one step lighter than the
+ * section's canvas-deeper bg), 1 px hairline border, rounded-xl
+ * corners matching every other inner block on the page.
+ *
+ * Script wires the input + results container after hydration (see
+ * src/scripts/search-demo.ts). Styling lives in the <style is:global>
+ * block — the row classes are injected by the script, so they need to
+ * survive Astro's scoped-style hashing.
  */
 ---
 
@@ -37,22 +40,30 @@
 </script>
 
 <style is:global>
+  /* Panel — same surface treatment as the other inner blocks on the page
+     (funnel container, scenario block). One step lighter than the
+     section's canvas-deeper bg so the panel reads as a raised tray. */
   .search-demo {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     width: 100%;
+    background: #131316;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
   }
 
-  /* Search input */
+  /* Search input — sits one tone darker than the panel so it reads as
+     an inset well. Rounded-xl corners match the panel + rows. */
   .search-demo-input-wrap {
     position: relative;
     display: flex;
     align-items: center;
     background: #0e0e11;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 9999px;
-    padding: 0 20px;
+    border-radius: 12px;
+    padding: 0 18px;
     transition: border-color 200ms ease, box-shadow 200ms ease;
   }
   .search-demo-input-wrap:focus-within {
@@ -73,18 +84,18 @@
     color: #EDEAE0;
     font-family: 'Hanken Grotesk', system-ui, sans-serif;
     font-size: 16px;
-    padding: 14px 0;
+    padding: 12px 0;
     width: 100%;
   }
   .search-demo-input::placeholder {
     color: rgba(237, 234, 224, 0.35);
   }
 
-  /* Results */
+  /* Results column inside the panel */
   .search-demo-results {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
   .search-demo-results[aria-busy='true'] {
     opacity: 0.55;
@@ -97,16 +108,16 @@
     font-size: 14px;
   }
 
-  /* Row */
+  /* Row — raised tile against the panel. Same rounded-xl corners. */
   .search-demo-row {
     display: grid;
-    grid-template-columns: 44px 1fr auto;
+    grid-template-columns: 40px 1fr auto;
     align-items: center;
     gap: 14px;
-    padding: 10px 16px;
+    padding: 10px 14px;
     background: #1f1f23;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 9999px;
+    border-radius: 12px;
     transition: border-color 180ms ease, background 180ms ease;
   }
   .search-demo-row:hover {
@@ -120,10 +131,10 @@
   }
 
   .search-demo-thumb {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 6px;
     background: #131316;
   }
 
@@ -195,10 +206,10 @@
     text-align: right;
   }
 
-  /* Footer status line */
+  /* Footer status — inside the panel, right-aligned, dim. */
   .search-demo-status {
-    margin-top: 4px;
-    padding: 0 20px;
+    margin-top: 2px;
+    padding: 0 6px;
     text-align: right;
     color: rgba(237, 234, 224, 0.4);
     font-family: 'JetBrains Mono', ui-monospace, monospace;
@@ -209,15 +220,13 @@
     color: rgba(239, 68, 68, 0.75);
   }
 
-  /* On narrow viewports the right cluster wraps under the info column
-     so pills don't squeeze the name to a single character. */
+  /* On narrow viewports the right cluster wraps under the info column. */
   @media (max-width: 640px) {
     .search-demo-row {
-      grid-template-columns: 44px 1fr;
+      grid-template-columns: 40px 1fr;
       grid-template-rows: auto auto;
       row-gap: 6px;
-      border-radius: 16px;
-      padding: 12px 16px;
+      padding: 12px 14px;
     }
     .search-demo-right {
       grid-column: 1 / -1;
