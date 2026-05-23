@@ -1,0 +1,97 @@
+---
+/**
+ * Language switcher dropdown for the header.
+ *
+ * Two languages: English (default, at `/`) and Spanish (at `/es/`).
+ * Native <select> for simplicity + accessibility; styled to read as a
+ * small inline dropdown in the header.
+ *
+ * The element calculates the alternate-locale URL by stripping or
+ * prepending `/es` on the current pathname, so switching from any
+ * page lands on the equivalent page in the other language.
+ */
+
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {}
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname;
+const stripped = base ? path.replace(new RegExp(`^${base}`), '') : path;
+const isSpanish = stripped === '/es' || stripped.startsWith('/es/');
+
+// Equivalent path in the other language
+const enPath = isSpanish ? (stripped.replace(/^\/es/, '') || '/') : stripped;
+const esPath = isSpanish
+  ? stripped
+  : (stripped === '/' ? '/es/' : `/es${stripped}`);
+
+const enHref = `${base}${enPath}`;
+const esHref = `${base}${esPath}`;
+---
+
+<div class="locale-switcher" data-locale-switcher data-current={isSpanish ? 'es' : 'en'}>
+  <select
+    class="locale-switcher-select"
+    aria-label="Language"
+    data-en-href={enHref}
+    data-es-href={esHref}
+  >
+    <option value="en" selected={!isSpanish}>EN</option>
+    <option value="es" selected={isSpanish}>ES</option>
+  </select>
+  <span class="locale-switcher-caret material-symbols-outlined" aria-hidden="true">expand_more</span>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-locale-switcher]').forEach((root) => {
+    const select = root.querySelector<HTMLSelectElement>('.locale-switcher-select');
+    if (!select) return;
+    const enHref = select.dataset.enHref ?? '/';
+    const esHref = select.dataset.esHref ?? '/es/';
+    select.addEventListener('change', () => {
+      window.location.href = select.value === 'es' ? esHref : enHref;
+    });
+  });
+</script>
+
+<style is:global>
+  .locale-switcher {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .locale-switcher-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    color: rgba(237, 234, 224, 0.85);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 6px 26px 6px 12px;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: border-color 180ms ease, color 180ms ease;
+  }
+  .locale-switcher-select:hover {
+    border-color: rgba(250, 225, 148, 0.45);
+    color: #fae194;
+  }
+  .locale-switcher-select:focus-visible {
+    outline: 2px solid rgba(250, 225, 148, 0.6);
+    outline-offset: 2px;
+  }
+  .locale-switcher-caret {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: rgba(237, 234, 224, 0.55);
+    pointer-events: none;
+  }
+</style>

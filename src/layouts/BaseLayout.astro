@@ -1,66 +1,104 @@
 ---
 import '../styles/global.css';
+import LocaleSwitcher from '../components/LocaleSwitcher.astro';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname;
+const stripped = base ? path.replace(new RegExp(`^${base}`), '') : path;
+const isSpanish = stripped === '/es' || stripped.startsWith('/es/');
+const locale = isSpanish ? 'es' : 'en';
+
+// Sensible defaults per locale; pages can override via props.
+const defaults = {
+  en: {
+    title: 'GroLabs · Recover lost revenue & grow your business',
+    description:
+      'Recover lost revenue and grow your business without paying for more traffic. AI-assisted search, catalog, and conversion tooling for small e-commerce stores.',
+    ogAlt:
+      'GroLabs — recover lost revenue and grow your business without paying for more traffic.',
+    nav: {
+      resources: 'Resources',
+      blog: 'Blog',
+    },
+    footer: {
+      rights: 'All rights reserved.',
+      privacy: 'Privacy Policy',
+      terms: 'Terms of Use',
+      security: 'Security',
+    },
+  },
+  es: {
+    title: 'GroLabs · Recupera ingresos perdidos y haz crecer tu negocio',
+    description:
+      'Recupera los ingresos perdidos y haz crecer tu negocio sin pagar por más tráfico. Herramientas de búsqueda, catálogo y conversión asistidas por IA para tiendas pequeñas de e-commerce.',
+    ogAlt:
+      'GroLabs — recupera los ingresos perdidos y haz crecer tu negocio sin pagar por más tráfico.',
+    nav: {
+      resources: 'Recursos',
+      blog: 'Blog',
+    },
+    footer: {
+      rights: 'Todos los derechos reservados.',
+      privacy: 'Política de Privacidad',
+      terms: 'Términos de Uso',
+      security: 'Seguridad',
+    },
+  },
+} as const;
+
+const t = defaults[locale];
 const {
-  title = 'GroLabs · Recover lost revenue & grow your business',
-  description = 'Recover lost revenue and grow your business without paying for more traffic. AI-assisted search, catalog, and conversion tooling for small e-commerce stores.',
+  title = t.title,
+  description = t.description,
 } = Astro.props;
 
-const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const home = base || '/';
+const home = isSpanish ? `${base}/es/` : (base || '/');
+const resourcesHref = isSpanish ? `${base}/es/resources` : `${base}/resources`;
+const blogHref = isSpanish ? `${base}/es/blog` : `${base}/blog`;
 const siteUrl = 'https://grolabs.ai';
 const ogImageUrl = `${siteUrl}${base}/og-image.png`;
+const canonicalUrl = `${siteUrl}${path}`;
 ---
 
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en">
+<html class="scroll-smooth" lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="alternate" hreflang="en" href={`${siteUrl}${base}/`} />
+    <link rel="alternate" hreflang="es" href={`${siteUrl}${base}/es/`} />
 
-    <!-- Open Graph + Twitter cards. Drives the link preview Facebook,
-         WhatsApp, LinkedIn, Slack, iMessage, Twitter, Discord etc.
-         display when grolabs.ai is shared. og:image is the 1200x630
-         SVG in public/og-image.svg. -->
+    <!-- Open Graph + Twitter cards. -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="GroLabs — recover lost revenue and grow your business without paying for more traffic." />
-    <meta property="og:url" content={siteUrl} />
+    <meta property="og:image:alt" content={t.ogAlt} />
+    <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="GroLabs" />
+    <meta property="og:locale" content={locale === 'es' ? 'es_ES' : 'en_US'} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Body font (Hanken Grotesk): display=swap. The system fallback is
-         a clean sans, so a brief FOUT here reads as a weight/letterform
-         shift rather than a jarring change of identity. -->
     <link
       href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700;800&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Display fonts (Permanent Marker, Special Elite): display=block.
-         These are highly distinctive — their cursive/serif system
-         fallback renders as italic, so display=swap produced a visible
-         flicker as section titles morphed from italic to marker. block
-         hides the text for ≤3 s while the font arrives, then paints it
-         correctly. Preload the stylesheet so it begins fetching alongside
-         the body font CSS rather than waiting for it. -->
     <link
       rel="preload"
       as="style"
@@ -70,19 +108,17 @@ const ogImageUrl = `${siteUrl}${base}/og-image.png`;
       href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Special+Elite&display=block"
       rel="stylesheet"
     />
-
     <link
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
       rel="stylesheet"
     />
   </head>
   <body class="font-body-md text-body-md selection:bg-primary selection:text-zinc-950 overflow-x-hidden">
-    <!-- Scroll Progress -->
     <div class="hidden md:block" id="scroll-progress">
       <div id="scroll-indicator"></div>
     </div>
 
-    <!-- TopNavBar — GroLabs wordmark + two nav links. -->
+    <!-- TopNavBar — GroLabs wordmark + nav links + language switcher. -->
     <header
       class="fixed top-0 left-0 w-full backdrop-blur-md h-20 flex items-center px-margin-mobile md:px-margin-desktop border-b border-zinc-800 z-50 bg-canvas/80"
     >
@@ -91,18 +127,13 @@ const ogImageUrl = `${siteUrl}${base}/og-image.png`;
           <h1 class="font-marker text-3xl text-white leading-none group-hover:brightness-110 transition-all">GroLabs</h1>
         </a>
         <nav class="flex items-center gap-lg">
-          <a
-            class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors"
-            href={`${base}/resources`}
-          >
-            Resources
+          <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href={resourcesHref}>
+            {t.nav.resources}
           </a>
-          <a
-            class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors"
-            href={`${base}/blog`}
-          >
-            Blog
+          <a class="font-button-text text-secondary-fixed-dim hover:text-primary transition-colors" href={blogHref}>
+            {t.nav.blog}
           </a>
+          <LocaleSwitcher />
         </nav>
       </div>
     </header>
@@ -110,17 +141,16 @@ const ogImageUrl = `${siteUrl}${base}/og-image.png`;
     <main class="relative z-10 pt-20 min-h-screen bg-transparent">
       <slot />
 
-      <!-- Footer — copyright + legal links only. -->
       <footer class="bg-zinc-950 py-xl border-t border-zinc-800">
         <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
             <p class="font-body-sm text-body-sm text-zinc-500">
-              © <span id="footer-year"></span> GroLabs AI. All rights reserved.
+              © <span id="footer-year"></span> GroLabs AI. {t.footer.rights}
             </p>
             <div class="flex flex-wrap gap-lg">
-              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Privacy Policy</a>
-              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Terms of Use</a>
-              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">Security</a>
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">{t.footer.privacy}</a>
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">{t.footer.terms}</a>
+              <a class="font-body-sm text-body-sm text-zinc-400 hover:text-primary transition-colors" href="#">{t.footer.security}</a>
             </div>
           </div>
         </div>

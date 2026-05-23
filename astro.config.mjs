@@ -10,6 +10,16 @@ const isGitHubPages = process.env.GITHUB_PAGES === 'true';
 export default defineConfig({
   site: isGitHubPages ? 'https://grolabsai.github.io' : 'https://grolabs.ai',
   base: isGitHubPages ? '/grolabs-landing' : undefined,
+  // English serves at the root (`/`), Spanish at `/es/`. The visitor
+  // toggles between them via the LocaleSwitcher component in the
+  // header — no auto-redirect on first visit, per the agreed UX.
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'es'],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   integrations: [
     tailwind({ applyBaseStyles: false }),
     sitemap(),
