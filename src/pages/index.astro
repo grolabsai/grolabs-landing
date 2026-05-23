@@ -28,9 +28,7 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         </span>
       </h1>
 
-      <p class="hero-subtitle">Find out how?</p>
-
-      <div class="flex flex-wrap justify-center gap-md">
+      <div class="flex flex-wrap justify-center gap-md mt-xl">
         <a href="#contact" class="hero-btn hero-btn--primary shimmer-btn">
           Start a conversation
           <span class="hero-btn-icon">
@@ -96,10 +94,10 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         description={`&ldquo;By 2026, traditional search volume will drop 25%, shifting to AI-powered answers.&rdquo;`}
       />
     </div>
-    </div>
-    <!-- Footer Note -->
+    <!-- Footer Note — sits inside .stats-section-surface so its left
+         edge aligns with the cards' left edge. -->
     <div
-      class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mx-auto mt-xl flex flex-col md:flex-row items-center gap-lg"
+      class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mt-xl flex flex-col md:flex-row items-center gap-lg"
     >
       <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
         <span class="material-symbols-outlined text-primary">info</span>
@@ -112,6 +110,7 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
           in a 15–20% immediate lift in Net Revenue.
         </p>
       </div>
+    </div>
     </div>
   </section>
 
