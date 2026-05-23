@@ -34,20 +34,31 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <span class="text-[0.92em]"><span class="text-primary">grow</span> your business</span><br />
         <span class="italic text-[0.75em]"><span class="text-primary">without paying</span> for more traffic</span>
       </h1>
+
+      <p class="hero-subtitle">Find out how?</p>
+
+      <div class="flex flex-wrap justify-center gap-md">
+        <a href="#contact" class="hero-btn hero-btn--primary shimmer-btn">
+          Start a conversation
+          <span class="hero-btn-icon">
+            <span class="material-symbols-outlined icon-inline-sm">add</span>
+          </span>
+        </a>
+        <a href="#video" class="hero-btn hero-btn--video">
+          Watch video
+          <span class="hero-btn-icon">
+            <span class="material-symbols-outlined icon-inline-sm">play_arrow</span>
+          </span>
+        </a>
+      </div>
     </div>
   </section>
 
-  <!-- Leak Numbers Section -->
-  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop py-xl my-xl mt-48">
-    <div class="text-center mb-xl reveal">
-      <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md leading-tight">
-        Five places small e-commerce stores quietly bleed revenue — every day.
-      </h2>
-      <p class="text-body-lg text-secondary-fixed-dim max-w-3xl mx-auto">
-        Small leaks sink large ships. In the high-velocity world of online commerce, these friction
-        points represent the difference between scaling and stagnating.
-      </p>
-    </div>
+  <!-- Yellow band that the stats cards straddle. -->
+  <div class="hero-stats-band"></div>
+
+  <!-- Leak Numbers Section — cards pulled up over the yellow band. -->
+  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop stats-overlap">
     <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg mb-xl">
       <!-- Card 1: Internal Site Search (Featured) -->
       <div

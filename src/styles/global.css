@@ -196,6 +196,47 @@ body {
   @apply text-zinc-300 text-4xl font-light;
 }
 
+/* Hero pill buttons — "Start a conversation" + "Watch video".
+   Shared base, two visual variants. The trailing icon is wrapped in
+   .hero-btn-icon so the circular treatment is centralised. */
+.hero-btn {
+  @apply inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full font-button-text transition-all;
+}
+.hero-btn-icon {
+  @apply inline-flex items-center justify-center w-9 h-9 rounded-full;
+}
+.hero-btn--primary {
+  @apply bg-primary text-on-primary hover:brightness-110;
+  box-shadow: 0 0 24px rgba(250, 225, 148, 0.28);
+}
+.hero-btn--primary .hero-btn-icon {
+  @apply bg-on-primary text-primary;
+}
+.hero-btn--video {
+  @apply bg-zinc-900 text-white border border-white/10 hover:border-white/30;
+}
+.hero-btn--video .hero-btn-icon {
+  @apply bg-primary text-on-primary;
+}
+
+/* "Find out how?" lede under the hero headline — single use, but the
+   styling is specific enough that a name beats five inline utilities. */
+.hero-subtitle {
+  @apply text-body-md italic text-secondary-fixed-dim mt-lg mb-xl;
+}
+
+/* The yellow band the stats cards straddle. Pairs with .stats-overlap. */
+.hero-stats-band {
+  @apply bg-primary h-hero-band w-full;
+}
+/* Stats grid pulled up so the cards overlap the yellow band: top half on
+   yellow, bottom half on the canvas. The negative offset is tied to
+   .hero-stats-band's height — keep them in sync. */
+.stats-overlap {
+  @apply relative z-10;
+  margin-top: -320px;
+}
+
 
 /* Material Symbols variants used by the funnel.
    .funnel-icon: inside the SVG (smaller, opsz 20). Used by funnel.ts.

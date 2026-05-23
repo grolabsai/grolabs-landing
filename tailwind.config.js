@@ -118,6 +118,9 @@ export default {
         section: '800px',
         'card-featured': '320px',
       },
+      height: {
+        'hero-band': '420px', // yellow band the stats cards straddle
+      },
     },
   },
   plugins: [forms, containerQueries],
