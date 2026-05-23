@@ -96,6 +96,12 @@
     flex-direction: column;
     gap: 6px;
   }
+  /* Before any search runs the results node is empty — collapse it to
+     zero height so the panel below the input stays clean and doesn't
+     suggest staged content. */
+  .search-demo-results:empty {
+    display: none;
+  }
   .search-demo-results[aria-busy='true'] {
     opacity: 0.55;
     transition: opacity 150ms ease;

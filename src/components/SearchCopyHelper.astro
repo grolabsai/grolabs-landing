@@ -2,20 +2,31 @@
 /**
  * Copy-to-clipboard helper that sits above the SearchDemo panel.
  *
- * The bone-coloured pill carries the three dietary keywords as both a
- * label AND the clipboard payload. Clicking it copies the text and the
- * adjacent CTA swaps to a "Copied — now paste it into the search box ↓"
- * confirmation that points down at the search panel below.
+ * Layout: a gray CTA on the left, a yellow pill carrying the dietary
+ * trio on the right. Clicking the pill writes the trio to the
+ * clipboard and the left-hand message swaps from the CTA to a green
+ * "Copied — now paste it into the search box ↓" confirmation. After
+ * 4 s the confirmation reverts so the same helper works for the next
+ * click.
  *
  * No auto-fill — the visitor performs the paste themselves so the
- * moment the box receives the text and the pills light up green reads
- * as their action, not ours.
+ * pills-light-up-green moment in the panel below reads as their
+ * action, not the page's.
  */
 
 const TRIO = 'gluten-free, sugar-free, dairy-free';
 ---
 
 <div class="copy-helper" data-copy-helper>
+  <div class="copy-helper-message">
+    <span class="copy-helper-cta" data-copy-cta>
+      Click to copy, then paste into the search box below.
+    </span>
+    <span class="copy-helper-feedback" data-copy-feedback hidden>
+      <span class="material-symbols-outlined copy-helper-feedback-icon">check_circle</span>
+      Copied — now paste it into the search box <span aria-hidden="true">↓</span>
+    </span>
+  </div>
   <button
     type="button"
     class="copy-helper-pill"
@@ -26,13 +37,6 @@ const TRIO = 'gluten-free, sugar-free, dairy-free';
     <span class="material-symbols-outlined copy-helper-pill-icon">content_copy</span>
     <span class="copy-helper-pill-text">{TRIO}</span>
   </button>
-  <span class="copy-helper-cta" data-copy-cta>
-    Click to copy, then paste into the search box below.
-  </span>
-  <span class="copy-helper-feedback" data-copy-feedback hidden>
-    <span class="material-symbols-outlined copy-helper-feedback-icon">check_circle</span>
-    Copied — now paste it into the search box <span aria-hidden="true">↓</span>
-  </span>
 </div>
 
 <script>
@@ -72,35 +76,11 @@ const TRIO = 'gluten-free, sugar-free, dairy-free';
     margin-bottom: 28px;
   }
 
-  .copy-helper-pill {
+  /* Message slot — holds the CTA OR the confirmation. Whichever isn't
+     hidden takes its natural width and the pill follows on the right. */
+  .copy-helper-message {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: #EDEAE0;
-    color: #0e0e11;
-    border: 0;
-    border-radius: 9999px;
-    padding: 8px 16px 8px 12px;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: transform 120ms ease, box-shadow 200ms ease, background 200ms ease;
-  }
-  .copy-helper-pill:hover {
-    transform: translateY(-1px);
-    background: #ffffff;
-    box-shadow: 0 4px 16px rgba(250, 225, 148, 0.2);
-  }
-  .copy-helper-pill:active {
-    transform: translateY(0);
-  }
-  .copy-helper-pill-icon {
-    font-size: 16px;
-    flex-shrink: 0;
-  }
-  .copy-helper-pill-text {
-    white-space: nowrap;
   }
 
   .copy-helper-cta {
@@ -118,7 +98,45 @@ const TRIO = 'gluten-free, sugar-free, dairy-free';
     font-family: 'Hanken Grotesk', system-ui, sans-serif;
     font-weight: 500;
   }
+  /* Beat the .copy-helper-feedback display:inline-flex declaration so
+     the [hidden] attribute actually hides on first render. */
+  .copy-helper-cta[hidden],
+  .copy-helper-feedback[hidden] {
+    display: none;
+  }
   .copy-helper-feedback-icon {
     font-size: 18px;
+  }
+
+  /* Yellow pill */
+  .copy-helper-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fae194;
+    color: #0e0e11;
+    border: 0;
+    border-radius: 9999px;
+    padding: 8px 16px 8px 12px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 200ms ease, background 200ms ease;
+  }
+  .copy-helper-pill:hover {
+    transform: translateY(-1px);
+    background: #fce8a8;
+    box-shadow: 0 4px 16px rgba(250, 225, 148, 0.32);
+  }
+  .copy-helper-pill:active {
+    transform: translateY(0);
+  }
+  .copy-helper-pill-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .copy-helper-pill-text {
+    white-space: nowrap;
   }
 </style>
