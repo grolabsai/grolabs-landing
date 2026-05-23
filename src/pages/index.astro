@@ -384,7 +384,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
         Try it out
       </span>
       <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-        Attribute Match Visibility
+        Search Demo
       </h2>
 
       <!-- Copy-to-clipboard helper. Sits between the title and the
@@ -393,22 +393,55 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
            search box" feedback points naturally at the panel below. -->
       <SearchCopyHelper />
 
-      <!-- Two-column layout: search panel on the left (wider), narrative
-           paragraph on the right (narrower). Stacks on mobile. -->
+      <!-- Two-column layout: search panel on the left (wider), feature
+           list on the right (narrower). Stacks on mobile. -->
       <div class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-xl items-start">
         <SearchDemo />
 
-        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
-          <p>
-            Search only finds what your catalog says is there. Three of these
-            four bars match the dietary keywords above; the fourth qualifies on
-            every count but was never tagged — so Meilisearch can't see it.
-          </p>
-          <p class="mt-md">
-            That last row is the GroLabs sales pitch in one line: catalog
-            quality is the ceiling on search quality. We fix the ceiling.
-          </p>
-        </div>
+        <!-- Yellow-icon feature list. Material Symbols stand in for
+             bullet glyphs; text on the right of each icon. The
+             "Attribute match visibility" item carries an extra
+             yellow sub-label ("Reduces returns") spelling out the
+             outcome. -->
+        <ul class="space-y-md">
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">bolt</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Lightning-fast results
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">check_box</span>
+            <div class="text-body-md leading-relaxed">
+              <div class="text-white">Attribute match visibility</div>
+              <div class="text-primary font-mono text-xs uppercase tracking-[0.18em] mt-1">Reduces returns</div>
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">person</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Personalized results
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">record_voice_over</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Semantic search
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">location_on</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Geo-search
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">spellcheck</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Typo tolerance &amp; synonyms
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   </section>
