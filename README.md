@@ -17,22 +17,32 @@ Standalone marketing landing page for GroLabs, deployed separately from the main
 ```
 src/
 ├── layouts/
-│   └── BaseLayout.astro    ← shared head, fonts, ambient grid, header, footer, script tag
+│   └── BaseLayout.astro       ← shared head, fonts, ambient grid, header, footer, script tag
+├── components/
+│   ├── LeakCard.astro         ← the 5 metrics cards (variants: default | featured | emerging)
+│   ├── EquationCard.astro     ← Luminous Equation cards (variants: default | returns)
+│   ├── CapabilityCard.astro   ← AI-assisted module cards (slot for structured body)
+│   ├── StatBlock.astro        ← big-number social-proof blocks above the footer
+│   └── FunnelStageRow.astro   ← one row of the diagnostic table under the funnel SVG
 ├── pages/
-│   ├── index.astro         ← marketing landing (hero + leaks + Luminous Eq + funnel + modules + code + stats)
+│   ├── index.astro            ← marketing landing — composes the components above
 │   └── blog/
-│       ├── index.astro     ← chronological post list
-│       └── [...slug].astro ← post detail (renders Markdown with prose-blog styles)
+│       ├── index.astro        ← chronological post list
+│       └── [...slug].astro    ← post detail (renders Markdown with prose-blog styles)
 ├── content/
-│   ├── blog/               ← drop a .md file here to publish a post
+│   ├── blog/                  ← drop a .md file here to publish a post
 │   └── ...
-├── content.config.ts       ← blog collection schema (title, description, pubDate, author, tags[], draft)
+├── content.config.ts          ← blog collection schema
 ├── scripts/
-│   ├── main.ts             ← entry: particles, reveal-on-scroll, mouse glow, scroll progress, equation reveal
-│   └── funnel.ts           ← interactive funnel SVG renderer
+│   ├── main.ts                ← entry: particles, reveal-on-scroll, mouse glow, scroll progress
+│   └── funnel.ts              ← interactive funnel SVG renderer
 └── styles/
-    └── global.css          ← Tailwind base + custom classes (glass-card, ambient-grid, funnel-info, etc.)
+    └── global.css             ← Tailwind base + custom classes (glass-card, equation-card, etc.)
 ```
+
+### When to extract a new component
+
+Three or more visually-similar instances on the page is the trigger. If you find yourself copy-pasting a card or row with only the text changing, lift it into `src/components/` with typed `Props`. The 9 AI-assisted modules used to be 9 copies of the same markup; now they're 9 `<CapabilityCard ... />` calls.
 
 ## Publishing a blog post
 

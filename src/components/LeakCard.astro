@@ -1,0 +1,91 @@
+---
+/**
+ * The bleed-revenue cards used in the metrics-overlap section.
+ *
+ * One component, three variants. Pass `variant="featured"` for the
+ * wide 2-3× card (row layout: huge number + italic quote side by side)
+ * or `variant="emerging"` for the AEO card (yellow border + highlighted
+ * index label). Default is the standard column-layout card.
+ *
+ * `description` accepts HTML — used in the featured variant's quote to
+ * inline a <span class="text-primary"> highlight.
+ */
+export interface Props {
+  index: string;
+  indexLabel?: string;
+  meta: string;
+  title: string;
+  statValue: string;
+  description: string;
+  variant?: 'default' | 'featured' | 'emerging';
+}
+
+const {
+  index,
+  indexLabel,
+  meta,
+  title,
+  statValue,
+  description,
+  variant = 'default',
+} = Astro.props;
+
+const isFeatured = variant === 'featured';
+const isEmerging = variant === 'emerging';
+---
+
+<div
+  class:list={[
+    'glass-card p-xl rounded-xl group transition-all flex flex-col reveal relative',
+    isFeatured ? 'md:col-span-6 lg:col-span-8 min-h-card-featured' : 'md:col-span-3 lg:col-span-4',
+    isEmerging && 'border-primary/20',
+  ]}
+>
+  <div class="absolute top-md right-md text-meta-xs font-mono text-primary/30 tracking-widest">
+    {meta}
+  </div>
+  <div class="mb-lg">
+    {
+      indexLabel ? (
+        <span
+          class:list={[
+            'font-mono text-xs tracking-tighter',
+            isFeatured && 'text-primary bg-primary/10 px-2 py-1 rounded',
+            isEmerging && 'text-primary/60',
+          ]}
+        >
+          {index} / {indexLabel}
+        </span>
+      ) : (
+        <span class="font-mono text-zinc-500 text-xs tracking-tighter">{index}</span>
+      )
+    }
+    <h3
+      class:list={[
+        'font-page-title-mobile text-white mt-md',
+        isFeatured ? 'text-card-title-lg' : 'text-card-title',
+      ]}
+    >
+      {title}
+    </h3>
+  </div>
+
+  {
+    isFeatured ? (
+      <div class="flex flex-col md:flex-row md:items-end gap-xl mt-auto">
+        <div class="font-page-title text-primary text-6xl md:text-7xl leading-none whitespace-nowrap">
+          {statValue}
+        </div>
+        <p
+          class="text-3xl text-secondary-fixed-dim italic mb-2 border-l border-primary/30 pl-md leading-snug"
+          set:html={description}
+        />
+      </div>
+    ) : (
+      <div class="mt-auto">
+        <div class="font-page-title text-primary text-6xl mb-md">{statValue}</div>
+        <p class="text-body-sm text-secondary-fixed-dim" set:html={description} />
+      </div>
+    )
+  }
+</div>

@@ -1,0 +1,29 @@
+---
+/**
+ * One row of the diagnostic table under the funnel SVG. The
+ * `data-stage-id` attribute is the binding back to funnel.ts — hovering
+ * the row toggles .is-active on the corresponding SVG stage and swaps
+ * the info-panel content. Keep the `stageId` values in sync with the
+ * STAGES array in src/scripts/funnel.ts.
+ */
+export interface Props {
+  stageId: string;   // 'search' | 'browsing' | 'pdp' | 'cart' | 'checkout'
+  icon: string;      // Material Symbols glyph name
+  label: string;
+  loss: string;      // "65%", "+25%" etc.
+  recovery: string;
+}
+
+const { stageId, icon, label, loss, recovery } = Astro.props;
+---
+
+<tr class="stage-row" data-stage-id={stageId}>
+  <td class="py-md pr-xl">
+    <div class="flex items-center gap-md">
+      <span class="material-symbols-outlined funnel-icon-table text-primary">{icon}</span>
+      <span>{label}</span>
+    </div>
+  </td>
+  <td class="py-md pr-xl text-error-red font-semibold">{loss}</td>
+  <td class="py-md text-success-emerald font-semibold">{recovery}</td>
+</tr>

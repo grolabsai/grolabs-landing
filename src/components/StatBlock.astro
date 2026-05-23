@@ -1,0 +1,19 @@
+---
+/**
+ * Big-number social-proof blocks above the footer. 4 of them in a row.
+ * The hover-scale animation lives on the wrapper via the `group` class.
+ */
+export interface Props {
+  value: string;   // "2.4M", "15k+", etc.
+  label: string;   // "DOWNLOADS", "SERVERS", etc.
+}
+
+const { value, label } = Astro.props;
+---
+
+<div class="text-center group">
+  <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">
+    {value}
+  </div>
+  <div class="font-label-caps text-label-caps text-zinc-400">{label}</div>
+</div>

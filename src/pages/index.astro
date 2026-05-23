@@ -1,5 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LeakCard from '../components/LeakCard.astro';
+import EquationCard from '../components/EquationCard.astro';
+import CapabilityCard from '../components/CapabilityCard.astro';
+import StatBlock from '../components/StatBlock.astro';
+import FunnelStageRow from '../components/FunnelStageRow.astro';
 ---
 
 <BaseLayout>
@@ -60,96 +65,45 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <!-- Leak Numbers Section — cards pulled up over the yellow band. -->
   <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop stats-overlap">
     <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg mb-xl">
-      <!-- Card 1: Internal Site Search (Featured) -->
-      <div
-        class="glass-card p-xl rounded-xl group transition-all md:col-span-6 lg:col-span-8 flex flex-col reveal relative min-h-card-featured"
-      >
-        <div class="absolute top-md right-md text-meta-xs font-mono text-primary/30 tracking-widest">
-          CONFIDENCE: HIGH // SOURCE: FORRESTER
-        </div>
-        <div class="mb-lg">
-          <span class="font-mono text-primary text-xs tracking-tighter bg-primary/10 px-2 py-1 rounded">
-            01 / Highest impact
-          </span>
-          <h3 class="font-page-title-mobile text-card-title-lg text-white mt-md">Internal site search</h3>
-        </div>
-        <div class="flex flex-col md:flex-row md:items-end gap-xl mt-auto">
-          <div class="font-page-title text-primary text-6xl md:text-7xl leading-none whitespace-nowrap">2–3×</div>
-          <p class="text-3xl text-secondary-fixed-dim italic mb-2 border-l border-primary/30 pl-md leading-snug">
-            "Users who search convert 2–3× more often than those who don't—<span class="text-primary">if they find what they want</span>."
-          </p>
-        </div>
-      </div>
-      <!-- Card 2: SEO -->
-      <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
-        <div class="absolute top-md right-md text-meta-xs font-mono text-primary/30 tracking-widest">
-          CONFIDENCE: MED
-        </div>
-        <div class="mb-lg">
-          <span class="font-mono text-zinc-500 text-xs tracking-tighter">02</span>
-          <h3 class="font-page-title-mobile text-card-title text-white mt-md">Product description SEO</h3>
-        </div>
-        <div class="mt-auto">
-          <div class="font-page-title text-primary text-6xl mb-md">53%</div>
-          <p class="text-body-sm text-secondary-fixed-dim">
-            More than half of all organic traffic is lost to thin, unoptimized content.
-          </p>
-        </div>
-      </div>
-      <!-- Card 3: Checkout -->
-      <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
-        <div class="absolute top-md right-md text-meta-xs font-mono text-primary/30 tracking-widest">
-          SOURCE: BAYMARD
-        </div>
-        <div class="mb-lg">
-          <span class="font-mono text-zinc-500 text-xs tracking-tighter">03</span>
-          <h3 class="font-page-title-mobile text-card-title text-white mt-md">Checkout friction</h3>
-        </div>
-        <div class="mt-auto">
-          <div class="font-page-title text-primary text-6xl mb-md">70%</div>
-          <p class="text-body-sm text-secondary-fixed-dim">
-            Cart abandonment remains the single largest "unforced error" in retail.
-          </p>
-        </div>
-      </div>
-      <!-- Card 4: Returns -->
-      <div class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative">
-        <div class="absolute top-md right-md text-meta-xs font-mono text-primary/30 tracking-widest">
-          CONFIDENCE: HIGH
-        </div>
-        <div class="mb-lg">
-          <span class="font-mono text-zinc-500 text-xs tracking-tighter">04</span>
-          <h3 class="font-page-title-mobile text-card-title text-white mt-md">
-            Returns from mismatched expectations
-          </h3>
-        </div>
-        <div class="mt-auto">
-          <div class="font-page-title text-primary text-6xl mb-md">17–20%</div>
-          <p class="text-body-sm text-secondary-fixed-dim">
-            Revenue lost to returns caused by search/image disconnect.
-          </p>
-        </div>
-      </div>
-      <!-- Card 5: AEO -->
-      <div
-        class="glass-card p-xl rounded-xl group transition-all md:col-span-3 lg:col-span-4 flex flex-col reveal relative border-primary/20"
-      >
-        <div class="absolute top-md right-md text-meta-xs font-mono text-primary/30 tracking-widest">
-          SOURCE: GARTNER
-        </div>
-        <div class="mb-lg">
-          <span class="font-mono text-primary/60 text-xs tracking-tighter">05 / Emerging</span>
-          <h3 class="font-page-title-mobile text-card-title text-white mt-md">
-            Answer Engine Optimization (AEO)
-          </h3>
-        </div>
-        <div class="mt-auto">
-          <div class="font-page-title text-primary text-6xl mb-md">25%</div>
-          <p class="text-body-sm text-secondary-fixed-dim">
-            "By 2026, traditional search volume will drop 25%, shifting to AI-powered answers."
-          </p>
-        </div>
-      </div>
+      <LeakCard
+        variant="featured"
+        index="01"
+        indexLabel="Highest impact"
+        meta="CONFIDENCE: HIGH // SOURCE: FORRESTER"
+        title="Internal site search"
+        statValue="2–3×"
+        description={`&ldquo;Users who search convert 2&ndash;3&times; more often than those who don't&mdash;<span class="text-primary">if they find what they want</span>.&rdquo;`}
+      />
+      <LeakCard
+        index="02"
+        meta="CONFIDENCE: MED"
+        title="Product description SEO"
+        statValue="53%"
+        description="More than half of all organic traffic is lost to thin, unoptimized content."
+      />
+      <LeakCard
+        index="03"
+        meta="SOURCE: BAYMARD"
+        title="Checkout friction"
+        statValue="70%"
+        description={`Cart abandonment remains the single largest &ldquo;unforced error&rdquo; in retail.`}
+      />
+      <LeakCard
+        index="04"
+        meta="CONFIDENCE: HIGH"
+        title="Returns from mismatched expectations"
+        statValue="17–20%"
+        description="Revenue lost to returns caused by search/image disconnect."
+      />
+      <LeakCard
+        variant="emerging"
+        index="05"
+        indexLabel="Emerging"
+        meta="SOURCE: GARTNER"
+        title="Answer Engine Optimization (AEO)"
+        statValue="25%"
+        description={`&ldquo;By 2026, traditional search volume will drop 25%, shifting to AI-powered answers.&rdquo;`}
+      />
     </div>
     <!-- Footer Note -->
     <div
@@ -189,36 +143,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       id="equation-container"
       class="flex items-center justify-center gap-6 w-full max-w-7xl transition-all duration-700 ease-out"
     >
-      <!-- Traffic -->
-      <div class="equation-card">
-        <span class="material-symbols-outlined text-4xl text-primary">groups</span>
-        <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Traffic</h3>
-      </div>
-
+      <EquationCard icon="groups" label="Traffic" />
       <div class="equation-operator">×</div>
-
-      <!-- Conversion -->
-      <div class="equation-card">
-        <span class="material-symbols-outlined text-4xl text-primary">percent</span>
-        <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Conversion</h3>
-      </div>
+      <EquationCard icon="percent" label="Conversion" />
 
       <!-- Returns — hidden until the section enters viewport at 50% -->
       <div id="returns-reveal" class="hidden-element flex items-center gap-6">
         <div class="equation-operator">−</div>
-        <div class="equation-card equation-card--returns">
-          <span class="material-symbols-outlined text-4xl text-error-red">keyboard_return</span>
-          <h3 class="text-error-red text-2xl font-bold tracking-tighter uppercase">Returns</h3>
-        </div>
+        <EquationCard variant="returns" icon="keyboard_return" label="Returns" />
       </div>
 
       <div class="equation-operator">=</div>
-
-      <!-- Revenue -->
-      <div class="equation-card">
-        <span class="material-symbols-outlined text-4xl text-primary">attach_money</span>
-        <h3 class="text-white text-2xl font-bold tracking-tighter uppercase">Revenue</h3>
-      </div>
+      <EquationCard icon="attach_money" label="Revenue" />
     </div>
 
     <p class="max-w-3xl text-zinc-400 text-base leading-relaxed text-center mt-16">
@@ -258,56 +194,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             </tr>
           </thead>
           <tbody class="divide-y divide-white/5 text-zinc-200">
-            <tr class="stage-row" data-stage-id="search">
-              <td class="py-md pr-xl">
-                <div class="flex items-center gap-md">
-                  <span class="material-symbols-outlined funnel-icon-table text-primary">search</span>
-                  <span>Search</span>
-                </div>
-              </td>
-              <td class="py-md pr-xl text-error-red font-semibold">65%</td>
-              <td class="py-md text-success-emerald font-semibold">+25%</td>
-            </tr>
-            <tr class="stage-row" data-stage-id="browsing">
-              <td class="py-md pr-xl">
-                <div class="flex items-center gap-md">
-                  <span class="material-symbols-outlined funnel-icon-table text-primary">grid_view</span>
-                  <span>Browsing</span>
-                </div>
-              </td>
-              <td class="py-md pr-xl text-error-red font-semibold">75%</td>
-              <td class="py-md text-success-emerald font-semibold">+30%</td>
-            </tr>
-            <tr class="stage-row" data-stage-id="pdp">
-              <td class="py-md pr-xl">
-                <div class="flex items-center gap-md">
-                  <span class="material-symbols-outlined funnel-icon-table text-primary">description</span>
-                  <span>Product page</span>
-                </div>
-              </td>
-              <td class="py-md pr-xl text-error-red font-semibold">80%</td>
-              <td class="py-md text-success-emerald font-semibold">+25%</td>
-            </tr>
-            <tr class="stage-row" data-stage-id="cart">
-              <td class="py-md pr-xl">
-                <div class="flex items-center gap-md">
-                  <span class="material-symbols-outlined funnel-icon-table text-primary">shopping_cart</span>
-                  <span>Cart</span>
-                </div>
-              </td>
-              <td class="py-md pr-xl text-error-red font-semibold">70%</td>
-              <td class="py-md text-success-emerald font-semibold">+20%</td>
-            </tr>
-            <tr class="stage-row" data-stage-id="checkout">
-              <td class="py-md pr-xl">
-                <div class="flex items-center gap-md">
-                  <span class="material-symbols-outlined funnel-icon-table text-primary">payments</span>
-                  <span>Checkout</span>
-                </div>
-              </td>
-              <td class="py-md pr-xl text-error-red font-semibold">17%</td>
-              <td class="py-md text-success-emerald font-semibold">+7%</td>
-            </tr>
+            <FunnelStageRow stageId="search" icon="search" label="Search" loss="65%" recovery="+25%" />
+            <FunnelStageRow stageId="browsing" icon="grid_view" label="Browsing" loss="75%" recovery="+30%" />
+            <FunnelStageRow stageId="pdp" icon="description" label="Product page" loss="80%" recovery="+25%" />
+            <FunnelStageRow stageId="cart" icon="shopping_cart" label="Cart" loss="70%" recovery="+20%" />
+            <FunnelStageRow stageId="checkout" icon="payments" label="Checkout" loss="17%" recovery="+7%" />
           </tbody>
         </table>
 
@@ -338,158 +229,60 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       AI-assisted modules
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">inventory_2</span>
-          <h4 class="text-xl font-normal text-white">Product catalog enhancement</h4>
+      <CapabilityCard
+        icon="inventory_2"
+        title="Product catalog enhancement"
+        description="Audit every product for missing attributes, weak descriptions, and broken images. AI-generated copy and metadata match your brand voice while respecting category rules. Continuous quality scoring surfaces problems before customers ever notice them."
+      />
+      <CapabilityCard
+        icon="search_check"
+        title="Enhanced search"
+        description="Synonym expansion, typo tolerance, and brand-aware ranking out of the box. Merchandisers promote stock, new arrivals, and sale items with inline boost rules. Sub-50 ms response times even on catalogs north of one million products."
+      />
+      <CapabilityCard
+        icon="bolt"
+        title="Fast checkout"
+        description="One-tap checkout that remembers shipping, payment, and address. The average flow collapses from seven form fields to a single confirm screen. Mobile abandonment falls 40–60% in the first week of release."
+      />
+      <CapabilityCard
+        icon="auto_awesome"
+        title="Agentic search"
+        description="AI agents understand shopper intent, not just keywords. Conversational follow-ups progressively refine the result set. Every answer plugs into your catalog so the recommendations reflect your store's actual stock and brand voice."
+      />
+      <CapabilityCard
+        icon="monitoring"
+        title="Traffic monitor"
+        description="Daily GA4 snapshots with anomaly detection on every traffic source. Alerts fire the moment a channel, campaign, or geo deviates from your baseline. One dashboard ties sessions, conversions, and revenue back to the funnel that produced them."
+      />
+      <CapabilityCard
+        icon="person_search"
+        title="User analytics tracking"
+        description="First-party event capture for clicks, searches, filters, and conversions — all stored in your stack. Per-shopper journeys show the full path before a purchase, not just last-click. Anonymized cohort exports feed retargeting, lookalike, and loyalty models."
+      />
+      <CapabilityCard icon="track_changes" title="Diagnose · Fix · Verify">
+        <div>
+          <span class="font-button-text text-zinc-200">Diagnose.</span>
+          Pinpoint where revenue is leaking with funnel data + analytics — no more vague hunches.
         </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          Audit every product for missing attributes, weak descriptions, and broken images.
-          AI-generated copy and metadata match your brand voice while respecting category rules.
-          Continuous quality scoring surfaces problems before customers ever notice them.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">search_check</span>
-          <h4 class="text-xl font-normal text-white">Enhanced search</h4>
+        <div>
+          <span class="font-button-text text-zinc-200">Fix.</span>
+          Apply a targeted change at the specific stage that's losing customers.
         </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          Synonym expansion, typo tolerance, and brand-aware ranking out of the box.
-          Merchandisers promote stock, new arrivals, and sale items with inline boost rules.
-          Sub-50 ms response times even on catalogs north of one million products.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">bolt</span>
-          <h4 class="text-xl font-normal text-white">Fast checkout</h4>
+        <div>
+          <span class="font-button-text text-zinc-200">Verify.</span>
+          Re-measure within hours; the loop reopens automatically if the fix didn't hold.
         </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          One-tap checkout that remembers shipping, payment, and address. The average flow
-          collapses from seven form fields to a single confirm screen. Mobile abandonment falls
-          40–60% in the first week of release.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">auto_awesome</span>
-          <h4 class="text-xl font-normal text-white">Agentic search</h4>
-        </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          AI agents understand shopper intent, not just keywords. Conversational follow-ups
-          progressively refine the result set. Every answer plugs into your catalog so the
-          recommendations reflect your store's actual stock and brand voice.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">monitoring</span>
-          <h4 class="text-xl font-normal text-white">Traffic monitor</h4>
-        </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          Daily GA4 snapshots with anomaly detection on every traffic source. Alerts fire the
-          moment a channel, campaign, or geo deviates from your baseline. One dashboard ties
-          sessions, conversions, and revenue back to the funnel that produced them.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">person_search</span>
-          <h4 class="text-xl font-normal text-white">User analytics tracking</h4>
-        </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          First-party event capture for clicks, searches, filters, and conversions — all stored
-          in your stack. Per-shopper journeys show the full path before a purchase, not just
-          last-click. Anonymized cohort exports feed retargeting, lookalike, and loyalty models.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">track_changes</span>
-          <h4 class="text-xl font-normal text-white">Diagnose · Fix · Verify</h4>
-        </div>
-        <div class="space-y-md mb-lg text-base text-white/60 leading-relaxed">
-          <div>
-            <span class="font-button-text text-zinc-200">Diagnose.</span>
-            Pinpoint where revenue is leaking with funnel data + analytics — no more vague hunches.
-          </div>
-          <div>
-            <span class="font-button-text text-zinc-200">Fix.</span>
-            Apply a targeted change at the specific stage that's losing customers.
-          </div>
-          <div>
-            <span class="font-button-text text-zinc-200">Verify.</span>
-            Re-measure within hours; the loop reopens automatically if the fix didn't hold.
-          </div>
-        </div>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">notifications_active</span>
-          <h4 class="text-xl font-normal text-white">Automated monitoring &amp; alerts</h4>
-        </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          Real-time anomaly detection across every funnel stage and traffic source. Alerts route
-          to Slack, email, or your incident tool of choice within seconds of a deviation.
-          Threshold rules tune per stage, channel, device, and geo segment.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
-
-      <div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
-        <div class="flex items-center gap-md mb-lg">
-          <span class="material-symbols-outlined text-primary">smart_toy</span>
-          <h4 class="text-xl font-normal text-white">AI catalog &amp; pricing</h4>
-        </div>
-        <p class="text-base text-white/60 leading-relaxed mb-lg">
-          AI proposes product copy, attribute fills, and category mappings — you approve before
-          anything ships. Pricing rules adapt to competitor moves and inventory levels in real
-          time. Manual overrides on every recommendation; never autopilot without you.
-        </p>
-        <a href="#" class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start">
-          More
-          <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
-        </a>
-      </div>
+      </CapabilityCard>
+      <CapabilityCard
+        icon="notifications_active"
+        title="Automated monitoring &amp; alerts"
+        description="Real-time anomaly detection across every funnel stage and traffic source. Alerts route to Slack, email, or your incident tool of choice within seconds of a deviation. Threshold rules tune per stage, channel, device, and geo segment."
+      />
+      <CapabilityCard
+        icon="smart_toy"
+        title="AI catalog &amp; pricing"
+        description="AI proposes product copy, attribute fills, and category mappings — you approve before anything ships. Pricing rules adapt to competitor moves and inventory levels in real time. Manual overrides on every recommendation; never autopilot without you."
+      />
     </div>
   </section>
 
@@ -537,22 +330,10 @@ console.log(search)</code></pre>
   <section class="py-xl bg-zinc-900/30 my-xl">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-xl reveal">
-        <div class="text-center group">
-          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">2.4M</div>
-          <div class="font-label-caps text-label-caps text-zinc-400">DOWNLOADS</div>
-        </div>
-        <div class="text-center group">
-          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">15k+</div>
-          <div class="font-label-caps text-label-caps text-zinc-400">SERVERS</div>
-        </div>
-        <div class="text-center group">
-          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">800+</div>
-          <div class="font-label-caps text-label-caps text-zinc-400">CONTRIBUTORS</div>
-        </div>
-        <div class="text-center group">
-          <div class="font-page-title text-primary mb-xs group-hover:scale-110 transition-transform duration-500">57.6k</div>
-          <div class="font-label-caps text-label-caps text-zinc-400">GITHUB STARS</div>
-        </div>
+        <StatBlock value="2.4M" label="DOWNLOADS" />
+        <StatBlock value="15k+" label="SERVERS" />
+        <StatBlock value="800+" label="CONTRIBUTORS" />
+        <StatBlock value="57.6k" label="GITHUB STARS" />
       </div>
     </div>
   </section>

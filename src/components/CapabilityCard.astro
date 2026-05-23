@@ -1,0 +1,46 @@
+---
+/**
+ * AI-assisted modules — the 9 cards in the second-to-last section.
+ *
+ * Standard usage takes `icon`, `title`, and `description` props and renders
+ * a single body paragraph + the "More →" link.
+ *
+ * For the Diagnose · Fix · Verify card (the only one with a structured
+ * 3-item body instead of a paragraph), omit `description` and put the
+ * three items into the default slot — they'll render in place of the
+ * paragraph with consistent spacing.
+ */
+export interface Props {
+  icon: string;       // Material Symbols glyph name
+  title: string;
+  description?: string;
+  href?: string;
+}
+
+const { icon, title, description, href = '#' } = Astro.props;
+---
+
+<div class="glass-card p-margin-desktop rounded-xl transition-all reveal relative flex flex-col">
+  <div class="flex items-center gap-md mb-lg">
+    <span class="material-symbols-outlined text-primary">{icon}</span>
+    <h4 class="text-xl font-normal text-white" set:html={title} />
+  </div>
+
+  {
+    description ? (
+      <p class="text-base text-white/60 leading-relaxed mb-lg">{description}</p>
+    ) : (
+      <div class="space-y-md mb-lg text-base text-white/60 leading-relaxed">
+        <slot />
+      </div>
+    )
+  }
+
+  <a
+    href={href}
+    class="mt-auto inline-flex items-center gap-1 text-primary font-button-text text-sm hover:gap-2 hover:brightness-110 transition-all self-start"
+  >
+    More
+    <span class="material-symbols-outlined icon-inline-sm">arrow_forward</span>
+  </a>
+</div>

@@ -1,0 +1,28 @@
+---
+/**
+ * Cards in the Luminous Equation row: Traffic, Conversion, Returns, Revenue.
+ * Returns gets variant="returns" — red icon + label + red-tinted card surface.
+ * The base styling lives in .equation-card / .equation-card--returns (global.css).
+ */
+export interface Props {
+  icon: string;            // Material Symbols glyph name
+  label: string;
+  variant?: 'default' | 'returns';
+}
+
+const { icon, label, variant = 'default' } = Astro.props;
+const isReturns = variant === 'returns';
+---
+
+<div class:list={['equation-card', isReturns && 'equation-card--returns']}>
+  <span
+    class:list={[
+      'material-symbols-outlined text-4xl',
+      isReturns ? 'text-error-red' : 'text-primary',
+    ]}>{icon}</span>
+  <h3
+    class:list={[
+      'text-2xl font-bold tracking-tighter uppercase',
+      isReturns ? 'text-error-red' : 'text-white',
+    ]}>{label}</h3>
+</div>
