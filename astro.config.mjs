@@ -8,7 +8,7 @@ import sitemap from '@astrojs/sitemap';
 const isGitHubPages = process.env.GITHUB_PAGES === 'true';
 
 export default defineConfig({
-  site: isGitHubPages ? 'https://grolabsai.github.io' : 'https://grolabs.io',
+  site: isGitHubPages ? 'https://grolabsai.github.io' : 'https://grolabs.ai',
   base: isGitHubPages ? '/grolabs-landing' : undefined,
   integrations: [
     tailwind({ applyBaseStyles: false }),
