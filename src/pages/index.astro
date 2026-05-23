@@ -56,39 +56,27 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg">
       <LeakCard
         variant="featured"
-        index="01"
-        indexLabel="Highest impact"
-        meta="CONFIDENCE: HIGH // SOURCE: FORRESTER"
         title="Internal site search"
         statValue="2–3×"
         description={`&ldquo;Users who search convert 2&ndash;3&times; more often than those who don't&mdash;<span class="text-primary">if they find what they want</span>.&rdquo;`}
       />
       <LeakCard
-        index="02"
-        meta="CONFIDENCE: MED"
         title="Product description SEO"
         statValue="53%"
         description="More than half of all organic traffic is lost to thin, unoptimized content."
       />
       <LeakCard
-        index="03"
-        meta="SOURCE: BAYMARD"
         title="Checkout friction"
         statValue="70%"
         description={`Cart abandonment remains the single largest &ldquo;unforced error&rdquo; in retail.`}
       />
       <LeakCard
-        index="04"
-        meta="CONFIDENCE: HIGH"
         title="Returns from mismatched expectations"
         statValue="17–20%"
         description="Revenue lost to returns caused by search/image disconnect."
       />
       <LeakCard
         variant="emerging"
-        index="05"
-        indexLabel="Emerging"
-        meta="SOURCE: GARTNER"
         title="Answer Engine Optimization (AEO)"
         statValue="25%"
         description={`&ldquo;By 2026, traditional search volume will drop 25%, shifting to AI-powered answers.&rdquo;`}
@@ -98,11 +86,11 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
          no icon chip; just an info glyph + dimmer copy that spans the
          full width of the stats surface for anyone curious enough to
          read it. -->
-    <div class="reveal mt-xl flex items-start gap-md">
-      <span class="material-symbols-outlined icon-inline-sm text-zinc-600 flex-shrink-0 mt-1">info</span>
+    <div class="reveal mt-xl flex items-start gap-md group cursor-default">
+      <span class="material-symbols-outlined icon-inline-sm text-primary flex-shrink-0 mt-1">info</span>
       <div>
-        <h4 class="font-label-caps text-label-caps text-zinc-500 mb-1">A NOTE ON THESE NUMBERS</h4>
-        <p class="font-mono text-meta-sm text-zinc-600 leading-tight">
+        <h4 class="font-label-caps text-label-caps text-zinc-500 group-hover:text-white transition-colors mb-1">A NOTE ON THESE NUMBERS</h4>
+        <p class="font-mono text-meta-sm text-zinc-600 group-hover:text-white transition-colors leading-tight">
           These benchmarks represent industry averages for mid-market merchants. While your specific
           "leakage" may vary, the compound effect of solving just two of these points often results
           in a 15–20% immediate lift in Net Revenue.
