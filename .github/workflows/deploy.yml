@@ -1,8 +1,11 @@
 name: Deploy to GitHub Pages
 
+# Auto-deploy on push to main is DISABLED because Vercel is now the
+# canonical deploy target for this site. The workflow is kept in source
+# (with workflow_dispatch only) so it can be re-triggered manually from
+# the Actions tab if Vercel ever needs a fallback. To bring back
+# automatic deploys, restore the `push: branches: [main]` block below.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
