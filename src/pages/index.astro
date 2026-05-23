@@ -161,14 +161,17 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Funnel Benchmark -->
-  <section
-    class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop pt-48 pb-xl relative my-xl reveal"
-  >
-    <div class="text-center mb-xl">
-      <h2 class="font-page-title text-4xl md:text-5xl text-white mb-md">Funnel benchmark</h2>
-      <p class="text-body-lg text-secondary-fixed-dim max-w-2xl mx-auto">
-        Quantifying the compound impact of search precision across the entire user journey.
+  <!-- Funnel Benchmark / Revenue leaks -->
+  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop mt-3xl relative reveal">
+    <div class="mb-2xl">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Conversion Funnel
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">Revenue leaks</h2>
+      <p class="text-body-lg text-secondary-fixed-dim max-w-3xl">
+        We have identified the most likely causes of lost revenue at each stage. These are
+        general e-commerce standard percentages, but you can change the values in order to
+        assess your particular situation.
       </p>
     </div>
     <div class="glass-card p-md md:p-xl rounded-xl mb-xl flex flex-col">
@@ -219,11 +222,14 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     ></div>
   </section>
 
-  <!-- AI-assisted modules -->
-  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop pt-40 pb-xl relative my-xl">
-    <h2 class="font-page-title text-4xl md:text-6xl text-white mb-xl text-center reveal">
-      AI-assisted modules
-    </h2>
+  <!-- AI-assisted modules / Tech stack -->
+  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop mt-3xl relative reveal">
+    <div class="mb-2xl">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Tech stack
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">AI-assisted modules</h2>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
       <CapabilityCard
         icon="inventory_2"
