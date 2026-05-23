@@ -15,6 +15,9 @@ export interface Props {
   statValue: string;
   description: string;
   variant?: 'default' | 'featured' | 'emerging';
+  /** Optional Material Symbols name rendered as a large, low-contrast
+   *  watermark in the upper-right corner of the card. Filled-style. */
+  icon?: string;
 }
 
 const {
@@ -22,6 +25,7 @@ const {
   statValue,
   description,
   variant = 'default',
+  icon,
 } = Astro.props;
 
 const isFeatured = variant === 'featured';
@@ -30,39 +34,46 @@ const isEmerging = variant === 'emerging';
 
 <div
   class:list={[
-    'glass-card p-xl rounded-xl group transition-all flex flex-col reveal relative',
+    'glass-card p-xl rounded-xl group transition-all flex flex-col reveal relative overflow-hidden',
     isFeatured ? 'md:col-span-6 lg:col-span-8 min-h-card-featured' : 'md:col-span-3 lg:col-span-4',
     isEmerging && 'border-primary/20',
   ]}
 >
-  <h3
-    class:list={[
-      'font-page-title-mobile text-white mb-sm',
-      isFeatured ? 'text-card-title-lg' : 'text-card-title',
-    ]}
-  >
-    {title}
-  </h3>
+  {icon && !isFeatured && (
+    <span class="leak-card-watermark material-symbols-outlined" aria-hidden="true">
+      {icon}
+    </span>
+  )}
+  {/* Content wrapper carries a stacking context (position relative +
+      z-index) so the title / number / description always paint above
+      the absolutely-positioned watermark. */}
+  <div class="relative z-10 flex flex-col h-full">
+    <h3
+      class:list={[
+        'font-page-title-mobile text-white mb-sm',
+        isFeatured ? 'text-card-title-lg' : 'text-card-title',
+      ]}
+    >
+      {title}
+    </h3>
 
-  {
-    isFeatured ? (
-      <div class="flex flex-col md:flex-row md:items-end gap-xl mt-auto">
-        <div class="font-marker text-primary text-6xl md:text-7xl leading-none whitespace-nowrap">
-          {statValue}
+    {
+      isFeatured ? (
+        <div class="flex flex-col md:flex-row md:items-end gap-xl mt-auto">
+          <div class="font-marker text-primary text-6xl md:text-7xl leading-none whitespace-nowrap">
+            {statValue}
+          </div>
+          <p
+            class="text-3xl text-secondary-fixed-dim italic mb-2 border-l border-primary/30 pl-md leading-snug"
+            set:html={description}
+          />
         </div>
-        <p
-          class="text-3xl text-secondary-fixed-dim italic mb-2 border-l border-primary/30 pl-md leading-snug"
-          set:html={description}
-        />
-      </div>
-    ) : (
-      // Standard card layout: number sits tight to the title, description
-      // takes the remaining vertical room below. Description font bumped
-      // from text-body-sm to text-body-md so the new copy has visual weight.
-      <div>
-        <div class="font-marker text-primary text-6xl mb-md">{statValue}</div>
-        <p class="text-body-md text-secondary-fixed-dim leading-relaxed" set:html={description} />
-      </div>
-    )
-  }
+      ) : (
+        <div>
+          <div class="font-marker text-primary text-6xl mb-md">{statValue}</div>
+          <p class="text-body-md text-secondary-fixed-dim leading-relaxed" set:html={description} />
+        </div>
+      )
+    }
+  </div>
 </div>

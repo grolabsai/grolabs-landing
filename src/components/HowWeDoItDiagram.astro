@@ -114,7 +114,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           <p class="how-phase-desc">Found keyword with no results</p>
         </div>
 
-        <span class="how-phase-sep" aria-hidden="true">›</span>
+        <svg class="how-phase-sep" viewBox="0 0 16 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 0 0 L 12 50 L 0 100 L 4 100 L 16 50 L 4 0 Z" />
+        </svg>
 
         <div class="how-phase">
           <div class="how-phase-head">
@@ -124,7 +126,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
           <p class="how-phase-desc">Automatically add synonym to search engine</p>
         </div>
 
-        <span class="how-phase-sep" aria-hidden="true">›</span>
+        <svg class="how-phase-sep" viewBox="0 0 16 100" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M 0 0 L 12 50 L 0 100 L 4 100 L 16 50 L 4 0 Z" />
+        </svg>
 
         <div class="how-phase">
           <div class="how-phase-head">
@@ -271,13 +275,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     padding: 12px 16px;
   }
   /* Yellow "phases" band — three flow stages with icon + title +
-     description, separated by chevron glyphs. */
+     description, separated by full-height chevron-shaped dividers. */
   .how-band--phases {
     background: #fae194;
     color: #0e0e11;
     display: flex;
     align-items: stretch;
-    gap: 6px;
+    gap: 0;
+    padding: 14px 16px;
   }
   .how-phase {
     flex: 1;
@@ -285,50 +290,65 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding: 0 10px;
   }
+  .how-phase:first-child { padding-left: 0; }
+  .how-phase:last-child { padding-right: 0; }
+
   .how-phase-head {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
   .how-phase-icon {
-    font-size: 16px;
+    font-size: 18px;
     flex-shrink: 0;
   }
   .how-phase-title {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     line-height: 1.1;
   }
+  /* Description indented to align with the title text (past the icon
+     + the gap between icon and title). Icon is 18 px, gap is 8 px →
+     26 px total inset. */
   .how-phase-desc {
-    font-size: 11px;
+    margin: 0 0 0 26px;
+    font-size: 13px;
     font-weight: 500;
-    line-height: 1.35;
+    line-height: 1.4;
     color: rgba(14, 14, 17, 0.72);
-    margin: 0;
   }
+
+  /* Full-height chevron-shape separator drawn as inline SVG. Same
+     yellow as the band, with a slightly darker yellow fill so the
+     shape reads as a subtle ribbon cut — pieces fitting one right
+     after the other. */
   .how-phase-sep {
-    font-size: 22px;
-    font-weight: 400;
-    color: rgba(14, 14, 17, 0.35);
-    align-self: center;
-    line-height: 1;
+    width: 14px;
+    align-self: stretch;
     flex-shrink: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    fill: rgba(14, 14, 17, 0.10);
+    display: block;
   }
 
   @media (max-width: 540px) {
     .how-band--phases {
       flex-direction: column;
       align-items: stretch;
-      gap: 10px;
+      padding: 14px 16px;
+    }
+    .how-phase {
+      padding: 6px 0;
     }
     .how-phase-sep {
-      align-self: center;
+      width: 100%;
+      height: 10px;
       transform: rotate(90deg);
+      align-self: center;
     }
   }
   .how-band--alert {

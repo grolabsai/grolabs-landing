@@ -153,6 +153,23 @@ body {
   flex-shrink: 0;
 }
 
+/* LeakCard watermark icon — large Material Symbols glyph in the
+   upper-right corner of the card, rendered at very low contrast so
+   it reads as a subtle background hint rather than a real icon.
+   font-variation-settings overrides the FILL axis to render a solid
+   filled glyph (the default Material Symbols load is outlined). */
+.leak-card-watermark {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-size: 96px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.045);
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 48;
+  pointer-events: none;
+  user-select: none;
+}
+
 /* Hairline divider under the label, separating it from the body. */
 .equation-card-divider {
   @apply border-t border-white/10 m-0 w-full;

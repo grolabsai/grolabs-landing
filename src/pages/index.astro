@@ -58,22 +58,26 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <LeakCard
         title="SEO"
         statValue="53%"
-        description="More than half of all organic traffic is lost to poor catalog data."
+        icon="search"
+        description="More than half of all organic traffic is lost to poor catalog data. SEO optimization results will always be limited by the info provided by the product catalog."
       />
       <LeakCard
         title="Cart abandonment"
         statValue="70%"
+        icon="shopping_cart"
         description="Cart abandonment is largely due to registration that requires email and password."
       />
       <LeakCard
         title="Returns"
         statValue="17–20%"
+        icon="arrow_back"
         description="Revenue lost to returns caused by imprecise results from keyword searches."
       />
       <LeakCard
         variant="emerging"
         title="AEO"
         statValue="25%"
+        icon="search"
         description={`AI-agent-powered answers will increase 25% by the end of 2026 &mdash; the SEO of the modern era of <span class="text-primary">ChatGPT</span>, <span class="text-primary">Claude</span>, <span class="text-primary">Gemini</span>, etc.`}
       />
     </div>
@@ -316,11 +320,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
              up with the eyebrow on the left. max-width caps the
              rendered phone size so the SVG doesn't dominate at wide
              viewports. -->
-        <div>
+        <div class="flex justify-center lg:justify-end">
           <img
             src={`${base}/agent-notification.svg`}
             alt="GroLabs push notification: Hello Peter, I'm afraid traffic dropped 6% yesterday. With a More info link."
-            class="w-full h-auto"
+            class="w-full max-w-[180px] h-auto"
             loading="lazy"
           />
         </div>
