@@ -117,44 +117,48 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
        not a hard divider line. mt-3xl + py-3xl give ~320 px from the
        previous section's last element to this section's title — twice
        the original 2xl breathing room, per design feedback. -->
-  <section
-    id="revenue-equation"
-    class="relative mt-3xl py-3xl px-10 bg-canvas-deeper overflow-hidden flex flex-col items-center"
-  >
-    <div class="max-w-7xl w-full mb-2xl">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Revenue uplift
-      </span>
-      <h2 class="font-marker text-white text-7xl mb-8">Want to increase revenue?</h2>
-      <p class="text-zinc-400 max-w-xl text-lg leading-relaxed">
-        Either increase traffic or increase conversion, right?
-      </p>
-    </div>
-
-    <div
-      id="equation-container"
-      class="flex items-center justify-center gap-6 w-full max-w-7xl transition-all duration-700 ease-out"
-    >
-      <EquationCard icon="groups" label="Traffic" />
-      <div class="equation-operator">×</div>
-      <EquationCard icon="percent" label="Conversion" />
-
-      <!-- Returns — hidden until the section enters viewport at 50% -->
-      <div id="returns-reveal" class="hidden-element flex items-center gap-6">
-        <div class="equation-operator">−</div>
-        <EquationCard variant="returns" icon="keyboard_return" label="Returns" />
+  <section id="revenue-equation" class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <!-- Title block — left-aligned to match the other section headers
+           (Funnel benchmark, AI-assisted modules, etc.). -->
+      <div class="mb-2xl">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+          Revenue uplift
+        </span>
+        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">
+          More money in your pocket
+        </h2>
+        <p class="text-zinc-400 max-w-xl text-lg leading-relaxed">
+          Either increase traffic or increase conversion, right?
+        </p>
       </div>
 
-      <div class="equation-operator">=</div>
-      <EquationCard icon="attach_money" label="Revenue" />
-    </div>
+      <!-- Equation cards — centered as a unit. -->
+      <div
+        id="equation-container"
+        class="flex items-center justify-center gap-6 max-w-7xl mx-auto transition-all duration-700 ease-out"
+      >
+        <EquationCard icon="groups" label="Traffic" />
+        <div class="equation-operator">×</div>
+        <EquationCard icon="percent" label="Conversion" />
 
-    <p class="max-w-3xl text-zinc-400 text-base leading-relaxed text-center mt-16">
-      There are experts who can increase traffic — we won't get into that discipline. We can
-      increase traffic to your site by enhancing product data attributes and enabling your
-      website for agentic searches. Our focus is on conversion, to make sure you recover the
-      lost revenue without paying for more traffic.
-    </p>
+        <!-- Returns — hidden until the section enters viewport at 50% -->
+        <div id="returns-reveal" class="hidden-element flex items-center gap-6">
+          <div class="equation-operator">−</div>
+          <EquationCard variant="returns" icon="keyboard_return" label="Returns" />
+        </div>
+
+        <div class="equation-operator">=</div>
+        <EquationCard icon="attach_money" label="Revenue" />
+      </div>
+
+      <p class="max-w-3xl text-zinc-400 text-base leading-relaxed text-center mx-auto mt-16">
+        There are experts who can increase traffic — we won't get into that discipline. We can
+        increase traffic to your site by enhancing product data attributes and enabling your
+        website for agentic searches. Our focus is on conversion, to make sure you recover the
+        lost revenue without paying for more traffic.
+      </p>
+    </div>
   </section>
 
   <!-- Funnel Benchmark -->
