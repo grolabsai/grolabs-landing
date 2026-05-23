@@ -94,15 +94,27 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   </div>
 
   <!-- RIGHT: dashboard SVG carries the "AI agent watches this so you
-       don't have to" story. Self-contained asset; subtle pulsing
-       indicator embedded inside the SVG signals "monitoring active". -->
+       don't have to" story, sandwiched between two same-width bands:
+         · Yellow positive band on top  — the agent's process cycle.
+         · Red alert band below         — what triggers a heads-up. -->
   <div class="how-diagram-col how-diagram-col--right-image">
-    <img
-      src={`${base}/grow-dashboard.svg`}
-      alt="An abstract analytics dashboard with KPI tiles, a line chart, and horizontal bars. A small yellow indicator in the top-right corner pulses to signal monitoring is live."
-      class="how-diagram-image"
-      loading="lazy"
-    />
+    <div class="how-right-stack">
+      <div class="how-band how-band--positive">
+        Measure → Fix → Verify uplift
+      </div>
+
+      <img
+        src={`${base}/grow-dashboard.svg`}
+        alt="An abstract analytics dashboard with KPI tiles, a line chart, and horizontal bars. A small yellow indicator in the top-right corner pulses to signal monitoring is live."
+        class="how-diagram-image"
+        loading="lazy"
+      />
+
+      <div class="how-band how-band--alert">
+        <span class="material-symbols-outlined how-band-icon" aria-hidden="true">warning</span>
+        <span>If a threshold is met, you will get a message in your preferred channel.</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -205,19 +217,57 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     color: rgba(237, 234, 224, 0.32);
   }
 
-  /* Right column now hosts the dashboard SVG instead of a stacked
-     parent/child card group. Centre the image vertically against the
-     taller left column so the empty space splits above and below. */
+  /* Right column holds a vertical stack: yellow positive band →
+     dashboard image → red alert band. The stack is centred vertically
+     against the taller left column so the empty space splits above
+     and below. */
   .how-diagram-col--right-image {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
+  }
+  .how-right-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
   }
   .how-diagram-image {
     width: 100%;
     height: auto;
     display: block;
     border-radius: 12px;
+  }
+
+  /* Bands flanking the dashboard image — same width as the image,
+     same rounded-xl corners. Yellow on top, red on bottom. */
+  .how-band {
+    border-radius: 12px;
+    padding: 12px 16px;
+  }
+  .how-band--positive {
+    background: #fae194;
+    color: #0e0e11;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .how-band--alert {
+    background: #ef4444;
+    color: #EDEAE0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .how-band-icon {
+    font-size: 22px;
+    flex-shrink: 0;
   }
 
   /* Eyebrow — same Tailwind class string as every section eyebrow on
