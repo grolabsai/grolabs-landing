@@ -111,17 +111,17 @@
     color: rgba(237, 234, 224, 0.35);
   }
 
-  /* Results column inside the panel */
+  /* Results column inside the panel. min-height reserves the space
+     four populated rows will occupy (4×60 px row + 3×6 px gap +
+     ~20 px status footer ≈ 280 px) so the panel doesn't visibly grow
+     once a search runs. Empty state stays blank — no skeleton rows,
+     no placeholder copy — but the slot is already there, balanced
+     under the input and obvious that something belongs in it. */
   .search-demo-results {
     display: flex;
     flex-direction: column;
     gap: 6px;
-  }
-  /* Before any search runs the results node is empty — collapse it to
-     zero height so the panel below the input stays clean and doesn't
-     suggest staged content. */
-  .search-demo-results:empty {
-    display: none;
+    min-height: 290px;
   }
   .search-demo-results[aria-busy='true'] {
     opacity: 0.55;
