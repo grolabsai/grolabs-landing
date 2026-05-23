@@ -186,10 +186,14 @@ body {
   background: theme('colors.zinc.500');
 }
 
-/* The ×, =, etc. operators between equation cards. self-center keeps
-   them vertically centered within the stretched-tall card row. */
+/* The ×, =, etc. operators between equation cards. Pinned to the top
+   so they sit at the same vertical line as the TRAFFIC / CONVERSION /
+   REVENUE labels rather than the geometric centre of the tall cards.
+   padding-top = card p-xl (40) + icon line-height (~36) + flex gap-md
+   (16) + half the label height (~16) ≈ 6.5rem. */
 .equation-operator {
-  @apply text-zinc-300 text-4xl font-light self-center;
+  @apply text-zinc-300 text-4xl font-light self-start;
+  padding-top: 6.5rem;
 }
 
 /* Hero pill buttons — "Start a conversation" + "Watch video".
