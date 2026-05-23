@@ -55,7 +55,9 @@ const STAGES: Stage[] = [
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
   // Browsing centered between Search (ends x=380) and PDP (starts x=740)
   // so its leak label in the red bar doesn't crowd Search's leak label.
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 500,  y: 90,
+  // y=70 (was 90) leaves enough vertical room for the leak drop column to
+  // read as a clear red line rather than a short stub.
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 500,  y: 70,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
   // Main-row continuation. PDP gets a wider box so the "Product page" label fits comfortably.
@@ -89,7 +91,8 @@ const TRANSITIONS: Transition[] = [
 ];
 
 const LEAKS: Leak[] = [
-  // Home no longer surfaces a leak — the entry stage just feeds Search / Browsing.
+  // Home → bounce leak. pct computes from 100 - (40% to Search + 45% to Browsing) = 15%.
+  { id: 'leak-home',     fromStageId: 'home',     label: 'BOUNCE' },
   { id: 'leak-search',   fromStageId: 'search',   label: 'UNABLE TO FIND PRODUCT' },
   { id: 'leak-browsing', fromStageId: 'browsing', label: 'UNABLE TO FIND PRODUCT' },
   { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'LACK OF CONVINCING INFO' },
@@ -100,9 +103,9 @@ const LEAKS: Leak[] = [
 // Geometry — taller boxes now that icon is on top, label centered below.
 const STAGE_W = 130;
 const STAGE_H = 80;                // was 50; grew to fit stacked icon + larger label
-const LEAK_Y = 180;                // drops end at the top of the red bar
+const LEAK_Y = 185;                // drops end at the top of the red bar
 const LEAK_ARROW_START_DY = 8;     // drop column starts just below stage box
-const BAR_Y = 180;                 // red bar top edge (drops meet it)
+const BAR_Y = 185;                 // red bar top edge (drops meet it)
 const BAR_H = 105;                 // red bar height (% + cause + title fit inside)
 // Top extends to -15 so the 35% pill (lifted to the level of Search's top edge) has clearance.
 const VIEWBOX = { x: 0, y: -15, w: 1400, h: BAR_Y + BAR_H + 15 };
