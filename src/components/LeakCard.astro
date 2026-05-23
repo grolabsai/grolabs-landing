@@ -37,7 +37,7 @@ const isEmerging = variant === 'emerging';
 >
   <h3
     class:list={[
-      'font-page-title-mobile text-white mb-lg',
+      'font-page-title-mobile text-white mb-sm',
       isFeatured ? 'text-card-title-lg' : 'text-card-title',
     ]}
   >
@@ -56,9 +56,12 @@ const isEmerging = variant === 'emerging';
         />
       </div>
     ) : (
-      <div class="mt-auto">
+      // Standard card layout: number sits tight to the title, description
+      // takes the remaining vertical room below. Description font bumped
+      // from text-body-sm to text-body-md so the new copy has visual weight.
+      <div>
         <div class="font-marker text-primary text-6xl mb-md">{statValue}</div>
-        <p class="text-body-sm text-secondary-fixed-dim" set:html={description} />
+        <p class="text-body-md text-secondary-fixed-dim leading-relaxed" set:html={description} />
       </div>
     )
   }

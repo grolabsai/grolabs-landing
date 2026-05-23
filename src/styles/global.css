@@ -196,11 +196,15 @@ body {
   padding-top: 6.5rem;
 }
 
-/* Hero pill buttons — "Start a conversation" + "Watch video".
-   Shared base, two visual variants. The trailing icon is wrapped in
-   .hero-btn-icon so the circular treatment is centralised. */
+/* Hero pill button — "Start a conversation".
+   Base padding leaves room for a trailing icon chip; the
+   .hero-btn--text-only modifier removes the asymmetric right padding
+   for variants without an icon. */
 .hero-btn {
   @apply inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full font-button-text transition-all;
+}
+.hero-btn--text-only {
+  @apply pr-6 py-3;
 }
 .hero-btn-icon {
   @apply inline-flex items-center justify-center w-9 h-9 rounded-full;
@@ -211,12 +215,6 @@ body {
 }
 .hero-btn--primary .hero-btn-icon {
   @apply bg-on-primary text-primary;
-}
-.hero-btn--video {
-  @apply bg-zinc-900 text-white border border-white/10 hover:border-white/30;
-}
-.hero-btn--video .hero-btn-icon {
-  @apply bg-primary text-on-primary;
 }
 
 /* "Find out how?" lede under the hero headline — single use, but the
