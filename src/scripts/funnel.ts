@@ -114,9 +114,16 @@ const STAGE_BORDER = 'rgba(255, 255, 255, 0.08)';
 const STAGE_BORDER_W = 1;
 const STAGE_ACCENT = '#fae194'; // text + icon
 
-// Forward arrows fade back so the red leaks pop
-const FORWARD_STROKE = '#a8e6c5';
-const FORWARD_STROKE_OPACITY = '0.55';
+// Forward arrows: very subtle neutral gray so they recede; the red
+// leaks are what should pop on the funnel. Arrowheads use the same
+// stroke so they stay coherent with the line.
+const FORWARD_STROKE = '#5a5a60';
+const FORWARD_STROKE_OPACITY = '0.5';
+
+// Percentage-pill text colour. Independent from FORWARD_STROKE so we
+// can keep the pills readable even when the arrows go invisible-quiet.
+// Dark-ish gray — visible against the #1b1b1e pill bg but not loud.
+const TRANSITION_LABEL_COLOR = '#9a9aa1';
 
 function stageById(id: string): Stage {
   const s = STAGES.find((x) => x.id === id);
@@ -361,7 +368,7 @@ export function renderFunnel(root: HTMLElement): void {
     label.setAttribute('x', String(estimatedWidth / 2));
     label.setAttribute('y', '18');
     label.setAttribute('text-anchor', 'middle');
-    label.setAttribute('fill', FORWARD_STROKE);
+    label.setAttribute('fill', TRANSITION_LABEL_COLOR);
     label.setAttribute('font-size', '12');
     label.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
     label.setAttribute('font-weight', '500');
