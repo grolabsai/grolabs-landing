@@ -1,21 +1,25 @@
 ---
 /**
- * Architecture diagram for the "Optimize catalog content and search
- * engine" section.
+ * Architecture diagram for the "Optimize catalog & search engine"
+ * section.
  *
  * Two-column layout: data sources on the left feed an AI agent on the
- * right. The right side is one big "AI agent" container that visually
- * wraps three sub-modules (Dashboard, Identify-fix-monitor, Threshold
- * monitor) as recessed wells inside it — background tone alone carries
- * the parent/child relationship, no extra chrome.
+ * right — represented by the grow-dashboard SVG. The dashboard mockup
+ * doubles as the visual story for the agent's role; no need for an
+ * explicit "AI agent" panel here since the section title + the
+ * dashboard imagery already say it.
  *
  * Left side: SEO and AEO are compressed to narrow title-only pills so
  * the Search box can claim the remaining width and split itself into
- * two text columns separated by a thin vertical hairline.
+ * two text columns separated by a thin vertical hairline. Upward
+ * arrows under each of SEO / AEO / Search signal that the catalog
+ * below them feeds all three surfaces.
  *
  * Box surfaces match the rest of the page's inner-block recipe; the
  * eyebrow class on box titles mirrors the section eyebrows verbatim.
  */
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <div class="how-diagram">
@@ -46,11 +50,15 @@
       </div>
     </div>
 
-    <!-- Upward arrows — catalog feeds the SEO/AEO/Search trio above. -->
+    <!-- Upward arrows — catalog feeds the SEO/AEO/Search trio above.
+         Slot widths mirror the trio's flex layout so each arrow lands
+         centred under the box it points at: narrow under SEO, narrow
+         under AEO, then a wide slot that centres an arrow under the
+         Search box regardless of viewport. -->
     <div class="how-diagram-trio-arrows" aria-hidden="true">
-      <span>↑</span>
-      <span>↑</span>
-      <span>↑</span>
+      <span class="how-trio-arrow-slot how-trio-arrow-slot--narrow">↑</span>
+      <span class="how-trio-arrow-slot how-trio-arrow-slot--narrow">↑</span>
+      <span class="how-trio-arrow-slot how-trio-arrow-slot--search">↑</span>
     </div>
 
     <div class="how-box">
@@ -85,40 +93,16 @@
     <span class="how-arrow">→</span>
   </div>
 
-  <!-- RIGHT: AI agent container wraps three sub-modules as nested wells. -->
-  <div class="how-diagram-col">
-    <div class="how-box how-box--container">
-      <span class="how-box-eyebrow how-box-eyebrow--container">AI agent</span>
-      <p class="how-box-body">
-        Reads every signal across catalog, search, and analytics. Finds
-        the leak. Proposes the fix.
-      </p>
-
-      <div class="how-nested-group">
-        <div class="how-box how-box--nested">
-          <span class="how-box-eyebrow">Dashboard</span>
-          <p class="how-box-body">
-            Surfaces the alerts and the numbers behind them — so you act on
-            findings, not on hunches.
-          </p>
-        </div>
-        <div class="how-box how-box--nested">
-          <span class="how-box-eyebrow">Identify, fix &amp; monitor</span>
-          <p class="how-box-body">
-            Spots missing attributes, weak product copy, and zero-result
-            queries. Proposes fixes. Tracks whether they worked.
-          </p>
-        </div>
-        <div class="how-box how-box--nested">
-          <span class="how-box-eyebrow">Threshold monitor</span>
-          <p class="how-box-body">
-            Watches traffic anomalies and trust signals. Alerts you when
-            something crosses the line — bot traffic, conversion collapse,
-            inventory drift.
-          </p>
-        </div>
-      </div>
-    </div>
+  <!-- RIGHT: dashboard SVG carries the "AI agent watches this so you
+       don't have to" story. Self-contained asset; subtle pulsing
+       indicator embedded inside the SVG signals "monitoring active". -->
+  <div class="how-diagram-col how-diagram-col--right-image">
+    <img
+      src={`${base}/grow-dashboard.svg`}
+      alt="An abstract analytics dashboard with KPI tiles, a line chart, and horizontal bars. A small yellow indicator in the top-right corner pulses to signal monitoring is live."
+      class="how-diagram-image"
+      loading="lazy"
+    />
   </div>
 </div>
 
@@ -142,14 +126,26 @@
     display: flex;
     gap: 8px;
   }
+  /* Mirror the trio's flex layout so each arrow lands centred under
+     the box it points at: SEO and AEO are narrow + min-width 64,
+     Search takes the rest. */
   .how-diagram-trio-arrows {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    text-align: center;
+    display: flex;
+    gap: 8px;
     color: rgba(250, 225, 148, 0.5);
     font-size: 18px;
     line-height: 1;
     padding: 2px 0;
+  }
+  .how-trio-arrow-slot {
+    text-align: center;
+  }
+  .how-trio-arrow-slot--narrow {
+    flex: 0 0 auto;
+    min-width: 64px;
+  }
+  .how-trio-arrow-slot--search {
+    flex: 1;
   }
 
   .how-diagram-arrows {
@@ -209,29 +205,19 @@
     color: rgba(237, 234, 224, 0.32);
   }
 
-  /* AI agent: parent container that wraps the three sub-modules. */
-  .how-box--container {
-    height: 100%;
+  /* Right column now hosts the dashboard SVG instead of a stacked
+     parent/child card group. Centre the image vertically against the
+     taller left column so the empty space splits above and below. */
+  .how-diagram-col--right-image {
     display: flex;
-    flex-direction: column;
-    padding: 20px;
+    align-items: center;
+    justify-content: center;
   }
-  .how-box-eyebrow--container {
-    font-size: 13px;
-  }
-  .how-nested-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 14px;
-    flex: 1;
-  }
-  /* Recessed sub-modules. Darker than the container so they read as
-     wells inside it. */
-  .how-box--nested {
-    background: #0e0e11;
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    padding: 12px 14px;
+  .how-diagram-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
   }
 
   /* Eyebrow — same Tailwind class string as every section eyebrow on
