@@ -2,16 +2,17 @@
 /**
  * Cards in the Revenue equation row: Traffic, Conversion, Revenue.
  *
- * Two sizes:
- *   - "expand" (default): flexes to fill available width, has a slot
- *     for bullets / body content under a hairline divider below the
- *     label. Used by Traffic + Conversion.
- *   - "compact": fixed narrow width (matches "REVENUE" with breathing
- *     room), no body content, just icon + label. Used by Revenue.
+ * Built on .glass-card so the hover treatment (scale + lift + yellow
+ * border + mouse-tracked glow) matches the LeakCard surface used in the
+ * stats section. The only variation here is layout/width:
  *
- * All cards stretch to the tallest sibling's height (via the parent
- * flex container's default items-stretch) so the row always reads as
- * one aligned unit, regardless of how much bullet copy any one card has.
+ *   - size="expand" (default): flex-1, fills the available row space
+ *   - size="compact": fixed narrow width (Revenue, ~320 px so its body
+ *     copy still fits in 3-4 readable lines)
+ *
+ * All cards stretch to the tallest sibling's height via the parent flex
+ * row's default items-stretch. The hairline divider + body slot render
+ * the same way regardless of size.
  */
 export interface Props {
   icon: string;
@@ -25,20 +26,14 @@ const isCompact = size === 'compact';
 
 <div
   class:list={[
-    'equation-card',
+    'glass-card group rounded-xl p-xl flex flex-col gap-md transition-all reveal relative',
     isCompact ? 'equation-card--compact' : 'flex-1',
   ]}
 >
   <span class="material-symbols-outlined text-4xl text-primary self-center">{icon}</span>
   <h3 class="text-white text-2xl font-bold tracking-tighter uppercase text-center">{label}</h3>
-  {
-    !isCompact && (
-      <>
-        <hr class="equation-card-divider" />
-        <div class="equation-card-body">
-          <slot />
-        </div>
-      </>
-    )
-  }
+  <hr class="equation-card-divider" />
+  <div class="equation-card-body">
+    <slot />
+  </div>
 </div>

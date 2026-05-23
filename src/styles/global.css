@@ -140,56 +140,50 @@ body {
   filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4));
 }
 
-/* Revenue equation cards — Traffic, Conversion, Revenue.
-   - .equation-card: base composition. Children stack column-wise; icon
-     + label centered, divider + body fill the card width.
-   - .equation-card--compact: fixed narrow width (Revenue), no body.
-   - All cards stretch to tallest sibling's height via the parent flex
-     row's default items-stretch — keeps the equation visually aligned
-     regardless of bullet density. */
-.equation-card {
-  @apply flex flex-col gap-6 p-10 rounded-sm border border-white/5 bg-zinc-900/50;
-  transition: transform 0.3s ease, background 0.3s ease;
-}
-.equation-card:hover {
-  transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.08);
-}
+/* Revenue equation cards now ride on .glass-card (same as LeakCard in
+   the stats section) — they inherit the hover scale + lift, yellow
+   border-on-hover, and mouse-tracked yellow glow for free. Only the
+   layout-specific bits live here. */
+
+/* Compact variant — Revenue. Wide enough that the body sentence wraps
+   to ~3 lines, still much narrower than Traffic / Conversion so the
+   equation reads as "Traffic × Conversion = Revenue (the outcome)". */
 .equation-card--compact {
-  width: 180px;
+  width: 320px;
   flex-shrink: 0;
 }
 
-/* Hairline divider under the label, separating it from the body bullets. */
+/* Hairline divider under the label, separating it from the body. */
 .equation-card-divider {
   @apply border-t border-white/10 m-0 w-full;
 }
 
-/* Body region under the divider — bullets + intro copy. */
+/* Body region under the divider — bullets + intro copy. text-body-md
+   (16 px) matches the standard body size used by CapabilityCard. */
 .equation-card-body {
-  @apply text-zinc-300 text-sm leading-relaxed space-y-3;
-}
-.equation-card-body p {
-  @apply text-zinc-400;
+  @apply text-zinc-300 text-body-md leading-relaxed space-y-md;
 }
 .equation-card-body ul {
-  @apply space-y-2;
+  @apply space-y-sm;
   list-style: none;
   padding: 0;
   margin: 0;
 }
-/* Hanging-indent bullets — wrapped lines align to the text column,
-   not under the bullet glyph. The "–" en-dash matches the typewriter
-   character of the closer line in the hero. */
+/* Hanging-indent bullets with a small circular marker — wrapped lines
+   align to the text column, not under the bullet glyph. */
 .equation-card-body li {
   position: relative;
   padding-left: 1.25rem;
 }
 .equation-card-body li::before {
-  content: '–';
+  content: '';
   position: absolute;
-  left: 0;
-  color: theme('colors.zinc.500');
+  left: 0.25rem;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: theme('colors.zinc.500');
 }
 
 /* The ×, =, etc. operators between equation cards. self-center keeps
