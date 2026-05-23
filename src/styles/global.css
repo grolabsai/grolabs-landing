@@ -408,6 +408,15 @@ body {
   }
 }
 
+/* Once the visitor has hovered any stage at least once the hint has
+   done its job — kill the pulse so the panel doesn't keep waving at
+   them after they've already learned the gesture. Set by funnel.ts on
+   the first showInfo() call, never removed. */
+.funnel-info.is-engaged .funnel-info-default {
+  animation: none;
+  box-shadow: none;
+}
+
 .funnel-info-content {
   display: none;
 }

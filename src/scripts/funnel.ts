@@ -620,6 +620,11 @@ export function renderFunnel(root: HTMLElement): void {
   function showInfo(stage: Stage) {
     if (!panel) return;
     panel.classList.add('is-active');
+    // Permanent flag: once the visitor has discovered that hovering
+    // does something, the "Hover any stage…" hint stops pulsing for
+    // the rest of the session — even after they move off the stage
+    // and the hint becomes visible again.
+    panel.classList.add('is-engaged');
     if (infoIcon) infoIcon.textContent = stage.icon;
     if (infoTitle) infoTitle.textContent = stage.label;
     if (infoBody) {
