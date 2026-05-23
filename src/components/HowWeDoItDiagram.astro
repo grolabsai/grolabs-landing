@@ -256,7 +256,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     text-align: center;
   }
   .how-band--alert {
-    background: #ef4444;
+    /* leak-red token — see tailwind.config.js. Same red used in the
+       funnel bar; the colour belongs to the page's red family. */
+    background: #991B1B;
     color: #EDEAE0;
     display: flex;
     align-items: center;

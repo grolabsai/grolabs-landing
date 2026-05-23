@@ -52,6 +52,12 @@ export default {
         'on-tertiary': '#ffffff',
         'on-secondary-fixed': '#1b1b1e',
         'error-red': '#ef4444',
+        // Single source of truth for the "leak" red used across the
+        // page: funnel bar background, alert bands, and any future
+        // attention-grabbing red surface. Picked to match the midpoint
+        // of the funnel-bar gradient so all reds on the page tonally
+        // belong to the same family.
+        'leak-red': '#991B1B',
         'inverse-on-surface': '#f0f1f1',
         'on-error-container': '#93000a',
         surface: '#f9f9f9',

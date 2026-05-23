@@ -10,7 +10,8 @@
   "monitoring is live" without drawing the eye away from the page copy.
 -->
 <svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 800 500"
+     viewBox="20 20 760 460"
+     preserveAspectRatio="xMidYMid meet"
      role="img"
      aria-label="Abstract dashboard with KPI tiles, a line chart, and a horizontal-bar block, signalling that a monitor is running.">
   <defs>
