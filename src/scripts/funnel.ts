@@ -40,6 +40,8 @@ type Leak = {
   id: string;
   fromStageId: string;
   label: string;
+  /** Optional second line rendered underneath `label` inside the leak bar. */
+  sublabel?: string;
   pctOverride?: number;
   xOffset?: number;
 };
@@ -96,8 +98,8 @@ const LEAKS: Leak[] = [
   { id: 'leak-search',   fromStageId: 'search',   label: 'UNABLE TO FIND PRODUCT' },
   { id: 'leak-browsing', fromStageId: 'browsing', label: 'UNABLE TO FIND PRODUCT' },
   { id: 'leak-pdp',      fromStageId: 'pdp',      label: 'LACK OF CONVINCING INFO' },
-  { id: 'leak-cart',     fromStageId: 'cart',     label: 'ABANDONED CART' },
-  { id: 'leak-checkout', fromStageId: 'checkout', label: 'RETURNS', pctOverride: 17 },
+  { id: 'leak-cart',     fromStageId: 'cart',     label: 'ABANDONED CART', sublabel: 'USER REGISTRATION FRICTION' },
+  { id: 'leak-checkout', fromStageId: 'checkout', label: 'RETURNS',        sublabel: 'PRODUCT MISMATCH', pctOverride: 17 },
 ];
 
 // Geometry — taller boxes now that icon is on top, label centered below.
@@ -106,7 +108,10 @@ const STAGE_H = 80;                // was 50; grew to fit stacked icon + larger 
 const LEAK_Y = 185;                // drops end at the top of the red bar
 const LEAK_ARROW_START_DY = 8;     // drop column starts just below stage box
 const BAR_Y = 185;                 // red bar top edge (drops meet it)
-const BAR_H = 105;                 // red bar height (% + cause + title fit inside)
+const BAR_H = 145;                 // red bar height — taller than the original 105
+                                   // to leave room above the % numbers, between
+                                   // them and the (now optionally two-line) cause
+                                   // captions, and below the leaking-funnel title.
 // Top extends to -15 so the 35% pill (lifted to the level of Search's top edge) has clearance.
 const VIEWBOX = { x: 0, y: -15, w: 1400, h: BAR_Y + BAR_H + 15 };
 
@@ -549,7 +554,7 @@ export function renderFunnel(root: HTMLElement): void {
 
     const pctLabel = document.createElementNS(svgNS, 'text');
     pctLabel.setAttribute('x', String(cx));
-    pctLabel.setAttribute('y', String(BAR_Y + 32));
+    pctLabel.setAttribute('y', String(BAR_Y + 44));
     pctLabel.setAttribute('text-anchor', 'middle');
     pctLabel.setAttribute('fill', '#ffffff');
     pctLabel.setAttribute('font-size', '24');
@@ -561,27 +566,42 @@ export function renderFunnel(root: HTMLElement): void {
 
     const causeLabel = document.createElementNS(svgNS, 'text');
     causeLabel.setAttribute('x', String(cx));
-    causeLabel.setAttribute('y', String(BAR_Y + 50));
+    causeLabel.setAttribute('y', String(BAR_Y + 62));
     causeLabel.setAttribute('text-anchor', 'middle');
     causeLabel.setAttribute('fill', 'rgba(254, 226, 226, 0.8)');
     causeLabel.setAttribute('font-size', '12');
     causeLabel.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
     causeLabel.dataset.leakId = leak.id;
-    causeLabel.textContent = leak.label;
+
+    // Use <tspan> children so the cause line and an optional second
+    // descriptor render as two centered lines without misaligning.
+    const labelLine = document.createElementNS(svgNS, 'tspan');
+    labelLine.setAttribute('x', String(cx));
+    labelLine.textContent = leak.label;
+    causeLabel.appendChild(labelLine);
+
+    if (leak.sublabel) {
+      const sublabelLine = document.createElementNS(svgNS, 'tspan');
+      sublabelLine.setAttribute('x', String(cx));
+      sublabelLine.setAttribute('dy', '14');
+      sublabelLine.textContent = leak.sublabel;
+      causeLabel.appendChild(sublabelLine);
+    }
+
     barGroup.appendChild(causeLabel);
   });
 
   // Title at the bottom of the bar
   const barTitle = document.createElementNS(svgNS, 'text');
   barTitle.setAttribute('x', String(VIEWBOX.w / 2));
-  barTitle.setAttribute('y', String(BAR_Y + 90));
+  barTitle.setAttribute('y', String(BAR_Y + 118));
   barTitle.setAttribute('text-anchor', 'middle');
   barTitle.setAttribute('fill', '#ffffff');
   barTitle.setAttribute('font-size', '26');
   barTitle.setAttribute('font-weight', '700');
   barTitle.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
-  barTitle.setAttribute('letter-spacing', '-0.01em');
-  barTitle.textContent = 'Leaking funnel = Lost revenue';
+  barTitle.setAttribute('letter-spacing', '0.04em');
+  barTitle.textContent = 'LEAKING FUNNEL = LOST REVENUE';
   barGroup.appendChild(barTitle);
 
   svg.appendChild(barGroup);

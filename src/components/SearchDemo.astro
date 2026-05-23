@@ -77,14 +77,35 @@
   }
   .search-demo-input {
     appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     background: transparent;
     border: 0;
-    outline: 0;
+    outline: none;
+    box-shadow: none;
     color: #EDEAE0;
     font-family: 'Hanken Grotesk', system-ui, sans-serif;
     font-size: 16px;
     padding: 12px 0;
     width: 100%;
+  }
+  /* Be explicit across every focus state — some browsers paint a blue
+     UA focus ring on inputs that the bare `outline:none` doesn't
+     suppress, especially for type="search". The wrap already shows a
+     yellow border + glow on :focus-within, which is the only focus
+     affordance we want here. */
+  .search-demo-input:focus,
+  .search-demo-input:focus-visible,
+  .search-demo-input:active {
+    outline: none;
+    box-shadow: none;
+    border: 0;
+  }
+  .search-demo-input::-webkit-search-cancel-button,
+  .search-demo-input::-webkit-search-decoration,
+  .search-demo-input::-webkit-search-results-button,
+  .search-demo-input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
   }
   .search-demo-input::placeholder {
     color: rgba(237, 234, 224, 0.35);
