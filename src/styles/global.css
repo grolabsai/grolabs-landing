@@ -81,11 +81,9 @@ body {
   border-left: 2px solid #fae194;
 }
 
+/* Decorative radial yellow glow used in the Funnel Benchmark section. */
 .ambient-glow-yellow {
   background: radial-gradient(circle at center, rgba(250, 225, 148, 0.18) 0%, transparent 70%);
-}
-.ambient-glow-yellow-sharp {
-  background: radial-gradient(circle at center, rgba(250, 225, 148, 0.15) 0%, transparent 50%);
 }
 
 /* Particle Layer */
@@ -231,16 +229,41 @@ body {
   @apply text-body-md italic text-secondary-fixed-dim mt-lg mb-xl;
 }
 
-/* The yellow band the stats cards straddle. Pairs with .stats-overlap. */
+/* Yellow gradient strip the stats section straddles. Designed so the
+   visible portion (the part NOT covered by .stats-section-surface) is
+   the bright bottom of the gradient — the surface appears to rest on
+   the yellow glow. Pairs with .stats-overlap. */
 .hero-stats-band {
-  @apply bg-primary h-hero-band w-full;
+  width: 100%;
+  height: theme('height.hero-band');
+  /* Single source of light — a subtle linear fade from the stats
+     surface upward toward the hero. Yellow at the bottom of the band
+     (just above the surface), fully transparent at the top. */
+  background: linear-gradient(
+    to top,
+    rgba(250, 225, 148, 0.3) 0%,
+    transparent 100%
+  );
 }
-/* Stats grid pulled up so the cards overlap the yellow band: top half on
-   yellow, bottom half on the canvas. The negative offset is tied to
-   .hero-stats-band's height — keep them in sync. */
+
+/* The stats section is pulled up so the surface straddles the yellow
+   gradient: top edge sits on the bright zone, body extends down onto
+   the canvas. Visible yellow above the surface = band-height minus
+   this overlap (~100 px). */
 .stats-overlap {
   @apply relative z-10;
-  margin-top: -320px;
+  margin-top: -260px;
+}
+
+/* Wraps the 5 leak cards as one visually-distinct section — slightly
+   lighter than the page canvas so the cards group together as a single
+   element rather than blending into the background. */
+.stats-section-surface {
+  background: #1f1f23;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
 }
 
 

@@ -28,21 +28,14 @@ cards.forEach((card) => {
 });
 
 // ============================================================
-// Ambient grid + hero glow follow the mouse
+// Ambient grid follows the mouse
 // ============================================================
-const heroGlow = document.getElementById('hero-glow');
 document.addEventListener('mousemove', (e) => {
   const xPercent = (e.clientX / window.innerWidth) * 100;
   const yPercent = (e.clientY / window.innerHeight) * 100;
 
   document.documentElement.style.setProperty('--grid-x', `${xPercent}%`);
   document.documentElement.style.setProperty('--grid-y', `${yPercent}%`);
-
-  if (heroGlow) {
-    const mx = (e.clientX / window.innerWidth - 0.5) * 60;
-    const my = (e.clientY / window.innerHeight - 0.5) * 60;
-    heroGlow.style.transform = `translate(calc(-50% + ${mx}px), calc(-50% + ${my}px))`;
-  }
 });
 
 // ============================================================

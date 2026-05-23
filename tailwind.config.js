@@ -114,12 +114,12 @@ export default {
         page: '1440px',
       },
       minHeight: {
-        hero: '85vh',
+        hero: '60vh',          // shorter than 85vh so the stats peek above the fold
         section: '800px',
         'card-featured': '320px',
       },
       height: {
-        'hero-band': '420px', // yellow band the stats cards straddle
+        'hero-band': '380px', // yellow glow strip the stats cards straddle
       },
     },
   },

@@ -10,25 +10,9 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
 <BaseLayout>
   <!-- Hero Section -->
   <section
-    class="relative px-margin-mobile md:px-margin-desktop py-xl overflow-hidden min-h-hero flex flex-col justify-center items-center text-center"
+    class="relative px-margin-mobile md:px-margin-desktop pt-xl pb-lg overflow-hidden min-h-hero flex flex-col justify-start items-center text-center"
   >
     <div id="particles-container"></div>
-
-    <!-- Cinematic Background Glow -->
-    <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none z-0 transition-transform duration-700 ease-out"
-      id="hero-glow"
-    >
-      <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] ambient-glow-yellow-sharp blur-[100px] opacity-70"
-      ></div>
-      <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1000px] ambient-glow-yellow blur-[160px] opacity-100"
-      ></div>
-      <div
-        class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] ambient-glow-yellow blur-[200px] opacity-30"
-      ></div>
-    </div>
 
     <div class="relative z-10 max-w-5xl reveal active">
       <h1
@@ -62,9 +46,12 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
   <!-- Yellow band that the stats cards straddle. -->
   <div class="hero-stats-band"></div>
 
-  <!-- Leak Numbers Section — cards pulled up over the yellow band. -->
+  <!-- Leak Numbers Section — cards pulled up over the yellow glow band.
+       The .stats-section-surface wraps the grid so the 5 cards read as
+       one distinct element rather than floating loose on the canvas. -->
   <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop stats-overlap">
-    <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg mb-xl">
+    <div class="stats-section-surface">
+    <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg">
       <LeakCard
         variant="featured"
         index="01"
@@ -105,9 +92,10 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         description={`&ldquo;By 2026, traditional search volume will drop 25%, shifting to AI-powered answers.&rdquo;`}
       />
     </div>
+    </div>
     <!-- Footer Note -->
     <div
-      class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mx-auto flex flex-col md:flex-row items-center gap-lg"
+      class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mx-auto mt-xl flex flex-col md:flex-row items-center gap-lg"
     >
       <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
         <span class="material-symbols-outlined text-primary">info</span>
