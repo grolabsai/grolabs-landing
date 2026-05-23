@@ -79,6 +79,7 @@ export default {
         lg: '24px',
         gutter: '24px',
         xl: '40px',
+        '2xl': '80px',
         'margin-mobile': '16px',
         'margin-desktop': '48px',
       },
