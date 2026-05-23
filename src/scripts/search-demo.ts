@@ -112,13 +112,31 @@ function statusHtml(visibleCount: number, hiddenCount: number, ms: number): stri
 
 async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
   const query = input.value.trim();
-  if (!query) {
-    resultsEl.innerHTML = emptyStateHtml('Type something to search.');
-    return;
-  }
   resultsEl.setAttribute('aria-busy', 'true');
   const started = performance.now();
   try {
+    if (!query) {
+      // Catalog preview — show every product in the category with all
+      // pills neutral (no query → nothing has "matched" yet). When the
+      // visitor pastes the trio, the pills light up green and the
+      // "hidden by missing attributes" badge appears on row 4. That
+      // transition is the demo's payoff, so the empty state has to set
+      // it up cleanly.
+      const sweep = await meiliSearch({
+        q: '',
+        filter: `category = "${CATEGORY}"`,
+        limit: 20,
+      });
+      const elapsed = Math.max(
+        sweep.processingTimeMs ?? 0,
+        Math.round(performance.now() - started),
+      );
+      const parts: string[] = sweep.hits.map((p) => rowHtml(p, '', false));
+      parts.push(statusHtml(sweep.hits.length, 0, elapsed));
+      resultsEl.innerHTML = parts.join('');
+      return;
+    }
+
     const [keywordRes, categoryRes] = await Promise.all([
       meiliSearch({ q: query, limit: 20 }),
       meiliSearch({ q: '', filter: `category = "${CATEGORY}"`, limit: 20 }),

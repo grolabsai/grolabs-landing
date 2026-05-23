@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import LeakCard from '../components/LeakCard.astro';
 import SearchDemo from '../components/SearchDemo.astro';
+import SearchCopyHelper from '../components/SearchCopyHelper.astro';
 import EquationCard from '../components/EquationCard.astro';
 import CapabilityCard from '../components/CapabilityCard.astro';
 import StatBlock from '../components/StatBlock.astro';
@@ -281,9 +282,15 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Try it out
       </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
         Attribute Match Visibility
       </h2>
+
+      <!-- Copy-to-clipboard helper. Sits between the title and the
+           two-column grid so the action ("copy these criteria") reads
+           as part of the section intro, and the "↓ paste into the
+           search box" feedback points naturally at the panel below. -->
+      <SearchCopyHelper />
 
       <!-- Two-column layout: search panel on the left (wider), narrative
            paragraph on the right (narrower). Stacks on mobile. -->
