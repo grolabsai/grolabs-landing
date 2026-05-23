@@ -53,8 +53,9 @@ const STAGES: Stage[] = [
   { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20,
     tooltip:
       "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
-  // Browsing shifted left so the 25% pill can sit close to its right edge.
-  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 400,  y: 90,
+  // Browsing centered between Search (ends x=380) and PDP (starts x=740)
+  // so its leak label in the red bar doesn't crowd Search's leak label.
+  { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 500,  y: 90,
     tooltip:
       "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
   // Main-row continuation. PDP gets a wider box so the "Product page" label fits comfortably.
@@ -106,10 +107,11 @@ const BAR_H = 105;                 // red bar height (% + cause + title fit insi
 // Top extends to -15 so the 35% pill (lifted to the level of Search's top edge) has clearance.
 const VIEWBOX = { x: 0, y: -15, w: 1400, h: BAR_Y + BAR_H + 15 };
 
-// Stage card fill is lighter than the section background (canvas-deeper)
-// so the cards visually pop. Matches the lifted-surface treatment used
-// by the LeakCards on the stats section.
-const STAGE_FILL = '#1F1F23';
+// Stage cards punch DARKER than the section background — they read as
+// recessed "wells" in the canvas-deeper surface. Pure black gives the
+// strongest separation; the kinetic-yellow icons + bone-white labels
+// pop loudest against it. Border stays as a subtle hairline.
+const STAGE_FILL = '#000000';
 const STAGE_BORDER = 'rgba(255, 255, 255, 0.08)';
 const STAGE_BORDER_W = 1;
 const STAGE_ACCENT = '#fae194'; // text + icon
