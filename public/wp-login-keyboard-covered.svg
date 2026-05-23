@@ -81,7 +81,7 @@
     <line x1="105" y1="14" x2="105" y2="32" stroke="#fae194" stroke-width="1.5"/>
   </g>
 
-  <!-- "Ghost" LOG IN button: where the button SHOULD be — covered by
+  <!-- "Ghost" SIGN IN button: where the button SHOULD be — covered by
        the keyboard below. Rendered at very low opacity so the reader
        can see what's hidden. The whole point of this image is to
        expose this overlap. -->
@@ -90,7 +90,7 @@
     <text x="136" y="32"
           font-family="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
           font-size="15" font-weight="800" fill="#0e0e11" text-anchor="middle"
-          letter-spacing="1.5">LOG IN</text>
+          letter-spacing="1.5">SIGN IN</text>
   </g>
 
   <!-- Small annotation pointing at the hidden button -->
@@ -174,8 +174,8 @@
         <text x="59"  y="26" font-size="16">☺</text>
         <rect x="78"  y="0" width="158" height="40" rx="5" fill="#3a3a3f"/>
         <text x="157" y="25" font-size="12">space</text>
-        <rect x="239" y="0" width="69" height="40" rx="5" fill="#fae194"/>
-        <text x="273" y="25" font-size="12" fill="#0e0e11" font-weight="700">go</text>
+        <rect x="239" y="0" width="69" height="40" rx="5" fill="#2a2a2d"/>
+        <text x="273" y="25" font-size="12" fill="#EDEAE0" font-weight="500">go</text>
       </g>
     </g>
   </g>
