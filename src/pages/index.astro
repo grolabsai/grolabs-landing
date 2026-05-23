@@ -269,19 +269,24 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     </div>
   </section>
 
-  <!-- Entrepreneurs' Priority / Grow a company. Two-column layout:
-       narrative copy on the left, diagram (to come) on the right. -->
+  <!-- Entrepreneurs' Priority / Grow a company. Two-column layout
+       where the LEFT column carries the entire section header +
+       narrative; the RIGHT column hosts the phone-notification SVG
+       starting at the same top edge so the phone visually aligns with
+       the eyebrow. -->
   <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Entrepreneurs' Priority
-      </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
-        Grow a company
-      </h2>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-xl items-start">
+        <!-- LEFT: eyebrow + title + Gerber quote + monitoring paragraph +
+             new no-news / if-needed line -->
         <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
+          <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+            Entrepreneurs' Priority
+          </span>
+          <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
+            Grow a company
+          </h2>
+
           <blockquote class="border-l border-primary/30 pl-md mb-xl">
             <p class="text-white text-body-lg italic leading-snug mb-sm">
               &ldquo;Most entrepreneurs fail because they're working
@@ -294,49 +299,31 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             </footer>
           </blockquote>
 
-          <p>
+          <p class="mb-md">
             Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
             hour you spend in the dashboard is an hour you're not spending on
             the company — on the strategy, the team, the next product, the
             partnerships only you can build.
           </p>
+
+          <p>
+            <span class="text-primary font-medium">No news = good news.</span>
+            <span class="text-white">If something requires your attention, we'll let you know.</span>
+          </p>
         </div>
 
-        <div class="flex flex-col gap-lg">
-          <!-- Dashboard mockup — visual hook that pairs with the
-               "no news = good news" callout below. Standalone SVG
-               (public/grow-dashboard.svg) so it's also reusable
-               outside the page. -->
+        <!-- RIGHT: phone notification mockup. align-self-start (default
+             via items-start on the grid) so the top of the phone lines
+             up with the eyebrow on the left. max-width caps the
+             rendered phone size so the SVG doesn't dominate at wide
+             viewports. -->
+        <div class="flex justify-center lg:justify-end">
           <img
-            src={`${base}/grow-dashboard.svg`}
-            alt="An abstract analytics dashboard with KPI tiles, a line chart, and horizontal bars. A small yellow indicator in the top-right corner pulses to signal that monitoring is live."
-            class="w-full rounded-xl"
+            src={`${base}/agent-notification.svg`}
+            alt="GroLabs push notification: Hello Peter, I'm afraid traffic dropped 6% yesterday. With a More info link."
+            class="w-full max-w-[280px] h-auto"
             loading="lazy"
           />
-
-          <!-- "No news = good news" callout: yellow inverted header on a
-               canvas-deeper body. Houses the agent's job description + the
-               four signal types it surfaces. Tone is "passive ops" — if
-               you don't hear from it, nothing's wrong. -->
-          <div class="bg-canvas-deeper border border-white/5 rounded-xl overflow-hidden">
-          <div class="bg-primary text-[#0e0e11] font-mono text-xs tracking-[0.2em] uppercase font-semibold px-md py-sm">
-            No news equals good news
-          </div>
-          <div class="px-md py-md text-secondary-fixed-dim text-body-md leading-relaxed">
-            <p class="mb-md">
-              The agent has one job: detect revenue leaks before you do. It
-              watches four signal types — search metrics, catalog
-              completeness, funnel analytics, and traffic patterns — and
-              surfaces:
-            </p>
-            <ul class="list-disc pl-lg space-y-sm marker:text-primary/50">
-              <li>search queries that should be converting but aren't</li>
-              <li>products with missing attributes or thin content holding back discoverability</li>
-              <li>funnel drop-offs and probable conversion leaks from analytics patterns</li>
-              <li>traffic anomalies that should trigger a trust-and-safety alert</li>
-            </ul>
-          </div>
-          </div>
         </div>
       </div>
     </div>
