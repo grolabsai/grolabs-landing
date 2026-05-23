@@ -91,6 +91,8 @@ export default {
         'body-lg': ['"Hanken Grotesk"', 'sans-serif'],
         'page-title-mobile': ['"Hanken Grotesk"', 'sans-serif'],
         'button-text': ['"Hanken Grotesk"', 'sans-serif'],
+        // The brand-mark / hero hand-drawn voice. Loaded by BaseLayout.
+        marker: ['"Permanent Marker"', 'cursive'],
         mono: ['monospace'],
       },
       fontSize: {
