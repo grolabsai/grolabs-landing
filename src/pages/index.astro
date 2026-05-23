@@ -257,16 +257,27 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         How?
       </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
         Catalog and Search Optimization
       </h2>
-      <p class="text-body-lg text-secondary-fixed-dim max-w-3xl mb-xl">
-        Search only finds what your catalog says is there. Three of these four
-        bars match the dietary keywords below; the fourth qualifies on every
-        count but was never tagged. Watch what surfaces — and what doesn't.
-      </p>
 
-      <SearchDemo />
+      <!-- Two-column layout: search demo on the left (wider), explanatory
+           paragraph on the right (narrower). Stacks on mobile. -->
+      <div class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-xl items-start">
+        <SearchDemo />
+
+        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
+          <p>
+            Search only finds what your catalog says is there. Three of these
+            four bars match the dietary keywords above; the fourth qualifies on
+            every count but was never tagged — so Meilisearch can't see it.
+          </p>
+          <p class="mt-md">
+            That last row is the GroLabs sales pitch in one line: catalog
+            quality is the ceiling on search quality. We fix the ceiling.
+          </p>
+        </div>
+      </div>
     </div>
   </section>
 

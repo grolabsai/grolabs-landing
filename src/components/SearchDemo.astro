@@ -4,10 +4,10 @@
  *
  * Talks to the `demo` index over Meilisearch's REST API via a
  * search-only key (see src/scripts/search-demo.ts). The script wires
- * the input + results container after hydration. All styling lives in
- * the <style> block at the bottom rather than scattered tailwind utilities
- * — the card layout has enough custom geometry that bespoke CSS reads
- * cleaner than Tailwind soup.
+ * the input + results container after hydration. Styling lives in the
+ * <style is:global> block — bespoke CSS reads cleaner here than the
+ * equivalent Tailwind soup, and `is:global` means the classes survive
+ * being injected by the runtime script.
  */
 ---
 
@@ -40,18 +40,18 @@
   .search-demo {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 16px;
     width: 100%;
   }
 
-  /* Input */
+  /* Search input */
   .search-demo-input-wrap {
     position: relative;
     display: flex;
     align-items: center;
     background: #0e0e11;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    border-radius: 9999px;
     padding: 0 20px;
     transition: border-color 200ms ease, box-shadow 200ms ease;
   }
@@ -61,8 +61,8 @@
   }
   .search-demo-input-icon {
     color: #fae194;
-    font-size: 22px;
-    margin-right: 12px;
+    font-size: 20px;
+    margin-right: 10px;
     flex-shrink: 0;
   }
   .search-demo-input {
@@ -72,8 +72,8 @@
     outline: 0;
     color: #EDEAE0;
     font-family: 'Hanken Grotesk', system-ui, sans-serif;
-    font-size: 18px;
-    padding: 18px 0;
+    font-size: 16px;
+    padding: 14px 0;
     width: 100%;
   }
   .search-demo-input::placeholder {
@@ -81,107 +81,101 @@
   }
 
   /* Results */
+  .search-demo-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
   .search-demo-results[aria-busy='true'] {
     opacity: 0.55;
     transition: opacity 150ms ease;
   }
-  .search-demo-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  @media (min-width: 768px) {
-    .search-demo-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
   .search-demo-empty {
     color: rgba(237, 234, 224, 0.5);
     font-style: italic;
-    padding: 24px 0;
+    padding: 16px 4px;
+    font-size: 14px;
   }
 
-  /* Card */
-  .search-demo-card {
+  /* Row */
+  .search-demo-row {
     display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 20px;
+    grid-template-columns: 44px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px;
     background: #1f1f23;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 16px;
-    transition: border-color 200ms ease, transform 200ms ease;
+    border-radius: 9999px;
+    transition: border-color 180ms ease, background 180ms ease;
   }
-  .search-demo-card:hover {
+  .search-demo-row:hover {
     border-color: rgba(250, 225, 148, 0.25);
-    transform: translateY(-2px);
+    background: #232328;
   }
-  .search-demo-card--hidden {
-    opacity: 0.78;
+  .search-demo-row--hidden {
     border-style: dashed;
-    border-color: rgba(239, 68, 68, 0.35);
+    border-color: rgba(239, 68, 68, 0.4);
+    opacity: 0.85;
   }
-  .search-demo-card-image {
-    width: 120px;
-    height: 120px;
+
+  .search-demo-thumb {
+    width: 44px;
+    height: 44px;
     object-fit: cover;
     border-radius: 8px;
     background: #131316;
   }
-  .search-demo-card-body {
+
+  .search-demo-info {
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    min-width: 0;
+    gap: 2px;
   }
-  .search-demo-card-meta {
+  .search-demo-name {
+    color: #EDEAE0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .search-demo-brand {
+    color: rgba(237, 234, 224, 0.5);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 8px;
   }
-  .search-demo-card-brand {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: rgba(250, 225, 148, 0.7);
-  }
-  .search-demo-card-score {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11px;
-    color: rgba(237, 234, 224, 0.5);
-  }
-  .search-demo-card-title {
-    font-family: 'Hanken Grotesk', system-ui, sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #EDEAE0;
-    margin: 0;
-    line-height: 1.3;
-  }
-  .search-demo-card-price {
-    color: rgba(237, 234, 224, 0.7);
-    font-size: 14px;
-    margin: 0;
+  .search-demo-hidden-tag {
+    color: rgba(239, 68, 68, 0.85);
+    font-size: 9px;
   }
 
-  /* Pills */
+  /* Right cluster: pills + price inline */
+  .search-demo-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
   .search-demo-pills {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 4px;
   }
   .search-demo-pill {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    padding: 4px 10px;
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
     border-radius: 999px;
     border: 1px solid transparent;
     white-space: nowrap;
+    line-height: 1;
   }
   .search-demo-pill--match {
     color: #10b981;
@@ -189,39 +183,45 @@
     border-color: rgba(16, 185, 129, 0.35);
   }
   .search-demo-pill--miss {
-    color: rgba(237, 234, 224, 0.45);
+    color: rgba(237, 234, 224, 0.4);
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(255, 255, 255, 0.08);
   }
-
-  /* "Hidden in your catalog" section header + per-card badge */
-  .search-demo-hidden-header {
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  .search-demo-price {
+    color: #EDEAE0;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 52px;
+    text-align: right;
   }
-  .search-demo-hidden-eyebrow {
-    display: inline-block;
-    color: #ef4444;
+
+  /* Footer status line */
+  .search-demo-status {
+    margin-top: 4px;
+    padding: 0 20px;
+    text-align: right;
+    color: rgba(237, 234, 224, 0.4);
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    margin-bottom: 8px;
+    letter-spacing: 0.04em;
   }
-  .search-demo-hidden-header p {
-    color: rgba(237, 234, 224, 0.55);
-    font-size: 14px;
-    line-height: 1.55;
-    margin: 0 0 16px 0;
-    max-width: 60ch;
+  .search-demo-status-hidden {
+    color: rgba(239, 68, 68, 0.75);
   }
-  .search-demo-card-hidden-badge {
-    margin-top: 8px;
-    color: rgba(239, 68, 68, 0.85);
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
+
+  /* On narrow viewports the right cluster wraps under the info column
+     so pills don't squeeze the name to a single character. */
+  @media (max-width: 640px) {
+    .search-demo-row {
+      grid-template-columns: 44px 1fr;
+      grid-template-rows: auto auto;
+      row-gap: 6px;
+      border-radius: 16px;
+      padding: 12px 16px;
+    }
+    .search-demo-right {
+      grid-column: 1 / -1;
+      justify-content: space-between;
+    }
   }
 </style>

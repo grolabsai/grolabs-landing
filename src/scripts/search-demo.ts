@@ -2,21 +2,21 @@
  * Client-side search demo for the landing page.
  *
  * Talks directly to Meilisearch Cloud (the `demo` index) using a
- * search-only API key that is restricted to that one index. The key is
- * embedded here intentionally — Meilisearch search-only keys are
- * designed to be shipped to the browser, and this one cannot read any
- * other index, mutate data, or mint other keys.
+ * search-only API key restricted to that one index. The key is embedded
+ * here intentionally — search-only keys are designed to ship to the
+ * browser and cannot read other indexes, mutate data, or mint other
+ * keys.
  *
  * Two searches run on every query:
  *
- *   1. Keyword search — what the user typed (the dietary trio).
- *      Returns products whose dietary_tags / name actually match.
+ *   1. Keyword search — what the user typed. Returns products whose
+ *      dietary_tags / name actually match.
  *
  *   2. Category sweep — empty query + filter category="Snack Bars".
- *      Returns ALL products in the same category, including the ones
- *      keyword search missed because the merchant never filled in
- *      attributes. The diff between (2) and (1) is the "hidden by
- *      data quality" cohort — the GroLabs sales pitch in one row.
+ *      Returns ALL products in the category, including ones keyword
+ *      search missed because attributes were never filled in. The diff
+ *      between (2) and (1) is the "hidden by data quality" cohort — the
+ *      GroLabs sales pitch made concrete.
  */
 
 const MS_HOST = 'https://ms-5a6fa3e472b4-47486.nyc.meilisearch.io';
@@ -26,7 +26,6 @@ const INDEX = 'demo';
 const CATEGORY = 'Snack Bars';
 
 const TRACKED_TAGS = ['gluten-free', 'sugar-free', 'dairy-free'] as const;
-type TrackedTag = (typeof TRACKED_TAGS)[number];
 
 type Product = {
   id: number;
@@ -39,9 +38,12 @@ type Product = {
   dietary_tags: string[];
 };
 
-type SearchResponse = { hits: Product[] };
+type SearchResponse = {
+  hits: Product[];
+  processingTimeMs?: number;
+};
 
-async function meiliSearch(body: Record<string, unknown>): Promise<Product[]> {
+async function meiliSearch(body: Record<string, unknown>): Promise<SearchResponse> {
   const res = await fetch(`${MS_HOST}/indexes/${INDEX}/search`, {
     method: 'POST',
     headers: {
@@ -51,8 +53,7 @@ async function meiliSearch(body: Record<string, unknown>): Promise<Product[]> {
     body: JSON.stringify(body),
   });
   if (!res.ok) throw new Error(`Meilisearch ${res.status}`);
-  const json = (await res.json()) as SearchResponse;
-  return json.hits;
+  return (await res.json()) as SearchResponse;
 }
 
 function formatPrice(n: number): string {
@@ -60,9 +61,7 @@ function formatPrice(n: number): string {
 }
 
 function pillsHtml(product: Product, query: string): string {
-  // Which of the tracked tags are present on the product?
   const productTags = new Set(product.dietary_tags);
-  // Which of the tracked tags did the user actually type?
   const lowerQuery = query.toLowerCase();
   return TRACKED_TAGS.map((tag) => {
     const queried = lowerQuery.includes(tag);
@@ -74,46 +73,41 @@ function pillsHtml(product: Product, query: string): string {
   }).join('');
 }
 
-function matchScore(product: Product, query: string): { hit: number; queried: number } {
-  const productTags = new Set(product.dietary_tags);
-  const lowerQuery = query.toLowerCase();
-  let queried = 0;
-  let hit = 0;
-  for (const tag of TRACKED_TAGS) {
-    if (lowerQuery.includes(tag)) {
-      queried++;
-      if (productTags.has(tag)) hit++;
-    }
-  }
-  return { hit, queried };
-}
-
-function cardHtml(product: Product, query: string, hidden: boolean): string {
-  const { hit, queried } = matchScore(product, query);
-  const score = queried > 0 ? `${hit}/${queried}` : '0/0';
-  const hiddenClass = hidden ? ' search-demo-card--hidden' : '';
-  const hiddenBadge = hidden
-    ? `<div class="search-demo-card-hidden-badge">Hidden — attributes missing in catalog</div>`
+function rowHtml(product: Product, query: string, hidden: boolean): string {
+  const hiddenClass = hidden ? ' search-demo-row--hidden' : '';
+  const hiddenTag = hidden
+    ? '<span class="search-demo-hidden-tag">Hidden · attributes missing</span>'
     : '';
   return `
-    <article class="search-demo-card${hiddenClass}">
-      <img src="${product.image_url}" alt="${product.name}" class="search-demo-card-image" loading="lazy" />
-      <div class="search-demo-card-body">
-        <div class="search-demo-card-meta">
-          <span class="search-demo-card-brand">${product.brand}</span>
-          <span class="search-demo-card-score">${score}</span>
-        </div>
-        <h3 class="search-demo-card-title">${product.name}</h3>
-        <p class="search-demo-card-price">${formatPrice(product.price)}</p>
-        <div class="search-demo-pills">${pillsHtml(product, query)}</div>
-        ${hiddenBadge}
+    <div class="search-demo-row${hiddenClass}">
+      <img src="${product.image_url}" alt="${product.name}" class="search-demo-thumb" loading="lazy" />
+      <div class="search-demo-info">
+        <div class="search-demo-name">${product.name}</div>
+        <div class="search-demo-brand">${product.brand}${hiddenTag}</div>
       </div>
-    </article>
+      <div class="search-demo-right">
+        <div class="search-demo-pills">${pillsHtml(product, query)}</div>
+        <div class="search-demo-price">${formatPrice(product.price)}</div>
+      </div>
+    </div>
   `;
 }
 
 function emptyStateHtml(message: string): string {
   return `<div class="search-demo-empty">${message}</div>`;
+}
+
+function statusHtml(visibleCount: number, hiddenCount: number, ms: number): string {
+  const total = visibleCount + hiddenCount;
+  const hiddenNote =
+    hiddenCount > 0
+      ? ` · <span class="search-demo-status-hidden">${hiddenCount} hidden by missing attributes</span>`
+      : '';
+  return `
+    <div class="search-demo-status">
+      ${total} result${total === 1 ? '' : 's'} in ${ms}ms${hiddenNote}
+    </div>
+  `;
 }
 
 async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -123,40 +117,27 @@ async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement): Promi
     return;
   }
   resultsEl.setAttribute('aria-busy', 'true');
+  const started = performance.now();
   try {
-    const [keywordHits, categoryHits] = await Promise.all([
+    const [keywordRes, categoryRes] = await Promise.all([
       meiliSearch({ q: query, limit: 20 }),
       meiliSearch({ q: '', filter: `category = "${CATEGORY}"`, limit: 20 }),
     ]);
-    const keywordIds = new Set(keywordHits.map((p) => p.id));
-    const hiddenHits = categoryHits.filter((p) => !keywordIds.has(p.id));
-
-    const visibleSorted = [...keywordHits].sort((a, b) => {
-      const sa = matchScore(a, query).hit;
-      const sb = matchScore(b, query).hit;
-      return sb - sa;
-    });
+    const keywordIds = new Set(keywordRes.hits.map((p) => p.id));
+    const hiddenHits = categoryRes.hits.filter((p) => !keywordIds.has(p.id));
+    const elapsed = Math.max(
+      keywordRes.processingTimeMs ?? 0,
+      categoryRes.processingTimeMs ?? 0,
+      Math.round(performance.now() - started),
+    );
 
     const parts: string[] = [];
-    if (visibleSorted.length === 0) {
+    if (keywordRes.hits.length === 0 && hiddenHits.length === 0) {
       parts.push(emptyStateHtml('No products matched your search.'));
     } else {
-      parts.push(
-        '<div class="search-demo-grid">',
-        ...visibleSorted.map((p) => cardHtml(p, query, false)),
-        '</div>',
-      );
-    }
-    if (hiddenHits.length > 0) {
-      parts.push(
-        '<div class="search-demo-hidden-header">',
-        '<span class="search-demo-hidden-eyebrow">Also in your catalog</span>',
-        '<p>These products belong in the same category but have no dietary attributes filled in. Meilisearch can\'t surface them by keyword — the data simply isn\'t there.</p>',
-        '</div>',
-        '<div class="search-demo-grid">',
-        ...hiddenHits.map((p) => cardHtml(p, query, true)),
-        '</div>',
-      );
+      for (const p of keywordRes.hits) parts.push(rowHtml(p, query, false));
+      for (const p of hiddenHits) parts.push(rowHtml(p, query, true));
+      parts.push(statusHtml(keywordRes.hits.length, hiddenHits.length, elapsed));
     }
     resultsEl.innerHTML = parts.join('');
   } catch (err) {
@@ -193,7 +174,7 @@ export function initSearchDemo(root: HTMLElement): void {
     }
   });
 
-  // Initial render — kick off with the pre-filled value so the demo
-  // shows results immediately instead of an empty state.
+  // Kick off with the pre-filled value so the demo shows results
+  // immediately without the visitor having to type.
   trigger();
 }
