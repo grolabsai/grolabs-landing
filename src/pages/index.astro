@@ -8,9 +8,11 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
 ---
 
 <BaseLayout>
-  <!-- Hero Section -->
+  <!-- Hero Section. Height is content-driven (no viewport-relative min-h)
+       so the stats section below sits at a fixed page offset regardless
+       of how tall the browser window is. -->
   <section
-    class="relative px-margin-mobile md:px-margin-desktop pt-2xl pb-lg overflow-hidden min-h-hero flex flex-col justify-start items-center text-center"
+    class="relative px-margin-mobile md:px-margin-desktop pt-3xl pb-2xl overflow-hidden flex flex-col items-center text-center"
   >
     <div id="particles-container"></div>
 
