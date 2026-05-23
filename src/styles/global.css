@@ -36,9 +36,15 @@ body {
   z-index: 1;
 }
 
-/* Luxury Motion Glass Card */
+/* Luxury Motion Glass Card.
+   The subtle white gradient on top + the dark canvas base layer underneath
+   means the card stays readable on ANY surface (dark canvas, yellow band,
+   yellow→black gradient transitions). Without the solid base, putting cards
+   over the .hero-stats-band turns them yellow. */
 .glass-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%),
+    #131316;
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   position: relative;
