@@ -273,20 +273,6 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
       </div>
 
       <HowWeDoItDiagram />
-
-      <div class="text-secondary-fixed-dim text-body-md leading-relaxed max-w-3xl mt-2xl">
-        <p class="mb-md">
-          The agent has one job: detect revenue leaks before you do. It
-          watches four signal types — search metrics, catalog completeness,
-          funnel analytics, and traffic patterns — and surfaces:
-        </p>
-        <ul class="list-disc pl-lg space-y-sm marker:text-primary/50">
-          <li>search queries that should be converting but aren't</li>
-          <li>products with missing attributes or thin content holding back discoverability</li>
-          <li>funnel drop-offs and probable conversion leaks from analytics patterns</li>
-          <li>traffic anomalies that should trigger a trust-and-safety alert</li>
-        </ul>
-      </div>
     </div>
   </section>
 
@@ -315,23 +301,37 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
             </footer>
           </blockquote>
 
-          <p class="mb-md">
+          <p>
             Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
             hour you spend in the dashboard is an hour you're not spending on
             the company — on the strategy, the team, the next product, the
             partnerships only you can build.
           </p>
-          <p class="mb-md">
-            Conversion work matters. It just doesn't need to be your work.
-          </p>
-          <p>
-            That's what we're here for. You stay on growth. We stay on the leaks.
-          </p>
         </div>
 
-        <!-- Right column reserved for the diagram. Intentionally empty
-             until the asset is ready. -->
-        <div aria-hidden="true"></div>
+        <!-- "No news = good news" callout: yellow inverted header on a
+             canvas-deeper body. Houses the agent's job description + the
+             four signal types it surfaces. Tone is "passive ops" — if
+             you don't hear from it, nothing's wrong. -->
+        <div class="bg-canvas-deeper border border-white/5 rounded-xl overflow-hidden">
+          <div class="bg-primary text-[#0e0e11] font-mono text-xs tracking-[0.2em] uppercase font-semibold px-md py-sm">
+            No news equals good news
+          </div>
+          <div class="px-md py-md text-secondary-fixed-dim text-body-md leading-relaxed">
+            <p class="mb-md">
+              The agent has one job: detect revenue leaks before you do. It
+              watches four signal types — search metrics, catalog
+              completeness, funnel analytics, and traffic patterns — and
+              surfaces:
+            </p>
+            <ul class="list-disc pl-lg space-y-sm marker:text-primary/50">
+              <li>search queries that should be converting but aren't</li>
+              <li>products with missing attributes or thin content holding back discoverability</li>
+              <li>funnel drop-offs and probable conversion leaks from analytics patterns</li>
+              <li>traffic anomalies that should trigger a trust-and-safety alert</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   </section>
