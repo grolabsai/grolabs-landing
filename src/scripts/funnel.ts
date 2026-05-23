@@ -96,9 +96,9 @@ const LEAKS: Leak[] = [
   { id: 'leak-checkout', fromStageId: 'checkout', label: 'RETURNS', pctOverride: 17 },
 ];
 
-// Geometry — short horizontal boxes (icon-left, label-right)
+// Geometry — taller boxes now that icon is on top, label centered below.
 const STAGE_W = 130;
-const STAGE_H = 50;
+const STAGE_H = 80;                // was 50; grew to fit stacked icon + larger label
 const LEAK_Y = 180;                // drops end at the top of the red bar
 const LEAK_ARROW_START_DY = 8;     // drop column starts just below stage box
 const BAR_Y = 180;                 // red bar top edge (drops meet it)
@@ -106,9 +106,12 @@ const BAR_H = 105;                 // red bar height (% + cause + title fit insi
 // Top extends to -15 so the 35% pill (lifted to the level of Search's top edge) has clearance.
 const VIEWBOX = { x: 0, y: -15, w: 1400, h: BAR_Y + BAR_H + 15 };
 
-const STAGE_FILL = '#000000';
-const STAGE_BORDER = 'rgba(255, 255, 255, 0.22)';
-const STAGE_BORDER_W = 1.5;
+// Stage card fill is lighter than the section background (canvas-deeper)
+// so the cards visually pop. Matches the lifted-surface treatment used
+// by the LeakCards on the stats section.
+const STAGE_FILL = '#1F1F23';
+const STAGE_BORDER = 'rgba(255, 255, 255, 0.08)';
+const STAGE_BORDER_W = 1;
 const STAGE_ACCENT = '#fae194'; // text + icon
 
 // Forward arrows fade back so the red leaks pop
@@ -423,15 +426,16 @@ export function renderFunnel(root: HTMLElement): void {
 
   svg.appendChild(connectorGroup);
 
-  // ---- Stage cards (dark fill, small icon LEFT + label to its RIGHT, both centered as a pair) ----
+  // ---- Stage cards (lighter fill on canvas-deeper section bg, icon
+  //      centered on TOP, uppercase label below, PDP wraps to 2 lines) ----
   const stageGroup = document.createElementNS(svgNS, 'g');
   stageGroup.setAttribute('class', 'funnel-stages');
 
-  const ICON_FS = 22;
-  const LABEL_FS = 17;
-  const ICON_LABEL_GAP = 8;
-  const CHAR_W = 7.6;
-  const CENTER_Y = STAGE_H / 2;   // both icon and label use dominant-baseline=central
+  const ICON_FS = 24;
+  const LABEL_FS = 16;                  // ~2× of the previous 17 was unreadable in 130-px-wide
+                                        // boxes; 16 px in caps reads about 2× heavier visually
+                                        // due to uppercase. Adjust upward if you want bigger.
+  const LABEL_LINE_GAP = 4;             // vertical gap between the two lines of "PRODUCT PAGE"
 
   STAGES.forEach((stage) => {
     const w = stageWidth(stage);
@@ -450,15 +454,22 @@ export function renderFunnel(root: HTMLElement): void {
     rect.style.transition = 'filter 180ms ease, stroke 180ms ease';
     group.appendChild(rect);
 
-    // Center the icon+label combo horizontally within the box's width
-    const labelWidth = stage.label.length * CHAR_W;
-    const totalWidth = ICON_FS + ICON_LABEL_GAP + labelWidth;
-    const startX = Math.max(10, (w - totalWidth) / 2);
+    // Stacked layout: icon top-centered, uppercase label centered below.
+    // "Product page" → two lines ("PRODUCT" / "PAGE"); everything else
+    // is a single line. ICON_Y / LABEL_Y are chosen per layout so the
+    // pair stays vertically centered within the 80-px tall box.
+    const labelLines = stage.label.toUpperCase().split(' ');
+    const isMultiLine = labelLines.length > 1;
+    const centerX = w / 2;
+
+    const iconY    = isMultiLine ? 16 : 22;
+    const label1Y  = isMultiLine ? 44 : 56;
+    const label2Y  = label1Y + LABEL_FS + LABEL_LINE_GAP;
 
     const iconText = document.createElementNS(svgNS, 'text');
-    iconText.setAttribute('x', String(startX));
-    iconText.setAttribute('y', String(CENTER_Y));
-    iconText.setAttribute('text-anchor', 'start');
+    iconText.setAttribute('x', String(centerX));
+    iconText.setAttribute('y', String(iconY));
+    iconText.setAttribute('text-anchor', 'middle');
     iconText.setAttribute('dominant-baseline', 'central');
     iconText.setAttribute('fill', STAGE_ACCENT);
     iconText.setAttribute('font-size', String(ICON_FS));
@@ -466,17 +477,20 @@ export function renderFunnel(root: HTMLElement): void {
     iconText.textContent = stage.icon;
     group.appendChild(iconText);
 
-    const labelText = document.createElementNS(svgNS, 'text');
-    labelText.setAttribute('x', String(startX + ICON_FS + ICON_LABEL_GAP));
-    labelText.setAttribute('y', String(CENTER_Y));
-    labelText.setAttribute('text-anchor', 'start');
-    labelText.setAttribute('dominant-baseline', 'central');
-    labelText.setAttribute('fill', '#ffffff');
-    labelText.setAttribute('font-size', String(LABEL_FS));
-    labelText.setAttribute('font-weight', '500');
-    labelText.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
-    labelText.textContent = stage.label;
-    group.appendChild(labelText);
+    labelLines.forEach((line, idx) => {
+      const labelText = document.createElementNS(svgNS, 'text');
+      labelText.setAttribute('x', String(centerX));
+      labelText.setAttribute('y', String(idx === 0 ? label1Y : label2Y));
+      labelText.setAttribute('text-anchor', 'middle');
+      labelText.setAttribute('dominant-baseline', 'central');
+      labelText.setAttribute('fill', '#EDEAE0');
+      labelText.setAttribute('font-size', String(LABEL_FS));
+      labelText.setAttribute('font-weight', '600');
+      labelText.setAttribute('letter-spacing', '0.05em');
+      labelText.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
+      labelText.textContent = line;
+      group.appendChild(labelText);
+    });
 
     group.addEventListener('mouseenter', () => highlightStage(stage.id));
     group.addEventListener('mouseleave', () => clearHighlight());

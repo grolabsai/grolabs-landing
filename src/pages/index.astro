@@ -163,8 +163,11 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Funnel Benchmark / Revenue leaks -->
-  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop mt-3xl relative reveal">
+  <!-- Funnel Benchmark / Revenue leaks. Same canvas-deeper bg + py-3xl
+       breathing pattern as the Revenue uplift section above — so the
+       page alternates dark-tone sections via background, not lines. -->
+  <section class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
     <div class="mb-2xl">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Conversion Funnel
@@ -219,9 +222,7 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         </div>
       </div>
     </div>
-    <div
-      class="absolute -left-1/4 bottom-0 w-[600px] h-[600px] ambient-glow-yellow blur-[150px] opacity-20 pointer-events-none"
-    ></div>
+    </div>
   </section>
 
   <!-- AI-assisted modules / Tech stack -->
