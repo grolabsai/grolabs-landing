@@ -7,12 +7,14 @@ interface Props {
 }
 
 const {
-  title = 'GroLabs | Engineered Luxury AI Search',
+  title = 'GroLabs · Recover lost revenue & grow your business',
   description = 'Recover lost revenue and grow your business without paying for more traffic. AI-assisted search, catalog, and conversion tooling for small e-commerce stores.',
 } = Astro.props;
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const home = base || '/';
+const siteUrl = 'https://grolabs.ai';
+const ogImageUrl = `${siteUrl}${base}/og-image.svg`;
 ---
 
 <!DOCTYPE html>
@@ -23,6 +25,24 @@ const home = base || '/';
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="icon" type="image/svg+xml" href={`${base}/favicon.svg`} />
+
+    <!-- Open Graph + Twitter cards. Drives the link preview Facebook,
+         WhatsApp, LinkedIn, Slack, iMessage, Twitter, Discord etc.
+         display when grolabs.ai is shared. og:image is the 1200x630
+         SVG in public/og-image.svg. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="GroLabs — recover lost revenue and grow your business without paying for more traffic." />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:site_name" content="GroLabs" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 

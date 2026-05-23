@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Open Graph share image — 1200×630, the standard size Facebook /
+  WhatsApp / LinkedIn / Twitter scale link-preview thumbnails to.
+
+  Text uses Permanent Marker for the headline and Special Elite for the
+  subtitle, with system fallbacks for previewers that don't load the
+  Google Fonts CSS during scrape. "LOST REVENUE" and "GROW" are
+  yellow-accented; everything else is bone.
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1200 630"
+     width="1200"
+     height="630"
+     role="img"
+     aria-label="GroLabs — recover lost revenue and grow your business without paying for more traffic.">
+  <defs>
+    <!-- Subtle radial yellow halo behind the headline so the canvas
+         doesn't read flat black at thumbnail size. -->
+    <radialGradient id="ogHalo" cx="50%" cy="50%" r="70%">
+      <stop offset="0%"  stop-color="#fae194" stop-opacity="0.10"/>
+      <stop offset="55%" stop-color="#fae194" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#fae194" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Black canvas + halo -->
+  <rect x="0" y="0" width="1200" height="630" fill="#0e0e11"/>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#ogHalo)"/>
+
+  <!-- Line 1: RECOVER (bone) + LOST REVENUE (yellow) -->
+  <text x="600" y="220"
+        text-anchor="middle"
+        font-family="'Permanent Marker', 'Marker Felt', cursive"
+        font-size="92"
+        font-weight="400"
+        fill="#EDEAE0">
+    RECOVER <tspan fill="#fae194">LOST REVENUE</tspan>
+  </text>
+
+  <!-- Small "&" between the two lines -->
+  <text x="600" y="290"
+        text-anchor="middle"
+        font-family="'Permanent Marker', 'Marker Felt', cursive"
+        font-size="44"
+        font-weight="400"
+        fill="#EDEAE0">&amp;</text>
+
+  <!-- Line 2: GROW (yellow) + YOUR BUSINESS (bone) -->
+  <text x="600" y="400"
+        text-anchor="middle"
+        font-family="'Permanent Marker', 'Marker Felt', cursive"
+        font-size="92"
+        font-weight="400"
+        fill="#EDEAE0">
+    <tspan fill="#fae194">GROW</tspan> YOUR BUSINESS
+  </text>
+
+  <!-- Subtitle in Special Elite (typewriter) -->
+  <text x="600" y="500"
+        text-anchor="middle"
+        font-family="'Special Elite', 'Courier New', monospace"
+        font-size="34"
+        font-weight="400"
+        fill="rgba(237, 234, 224, 0.85)">
+    without paying for more traffic
+  </text>
+
+  <!-- Brand mark at the bottom: GroLabs wordmark in marker -->
+  <text x="600" y="585"
+        text-anchor="middle"
+        font-family="'Permanent Marker', 'Marker Felt', cursive"
+        font-size="32"
+        font-weight="400"
+        fill="rgba(250, 225, 148, 0.85)"
+        letter-spacing="4">
+    GROLABS
+  </text>
+</svg>
