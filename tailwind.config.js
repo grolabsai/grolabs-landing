@@ -11,7 +11,10 @@ export default {
         // ── Engineered Luxury canvas palette ─────────────────────────────
         // Use these for backgrounds, never raw hex.
         canvas: '#131316',          // page background, header glass tint
-        'canvas-deeper': '#131313', // sectional dark stripe (Luminous Equation)
+        'canvas-deeper': '#0E0E11', // alternating "recessed" section bg
+                                    // (Luminous Equation). ~4% darker
+                                    // than canvas — enough to register
+                                    // as a section break, not a stripe.
         // Soft bone-white instead of pure #FFFFFF — every `text-white` /
         // `bg-white` on the site picks this up. Pure white reads as harsh
         // neon on the dark canvas; bone keeps the engineered-luxury feel

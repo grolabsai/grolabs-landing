@@ -94,17 +94,15 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
         description={`&ldquo;By 2026, traditional search volume will drop 25%, shifting to AI-powered answers.&rdquo;`}
       />
     </div>
-    <!-- Footer Note — sits inside .stats-section-surface so its left
-         edge aligns with the cards' left edge. -->
-    <div
-      class="code-block p-lg md:p-md rounded-xl border border-zinc-800 reveal max-w-3xl mt-xl flex flex-col md:flex-row items-center gap-lg"
-    >
-      <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full">
-        <span class="material-symbols-outlined text-primary">info</span>
-      </div>
+    <!-- Footer note — deliberately subtle. No surface, no border,
+         no icon chip; just an info glyph + dimmer copy that spans the
+         full width of the stats surface for anyone curious enough to
+         read it. -->
+    <div class="reveal mt-xl flex items-start gap-md">
+      <span class="material-symbols-outlined icon-inline-sm text-zinc-600 flex-shrink-0 mt-1">info</span>
       <div>
-        <h4 class="font-label-caps text-label-caps text-primary mb-1">A NOTE ON THESE NUMBERS</h4>
-        <p class="font-mono text-meta-sm text-zinc-500 leading-tight">
+        <h4 class="font-label-caps text-label-caps text-zinc-500 mb-1">A NOTE ON THESE NUMBERS</h4>
+        <p class="font-mono text-meta-sm text-zinc-600 leading-tight">
           These benchmarks represent industry averages for mid-market merchants. While your specific
           "leakage" may vary, the compound effect of solving just two of these points often results
           in a 15–20% immediate lift in Net Revenue.
@@ -114,19 +112,21 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Luminous Equation -->
+  <!-- Revenue equation section. Background is canvas-deeper (~4% darker
+       than canvas) so it reads as a distinct section via tonal step,
+       not a hard divider line. mt-2xl + py-2xl give a clean breath
+       across the boundary. -->
   <section
     id="revenue-equation"
-    class="relative py-32 px-10 bg-canvas-deeper overflow-hidden min-h-section flex flex-col justify-center items-center"
+    class="relative mt-2xl py-2xl px-10 bg-canvas-deeper overflow-hidden flex flex-col items-center"
   >
-    <div class="max-w-7xl w-full mb-24">
+    <div class="max-w-7xl w-full mb-2xl">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Precision Retrieval Systems
       </span>
-      <h2 class="text-white text-7xl font-light mb-8">Luminous Equation</h2>
+      <h2 class="text-white text-7xl font-light mb-8">Want to increase revenue?</h2>
       <p class="text-zinc-400 max-w-xl text-lg leading-relaxed">
-        Quantify the architectural efficiency of your data pipeline with our high-density
-        revenue modeling framework.
+        Either increase traffic or increase conversion, right?
       </p>
     </div>
 
