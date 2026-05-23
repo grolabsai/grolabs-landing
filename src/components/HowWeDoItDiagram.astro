@@ -1,0 +1,216 @@
+---
+/**
+ * Architecture diagram for the "How we do it" section.
+ *
+ * Two-column layout: data sources on the left feeding AI-agent
+ * capabilities on the right. Built as semantic divs + Tailwind so the
+ * grid reflows on mobile (columns stack, the horizontal arrows column
+ * turns into a short vertical glyph row).
+ *
+ * Box surface treatment matches the rest of the inner blocks on the
+ * page (bg-canvas with a 1 px hairline border + rounded-xl). Eyebrow
+ * style on box titles is the same Tailwind class string used by every
+ * section eyebrow on the page — see the `.how-box-eyebrow` rule below.
+ */
+---
+
+<div class="how-diagram">
+  <!-- LEFT: data sources -->
+  <div class="how-diagram-col">
+    <div class="how-diagram-trio">
+      <div class="how-box how-box--small">
+        <span class="how-box-eyebrow">SEO</span>
+      </div>
+      <div class="how-box how-box--small">
+        <span class="how-box-eyebrow">AEO</span>
+      </div>
+      <div class="how-box how-box--small">
+        <span class="how-box-eyebrow">Search</span>
+        <p class="how-box-body">
+          Typo tolerance, synonyms, and ranking that adapt to how your
+          customers actually shop.
+        </p>
+      </div>
+    </div>
+
+    <!-- Upward arrows — catalog feeds the SEO/AEO/Search trio above. -->
+    <div class="how-diagram-trio-arrows" aria-hidden="true">
+      <span>↑</span>
+      <span>↑</span>
+      <span>↑</span>
+    </div>
+
+    <div class="how-box">
+      <span class="how-box-eyebrow">Product catalog</span>
+      <p class="how-box-body">
+        AI-assisted catalog management. No more Excel files. No more
+        wrestling with the WooCommerce admin.
+      </p>
+    </div>
+
+    <div class="how-box">
+      <span class="how-box-eyebrow">User analytics &amp; conversion events</span>
+      <p class="how-box-body">
+        Every click, add-to-cart, and checkout step — captured and stitched
+        to the products customers actually see.
+      </p>
+    </div>
+
+    <div class="how-box">
+      <span class="how-box-eyebrow">GA4 traffic</span>
+      <p class="how-box-body">
+        Traffic sources, sessions, and behavior pulled from your existing
+        GA4 install — no re-instrumentation.
+      </p>
+    </div>
+  </div>
+
+  <!-- ARROWS: left-feeds-right. Three placements, not one per box —
+       the visual point is the gestalt, not a precise wiring diagram. -->
+  <div class="how-diagram-arrows" aria-hidden="true">
+    <span class="how-arrow">→</span>
+    <span class="how-arrow">→</span>
+    <span class="how-arrow">→</span>
+  </div>
+
+  <!-- RIGHT: AI agent capabilities -->
+  <div class="how-diagram-col">
+    <div class="how-box">
+      <span class="how-box-eyebrow">AI agent</span>
+      <p class="how-box-body">
+        Reads every signal across catalog, search, and analytics. Finds
+        the leak. Proposes the fix.
+      </p>
+    </div>
+    <div class="how-box">
+      <span class="how-box-eyebrow">Dashboard</span>
+      <p class="how-box-body">
+        Surfaces the alerts and the numbers behind them — so you act on
+        findings, not on hunches.
+      </p>
+    </div>
+    <div class="how-box">
+      <span class="how-box-eyebrow">Identify, fix &amp; monitor</span>
+      <p class="how-box-body">
+        Spots missing attributes, weak product copy, and zero-result
+        queries. Proposes fixes. Tracks whether they worked.
+      </p>
+    </div>
+    <div class="how-box">
+      <span class="how-box-eyebrow">Threshold monitor</span>
+      <p class="how-box-body">
+        Watches traffic anomalies and trust signals. Alerts you when
+        something crosses the line — bot traffic, conversion collapse,
+        inventory drift.
+      </p>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .how-diagram {
+    display: grid;
+    grid-template-columns: 1fr 56px 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .how-diagram-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .how-diagram-trio {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .how-diagram-trio-arrows {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    text-align: center;
+    color: rgba(250, 225, 148, 0.5);
+    font-size: 18px;
+    line-height: 1;
+    padding: 2px 0;
+  }
+
+  .how-diagram-arrows {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .how-arrow {
+    color: rgba(250, 225, 148, 0.5);
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  /* Inner-block surface — same recipe as the funnel container, scenario
+     box, and search-demo panel. */
+  .how-box {
+    background: #131316;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .how-box--small {
+    padding: 12px;
+  }
+
+  /* Eyebrow class string verbatim from the section eyebrows used in
+     index.astro: text-primary font-mono tracking-[0.2em] text-xs uppercase.
+     Reproducing it here as plain CSS so the diagram works as a single
+     component without depending on Tailwind utilities mid-content. */
+  .how-box-eyebrow {
+    display: block;
+    color: #fae194;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    font-weight: 500;
+  }
+
+  .how-box-body {
+    color: rgba(237, 234, 224, 0.62);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 8px 0 0;
+  }
+
+  /* Mobile: collapse to single column, arrows become a short horizontal
+     row of down-pointing glyphs between the source groups. */
+  @media (max-width: 900px) {
+    .how-diagram {
+      grid-template-columns: 1fr;
+    }
+    .how-diagram-arrows {
+      flex-direction: row;
+      justify-content: center;
+      gap: 18px;
+      padding: 4px 0;
+    }
+    .how-arrow {
+      transform: rotate(90deg);
+      display: inline-block;
+    }
+  }
+
+  /* Tightest viewport: stack the SEO/AEO/Search trio and drop the
+     upward arrows — the spatial story doesn't survive at that width
+     and the arrows just create visual clutter. */
+  @media (max-width: 480px) {
+    .how-diagram-trio {
+      grid-template-columns: 1fr;
+    }
+    .how-diagram-trio-arrows {
+      display: none;
+    }
+  }
+</style>

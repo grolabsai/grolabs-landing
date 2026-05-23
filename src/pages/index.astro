@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import LeakCard from '../components/LeakCard.astro';
 import SearchDemo from '../components/SearchDemo.astro';
 import SearchCopyHelper from '../components/SearchCopyHelper.astro';
+import HowWeDoItDiagram from '../components/HowWeDoItDiagram.astro';
 import EquationCard from '../components/EquationCard.astro';
 import CapabilityCard from '../components/CapabilityCard.astro';
 import StatBlock from '../components/StatBlock.astro';
@@ -247,15 +248,55 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
                                                      section's perceived feel.
        Keep this calibration so all sections look balanced regardless of bg. -->
 
-  <!-- How? / Catalog and Search Optimization. Placeholder. -->
+  <!-- How we do it. The architectural insight: search and catalog are
+       one problem, monitored by an AI agent. Opener → diagram → closing
+       paragraph + bullet list. -->
   <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        How?
+        How we do it
       </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl">
-        Catalog and Search Optimization
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+        Search engines alone don't fix conversion. Catalogs alone don't either.
       </h2>
+
+      <div class="text-secondary-fixed-dim text-body-md leading-relaxed max-w-3xl mb-2xl">
+        <p class="mb-md">
+          Most stores try to solve discoverability by bolting on a better
+          search engine, or by cleaning up product data in isolation. Both
+          help. Neither is enough.
+        </p>
+        <p class="mb-md">
+          A customer who searches &ldquo;alimento perro chico&rdquo; gets
+          zero results — not because the search engine is broken, but because
+          no product in the catalog has been tagged with
+          <span class="text-primary">size: small</span>. The fix is half on
+          the search side (synonym for <em class="not-italic text-primary">chico</em> → <em class="not-italic text-primary">pequeño</em>)
+          and half on the catalog side (attribute the missing products).
+          Treating them as separate problems is why neither stack alone moves
+          the needle.
+        </p>
+        <p class="text-white text-body-lg">
+          GroLabs combines both into a single optimization layer — and points
+          an AI agent at the result.
+        </p>
+      </div>
+
+      <HowWeDoItDiagram />
+
+      <div class="text-secondary-fixed-dim text-body-md leading-relaxed max-w-3xl mt-2xl">
+        <p class="mb-md">
+          The agent has one job: detect revenue leaks before you do. It
+          watches four signal types — search metrics, catalog completeness,
+          funnel analytics, and traffic patterns — and surfaces:
+        </p>
+        <ul class="list-disc pl-lg space-y-sm marker:text-primary/50">
+          <li>search queries that should be converting but aren't</li>
+          <li>products with missing attributes or thin content holding back discoverability</li>
+          <li>funnel drop-offs and probable conversion leaks from analytics patterns</li>
+          <li>traffic anomalies that should trigger a trust-and-safety alert</li>
+        </ul>
+      </div>
     </div>
   </section>
 
