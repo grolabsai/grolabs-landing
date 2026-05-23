@@ -369,11 +369,43 @@ body {
   font-size: 14px;
   line-height: 1.5;
   font-style: italic;
+
+  /* Pulsing yellow halo — same recipe as SearchCopyHelper's CTA pill,
+     toned down because this is a hint inside a panel, not a button.
+     Padding + negative margin gives the box-shadow a defined edge to
+     glow around without changing the surrounding layout. The
+     animation auto-stops as soon as a stage is hovered, because
+     .funnel-info-default is set to display:none once .funnel-info
+     gains .is-active. */
+  padding: 6px 10px;
+  margin: -6px -10px;
+  border-radius: 8px;
+  animation: funnel-info-pulse 2.4s ease-in-out infinite;
 }
 .funnel-info-default .material-symbols-outlined {
   font-size: 28px;
   color: rgba(250, 225, 148, 0.55);
   flex-shrink: 0;
+}
+
+@keyframes funnel-info-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(250, 225, 148, 0.35),
+      0 0 14px 0 rgba(250, 225, 148, 0.18);
+  }
+  50% {
+    box-shadow:
+      0 0 0 8px rgba(250, 225, 148, 0),
+      0 0 22px 4px rgba(250, 225, 148, 0.40);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .funnel-info-default {
+    animation: none;
+    box-shadow: 0 0 14px 0 rgba(250, 225, 148, 0.18);
+  }
 }
 
 .funnel-info-content {

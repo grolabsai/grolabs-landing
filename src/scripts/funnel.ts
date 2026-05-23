@@ -54,25 +54,25 @@ const STAGES: Stage[] = [
   // Search/Browsing sit in the (wider) Home–PDP gap with breathing room.
   { id: 'search',   label: 'Search',       icon: 'search',        x: 250,  y: 20,
     tooltip:
-      "Drop-offs at search are usually caused by missing synonyms and weak typo tolerance. Shoppers searching with non-canonical terms see 'no results' and leave." },
+      "Search drop-offs are usually a compound problem: misconfigured typo tolerance, missing synonyms, and — underneath both of those — patchy catalog data the engine has nothing rich to match against. Once the product data is clean, semantic search becomes the next lever to push discovery further: matching by meaning, not just keywords." },
   // Browsing centered between Search (ends x=380) and PDP (starts x=740)
   // so its leak label in the red bar doesn't crowd Search's leak label.
   // y=70 (was 90) leaves enough vertical room for the leak drop column to
   // read as a clear red line rather than a short stub.
   { id: 'browsing', label: 'Browsing',     icon: 'grid_view',     x: 500,  y: 70,
     tooltip:
-      "Category browsers leak when grids are slow, image quality is inconsistent, and filters don't match how shoppers actually narrow their choice." },
+      "Browsing leaks when the category taxonomy doesn't follow industry best practice and when products lack the attributes needed to power relevant faceted filtering. Without those facets, shoppers can't narrow a ten-thousand-item shelf down to the handful that actually match how they decide." },
   // Main-row continuation. PDP gets a wider box so the "Product page" label fits comfortably.
   { id: 'pdp',      label: 'Product page', icon: 'description',   x: 740,  y: 55,  width: 160,
     tooltip:
       "The lack of high-quality images, missing attributes or key specifications, and weak product descriptions all increase drop-off here. The product page is where intent turns into action — or it doesn't." },
   { id: 'cart',     label: 'Cart',         icon: 'shopping_cart', x: 990,  y: 55,
     tooltip:
-      "Cart abandonment is driven by surprise shipping costs, mandatory account creation, and a long path to checkout. Trust signals and total-cost transparency matter most." },
+      "The single biggest source of cart abandonment is the login wall — a required email-and-password account that has to be created and email-confirmed before the first purchase can close. It kills most first orders outright. And on the second visit it punishes returning shoppers who don't remember the password they set months ago, adding fresh friction every time." },
   // Checkout flush right (right edge at viewBox.w - 30 = 1370).
   { id: 'checkout', label: 'Checkout',     icon: 'payments',      x: 1240, y: 55,
     tooltip:
-      "Returns are driven by image vs. product mismatch, sizing/fit ambiguity, and missing detail photographs (texture, scale, packaging). Better PDPs reduce returns 30-50%." },
+      "Returns trace back to opaque search results. Most engines rank probabilistically and never tell the shopper which keywords matched which product attributes — so the buyer commits to something they think matches, gets it home, and finds out it doesn't. Show the matches and the mismatches up front and returns drop sharply." },
 ];
 
 const TRANSITIONS: Transition[] = [
