@@ -106,12 +106,12 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       />
 
       <div class="how-band how-band--phases">
-        <div class="how-phase">
+        <div class="how-phase how-phase--narrow">
           <div class="how-phase-head">
             <span class="material-symbols-outlined how-phase-icon" aria-hidden="true">visibility</span>
             <span class="how-phase-title">Monitor</span>
           </div>
-          <p class="how-phase-desc">Found keyword with no results</p>
+          <p class="how-phase-desc">Found keyword<br />with no results</p>
         </div>
 
         <svg class="how-phase-sep" viewBox="0 0 16 100" preserveAspectRatio="none" aria-hidden="true">
@@ -123,7 +123,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             <span class="material-symbols-outlined how-phase-icon" aria-hidden="true">build</span>
             <span class="how-phase-title">Fix</span>
           </div>
-          <p class="how-phase-desc">Automatically add synonym to search engine</p>
+          <p class="how-phase-desc">Automatically add synonym to search<br />engine</p>
         </div>
 
         <svg class="how-phase-sep" viewBox="0 0 16 100" preserveAspectRatio="none" aria-hidden="true">
@@ -284,13 +284,22 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     gap: 0;
     padding: 14px 16px;
   }
+  /* Phases size to their content so Monitor (the shortest copy) can
+     shrink toward the left and free vertical room — fewer wrap lines,
+     shorter band overall. Fix and Verify grow to share the remaining
+     space proportionally. */
   .how-phase {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 0 10px;
+  }
+  .how-phase--narrow {
+    /* Monitor: content-fit so the column hugs the broken two-line
+       copy "Found keyword / with no results". */
+    flex: 0 1 auto;
   }
   .how-phase:first-child { padding-left: 0; }
   .how-phase:last-child { padding-right: 0; }
