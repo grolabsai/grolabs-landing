@@ -110,24 +110,11 @@ const tree = {
         props: {
           style: {
             fontFamily: 'Special Elite',
-            fontSize: '32px',
-            marginTop: '50px',
-            color: 'rgba(237, 234, 224, 0.85)',
+            fontSize: '36px',
+            marginTop: '60px',
+            color: 'rgba(237, 234, 224, 0.9)',
           },
           children: 'without paying for more traffic',
-        },
-      },
-      {
-        type: 'div',
-        props: {
-          style: {
-            fontFamily: 'Permanent Marker',
-            fontSize: '28px',
-            marginTop: '40px',
-            letterSpacing: '8px',
-            color: 'rgba(250, 225, 148, 0.85)',
-          },
-          children: 'GROLABS',
         },
       },
     ],
