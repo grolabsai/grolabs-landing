@@ -259,15 +259,49 @@ import FunnelStageRow from '../components/FunnelStageRow.astro';
     </div>
   </section>
 
-  <!-- Entrepreneurs' Priority / Grow a company. Placeholder. -->
+  <!-- Entrepreneurs' Priority / Grow a company. Two-column layout:
+       narrative copy on the left, diagram (to come) on the right. -->
   <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Entrepreneurs' Priority
       </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl">
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
         Grow a company
       </h2>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
+          <blockquote class="border-l border-primary/30 pl-md mb-xl">
+            <p class="text-white text-body-lg italic leading-snug mb-sm">
+              &ldquo;Most entrepreneurs fail because they're working
+              <span class="text-primary font-medium not-italic">in their business</span>
+              rather than
+              <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
+            </p>
+            <footer class="text-body-sm text-zinc-500 not-italic">
+              — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
+            </footer>
+          </blockquote>
+
+          <p class="mb-md">
+            Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
+            hour you spend in the dashboard is an hour you're not spending on
+            the company — on the strategy, the team, the next product, the
+            partnerships only you can build.
+          </p>
+          <p class="mb-md">
+            Conversion work matters. It just doesn't need to be your work.
+          </p>
+          <p>
+            That's what we're here for. You stay on growth. We stay on the leaks.
+          </p>
+        </div>
+
+        <!-- Right column reserved for the diagram. Intentionally empty
+             until the asset is ready. -->
+        <div aria-hidden="true"></div>
+      </div>
     </div>
   </section>
 
