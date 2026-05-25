@@ -6,18 +6,25 @@ import SearchCopyHelper from '../components/SearchCopyHelper.astro';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 /**
- * Booking URL for the hero's "Book Growth Assessment Call" CTA.
- * Defaults to the live Calendly 30-min event so the button works
- * out-of-the-box in any environment (prod, preview, fresh checkout).
- * Override with PUBLIC_BOOKING_URL in `.env` (or in the Vercel project
- * env settings) if we ever switch providers without redeploying code.
- *
- * Today's date is appended as ?month=YYYY-MM&date=YYYY-MM-DD at click
- * time (see the inline script at the bottom of this page) so visitors
- * land on the time-picker for today instead of Calendly's month
- * landing screen.
+ * Booking provider toggle. Flip `provider` between 'cal' and 'calendly'
+ * to swap embeds without removing either's code path. The unused
+ * provider's script + click handler are gated behind a conditional
+ * below, so only one is shipped to the browser at a time.
  */
-const bookingUrl = import.meta.env.PUBLIC_BOOKING_URL || 'https://calendly.com/grolabs-15min-free-growth-assesment/30min';
+const provider = 'cal' as 'cal' | 'calendly';
+
+// Calendly config — preserved intact for easy revert (set provider above).
+const calendlyUrl =
+  import.meta.env.PUBLIC_BOOKING_URL ||
+  'https://calendly.com/grolabs-15min-free-growth-assesment/30min';
+
+// Cal.com config.
+const calLink = 'tuncho-granados-uibzst/15min';
+const calUrl = `https://cal.com/${calLink}`;
+
+// CTA's href — used as both the visible link and a graceful fallback
+// for visitors with JS disabled (or before embed.js finishes loading).
+const bookingUrl = provider === 'cal' ? calUrl : calendlyUrl;
 const bookingIsExternal = bookingUrl.startsWith('http');
 ---
 
@@ -89,13 +96,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <p class="text-zinc-900 text-body-lg leading-relaxed max-w-2xl mb-lg">
         Select the most convenient date and time for our call.
       </p>
-      <!-- Calendly's inline widget renders an iframe inside this mount.
-           Dark widget + light text via URL params so it sits directly
-           on the yellow section with no intermediate frame. overflow:
-           hidden clips trailing whitespace; the script below caps the
-           height at MAX_EMBED_HEIGHT so the widget never scrolls
-           internally. -->
-      <div id="calendly-mount" style="min-width:320px; height:760px; width:100%; overflow:hidden;"></div>
+      {/* Mount shared by both providers. Cal.com's embed.js auto-resizes
+          the iframe to its content, so it just needs a starting
+          min-height; Calendly's iframe requires an explicit fixed
+          height + overflow:hidden so trailing whitespace gets clipped. */}
+      <div
+        id="booking-mount"
+        style={
+          provider === 'cal'
+            ? 'min-width:320px; min-height:600px; width:100%;'
+            : 'min-width:320px; height:760px; width:100%; overflow:hidden;'
+        }
+      ></div>
     </div>
   </section>
 
@@ -426,89 +438,158 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
-  {/* Calendly inline embed — loaded on demand when the hero CTA is
-      clicked. The widget URL carries theme colors so Calendly's own
-      calendar renders yellow-with-dark-text inside our inverted
-      section. Today's date is computed at click time so the picker
-      lands on the time-slot view for today regardless of when the
-      page was last built. If JS fails, the CTA's href + target=_blank
-      still opens Calendly in a new tab as a graceful fallback. */}
-  <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
-  <script async src="https://assets.calendly.com/assets/external/widget.js"></script>
-  <script is:inline define:vars={{ bookingUrl }}>
-    let mounted = false;
+  {provider === 'calendly' && (
+    <>
+      {/* Calendly inline embed — loaded on demand when the hero CTA is
+          clicked. The widget URL carries theme colors so Calendly's own
+          calendar renders dark-with-light-text inside our yellow
+          section. Today's date is computed at click time so the picker
+          lands on the time-slot view for today regardless of when the
+          page was last built. If JS fails, the CTA's href + target=_blank
+          still opens Calendly in a new tab as a graceful fallback. */}
+      <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
+      <script async src="https://assets.calendly.com/assets/external/widget.js"></script>
+      <script is:inline define:vars={{ bookingUrl }}>
+        (function() {
+        let mounted = false;
 
-    function buildEmbedUrl(base) {
-      const d = new Date();
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const dd = String(d.getDate()).padStart(2, '0');
-      const sep = base.includes('?') ? '&' : '?';
-      return base
-        + sep
-        + 'background_color=131316'    // dark widget bg — contrasts with the yellow section
-        + '&text_color=EDEAE0'          // cream/white body text
-        + '&primary_color=fae194'       // brand yellow for accents + buttons
-        + '&hide_event_type_details=1'
-        + '&hide_landing_page_details=1'
-        + '&hide_gdpr_banner=1'
-        + `&month=${yyyy}-${mm}`
-        + `&date=${yyyy}-${mm}-${dd}`;
-    }
+        function buildEmbedUrl(base) {
+          const d = new Date();
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          const sep = base.includes('?') ? '&' : '?';
+          return base
+            + sep
+            + 'background_color=131316'    // dark widget bg — contrasts with the yellow section
+            + '&text_color=EDEAE0'          // cream/white body text
+            + '&primary_color=fae194'       // brand yellow for accents + buttons
+            + '&hide_event_type_details=1'
+            + '&hide_landing_page_details=1'
+            + '&hide_gdpr_banner=1'
+            + `&month=${yyyy}-${mm}`
+            + `&date=${yyyy}-${mm}-${dd}`;
+        }
 
-    function mountWidget() {
-      const section = document.getElementById('booking-embed');
-      const mount = document.getElementById('calendly-mount');
-      if (!section || !mount) return;
-      section.hidden = false;
-      if (!mounted && window.Calendly && Calendly.initInlineWidget) {
-        Calendly.initInlineWidget({
-          url: buildEmbedUrl(bookingUrl),
-          parentElement: mount,
+        function mountWidget() {
+          const section = document.getElementById('booking-embed');
+          const mount = document.getElementById('booking-mount');
+          if (!section || !mount) return;
+          section.hidden = false;
+          if (!mounted && window.Calendly && Calendly.initInlineWidget) {
+            Calendly.initInlineWidget({
+              url: buildEmbedUrl(bookingUrl),
+              parentElement: mount,
+            });
+            mounted = true;
+          }
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        document.addEventListener('click', function (e) {
+          const link = e.target.closest('[data-booking-cta]');
+          if (!link) return;
+          if (!window.Calendly || !Calendly.initInlineWidget) return;
+          e.preventDefault();
+          mountWidget();
         });
-        mounted = true;
+
+        // Calendly posts an `iframe_height` event whenever its content
+        // reflows. Mirror that height into the mount, capped at
+        // MAX_EMBED_HEIGHT so trailing whitespace stays clipped.
+        window.addEventListener('message', function (e) {
+          if (!e || !e.data || typeof e.origin !== 'string') return;
+          if (!e.origin.endsWith('.calendly.com') && e.origin !== 'https://calendly.com') return;
+          const data = e.data;
+          const evt = (data && data.event) || '';
+          const height =
+            (data.payload && (data.payload.height || data.payload.iframeHeight)) ||
+            data.height ||
+            data.iframeHeight;
+          if (!height || typeof height !== 'number') return;
+          if (!/iframe.?height|page_height|resize/i.test(evt) && !data.height) return;
+          const mount = document.getElementById('booking-mount');
+          if (!mount) return;
+          const MAX_EMBED_HEIGHT = 760;
+          mount.style.height = Math.min(height, MAX_EMBED_HEIGHT) + 'px';
+        });
+        })();
+      </script>
+    </>
+  )}
+
+  {provider === 'cal' && (
+    <script is:inline define:vars={{ calLink }}>
+      (function() {
+      // Cal.com embed.js loader (their canonical snippet, lightly
+      // formatted). Queues calls until embed.js is loaded.
+      (function (C, A, L) {
+        let p = function (a, ar) { a.q.push(ar); };
+        let d = C.document;
+        C.Cal = C.Cal || function () {
+          let cal = C.Cal;
+          let ar = arguments;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            d.head.appendChild(d.createElement("script")).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api = function () { p(api, arguments); };
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = cal.ns[namespace] || api;
+              p(cal.ns[namespace], ar);
+              p(cal, ["initNamespace", namespace]);
+            } else {
+              p(cal, ar);
+            }
+            return;
+          }
+          p(cal, ar);
+        };
+      })(window, "https://app.cal.com/embed/embed.js", "init");
+
+      Cal("init", "booking", { origin: "https://cal.com" });
+
+      let mounted = false;
+
+      function mountWidget() {
+        const section = document.getElementById('booking-embed');
+        if (!section) return;
+        section.hidden = false;
+        if (!mounted) {
+          const d = new Date();
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          Cal.ns.booking("inline", {
+            elementOrSelector: "#booking-mount",
+            calLink: `${calLink}?date=${yyyy}-${mm}-${dd}`,
+            config: { layout: "month_view" },
+          });
+          Cal.ns.booking("ui", {
+            theme: "dark",
+            hideEventTypeDetails: true,
+            layout: "month_view",
+            styles: { branding: { brandColor: "#fae194" } },
+          });
+          mounted = true;
+        }
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
 
-    document.addEventListener('click', function (e) {
-      const link = e.target.closest('[data-booking-cta]');
-      if (!link) return;
-      // Only intercept if Calendly's script has loaded. Otherwise let
-      // the link's default new-tab behaviour run.
-      if (!window.Calendly || !Calendly.initInlineWidget) return;
-      e.preventDefault();
-      mountWidget();
-    });
-
-    // Calendly posts an `iframe_height` (sometimes prefixed) event over
-    // postMessage whenever its content reflows — month → time slots →
-    // confirmation form. Mirror that height into the mount container so
-    // the iframe never scrolls internally; the page scrolls naturally
-    // instead.
-    window.addEventListener('message', function (e) {
-      if (!e || !e.data || typeof e.origin !== 'string') return;
-      if (!e.origin.endsWith('.calendly.com') && e.origin !== 'https://calendly.com') return;
-      const data = e.data;
-      const evt = (data && data.event) || '';
-      // Calendly's event for size change. Different versions of the
-      // widget have used slightly different shapes — check the common
-      // possibilities and pull whichever height field is present.
-      const height =
-        (data.payload && (data.payload.height || data.payload.iframeHeight)) ||
-        data.height ||
-        data.iframeHeight;
-      if (!height || typeof height !== 'number') return;
-      if (!/iframe.?height|page_height|resize/i.test(evt) && !data.height) return;
-      const mount = document.getElementById('calendly-mount');
-      if (!mount) return;
-      // Cap the height so Calendly's trailing whitespace gets clipped
-      // by the mount's `overflow: hidden`. The calendar + slot picker
-      // both fit comfortably inside this cap; only the empty padding
-      // beyond Calendly's content gets cropped.
-      const MAX_EMBED_HEIGHT = 760;
-      mount.style.height = Math.min(height, MAX_EMBED_HEIGHT) + 'px';
-    });
-  </script>
+      document.addEventListener('click', function (e) {
+        const link = e.target.closest('[data-booking-cta]');
+        if (!link) return;
+        if (!window.Cal) return;
+        e.preventDefault();
+        mountWidget();
+      });
+      })();
+    </script>
+  )}
 
 </BaseLayout>
