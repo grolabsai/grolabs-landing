@@ -1,336 +1,194 @@
 ---
 /**
- * SPANISH MIRROR of src/pages/index.astro.
+ * SPANISH MIRROR of src/pages/index.astro (v2 layout).
  *
  * Structure-for-structure copy with localized strings. When the English
  * homepage's content evolves, this file needs to be updated in lockstep
- * — keep them paired. Components that accept a `locale` prop (Search
- * panel, copy helper, How-section diagram, FunnelStageRow labels, etc.)
- * receive `locale="es"` here so their internal copy switches with the
- * page.
+ * — keep them paired. Components that accept a `locale` prop (SearchDemo,
+ * SearchCopyHelper) receive `locale="es"` here so their internal copy
+ * switches with the page; the funnel script reads `data-locale="es"`
+ * from #funnel-root for the same purpose.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import LeakCard from '../../components/LeakCard.astro';
 import SearchDemo from '../../components/SearchDemo.astro';
 import SearchCopyHelper from '../../components/SearchCopyHelper.astro';
-import HowWeDoItDiagram from '../../components/HowWeDoItDiagram.astro';
-import EquationCard from '../../components/EquationCard.astro';
-import FunnelStageRow from '../../components/FunnelStageRow.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+/**
+ * Booking provider toggle. Flip `provider` between 'cal' and 'calendly'
+ * to swap embeds without removing either's code path. The unused
+ * provider's script + click handler are gated behind a conditional
+ * below, so only one is shipped to the browser at a time.
+ */
+const provider = 'cal' as 'cal' | 'calendly';
+
+// Calendly config — preserved intact for easy revert (set provider above).
+const calendlyUrl =
+  import.meta.env.PUBLIC_BOOKING_URL ||
+  'https://calendly.com/grolabs-15min-free-growth-assesment/30min';
+
+// Cal.com config.
+const calLink = 'tuncho-granados-uibzst/15min';
+const calUrl = `https://cal.com/${calLink}`;
+
+const bookingUrl = provider === 'cal' ? calUrl : calendlyUrl;
+const bookingIsExternal = bookingUrl.startsWith('http');
 ---
 
 <BaseLayout>
-  <!-- Hero -->
-  <section
-    class="relative px-margin-mobile md:px-margin-desktop pt-3xl pb-2xl overflow-hidden flex flex-col items-center text-center"
-  >
+  {/* Header-anchored CTAs. Hidden by default; an IntersectionObserver
+      at the bottom of this page reveals them when the hero CTA row
+      scrolls out of view. */}
+  <Fragment slot="header-ctas">
+    <div id="header-ctas" class="header-ctas" hidden>
+      <a
+        href="https://cal.com/tuncho-granados-uibzst/15min"
+        class="header-cta header-cta--primary cta-button-style"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-booking-cta
+      >
+        Agenda una llamada de evaluación
+      </a>
+      <a
+        href="mailto:growth@grolabs.ai"
+        class="header-cta header-cta--ghost"
+      >
+        Contacto
+      </a>
+    </div>
+  </Fragment>
+
+  <!-- Hero + Stats (v2) — merged into one viewport. -->
+  <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-2xl pb-2xl md:pt-3xl md:pb-3xl overflow-hidden">
     <div id="particles-container"></div>
 
-    <div class="relative z-10 max-w-5xl reveal active">
-      <h1
-        class="font-marker text-page-title-mobile md:text-hero text-white leading-tight drop-shadow-2xl"
-      >
-        Recupera <span class="text-primary">ingresos perdidos</span><br />
-        &amp;<br />
-        <span class="text-[0.92em]"><span class="text-primary">haz crecer</span> tu negocio</span><br />
-        <span class="font-typewriter text-white text-[0.4em]">
-          sin pagar por más tráfico
-        </span>
-      </h1>
+    <div class="hero-v2-grid max-w-page mx-auto relative z-10 reveal active">
+      <div class="hero-v2-copy">
+        <h1 class="hero-v2-headline">
+          <span class="hero-v2-line">Recupera ingresos perdidos</span>
+          <span class="hero-v2-line"><span class="hero-v2-amp">&amp;</span> haz crecer tu negocio</span>
+        </h1>
+        <p class="hero-v2-tagline">Sin pagar por más tráfico</p>
+        <p class="hero-v2-lede">
+          Sí, es posible. Te ayudamos a recuperar ingresos perdidos y aumentar las
+          ventas sin pagar por más tráfico.
+        </p>
+        <div class="hero-v2-ctas" data-hero-ctas>
+          <a
+            href={bookingUrl}
+            class="hero-v2-btn hero-v2-btn--primary cta-button-style"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-booking-cta
+          >
+            Agenda una llamada de evaluación
+          </a>
+          <a href="mailto:growth@grolabs.ai" class="hero-v2-btn hero-v2-btn--ghost">
+            Contacto
+          </a>
+        </div>
+      </div>
 
-      <div class="flex flex-wrap justify-center gap-md mt-xl">
-        <a href="mailto:hello@grolabs.ai" class="hero-btn hero-btn--primary hero-btn--text-only shimmer-btn">
-          Iniciar conversación
-        </a>
+      <div class="hero-v2-stage">
+        <article class="hero-v2-card hero-v2-card--featured">
+          <div class="hero-v2-stat">2&ndash;3&times;</div>
+          <h3 class="hero-v2-card-title">Aumento en conversión de búsqueda con optimización de catálogo y motor</h3>
+          <p class="hero-v2-card-body">
+            Quienes buscan convierten 2&ndash;3&times; más que quienes no lo hacen&mdash;<br>
+            <span class="hero-v2-highlight">si encuentran lo que buscan</span>.
+          </p>
+        </article>
+        <article class="hero-v2-card">
+          <div class="hero-v2-stat">14&ndash;23%</div>
+          <h3 class="hero-v2-card-title">Abandono en página de producto</h3>
+          <p class="hero-v2-card-body">Los compradores abandonan las páginas de producto sin agregar al carrito por falta de detalles e información poco clara.</p>
+        </article>
+        <article class="hero-v2-card">
+          <div class="hero-v2-stat">19&ndash;24%</div>
+          <h3 class="hero-v2-card-title">Devoluciones de productos perfectos</h3>
+          <p class="hero-v2-card-body">Devoluciones por expectativas no coincidentes causadas por datos de producto incompletos y problemas de descubrimiento.</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <div class="hero-stats-band"></div>
-
-  <!-- Leak Numbers Section -->
-  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop stats-overlap">
-    <div class="stats-section-surface">
-    <div class="grid grid-cols-1 md:grid-cols-6 lg:grid-cols-12 gap-lg">
-      <LeakCard
-        variant="featured"
-        title="Búsqueda interna del sitio"
-        statValue="2–3×"
-        icon="search"
-        description={`&ldquo;Quienes buscan convierten 2&ndash;3&times; más que quienes no &mdash;<span class="text-primary">siempre que encuentren lo que buscan</span>.&rdquo;`}
-      />
-      <LeakCard
-        title="SEO"
-        statValue="53%"
-        icon="search"
-        description={`Más de la mitad del tráfico orgánico se pierde por catálogos de baja calidad.<br/><br/>Los resultados de SEO siempre estarán limitados por la información del catálogo de productos.`}
-      />
-      <LeakCard
-        title="Abandono del carrito"
-        statValue="70%"
-        icon="shopping_cart"
-        description="El abandono del carrito se debe en gran parte al registro obligatorio que pide email y contraseña."
-      />
-      <LeakCard
-        title="Devoluciones"
-        statValue="17–20%"
-        icon="arrow_back"
-        description="Ingresos perdidos por devoluciones causadas por resultados imprecisos en la búsqueda por palabras clave."
-      />
-      <LeakCard
-        variant="emerging"
-        title="AEO"
-        statValue="25%"
-        icon="search"
-        description={`Las respuestas impulsadas por agentes de IA aumentarán un 25% para finales de 2026 &mdash; el SEO de la era moderna de <span class="text-primary">ChatGPT</span>, <span class="text-primary">Claude</span>, <span class="text-primary">Gemini</span>, etc.`}
-      />
-    </div>
-    <div class="reveal mt-xl flex items-start gap-md group cursor-default">
-      <span class="material-symbols-outlined icon-inline-sm text-primary flex-shrink-0 mt-1">info</span>
-      <div>
-        <h4 class="font-label-caps text-label-caps text-zinc-500 group-hover:text-white transition-colors mb-1">UNA NOTA SOBRE ESTOS NÚMEROS</h4>
-        <p class="font-mono text-meta-sm text-zinc-600 group-hover:text-white transition-colors leading-tight">
-          Estos benchmarks representan promedios de la industria para comerciantes medianos. Aunque tu
-          "fuga" específica puede variar, el efecto compuesto de resolver solo dos de estos puntos
-          suele resultar en un incremento inmediato del 15-20% en los ingresos netos.
-        </p>
-      </div>
-    </div>
-    </div>
-  </section>
-
-  <!-- Revenue equation -->
-  <section id="revenue-equation" class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="mb-2xl">
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-          Aumento de ingresos
-        </span>
-        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">
-          Más dinero en tu bolsillo
-        </h2>
-        <p class="text-zinc-400 text-lg leading-relaxed">
-          O aumentas tráfico o aumentas conversión, ¿cierto?
-          <span class="text-primary">Nosotros nos especializamos en conversión.</span>
-        </p>
-      </div>
-
+  <!-- Booking embed -->
+  <section id="booking-embed" hidden class="bg-primary pt-xl pb-md md:pt-2xl px-margin-mobile md:px-margin-desktop">
+    <div class="max-w-page mx-auto">
+      <p class="text-zinc-900 text-body-lg leading-relaxed max-w-2xl mb-lg">
+        Selecciona la fecha y hora más conveniente para nuestra llamada.
+      </p>
       <div
-        id="equation-container"
-        class="flex items-stretch gap-6 w-full transition-all duration-700 ease-out"
-      >
-        <EquationCard icon="groups" label="Tráfico">
-          <p>No manejamos tu publicidad ni generamos leads, pero sí podemos:</p>
-          <ul>
-            <li>Más tráfico <span class="text-primary">SEO</span>, gracias a datos de producto más ricos.</li>
-            <li>Más <span class="text-primary">referencias de agentes IA</span>, preparando tu tienda para los agentes.</li>
-          </ul>
-        </EquationCard>
-        <div class="equation-operator">×</div>
-        <EquationCard icon="percent" label="Conversión">
-          <p>Mejoramos la conversión en los tres puntos donde normalmente se rompe:</p>
-          <ul>
-            <li><span class="text-primary">Búsqueda</span> que encuentra lo que el cliente realmente pidió.</li>
-            <li><span class="text-primary">Datos de catálogo</span> lo suficientemente ricos para que la búsqueda funcione — gestionados por nosotros, no por ti.</li>
-            <li><span class="text-primary">Checkout</span> sin la barrera de crear cuenta.</li>
-          </ul>
-        </EquationCard>
-        <div class="equation-operator">=</div>
-        <EquationCard size="compact" icon="attach_money" label="Ingresos">
-          <p>Es un poco más complicado que esto, pero lo simplificamos con fines ilustrativos.</p>
-        </EquationCard>
-      </div>
+        id="booking-mount"
+        style={
+          provider === 'cal'
+            ? 'min-width:320px; min-height:600px; width:100%;'
+            : 'min-width:320px; height:760px; width:100%; overflow:hidden;'
+        }
+      ></div>
     </div>
   </section>
 
-  <!-- Funnel / Revenue leaks -->
-  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-    <div class="mb-xs grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+  <!-- Funnel Benchmark / Revenue leaks (dark section per the v2 alternation). -->
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
+    <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+      Embudo de conversión
+    </span>
+    <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">Fugas de ingresos</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-xl mb-xl">
       <div>
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-          Embudo de Conversión
-        </span>
-        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">Fugas de ingresos</h2>
         <p class="text-body-lg text-secondary-fixed-dim">
-          Identificamos las causas más probables de la pérdida de ingresos en cada etapa. Estos
-          son porcentajes estándar del e-commerce, pero puedes cambiar los valores para evaluar
-          tu situación particular.
+          La fuga de ingresos es la brecha entre los ingresos que un negocio ha
+          generado y los que realmente capta, causada por fricciones evitables,
+          procesos rotos y oportunidades perdidas.
         </p>
-      </div>
-      <div class="bg-canvas-deeper border border-white/5 rounded-xl p-xl">
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-          Escenario
-        </span>
-        <p class="text-body-lg text-secondary-fixed-dim leading-relaxed">
-          El embudo de abajo usa los números con los que la mayoría de nuestros clientes llegan:
-          <span class="text-primary">5,000 sesiones mensuales</span> con un
-          <span class="text-primary">AOV de $100</span>. Catálogo gestionado en Excel o en el
-          admin de WooCommerce. Búsqueda predeterminada. Checkout estándar con email y
-          contraseña. GA4 instalado, pero nunca monitoreado.
+        <p class="text-body-lg text-secondary-fixed-dim mt-md">
+          Pérdidas causadas por nuestros errores, no por la competencia o las condiciones del mercado.
         </p>
-      </div>
-    </div>
-    <div class="bg-canvas-deeper border border-white/5 p-md md:p-xl rounded-xl mb-xl flex flex-col overflow-hidden">
-      <div id="funnel-root" data-locale="es" class="w-full overflow-x-auto"></div>
-
-      <div class="mt-md flex gap-xl items-stretch">
-        <table class="text-left text-body-sm flex-shrink-0">
-          <thead>
-            <tr class="border-b border-white/10">
-              <th class="py-md pr-xl font-label-caps text-zinc-400 text-meta-sm leading-tight align-bottom">
-                ETAPA DEL<br />EMBUDO
-              </th>
-              <th class="py-md pr-xl font-label-caps text-error-red text-meta-sm leading-tight align-bottom text-left">
-                INGRESOS<br />PERDIDOS
-              </th>
-              <th class="py-md pr-xl font-label-caps text-white text-meta-sm leading-tight align-bottom text-left">
-                POTENCIAL DE<br />RECUPERACIÓN
-              </th>
-              <th class="py-md font-label-caps text-success-emerald text-meta-sm leading-tight align-bottom text-left">
-                POTENCIAL DE<br />RECUPERACIÓN
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/5 text-zinc-200">
-            <FunnelStageRow stageId="search"   icon="search"         label="Búsqueda"          loss="65%" recovery="+25%" recoveryAmount="+$1,250" />
-            <FunnelStageRow stageId="browsing" icon="grid_view"      label="Navegación"        loss="75%" recovery="+30%" recoveryAmount="+$1,500" />
-            <FunnelStageRow stageId="pdp"      icon="description"    label="Página de producto" loss="80%" recovery="+25%" recoveryAmount="+$1,250" />
-            <FunnelStageRow stageId="cart"     icon="shopping_cart"  label="Carrito"           loss="70%" recovery="+20%" recoveryAmount="+$1,000" />
-            <FunnelStageRow stageId="checkout" icon="payments"       label="Checkout"          loss="17%" recovery="+7%"  recoveryAmount="+$350"   />
-          </tbody>
-        </table>
-
-        <div id="funnel-info" class="funnel-info flex-1">
-          <div class="funnel-info-default">
-            <span class="material-symbols-outlined">touch_app</span>
-            <span>Pasa el cursor sobre cualquier etapa para ver qué suele causar los abandonos.</span>
-          </div>
-          <div class="funnel-info-content">
-            <div class="funnel-info-eyebrow">
-              <span class="material-symbols-outlined" data-info-icon>info</span>
-              <span>Causas del abandono</span>
-            </div>
-            <div class="funnel-info-title" data-info-title></div>
-            <div class="funnel-info-body" data-info-body></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </div>
-  </section>
-
-  <!-- How we do it -->
-  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        ¿Cómo lo hacemos?
-      </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-        Optimiza el catálogo y el motor de búsqueda
-      </h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-xl items-start mb-2xl">
-        <p class="text-secondary-fixed-dim text-body-md leading-relaxed">
-          La mayoría de tiendas abordan el descubrimiento personalizando el motor
-          de búsqueda y mejorando los datos del producto por separado.
-        </p>
-        <p class="text-primary text-body-lg leading-relaxed md:border-l md:border-white/10 md:pl-xl">
-          GroLabs combina ambos en una sola capa de optimización.
+        <p class="text-body-lg mt-md">
+          <span class="text-white">Errores no forzados del negocio&nbsp;&mdash;</span>
+          <span class="text-primary">Tres-putts, bases por bolas, dobles faltas, pérdidas ...</span>
         </p>
       </div>
 
-      <HowWeDoItDiagram locale="es" />
-    </div>
-  </section>
-
-  <!-- Connector arrow -->
-  <div class="relative max-w-page mx-auto px-margin-mobile md:px-margin-desktop pointer-events-none" aria-hidden="true">
-    <svg
-      class="hidden lg:block absolute right-12 xl:right-20 z-20"
-      style="top: -180px;"
-      width="80"
-      height="320"
-      viewBox="0 0 80 320"
-      fill="none"
-    >
-      <path
-        d="M 40 4 C 64 70 64 220 40 286"
-        stroke="rgba(237, 234, 224, 0.42)"
-        stroke-width="2.5"
-        stroke-dasharray="2 8"
-        stroke-linecap="round"
-        fill="none"
-      />
-      <path
-        d="M 28 278 L 40 296 L 52 278"
-        stroke="rgba(237, 234, 224, 0.6)"
-        stroke-width="2.5"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        fill="none"
-      />
-    </svg>
-  </div>
-
-  <!-- Grow a Company -->
-  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-xl items-start">
-        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
-          <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-            Prioridad del emprendedor
+      <div class="leak-equation-card">
+        <div class="leak-equation">
+          <span class="leak-equation-lhs" style="white-space: nowrap;">Fugas de ingresos (%)&nbsp;=</span>
+          <span class="leak-equation-fraction">
+            <span class="leak-equation-num">IPT&nbsp;−&nbsp;IRC</span>
+            <span class="leak-equation-den">IPT</span>
           </span>
-          <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
-            Hacer crecer una empresa
-          </h2>
-
-          <blockquote class="border-l border-primary/30 pl-md mb-xl">
-            <p class="text-white text-body-lg italic leading-snug mb-sm">
-              &ldquo;La mayoría de los emprendedores fracasan porque están trabajando
-              <span class="text-primary font-medium not-italic">en su negocio</span>
-              en lugar de trabajar
-              <span class="text-primary font-medium not-italic">sobre su negocio</span>.&rdquo;
-            </p>
-            <footer class="text-body-sm text-zinc-500 not-italic">
-              — Michael Gerber, <cite class="not-italic">El Mito del Emprendedor</cite>
-            </footer>
-          </blockquote>
-
-          <p class="mb-md">
-            Monitorear embudos. Cazar fugas. Leer GA4 a medianoche. Cada hora que
-            pasas en el dashboard es una hora que no estás invirtiendo en la
-            compañía — en la estrategia, el equipo, el siguiente producto, las
-            alianzas que solo tú puedes construir.
-          </p>
-
-          <p>
-            <span class="text-primary font-medium">Sin noticias = buenas noticias.</span>
-            <span class="text-white">Si algo requiere tu atención, te avisaremos.</span>
-          </p>
+          <span class="leak-equation-rhs">×&nbsp;100</span>
         </div>
-
-        <div class="flex justify-center lg:justify-end">
-          <img
-            src={`${base}/agent-notification.svg`}
-            alt="Notificación push de GroLabs: Hola Peter, me temo que el tráfico bajó 6% ayer. Con un enlace de Más información."
-            class="w-full max-w-[180px] h-auto"
-            loading="lazy"
-          />
-        </div>
+        <dl class="leak-equation-key">
+          <div class="leak-equation-row">
+            <dt>IPT</dt>
+            <dd>Ingresos Potenciales Totales</dd>
+          </div>
+          <div class="leak-equation-row">
+            <dt>IRC</dt>
+            <dd>Ingresos Realmente Captados</dd>
+          </div>
+        </dl>
       </div>
+    </div>
+    <div class="p-md md:p-xl mb-xl flex flex-col">
+      <div id="funnel-root" data-locale="es" class="w-full overflow-x-auto"></div>
+    </div>
     </div>
   </section>
 
-  <!-- Try it out -->
-  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+  <!-- Try it out / Search Demo (light section). -->
+  <section class="relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Pruébalo
       </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-        Demo de Búsqueda
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">
+        Demo de búsqueda
       </h2>
 
       <SearchCopyHelper locale="es" />
@@ -338,7 +196,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <div class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-xl items-start">
         <SearchDemo locale="es" />
 
-        <ul class="space-y-md">
+        <ul class="grid grid-cols-2 gap-md lg:grid-cols-1">
           <li class="flex items-start gap-md">
             <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">bolt</span>
             <div class="text-white text-body-md leading-relaxed">
@@ -380,4 +238,454 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       </div>
     </div>
   </section>
+
+  <!-- Entrepreneurs' Priority / Grow a Company (yellow section). -->
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-lg items-end">
+        <div>
+          <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
+            Prioridad del emprendedor
+          </span>
+          <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-lg md:mb-[48px]">
+            Hacer crecer una empresa
+          </h2>
+
+          <div class="bg-canvas rounded-xl p-lg md:p-xl text-secondary-fixed-dim text-body-md leading-relaxed">
+            <blockquote class="border-l border-primary/30 pl-md mb-xl">
+              <p class="text-white text-body-lg italic leading-snug mb-sm">
+                &ldquo;La mayoría de los emprendedores fracasan porque están trabajando
+                <span class="text-primary font-medium not-italic">en su negocio</span>
+                en lugar de trabajar
+                <span class="text-primary font-medium not-italic">sobre su negocio</span>.&rdquo;
+              </p>
+              <footer class="text-body-sm text-zinc-500 not-italic">
+                — Michael Gerber, <cite class="not-italic">El Mito del Emprendedor</cite>
+              </footer>
+            </blockquote>
+
+            <p class="mb-md">
+              Monitorear embudos. Cazar fugas. Leer GA4 a medianoche. Cada hora
+              que pasas en el dashboard es una hora que no estás invirtiendo en
+              la compañía — en la estrategia, el equipo, el siguiente producto,
+              las alianzas que solo tú puedes construir.
+            </p>
+
+            <p>
+              <span class="text-primary font-medium">Sin noticias = buenas noticias.</span>
+              <span class="text-white">Si algo requiere tu atención, te avisaremos.</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex justify-center lg:justify-end">
+          <img
+            src={`${base}/agent-notification.svg`}
+            alt="Notificación push de GroLabs: Hola Peter, me temo que el tráfico bajó 6% ayer. Con un enlace de Más información."
+            class="w-full max-w-[180px] h-auto block"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {provider === 'calendly' && (
+    <>
+      <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
+      <script async src="https://assets.calendly.com/assets/external/widget.js"></script>
+      <script is:inline define:vars={{ bookingUrl }}>
+        (function() {
+        let mounted = false;
+
+        function buildEmbedUrl(base) {
+          const d = new Date();
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          const sep = base.includes('?') ? '&' : '?';
+          return base
+            + sep
+            + 'background_color=131316'
+            + '&text_color=EDEAE0'
+            + '&primary_color=fae194'
+            + '&hide_event_type_details=1'
+            + '&hide_landing_page_details=1'
+            + '&hide_gdpr_banner=1'
+            + `&month=${yyyy}-${mm}`
+            + `&date=${yyyy}-${mm}-${dd}`;
+        }
+
+        function mountWidget() {
+          const section = document.getElementById('booking-embed');
+          const mount = document.getElementById('booking-mount');
+          if (!section || !mount) return;
+          section.hidden = false;
+          if (!mounted && window.Calendly && Calendly.initInlineWidget) {
+            Calendly.initInlineWidget({
+              url: buildEmbedUrl(bookingUrl),
+              parentElement: mount,
+            });
+            mounted = true;
+          }
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        document.addEventListener('click', function (e) {
+          const link = e.target.closest('[data-booking-cta]');
+          if (!link) return;
+          if (!window.Calendly || !Calendly.initInlineWidget) return;
+          e.preventDefault();
+          mountWidget();
+        });
+
+        window.addEventListener('message', function (e) {
+          if (!e || !e.data || typeof e.origin !== 'string') return;
+          if (!e.origin.endsWith('.calendly.com') && e.origin !== 'https://calendly.com') return;
+          const data = e.data;
+          const evt = (data && data.event) || '';
+          const height =
+            (data.payload && (data.payload.height || data.payload.iframeHeight)) ||
+            data.height ||
+            data.iframeHeight;
+          if (!height || typeof height !== 'number') return;
+          if (!/iframe.?height|page_height|resize/i.test(evt) && !data.height) return;
+          const mount = document.getElementById('booking-mount');
+          if (!mount) return;
+          const MAX_EMBED_HEIGHT = 760;
+          mount.style.height = Math.min(height, MAX_EMBED_HEIGHT) + 'px';
+        });
+        })();
+      </script>
+    </>
+  )}
+
+  {provider === 'cal' && (
+    <script is:inline define:vars={{ calLink }}>
+      (function() {
+      (function (C, A, L) {
+        let p = function (a, ar) { a.q.push(ar); };
+        let d = C.document;
+        C.Cal = C.Cal || function () {
+          let cal = C.Cal;
+          let ar = arguments;
+          if (!cal.loaded) {
+            cal.ns = {};
+            cal.q = cal.q || [];
+            d.head.appendChild(d.createElement("script")).src = A;
+            cal.loaded = true;
+          }
+          if (ar[0] === L) {
+            const api = function () { p(api, arguments); };
+            const namespace = ar[1];
+            api.q = api.q || [];
+            if (typeof namespace === "string") {
+              cal.ns[namespace] = cal.ns[namespace] || api;
+              p(cal.ns[namespace], ar);
+              p(cal, ["initNamespace", namespace]);
+            } else {
+              p(cal, ar);
+            }
+            return;
+          }
+          p(cal, ar);
+        };
+      })(window, "https://app.cal.com/embed/embed.js", "init");
+
+      Cal("init", "booking", { origin: "https://cal.com" });
+
+      let mounted = false;
+
+      function mountWidget() {
+        const section = document.getElementById('booking-embed');
+        if (!section) return;
+        section.hidden = false;
+        if (!mounted) {
+          const d = new Date();
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, '0');
+          const dd = String(d.getDate()).padStart(2, '0');
+          Cal.ns.booking("inline", {
+            elementOrSelector: "#booking-mount",
+            calLink: `${calLink}?date=${yyyy}-${mm}-${dd}`,
+            config: { layout: "month_view" },
+          });
+          Cal.ns.booking("ui", {
+            theme: "dark",
+            hideEventTypeDetails: true,
+            layout: "month_view",
+            styles: { branding: { brandColor: "#fae194" } },
+          });
+          mounted = true;
+        }
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      document.addEventListener('click', function (e) {
+        const link = e.target.closest('[data-booking-cta]');
+        if (!link) return;
+        if (!window.Cal) return;
+        e.preventDefault();
+        mountWidget();
+      });
+      })();
+    </script>
+  )}
+
+  {/* Reveal the header CTAs as soon as the hero CTA row scrolls past
+      the top of the viewport, and hide them again when it scrolls back in. */}
+  <script is:inline>
+    (function () {
+      const heroCtas = document.querySelector('[data-hero-ctas]');
+      const headerCtas = document.getElementById('header-ctas');
+      if (!heroCtas || !headerCtas) return;
+      const observer = new IntersectionObserver(
+        function (entries) {
+          headerCtas.hidden = entries[0].isIntersecting;
+        },
+        { threshold: 0 }
+      );
+      observer.observe(heroCtas);
+    })();
+  </script>
 </BaseLayout>
+
+<style is:global>
+  /* Hero v2 — merged hero + stats. Duplicated from index.astro because
+     Astro's <style is:global> only loads on pages that include the file. */
+  .hero-v2-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 96px;
+    align-items: center;
+  }
+  @media (max-width: 1100px) {
+    .hero-v2-grid { grid-template-columns: 1fr; gap: 56px; }
+  }
+
+  .hero-v2-headline {
+    margin: 0 0 14px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .hero-v2-line {
+    font-family: "Permanent Marker", cursive;
+    font-weight: 400;
+    color: #fff;
+    font-size: clamp(36px, 3.9vw, 54px);
+    line-height: 1;
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+  }
+  .hero-v2-amp {
+    font-size: 0.75em;
+    margin-right: 0.08em;
+    position: relative; top: -0.02em;
+  }
+
+  .hero-v2-tagline {
+    font-family: monospace;
+    color: #fae194;
+    font-size: clamp(12px, 1.4vw, 18px);
+    line-height: 1.4;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 14px 0 56px;
+    white-space: nowrap;
+  }
+
+  .hero-v2-lede {
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 20px;
+    line-height: 1.55;
+    color: rgba(237, 234, 224, 0.6);
+    margin: 0 0 32px;
+    max-width: 580px;
+  }
+
+  .hero-v2-ctas { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .hero-v2-btn {
+    font-family: "Hanken Grotesk", sans-serif;
+    font-weight: 600; font-size: 15px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: transform .15s, box-shadow .2s, background .2s, color .2s, border-color .2s;
+  }
+  .hero-v2-btn--primary {
+    color: #1A1A1A;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      0 8px 24px -4px rgba(250,225,148,0.35);
+  }
+  .hero-v2-btn--primary:hover { transform: translateY(-1px); }
+  .hero-v2-btn--ghost {
+    background: transparent;
+    color: rgba(237, 234, 224, 0.55);
+    border-color: rgba(237, 234, 224, 0.35);
+  }
+  .hero-v2-btn--ghost:hover {
+    color: rgba(237, 234, 224, 0.9);
+    border-color: rgba(237, 234, 224, 0.6);
+  }
+
+  /* Cards */
+  .hero-v2-stage {
+    width: 100%;
+    max-width: 720px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-left: auto;
+  }
+  .hero-v2-card {
+    background: #1c1d24;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.05) inset,
+      0 2px 4px rgba(0,0,0,0.5),
+      0 30px 60px -12px rgba(0,0,0,0.65),
+      0 60px 120px -24px rgba(0,0,0,0.55);
+  }
+  .hero-v2-card--featured { grid-column: 1 / -1; }
+
+  .hero-v2-stat {
+    font-family: "Permanent Marker", cursive;
+    color: #fff;
+    line-height: 1;
+    font-size: 34px;
+    margin-bottom: 16px;
+  }
+  .hero-v2-card-title {
+    font-family: monospace;
+    color: #fae194;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+  }
+  .hero-v2-card-body {
+    font-family: "Hanken Grotesk", sans-serif;
+    color: rgba(237, 234, 224, 0.6);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .hero-v2-card--featured .hero-v2-card-body { font-size: 20px; }
+  .hero-v2-highlight { color: #fff; white-space: nowrap; }
+
+  @media (max-width: 720px) {
+    .hero-v2-stage { grid-template-columns: 1fr; }
+    .hero-v2-card--featured { grid-column: auto; }
+    .hero-v2-card-title { white-space: normal; }
+  }
+
+  /* Header-anchored CTAs */
+  .header-ctas {
+    display: flex; align-items: center; gap: 10px; margin-left: 16px;
+    animation: header-ctas-in 200ms ease-out;
+  }
+  .header-ctas[hidden] { display: none; }
+  @keyframes header-ctas-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .header-cta {
+    font-family: "Hanken Grotesk", sans-serif;
+    font-weight: 600; font-size: 13px;
+    padding: 8px 16px; border-radius: 8px;
+    border: 1px solid transparent; text-decoration: none;
+    display: inline-flex; align-items: center;
+    transition: transform .15s, background .2s, color .2s, border-color .2s;
+  }
+  .header-cta--primary {
+    color: #1A1A1A;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 4px 14px -2px rgba(250,225,148,0.35);
+  }
+  .header-cta--primary:hover { transform: translateY(-1px); }
+  .header-cta--ghost {
+    background: transparent;
+    color: rgba(237, 234, 224, 0.6);
+    border-color: rgba(237, 234, 224, 0.35);
+  }
+  .header-cta--ghost:hover { color: rgba(237, 234, 224, 0.9); border-color: rgba(237, 234, 224, 0.6); }
+  @media (max-width: 768px) {
+    .header-cta--ghost { display: none; }
+    .header-cta { font-size: 12px; padding: 6px 12px; }
+    .header-ctas { margin-left: 8px; }
+  }
+
+  /* Revenue Leaks — equation card */
+  .leak-equation-card {
+    background: #1c1d24;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.05) inset,
+      0 2px 4px rgba(0,0,0,0.5),
+      0 30px 60px -12px rgba(0,0,0,0.65),
+      0 60px 120px -24px rgba(0,0,0,0.55);
+    display: flex; flex-direction: column;
+    gap: 24px;
+    align-self: start;
+  }
+  .leak-equation {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: "Permanent Marker", cursive;
+    font-weight: 400;
+    font-size: 28px;
+    color: #EDEAE0;
+    text-transform: uppercase;
+    line-height: 1.1;
+    flex-wrap: wrap;
+  }
+  .leak-equation-fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .leak-equation-num {
+    border-bottom: 1px solid rgba(237, 234, 224, 0.6);
+    padding: 0 8px 4px;
+    white-space: nowrap;
+  }
+  .leak-equation-den { padding-top: 0; white-space: nowrap; }
+  .leak-equation-key { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+  .leak-equation-row {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .leak-equation-row dt {
+    font-family: monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #fae194;
+    font-weight: 400;
+  }
+  .leak-equation-row dd {
+    font-family: monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    margin: 0;
+  }
+
+  /* CTA gradient — reusable yellow gradient already defined in BaseLayout's
+     global style for the footer, but redeclared here so the page's own
+     hero/header CTAs also pick it up. */
+  .cta-button-style {
+    background: linear-gradient(180deg, #fbe9a8 0%, #fae194 55%, #f0d770 100%);
+  }
+</style>
