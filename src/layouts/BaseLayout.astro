@@ -150,31 +150,30 @@ const canonicalUrl = `${siteUrl}${path}`;
     <main class="relative z-10 pt-20 min-h-screen bg-transparent">
       <slot />
 
-      <footer class="bg-primary py-xl">
+      <footer class="bg-canvas-deeper pt-2xl md:pt-[120px] pb-xl">
         <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
           <div class="grid grid-cols-1 md:grid-cols-3 items-start gap-xl">
-            {/* Left: black wordmark using the tight-viewBox variant
-                (no internal padding on any side) so the visible artwork
-                fills its box edge-to-edge. The logo's top/left/right
-                edges now align cleanly with sibling elements without
-                negative-margin hacks. */}
+            {/* Left: cream/white wordmark + tagline eyebrow. The tight
+                viewBox variant has no internal padding so the artwork
+                fills its box edge-to-edge and aligns cleanly with the
+                CTAs and links. */}
             <div class="flex flex-col gap-sm justify-self-start">
               <img
-                src="/grolabs-wordmark-black-tight.svg"
+                src="/grolabs-wordmark-gray-tight.svg"
                 alt="GroLabs"
-                style="height: 68px; width: auto; display: block;"
+                style="height: 30px; width: auto; display: block;"
               />
-              <span class="font-mono tracking-[0.2em] text-xs uppercase text-black">
+              <span class="font-mono tracking-[0.2em] text-xs uppercase text-zinc-500">
                 Recover lost revenue
               </span>
             </div>
 
-            {/* Center: Book CTA + ghost Contact, aligned at the top so the
-                buttons share their top edge with the logo's top edge. */}
+            {/* Center: yellow-gradient Book CTA + ghost Contact — same
+                styling as the hero CTAs. */}
             <div class="flex flex-wrap items-center justify-start md:justify-center gap-sm">
               <a
                 href="https://cal.com/tuncho-granados-uibzst/15min"
-                class="footer-cta footer-cta--inverted"
+                class="footer-cta footer-cta--primary cta-button-style"
                 target="_blank"
                 rel="noopener noreferrer"
                 data-booking-cta
@@ -189,14 +188,14 @@ const canonicalUrl = `${siteUrl}${path}`;
               </a>
             </div>
 
-            {/* Right: nav links on top, copyright underneath. */}
+            {/* Right: nav links on top, copyright underneath — all gray. */}
             <div class="flex flex-col items-start md:items-end gap-sm">
               <div class="flex flex-wrap gap-lg">
-                <a class="font-body-sm text-body-sm text-zinc-900 hover:text-black transition-colors" href="#">{t.footer.privacy}</a>
-                <a class="font-body-sm text-body-sm text-zinc-900 hover:text-black transition-colors" href="#">{t.footer.terms}</a>
-                <a class="font-body-sm text-body-sm text-zinc-900 hover:text-black transition-colors" href="#">{t.footer.security}</a>
+                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href="#">{t.footer.privacy}</a>
+                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href="#">{t.footer.terms}</a>
+                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href="#">{t.footer.security}</a>
               </div>
-              <p class="font-body-sm text-body-sm text-zinc-900">
+              <p class="font-body-sm text-body-sm text-zinc-500">
                 © <span id="footer-year"></span> GroLabs AI. {t.footer.rights}
               </p>
             </div>
@@ -210,7 +209,14 @@ const canonicalUrl = `${siteUrl}${path}`;
     </script>
 
     <style is:global>
-      /* ─────────── Footer CTAs (yellow footer, inverted vs hero) ─────────── */
+      /* ─────────── Primary CTA — reusable, hero-style ───────────
+         Yellow gradient (lighter top → deeper bottom), dark text,
+         soft yellow halo. Same look as the hero CTA so the footer
+         and any other surface can reuse it via .cta-button-style
+         + .footer-cta classes. */
+      .cta-button-style {
+        background: linear-gradient(180deg, #fbe9a8 0%, #fae194 55%, #f0d770 100%);
+      }
       .footer-cta {
         font-family: "Hanken Grotesk", sans-serif;
         font-weight: 600;
@@ -224,22 +230,21 @@ const canonicalUrl = `${siteUrl}${path}`;
         gap: 8px;
         transition: transform .15s, box-shadow .2s, background .2s, color .2s, border-color .2s;
       }
-      .footer-cta--inverted {
-        color: #fae194;
-        background: #000000;
+      .footer-cta--primary {
+        color: #1A1A1A;
         box-shadow:
-          inset 0 1px 0 rgba(255,255,255,0.08),
-          0 8px 24px -4px rgba(0,0,0,0.45);
+          inset 0 1px 0 rgba(255,255,255,0.35),
+          0 8px 24px -4px rgba(250,225,148,0.35);
       }
-      .footer-cta--inverted:hover { transform: translateY(-1px); }
+      .footer-cta--primary:hover { transform: translateY(-1px); }
       .footer-cta--ghost {
         background: transparent;
-        color: rgba(0,0,0,0.65);
-        border-color: rgba(0,0,0,0.35);
+        color: rgba(237, 234, 224, 0.55);
+        border-color: rgba(237, 234, 224, 0.35);
       }
       .footer-cta--ghost:hover {
-        color: #000000;
-        border-color: rgba(0,0,0,0.7);
+        color: rgba(237, 234, 224, 0.9);
+        border-color: rgba(237, 234, 224, 0.6);
       }
     </style>
   </body>

@@ -544,54 +544,56 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        narrative; the RIGHT column hosts the phone-notification SVG
        starting at the same top edge so the phone visually aligns with
        the eyebrow. Dark section closing the v2 alternation. -->
-  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
     <div class="max-w-page mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-xl items-start">
-        <!-- LEFT: eyebrow + title + Gerber quote + monitoring paragraph +
-             new no-news / if-needed line -->
-        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
-          <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-lg items-end">
+        <!-- LEFT: eyebrow + title (on yellow); body content lives inside
+             a gray card below so the dense paragraphs read against a
+             quieter surface. -->
+        <div>
+          <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
             Entrepreneurs' Priority
           </span>
-          <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">
+          <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-lg md:mb-[48px]">
             Grow a company
           </h2>
 
-          <blockquote class="border-l border-primary/30 pl-md mb-xl">
-            <p class="text-white text-body-lg italic leading-snug mb-sm">
-              &ldquo;Most entrepreneurs fail because they're working
-              <span class="text-primary font-medium not-italic">in their business</span>
-              rather than
-              <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
+          <div class="bg-canvas rounded-xl p-lg md:p-xl text-secondary-fixed-dim text-body-md leading-relaxed">
+            <blockquote class="border-l border-primary/30 pl-md mb-xl">
+              <p class="text-white text-body-lg italic leading-snug mb-sm">
+                &ldquo;Most entrepreneurs fail because they're working
+                <span class="text-primary font-medium not-italic">in their business</span>
+                rather than
+                <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
+              </p>
+              <footer class="text-body-sm text-zinc-500 not-italic">
+                — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
+              </footer>
+            </blockquote>
+
+            <p class="mb-md">
+              Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
+              hour you spend in the dashboard is an hour you're not spending on
+              the company — on the strategy, the team, the next product, the
+              partnerships only you can build.
             </p>
-            <footer class="text-body-sm text-zinc-500 not-italic">
-              — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
-            </footer>
-          </blockquote>
 
-          <p class="mb-md">
-            Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
-            hour you spend in the dashboard is an hour you're not spending on
-            the company — on the strategy, the team, the next product, the
-            partnerships only you can build.
-          </p>
-
-          <p>
-            <span class="text-primary font-medium">No news = good news.</span>
-            <span class="text-white">If something requires your attention, we'll let you know.</span>
-          </p>
+            <p>
+              <span class="text-primary font-medium">No news = good news.</span>
+              <span class="text-white">If something requires your attention, we'll let you know.</span>
+            </p>
+          </div>
         </div>
 
-        <!-- RIGHT: phone notification mockup. align-self-start (default
-             via items-start on the grid) so the top of the phone lines
-             up with the eyebrow on the left. max-width caps the
-             rendered phone size so the SVG doesn't dominate at wide
-             viewports. -->
+        <!-- RIGHT: phone notification mockup. items-end on the grid
+             aligns the phone's bottom edge with the bottom of the
+             dark content card on the left. Column width tightened
+             from 360px to 220px to bring the phone closer. -->
         <div class="flex justify-center lg:justify-end">
           <img
             src={`${base}/agent-notification.svg`}
             alt="GroLabs push notification: Hello Peter, I'm afraid traffic dropped 6% yesterday. With a More info link."
-            class="w-full max-w-[180px] h-auto"
+            class="w-full max-w-[180px] h-auto block"
             loading="lazy"
           />
         </div>
