@@ -4,6 +4,8 @@ Standalone marketing landing page for GroLabs, deployed separately from the main
 
 **Design system:** Engineered Luxury — deep zinc canvas (`#131316`), kinetic yellow accent (`#fae194`), Hanken Grotesk primary type, extreme vertical whitespace (160–200 px between major sections), ambient radial glows behind hero / feature / CTA blocks.
 
+> ⚠️ **Before changing any color, font, spacing, or component on this page, read [`docs/STYLEGUIDE.md`](./docs/STYLEGUIDE.md) first.** It is the single source of truth for every visual token. Visual mirror (open in any browser, no build needed): [`docs/style-guide.html`](./docs/style-guide.html). If a token you need isn't there, add it to the guide first, then implement it in code.
+
 ## Stack
 
 - **Astro 6** — static-site generator, file-based routing, content collections for the blog
