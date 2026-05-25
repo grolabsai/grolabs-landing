@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>GroLabs — Style Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700;800&family=Permanent+Marker&family=Special+Elite&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas: #131316;
+    --canvas-deeper: #0E0E11;
+    --card: #1c1d24;
+    --yellow: #fae194;
+    --cream: #EDEAE0;
+    --muted: rgba(237, 234, 224, 0.6);
+    --subtle: rgba(237, 234, 224, 0.35);
+    --gray: #71717a;
+    --dark-text: #1A1A1A;
+    --border: rgba(255,255,255,0.05);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Hanken Grotesk", sans-serif;
+    background: var(--canvas);
+    color: var(--cream);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+  }
+  header.page-h {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 56px;
+  }
+  header.page-h h1 {
+    font-family: "Permanent Marker", cursive;
+    font-weight: 400;
+    font-size: 48px;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    line-height: 1;
+  }
+  header.page-h p {
+    color: var(--muted);
+    font-size: 17px;
+    margin: 0;
+    max-width: 760px;
+  }
+
+  section {
+    margin: 56px 0;
+  }
+  h2.section-h {
+    font-family: monospace;
+    color: var(--yellow);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  h3.section-title {
+    font-family: "Permanent Marker", cursive;
+    font-weight: 400;
+    font-size: 32px;
+    color: #fff;
+    margin: 0 0 24px;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .section-note {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 24px;
+    max-width: 760px;
+  }
+
+  /* Color swatches */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .swatch {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--card);
+  }
+  .swatch-color {
+    height: 96px;
+    border-bottom: 1px solid var(--border);
+  }
+  .swatch-meta {
+    padding: 14px 16px;
+  }
+  .swatch-name {
+    font-weight: 600;
+    color: #fff;
+    font-size: 14px;
+    margin: 0 0 4px;
+  }
+  .swatch-hex {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 6px;
+    user-select: all;
+  }
+  .swatch-use {
+    font-size: 12px;
+    color: var(--subtle);
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  /* Type ramp */
+  .type-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: baseline;
+  }
+  .type-row:last-child { border-bottom: 0; }
+  .type-label {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .type-label code {
+    display: block;
+    font-family: monospace;
+    color: var(--gray);
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  .type-sample {
+    color: #fff;
+  }
+
+  /* Spacing scale */
+  .spacing-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 80px;
+    gap: 24px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .spacing-row code {
+    font-family: monospace;
+    color: var(--yellow);
+    font-size: 13px;
+  }
+  .spacing-bar {
+    background: var(--yellow);
+    height: 16px;
+    border-radius: 4px;
+  }
+  .spacing-px {
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* Cards */
+  .card-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .lifted-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.05) inset,
+      0 2px 4px rgba(0,0,0,0.5),
+      0 30px 60px -12px rgba(0,0,0,0.65),
+      0 60px 120px -24px rgba(0,0,0,0.55);
+  }
+  .lifted-card h4 {
+    font-family: monospace;
+    color: var(--yellow);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+  }
+  .stat-big {
+    font-family: "Permanent Marker", cursive;
+    color: #fff;
+    font-size: 34px;
+    line-height: 1;
+    margin: 0 0 12px;
+  }
+  .stat-body { font-size: 16px; color: var(--muted); margin: 0; }
+
+  /* Buttons */
+  .btn-row {
+    display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px;
+  }
+  .btn {
+    font-family: "Hanken Grotesk", sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    cursor: pointer;
+    transition: transform .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary {
+    color: var(--dark-text);
+    background: linear-gradient(180deg, #fbe9a8 0%, #fae194 55%, #f0d770 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      0 8px 24px -4px rgba(250,225,148,0.35);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: rgba(237,234,224,0.55);
+    border-color: rgba(237,234,224,0.35);
+  }
+  .btn-ghost:hover { color: rgba(237,234,224,0.9); border-color: rgba(237,234,224,0.6); }
+  .btn-header {
+    font-size: 13px; padding: 8px 16px;
+  }
+
+  /* Section bg examples */
+  .bg-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px;
+  }
+  .bg-tile {
+    height: 120px; border-radius: 12px; border: 1px solid var(--border);
+    display: flex; align-items: flex-end; padding: 14px;
+    font-family: monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* Code blocks */
+  pre {
+    background: var(--canvas-deeper);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--muted);
+    overflow-x: auto;
+  }
+  code.inline {
+    font-family: monospace;
+    background: var(--canvas-deeper);
+    color: var(--yellow);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header class="page-h">
+  <h1>Grolabs — Style guide</h1>
+  <p>Single source of truth for the landing page's visual language. Every color, font, and spacing token in production comes from here. The companion canonical reference is <code class="inline">docs/STYLEGUIDE.md</code>.</p>
+</header>
+
+<!-- COLORS -->
+<section>
+  <h2 class="section-h">Colors · Backgrounds</h2>
+  <h3 class="section-title">Surfaces</h3>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#131316"></div>
+      <div class="swatch-meta"><p class="swatch-name">Canvas</p><p class="swatch-hex">#131316</p><p class="swatch-use">Body bg, hero, search demo. <code class="inline">bg-canvas</code></p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#0E0E11"></div>
+      <div class="swatch-meta"><p class="swatch-name">Canvas-deeper</p><p class="swatch-hex">#0E0E11</p><p class="swatch-use">Dark sections, footer. <code class="inline">bg-canvas-deeper</code></p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#fae194"></div>
+      <div class="swatch-meta"><p class="swatch-name">Brand yellow</p><p class="swatch-hex">#fae194</p><p class="swatch-use">Grow-a-Company section, booking, CTAs. <code class="inline">bg-primary</code></p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1c1d24"></div>
+      <div class="swatch-meta"><p class="swatch-name">Card surface</p><p class="swatch-hex">#1c1d24</p><p class="swatch-use">Lifted cards — one tone above the canvas they sit on.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 class="section-h">Colors · Foreground</h2>
+  <h3 class="section-title">Text & accents</h3>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background:#FFFFFF"></div>
+      <div class="swatch-meta"><p class="swatch-name">Pure white</p><p class="swatch-hex">#FFFFFF</p><p class="swatch-use">Headlines, highlights. <code class="inline">text-white</code></p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#EDEAE0"></div>
+      <div class="swatch-meta"><p class="swatch-name">Cream</p><p class="swatch-hex">#EDEAE0</p><p class="swatch-use">Default wordmark fill, base body. <code class="inline">text-secondary-fixed-dim</code></p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:rgba(237,234,224,0.6)"></div>
+      <div class="swatch-meta"><p class="swatch-name">Muted body</p><p class="swatch-hex">rgba(237,234,224,0.6)</p><p class="swatch-use">Hero lede, card body, paragraphs.</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:rgba(237,234,224,0.35)"></div>
+      <div class="swatch-meta"><p class="swatch-name">Subtle</p><p class="swatch-hex">rgba(237,234,224,0.35)</p><p class="swatch-use">Citation source under stats.</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#71717a"></div>
+      <div class="swatch-meta"><p class="swatch-name">Footer gray</p><p class="swatch-hex">#71717a</p><p class="swatch-use">Footer wordmark, tagline, nav, copyright. <code class="inline">text-zinc-500</code></p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#1A1A1A"></div>
+      <div class="swatch-meta"><p class="swatch-name">Dark on yellow</p><p class="swatch-hex">#1A1A1A</p><p class="swatch-use">Primary button label on yellow gradient.</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#fae194"></div>
+      <div class="swatch-meta"><p class="swatch-name">Primary yellow</p><p class="swatch-hex">#fae194</p><p class="swatch-use">Eyebrow accents, card titles, hover highlights. <code class="inline">text-primary</code></p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2 class="section-h">Colors · Funnel</h2>
+  <h3 class="section-title">Leak (subtle red)</h3>
+  <p class="section-note">A muted red used only inside the Revenue Leaks funnel diagram. Desaturated so it sits alongside the brand yellow without clashing.</p>
+  <div class="swatch-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background:linear-gradient(90deg,#4a1c1c 0%,#5e2424 50%,#4a1c1c 100%)"></div>
+      <div class="swatch-meta"><p class="swatch-name">Leak bar gradient</p><p class="swatch-hex">#4a1c1c → #5e2424 → #4a1c1c</p><p class="swatch-use">Funnel "Leaking funnel = Lost revenue" bar.</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background:#a85050"></div>
+      <div class="swatch-meta"><p class="swatch-name">Leak droplet</p><p class="swatch-hex">#a85050</p><p class="swatch-use">Falling droplets in the funnel diagram.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPOGRAPHY -->
+<section>
+  <h2 class="section-h">Typography</h2>
+  <h3 class="section-title">Font families</h3>
+
+  <div class="type-row">
+    <div class="type-label">Marker<code>font-marker · "Permanent Marker"</code></div>
+    <div class="type-sample" style="font-family:'Permanent Marker',cursive; font-size:54px; line-height:1;">Recover lost revenue</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Caveat<code>font-caveat · "Caveat"</code></div>
+    <div class="type-sample" style="font-family:'Caveat',cursive; font-size:48px; font-weight:600; line-height:1;">& grow your business</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Sans<code>font-body-md · "Hanken Grotesk"</code></div>
+    <div class="type-sample" style="font-family:'Hanken Grotesk',sans-serif; font-size:20px;">Yes, it's possible. We will help you recover lost revenue and increase sales.</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Mono (eyebrow)<code>font-mono · system monospace</code></div>
+    <div class="type-sample" style="font-family:monospace; font-size:14px; letter-spacing:0.2em; text-transform:uppercase; color:#fae194;">Conversion Funnel</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Typewriter<code>font-typewriter · "Special Elite"</code></div>
+    <div class="type-sample" style="font-family:'Special Elite',monospace; font-size:18px;">Closing-copy voice. Loaded but rarely used.</div>
+  </div>
+</section>
+
+<section>
+  <h3 class="section-title">Type ramp (live)</h3>
+  <p class="section-note">Each row shows the role, the technical recipe, and a rendered sample. Match these recipes exactly when reusing the same role elsewhere.</p>
+
+  <div class="type-row">
+    <div class="type-label">Hero headline<code>clamp(36px, 3.9vw, 54px) · Marker · leading-none</code></div>
+    <div class="type-sample" style="font-family:'Permanent Marker',cursive; font-size:54px; line-height:1;">Recover lost revenue</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Section H2<code>text-4xl md:text-5xl · Marker · uppercase</code></div>
+    <div class="type-sample" style="font-family:'Permanent Marker',cursive; font-size:48px; text-transform:uppercase; line-height:1;">Revenue leaks</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Section eyebrow<code>text-xs · mono · 0.2em tracking · yellow</code></div>
+    <div class="type-sample" style="font-family:monospace; font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:#fae194;">Conversion Funnel</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Hero tagline<code>clamp(12px, 1.4vw, 18px) · mono · 0.2em · yellow</code></div>
+    <div class="type-sample" style="font-family:monospace; font-size:18px; letter-spacing:0.2em; text-transform:uppercase; color:#fae194;">Without paying for more traffic</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Hero lede<code>20px · Sans · line-height 1.55 · muted</code></div>
+    <div class="type-sample" style="font-family:'Hanken Grotesk',sans-serif; font-size:20px; line-height:1.55; color:rgba(237,234,224,0.6);">Yes, it's possible! We will help you recover lost revenue and increase sales.</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Card title<code>12px · mono · 0.2em · yellow</code></div>
+    <div class="type-sample" style="font-family:monospace; font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:#fae194;">Search conversion uplift</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Card body<code>16px · Sans · line-height 1.6 · muted</code></div>
+    <div class="type-sample" style="font-family:'Hanken Grotesk',sans-serif; font-size:16px; line-height:1.6; color:rgba(237,234,224,0.6);">Shoppers leave product pages without adding to cart due to missing details.</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Card stat<code>34px · Marker · white</code></div>
+    <div class="type-sample" style="font-family:'Permanent Marker',cursive; font-size:34px; color:#fff; line-height:1;">14–23%</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Equation<code>28px · Marker · uppercase · cream</code></div>
+    <div class="type-sample" style="font-family:'Permanent Marker',cursive; font-size:28px; text-transform:uppercase; color:#EDEAE0; line-height:1;">Revenue leaks (%) = (TPR − ACR) / TPR × 100</div>
+  </div>
+  <div class="type-row">
+    <div class="type-label">Citation under stat<code>11px · mono · 0.08em · subtle</code></div>
+    <div class="type-sample" style="font-family:monospace; font-style:normal; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:rgba(237,234,224,0.35);">Industry benchmark — mid-market e-commerce</div>
+  </div>
+</section>
+
+<!-- SPACING -->
+<section>
+  <h2 class="section-h">Spacing</h2>
+  <h3 class="section-title">Scale (Tailwind tokens)</h3>
+
+  <div class="spacing-row"><code>xs</code><div class="spacing-bar" style="width:4px;"></div><div class="spacing-px">4 px</div></div>
+  <div class="spacing-row"><code>sm</code><div class="spacing-bar" style="width:8px;"></div><div class="spacing-px">8 px</div></div>
+  <div class="spacing-row"><code>md</code><div class="spacing-bar" style="width:16px;"></div><div class="spacing-px">16 px</div></div>
+  <div class="spacing-row"><code>lg</code><div class="spacing-bar" style="width:24px;"></div><div class="spacing-px">24 px</div></div>
+  <div class="spacing-row"><code>xl</code><div class="spacing-bar" style="width:40px;"></div><div class="spacing-px">40 px</div></div>
+  <div class="spacing-row"><code>2xl</code><div class="spacing-bar" style="width:80px;"></div><div class="spacing-px">80 px</div></div>
+  <div class="spacing-row"><code>3xl</code><div class="spacing-bar" style="width:160px;"></div><div class="spacing-px">160 px</div></div>
+
+  <h3 class="section-title" style="margin-top:48px;">Standards built on the scale</h3>
+  <ul style="color: var(--muted); font-size: 14px; line-height: 1.7;">
+    <li><strong style="color:#fff;">Section padding (vertical)</strong>: <code class="inline">py-2xl md:py-3xl</code> — 80 px mobile, 160 px desktop. Always on the outer <code class="inline">&lt;section&gt;</code>, never on the inner <code class="inline">max-w-page</code> div.</li>
+    <li><strong style="color:#fff;">Section title → content gap</strong>: <code class="inline">mb-lg md:mb-[48px]</code> — 24 px mobile, 48 px desktop. On every section <code class="inline">&lt;h2&gt;</code>.</li>
+    <li><strong style="color:#fff;">Horizontal page padding</strong>: <code class="inline">px-margin-mobile md:px-margin-desktop</code> — 16 px / 48 px. Always paired with inner <code class="inline">max-w-page mx-auto</code>.</li>
+    <li><strong style="color:#fff;">Footer top padding</strong>: <code class="inline">pt-2xl md:pt-[120px]</code> — extra breathing room (3× the bottom).</li>
+  </ul>
+</section>
+
+<!-- LAYOUT -->
+<section>
+  <h2 class="section-h">Layout</h2>
+  <h3 class="section-title">Section-padding pattern</h3>
+  <p class="section-note">Padding lives on the outer <code class="inline">&lt;section&gt;</code>, the inner div is just <code class="inline">max-w-page mx-auto</code>. The inverted pattern (padding on the inner div) causes content to start further-right than the header on viewports wider than 1440 px.</p>
+  <pre>&lt;!-- ✅ Right --&gt;
+&lt;section class="py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas"&gt;
+  &lt;div class="max-w-page mx-auto"&gt;
+    ...
+  &lt;/div&gt;
+&lt;/section&gt;
+
+&lt;!-- ❌ Wrong --&gt;
+&lt;section class="py-2xl bg-canvas"&gt;
+  &lt;div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop"&gt;
+    ...
+  &lt;/div&gt;
+&lt;/section&gt;</pre>
+
+  <h3 class="section-title" style="margin-top:48px;">Section alternation</h3>
+  <p class="section-note">Sections alternate between the lighter canvas, the deeper canvas, and the yellow accent so the eye reads them as distinct blocks.</p>
+  <div class="bg-grid">
+    <div class="bg-tile" style="background:#131316; color:rgba(237,234,224,0.5);">Hero · canvas</div>
+    <div class="bg-tile" style="background:#0E0E11; color:rgba(237,234,224,0.5);">Revenue leaks · canvas-deeper</div>
+    <div class="bg-tile" style="background:#131316; color:rgba(237,234,224,0.5);">Search demo · canvas</div>
+    <div class="bg-tile" style="background:#fae194; color:#1a1a1a;">Grow a company · primary</div>
+    <div class="bg-tile" style="background:#0E0E11; color:rgba(237,234,224,0.5);">Footer · canvas-deeper</div>
+  </div>
+</section>
+
+<!-- CARDS -->
+<section>
+  <h2 class="section-h">Components</h2>
+  <h3 class="section-title">Lifted card</h3>
+  <p class="section-note">Used for hero stat cards, the Revenue Leaks equation card, and the Search Demo panel. <code class="inline">#1c1d24</code> fill (one tone above the canvas), 1 px subtle border, 16 px radius, multi-layer drop shadow that gets larger toward the bottom. The card appears to float above the surface.</p>
+  <div class="card-row">
+    <div class="lifted-card">
+      <div class="stat-big">14–23%</div>
+      <h4>Product page drop-off</h4>
+      <p class="stat-body">Shoppers leave product pages without adding to cart due to missing details and unclear information.</p>
+    </div>
+    <div class="lifted-card">
+      <div class="stat-big">19–24%</div>
+      <h4>Returns of perfect products</h4>
+      <p class="stat-body">Returns linked to mismatched expectations caused by incomplete product data and discovery issues.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BUTTONS -->
+<section>
+  <h3 class="section-title">Buttons</h3>
+  <p class="section-note">Primary CTAs use the <code class="inline">.cta-button-style</code> gradient: <code class="inline">linear-gradient(180deg, #fbe9a8 0%, #fae194 55%, #f0d770 100%)</code>. The gradient is the reusable token — keep it identical wherever the Book CTA appears.</p>
+
+  <p style="color: var(--muted); font-size: 14px; margin: 32px 0 8px;"><strong style="color:#fff;">Hero / footer (full size)</strong></p>
+  <div class="btn-row">
+    <a class="btn btn-primary">Book Growth Assessment Call</a>
+    <a class="btn btn-ghost">Contact</a>
+  </div>
+
+  <p style="color: var(--muted); font-size: 14px; margin: 32px 0 8px;"><strong style="color:#fff;">Header (compact)</strong></p>
+  <div class="btn-row">
+    <a class="btn btn-primary btn-header">Book Growth Assessment Call</a>
+    <a class="btn btn-ghost btn-header">Contact</a>
+  </div>
+</section>
+
+<!-- VOICE -->
+<section>
+  <h2 class="section-h">Voice rules</h2>
+  <h3 class="section-title">Typography decisions that affect copy</h3>
+  <ul style="color: var(--muted); font-size: 14px; line-height: 1.7;">
+    <li><strong style="color:#fff;">Marker headlines are the brand voice.</strong> Hero headlines and every section <code class="inline">&lt;h2&gt;</code> are Permanent Marker, all caps, white.</li>
+    <li><strong style="color:#fff;">Eyebrows = monospace caps in yellow.</strong> Every section gets one above its H2. <code class="inline">font-mono tracking-[0.2em] text-xs uppercase text-primary mb-4 block</code>.</li>
+    <li><strong style="color:#fff;">Stats use Marker; their explanation uses Hanken.</strong> Mixing voices in one card is intentional — the stat is the punchline, the body is the rationale.</li>
+    <li><strong style="color:#fff;">Caveat is for secondary handwritten lines.</strong> Different texture than the marker, used sparingly. Registered for future use.</li>
+    <li><strong style="color:#fff;">Black text is allowed only on yellow surfaces.</strong> Title + eyebrow on the Grow-a-Company section is the canonical use case.</li>
+  </ul>
+</section>
+
+<footer style="margin-top:96px; padding-top:32px; border-top: 1px solid var(--border); color: var(--subtle); font-size: 13px;">
+  GroLabs · Style Guide · Mirror of <code class="inline">docs/STYLEGUIDE.md</code>. If the production code drifts from this file, the production code wins — update this file in the same PR so it stays canonical.
+</footer>
+
+</div>
+
+</body>
+</html>
