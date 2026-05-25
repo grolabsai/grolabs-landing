@@ -7,18 +7,18 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 /**
  * Booking URL for the hero's "Book Growth Assessment Call" CTA.
- * Defaults to the live Calendly booking page so the button works
+ * Defaults to the live Calendly 30-min event so the button works
  * out-of-the-box in any environment (prod, preview, fresh checkout).
  * Override with PUBLIC_BOOKING_URL in `.env` (or in the Vercel project
  * env settings) if we ever switch providers without redeploying code.
+ *
+ * Today's date is appended as ?month=YYYY-MM&date=YYYY-MM-DD at click
+ * time (see the inline script at the bottom of this page) so visitors
+ * land on the time-picker for today instead of Calendly's month
+ * landing screen.
  */
-const bookingUrl = import.meta.env.PUBLIC_BOOKING_URL || 'https://calendly.com/grolabs/15min-free-growth-assesment';
+const bookingUrl = import.meta.env.PUBLIC_BOOKING_URL || 'https://calendly.com/grolabs-15min-free-growth-assesment/30min';
 const bookingIsExternal = bookingUrl.startsWith('http');
-// When the booking URL is a Calendly link, the page loads Calendly's
-// widget script so clicking the CTA opens an inline popup instead of
-// navigating away. Falls back to the regular new-tab link if the
-// script fails to load or JS is disabled.
-const bookingIsCalendly = bookingUrl.includes('calendly.com');
 ---
 
 <BaseLayout>
@@ -44,9 +44,9 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
           <a
             href={bookingUrl}
             class="hero-v2-btn hero-v2-btn--primary"
-            target={bookingIsExternal && !bookingIsCalendly ? '_blank' : undefined}
-            rel={bookingIsExternal && !bookingIsCalendly ? 'noopener noreferrer' : undefined}
-            data-calendly-url={bookingIsCalendly ? bookingUrl : undefined}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-booking-cta
           >
             Book Growth Assessment Call
           </a>
@@ -76,6 +76,25 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
           <p class="hero-v2-card-body">Returns linked to mismatched expectations caused by incomplete product data and discovery issues.</p>
         </article>
       </div>
+    </div>
+  </section>
+
+  <!-- Booking embed — Calendly's inline widget themed yellow + dark to
+       match the inverted footer. Hidden by default; revealed when the
+       hero CTA is clicked (see the inline script at the bottom of this
+       page). The hero CTA also still carries an `href` + target="_blank"
+       so the page degrades to "open Calendly in a new tab" if JS fails. -->
+  <section id="booking-embed" hidden class="bg-primary pt-2xl pb-md">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <p class="text-zinc-900 text-body-lg leading-relaxed max-w-2xl mb-lg">
+        Select the most convenient date and time for our call.
+      </p>
+      <!-- Calendly's inline widget renders an iframe inside this mount.
+           overflow:hidden clips any trailing whitespace from the widget;
+           the inline script below sets the height to Calendly's reported
+           content height capped at MAX_EMBED_HEIGHT so the calendar
+           never scrolls internally and the bottom dead-space is hidden. -->
+      <div id="calendly-mount" style="min-width:320px; height:760px; width:100%; overflow:hidden;"></div>
     </div>
   </section>
 
@@ -234,7 +253,7 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
         assess your particular situation.
       </p>
     </div>
-    <div class="bg-canvas border border-white/5 p-md md:p-xl rounded-xl mb-xl flex flex-col overflow-hidden">
+    <div class="p-md md:p-xl mb-xl flex flex-col">
       <div id="funnel-root" data-locale="en" class="w-full overflow-x-auto"></div>
 
       <div class="mt-md flex gap-xl items-stretch">
@@ -270,73 +289,15 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
                                                      section's perceived feel.
        Keep this calibration so all sections look balanced regardless of bg. -->
 
-  <!-- Entrepreneurs' Priority / Grow a company. Two-column layout
-       where the LEFT column carries the entire section header +
-       narrative; the RIGHT column hosts the phone-notification SVG
-       starting at the same top edge so the phone visually aligns with
-       the eyebrow. -->
-  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-xl items-start">
-        <!-- LEFT: eyebrow + title + Gerber quote + monitoring paragraph +
-             new no-news / if-needed line -->
-        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
-          <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-            Entrepreneurs' Priority
-          </span>
-          <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
-            Grow a company
-          </h2>
-
-          <blockquote class="border-l border-primary/30 pl-md mb-xl">
-            <p class="text-white text-body-lg italic leading-snug mb-sm">
-              &ldquo;Most entrepreneurs fail because they're working
-              <span class="text-primary font-medium not-italic">in their business</span>
-              rather than
-              <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
-            </p>
-            <footer class="text-body-sm text-zinc-500 not-italic">
-              — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
-            </footer>
-          </blockquote>
-
-          <p class="mb-md">
-            Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
-            hour you spend in the dashboard is an hour you're not spending on
-            the company — on the strategy, the team, the next product, the
-            partnerships only you can build.
-          </p>
-
-          <p>
-            <span class="text-primary font-medium">No news = good news.</span>
-            <span class="text-white">If something requires your attention, we'll let you know.</span>
-          </p>
-        </div>
-
-        <!-- RIGHT: phone notification mockup. align-self-start (default
-             via items-start on the grid) so the top of the phone lines
-             up with the eyebrow on the left. max-width caps the
-             rendered phone size so the SVG doesn't dominate at wide
-             viewports. -->
-        <div class="flex justify-center lg:justify-end">
-          <img
-            src={`${base}/agent-notification.svg`}
-            alt="GroLabs push notification: Hello Peter, I'm afraid traffic dropped 6% yesterday. With a More info link."
-            class="w-full max-w-[180px] h-auto"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Try it out / Attribute Match Visibility. Live Meilisearch demo
        against the `demo` index — 4 snack bars with a deliberate
        data-quality gradient (3/3, 2/3, 1/3, 0/3 matches against the
        gluten-free + sugar-free + dairy-free trio). The 0/3 product is
        the punchline: it IS all three things, but the merchant never
-       tagged it, so search can't surface it by attribute. -->
-  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
+       tagged it, so search can't surface it by attribute.
+       Sits on the lighter canvas bg so the search panel inside it can
+       use the floating-card shadow treatment from the hero. -->
+  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Try it out
@@ -404,27 +365,149 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
     </div>
   </section>
 
-  {bookingIsCalendly && (
-    <>
-      {/* Calendly popup widget — loaded async so it doesn't block the
-          critical path. The click handler below intercepts clicks on any
-          `[data-calendly-url]` element; if Calendly hasn't loaded yet,
-          the default link navigation kicks in as a graceful fallback. */}
-      <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
-      <script async src="https://assets.calendly.com/assets/external/widget.js"></script>
-      <script is:inline>
-        document.addEventListener('click', function (e) {
-          const link = e.target.closest('[data-calendly-url]');
-          if (!link) return;
-          const url = link.getAttribute('data-calendly-url');
-          if (window.Calendly && url) {
-            e.preventDefault();
-            window.Calendly.initPopupWidget({ url });
-          }
-        });
-      </script>
-    </>
-  )}
+  <!-- Entrepreneurs' Priority / Grow a company. Two-column layout
+       where the LEFT column carries the entire section header +
+       narrative; the RIGHT column hosts the phone-notification SVG
+       starting at the same top edge so the phone visually aligns with
+       the eyebrow. Dark section closing the v2 alternation. -->
+  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-xl items-start">
+        <!-- LEFT: eyebrow + title + Gerber quote + monitoring paragraph +
+             new no-news / if-needed line -->
+        <div class="text-secondary-fixed-dim text-body-md leading-relaxed">
+          <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+            Entrepreneurs' Priority
+          </span>
+          <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-xl">
+            Grow a company
+          </h2>
 
+          <blockquote class="border-l border-primary/30 pl-md mb-xl">
+            <p class="text-white text-body-lg italic leading-snug mb-sm">
+              &ldquo;Most entrepreneurs fail because they're working
+              <span class="text-primary font-medium not-italic">in their business</span>
+              rather than
+              <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
+            </p>
+            <footer class="text-body-sm text-zinc-500 not-italic">
+              — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
+            </footer>
+          </blockquote>
+
+          <p class="mb-md">
+            Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
+            hour you spend in the dashboard is an hour you're not spending on
+            the company — on the strategy, the team, the next product, the
+            partnerships only you can build.
+          </p>
+
+          <p>
+            <span class="text-primary font-medium">No news = good news.</span>
+            <span class="text-white">If something requires your attention, we'll let you know.</span>
+          </p>
+        </div>
+
+        <!-- RIGHT: phone notification mockup. align-self-start (default
+             via items-start on the grid) so the top of the phone lines
+             up with the eyebrow on the left. max-width caps the
+             rendered phone size so the SVG doesn't dominate at wide
+             viewports. -->
+        <div class="flex justify-center lg:justify-end">
+          <img
+            src={`${base}/agent-notification.svg`}
+            alt="GroLabs push notification: Hello Peter, I'm afraid traffic dropped 6% yesterday. With a More info link."
+            class="w-full max-w-[180px] h-auto"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Calendly inline embed — loaded on demand when the hero CTA is
+      clicked. The widget URL carries theme colors so Calendly's own
+      calendar renders yellow-with-dark-text inside our inverted
+      section. Today's date is computed at click time so the picker
+      lands on the time-slot view for today regardless of when the
+      page was last built. If JS fails, the CTA's href + target=_blank
+      still opens Calendly in a new tab as a graceful fallback. */}
+  <link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
+  <script async src="https://assets.calendly.com/assets/external/widget.js"></script>
+  <script is:inline define:vars={{ bookingUrl }}>
+    let mounted = false;
+
+    function buildEmbedUrl(base) {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const sep = base.includes('?') ? '&' : '?';
+      return base
+        + sep
+        + 'background_color=fae194'    // yellow page bg inside Calendly
+        + '&text_color=18181b'          // near-black body text
+        + '&primary_color=18181b'       // near-black for accents + buttons
+        + '&hide_event_type_details=1'
+        + '&hide_landing_page_details=1'
+        + '&hide_gdpr_banner=1'
+        + `&month=${yyyy}-${mm}`
+        + `&date=${yyyy}-${mm}-${dd}`;
+    }
+
+    function mountWidget() {
+      const section = document.getElementById('booking-embed');
+      const mount = document.getElementById('calendly-mount');
+      if (!section || !mount) return;
+      section.hidden = false;
+      if (!mounted && window.Calendly && Calendly.initInlineWidget) {
+        Calendly.initInlineWidget({
+          url: buildEmbedUrl(bookingUrl),
+          parentElement: mount,
+        });
+        mounted = true;
+      }
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('click', function (e) {
+      const link = e.target.closest('[data-booking-cta]');
+      if (!link) return;
+      // Only intercept if Calendly's script has loaded. Otherwise let
+      // the link's default new-tab behaviour run.
+      if (!window.Calendly || !Calendly.initInlineWidget) return;
+      e.preventDefault();
+      mountWidget();
+    });
+
+    // Calendly posts an `iframe_height` (sometimes prefixed) event over
+    // postMessage whenever its content reflows — month → time slots →
+    // confirmation form. Mirror that height into the mount container so
+    // the iframe never scrolls internally; the page scrolls naturally
+    // instead.
+    window.addEventListener('message', function (e) {
+      if (!e || !e.data || typeof e.origin !== 'string') return;
+      if (!e.origin.endsWith('.calendly.com') && e.origin !== 'https://calendly.com') return;
+      const data = e.data;
+      const evt = (data && data.event) || '';
+      // Calendly's event for size change. Different versions of the
+      // widget have used slightly different shapes — check the common
+      // possibilities and pull whichever height field is present.
+      const height =
+        (data.payload && (data.payload.height || data.payload.iframeHeight)) ||
+        data.height ||
+        data.iframeHeight;
+      if (!height || typeof height !== 'number') return;
+      if (!/iframe.?height|page_height|resize/i.test(evt) && !data.height) return;
+      const mount = document.getElementById('calendly-mount');
+      if (!mount) return;
+      // Cap the height so Calendly's trailing whitespace gets clipped
+      // by the mount's `overflow: hidden`. The calendar + slot picker
+      // both fit comfortably inside this cap; only the empty padding
+      // beyond Calendly's content gets cropped.
+      const MAX_EMBED_HEIGHT = 760;
+      mount.style.height = Math.min(height, MAX_EMBED_HEIGHT) + 'px';
+    });
+  </script>
 
 </BaseLayout>

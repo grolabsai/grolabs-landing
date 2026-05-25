@@ -43,17 +43,24 @@ const STRINGS = {
 
 <style is:global>
   /* Panel — same surface treatment as the other inner blocks on the page
-     (funnel container, scenario block). One step lighter than the
-     section's canvas-deeper bg so the panel reads as a raised tray. */
+     (funnel container, scenario block). Now sits on the section's
+     lighter bg-canvas — uses the same lifted-panel treatment as the
+     hero cards: panel one tonal step ABOVE the page bg + a big soft
+     drop shadow so the panel reads as floating above the surface. */
   .search-demo {
     display: flex;
     flex-direction: column;
     gap: 12px;
     width: 100%;
-    background: #131316;
+    background: #1c1d24;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 16px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.05) inset,
+      0 2px 4px rgba(0,0,0,0.5),
+      0 30px 60px -12px rgba(0,0,0,0.65),
+      0 60px 120px -24px rgba(0,0,0,0.55);
   }
 
   /* Search input — sits one tone darker than the panel so it reads as

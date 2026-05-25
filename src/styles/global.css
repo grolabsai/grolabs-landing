@@ -135,6 +135,13 @@ body {
   transition: height 0.1s linear;
 }
 
+/* Funnel stage tiles — floating-card treatment that matches the hero v2
+   cards. The drop-shadow is applied to the rect rather than the parent
+   group so the icon + label text stay crisp (no shadow on text). */
+.funnel-stages > g > rect {
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55));
+}
+
 /* Leak droplets — falling drops convey the funnel bleeding revenue */
 .funnel-droplet {
   filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.4));

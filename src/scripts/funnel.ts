@@ -173,15 +173,12 @@ const BAR_H = 145;                 // red bar height — taller than the origina
 // Top extends to -15 so the 35% pill (lifted to the level of Search's top edge) has clearance.
 const VIEWBOX = { x: 0, y: -15, w: 1400, h: BAR_Y + BAR_H + 15 };
 
-// Stage cards punch DARKER than the section background — they read as
-// recessed "wells" in the canvas-deeper surface. Pure black gives the
-// strongest separation; the kinetic-yellow icons + bone-white labels
-// pop loudest against it. Border stays as a subtle hairline.
-// Stage tiles now sit on a darker funnel container (canvas-deeper); use
-// the same #1F1F23 step-up tone used by .stats-section-surface so they
-// read as raised tiles rather than punched-out wells.
-const STAGE_FILL = '#1F1F23';
-const STAGE_BORDER = 'rgba(255, 255, 255, 0.08)';
+// Stage cards now use the same lifted-card treatment as the hero v2
+// cards: one tonal step ABOVE the section's canvas-deeper bg, with a
+// soft drop shadow (applied via CSS on `.funnel-stages > g > rect` in
+// global.css) so each tile reads as floating above the surface.
+const STAGE_FILL = '#1c1d24';
+const STAGE_BORDER = 'rgba(255, 255, 255, 0.05)';
 const STAGE_BORDER_W = 1;
 const STAGE_ACCENT = '#fae194'; // text + icon
 
