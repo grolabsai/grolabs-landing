@@ -1,0 +1,62 @@
+# GroLabs
+
+> AI-agent-driven optimization layer for small e-commerce businesses.
+> GroLabs recovers revenue that merchants are already losing to three
+> specific failure modes — customers who can't find the product they
+> want, customers who find it but aren't convinced, and customers who
+> are convinced but can't get through checkout.
+
+GroLabs runs continuously on the merchant's existing storefront
+(WooCommerce today, more platforms over time), detects leaks at every
+funnel stage, and fixes them. The merchant pays a flat subscription
+and the agent monitors / hunts leaks / proposes fixes so the operator
+gets their time back.
+
+## Who GroLabs is for
+
+- Small-to-mid e-commerce stores on WooCommerce (other platforms next).
+- Owner-operators who can't afford a full optimization team.
+- Stores with at least a few thousand monthly sessions where small
+  conversion lifts already produce meaningful dollar returns.
+
+## The three failure modes GroLabs addresses
+
+1. **Search conversion uplift** — internal site search. Industry
+   benchmark: users who search convert 2–3× more often than those
+   who don't, if they find what they want.
+2. **Product page drop-off** — shoppers leave product pages without
+   adding to cart. Industry benchmark: 14–23% of product page visits.
+3. **Returns of perfect products** — products returned because the
+   customer expected something different than what arrived. Industry
+   benchmark: 19–24% of returns trace to mismatched expectations
+   caused by incomplete product data or discovery issues.
+
+## How to engage
+
+- Free 15-minute growth assessment call: https://cal.com/tuncho-granados-uibzst/15min
+- Email: growth@grolabs.ai
+- Website (English): https://grolabs.ai
+- Website (Spanish):  https://grolabs.ai/es/
+
+## Canonical pages
+
+- /              Landing page, English
+- /es/           Landing page, Spanish
+- /blog/         Blog (English)
+- /resources/    Resources (English)
+- /sitemap-index.xml  Sitemap index
+
+## Brand
+
+- Display name: GroLabs
+- Legal name:   GroLabs AI
+- Logo:         https://grolabs.ai/grolabs-wordmark.svg
+- Tagline:      Recover lost revenue & grow your business — without paying for more traffic.
+
+## Licensing
+
+Marketing pages are open for indexing and quoting with attribution.
+Please link back to https://grolabs.ai or the specific URL when
+quoting figures or product copy. The "industry benchmark" percentages
+above represent mid-market e-commerce averages; consult the GroLabs
+team for the underlying methodology before publishing them.

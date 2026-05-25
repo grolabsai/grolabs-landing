@@ -37,6 +37,59 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 ---
 
 <BaseLayout>
+  {/* JSON-LD: Service + FAQPage in Spanish so answer engines that
+      reply in Spanish (or that need a localized version) can quote
+      the page with attribution. */}
+  <Fragment slot="head-extra">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Llamada de evaluación de crecimiento",
+      "description": "Llamada gratuita de 15 minutos. Recorremos juntos tu tienda y señalamos las mayores fugas de ingresos en búsqueda, página de producto y checkout.",
+      "provider": { "@type": "Organization", "name": "GroLabs", "url": "https://grolabs.ai" },
+      "areaServed": "Worldwide",
+      "serviceType": "Consultoría de crecimiento e-commerce",
+      "inLanguage": "es",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      "potentialAction": {
+        "@type": "ReserveAction",
+        "target": "https://cal.com/tuncho-granados-uibzst/15min",
+        "result": { "@type": "Reservation", "name": "Llamada de evaluación de crecimiento" }
+      }
+    })} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "inLanguage": "es",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cuánto aumenta la conversión la búsqueda interna del sitio?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Los usuarios que buscan en una tienda convierten 2–3× más que quienes no buscan — pero solo si encuentran lo que quieren. La búsqueda del sitio genera un aumento medible en la conversión cuando se combina con datos de catálogo ricos y un motor de búsqueda que entiende la intención del comprador."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuántos ingresos se pierden por abandono en la página de producto?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Entre el 14% y el 23% de las visitas a páginas de producto terminan sin agregar al carrito en tiendas e-commerce de mercado medio. Las causas más comunes son la falta de detalles de producto (tallas, materiales, compatibilidad) y una imagen principal poco clara — ambas se pueden resolver en la capa de catálogo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuántas devoluciones se deben a expectativas no coincidentes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Entre el 19% y el 24% de las devoluciones en tiendas e-commerce de mercado medio se deben a expectativas no coincidentes — el producto en sí estaba bien, pero el comprador esperaba algo diferente. La causa raíz suele ser datos de producto incompletos y problemas de descubrimiento que muestran el producto equivocado al comprador equivocado."
+          }
+        }
+      ]
+    })} />
+  </Fragment>
+
   {/* Header-anchored CTAs. Hidden by default; an IntersectionObserver
       at the bottom of this page reveals them when the hero CTA row
       scrolls out of view. */}
@@ -99,16 +152,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             Quienes buscan convierten 2&ndash;3&times; más que quienes no lo hacen&mdash;<br>
             <span class="hero-v2-highlight">si encuentran lo que buscan</span>.
           </p>
+          <cite class="hero-v2-card-source">Referencia de industria — e-commerce de mercado medio.</cite>
         </article>
         <article class="hero-v2-card">
           <div class="hero-v2-stat">14&ndash;23%</div>
           <h3 class="hero-v2-card-title">Abandono en página de producto</h3>
           <p class="hero-v2-card-body">Los compradores abandonan las páginas de producto sin agregar al carrito por falta de detalles e información poco clara.</p>
+          <cite class="hero-v2-card-source">Referencia de industria — e-commerce de mercado medio.</cite>
         </article>
         <article class="hero-v2-card">
           <div class="hero-v2-stat">19&ndash;24%</div>
           <h3 class="hero-v2-card-title">Devoluciones de productos perfectos</h3>
           <p class="hero-v2-card-body">Devoluciones por expectativas no coincidentes causadas por datos de producto incompletos y problemas de descubrimiento.</p>
+          <cite class="hero-v2-card-source">Referencia de industria — e-commerce de mercado medio.</cite>
         </article>
       </div>
     </div>
@@ -577,6 +633,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   }
   .hero-v2-card--featured .hero-v2-card-body { font-size: 20px; }
   .hero-v2-highlight { color: #fff; white-space: nowrap; }
+
+  /* Source attribution under each stat card. */
+  .hero-v2-card-source {
+    display: block;
+    margin-top: 16px;
+    font-family: monospace;
+    font-style: normal;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(237, 234, 224, 0.35);
+  }
 
   @media (max-width: 720px) {
     .hero-v2-stage { grid-template-columns: 1fr; }

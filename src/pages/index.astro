@@ -29,6 +29,59 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 ---
 
 <BaseLayout>
+  {/* Page-level JSON-LD: Service + FAQPage. Service describes the
+      Growth Assessment Call as a bookable offering (with the Cal.com
+      URL as a potentialAction). FAQPage marks up each stat card as
+      a Question/Answer pair so answer engines can quote them with
+      attribution. */}
+  <Fragment slot="head-extra">
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": "Growth Assessment Call",
+      "description": "Free 15-minute growth assessment call. We walk through your storefront together and point out the biggest revenue leaks at the search, product page, and checkout stages.",
+      "provider": { "@type": "Organization", "name": "GroLabs", "url": "https://grolabs.ai" },
+      "areaServed": "Worldwide",
+      "serviceType": "E-commerce growth consultation",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD", "availability": "https://schema.org/InStock" },
+      "potentialAction": {
+        "@type": "ReserveAction",
+        "target": "https://cal.com/tuncho-granados-uibzst/15min",
+        "result": { "@type": "Reservation", "name": "Growth Assessment Call" }
+      }
+    })} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much does site search lift conversion?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Users who search on a storefront convert 2–3× more often than visitors who don't search — but only if they find what they want. Site search drives a measurable conversion uplift when paired with rich catalog data and a search engine that understands shopper intent."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much revenue do product pages lose to drop-off?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "14–23% of product page visits end without an add-to-cart on mid-market e-commerce stores. The most common causes are missing product details (sizing, materials, compatibility) and unclear primary imagery — both of which can be addressed at the catalog layer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many returns are caused by mismatched expectations?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "19–24% of returns on mid-market e-commerce stores trace to mismatched expectations — the product itself was fine, but the shopper expected something different than what arrived. The root cause is usually incomplete product data and discovery issues that surface the wrong product to the wrong shopper."
+          }
+        }
+      ]
+    })} />
+  </Fragment>
+
   {/* Header-anchored CTAs. Hidden by default; an IntersectionObserver
       at the bottom of this page reveals them when the hero CTA row
       scrolls out of view. Same Book primary + Contact ghost pair as
@@ -95,16 +148,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             Users who search convert 2&ndash;3&times; more often than those who don't&mdash;<br>
             <span class="hero-v2-highlight">if they find what they want</span>.
           </p>
+          <cite class="hero-v2-card-source">Industry benchmark — mid-market e-commerce.</cite>
         </article>
         <article class="hero-v2-card">
           <div class="hero-v2-stat">14&ndash;23%</div>
           <h3 class="hero-v2-card-title">Product page drop-off</h3>
           <p class="hero-v2-card-body">Shoppers leave product pages without adding to cart due to missing details and unclear information.</p>
+          <cite class="hero-v2-card-source">Industry benchmark — mid-market e-commerce.</cite>
         </article>
         <article class="hero-v2-card">
           <div class="hero-v2-stat">19&ndash;24%</div>
           <h3 class="hero-v2-card-title">Returns of perfect products</h3>
           <p class="hero-v2-card-body">Returns linked to mismatched expectations caused by incomplete product data and discovery issues.</p>
+          <cite class="hero-v2-card-source">Industry benchmark — mid-market e-commerce.</cite>
         </article>
       </div>
     </div>
@@ -274,6 +330,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* Intentional exception: featured card body runs at 20px. */
     .hero-v2-card--featured .hero-v2-card-body { font-size: 20px; }
     .hero-v2-highlight { color: #fff; white-space: nowrap; }
+
+    /* Source attribution under each stat card. Small, low-contrast,
+       monospace — readable as a citation but not loud. */
+    .hero-v2-card-source {
+      display: block;
+      margin-top: 16px;
+      font-family: monospace;
+      font-style: normal;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(237, 234, 224, 0.35);
+    }
 
     @media (max-width: 720px) {
       .hero-v2-stage { grid-template-columns: 1fr; }

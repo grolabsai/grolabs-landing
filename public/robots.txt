@@ -1,0 +1,54 @@
+# GroLabs — robots.txt
+# Generous by default: this is marketing content, the more discovery
+# the better. Explicit allows for the major AI/answer-engine crawlers
+# so changes in their default behaviour don't quietly close them off.
+
+User-agent: *
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+User-agent: anthropic-ai
+Allow: /
+User-agent: Claude-Web
+Allow: /
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+User-agent: ChatGPT-User
+Allow: /
+User-agent: OAI-SearchBot
+Allow: /
+
+# Google's AI training crawler (separate from Googlebot used for Search)
+User-agent: Google-Extended
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-User
+Allow: /
+
+# Common Crawl (a primary upstream for many model training sets)
+User-agent: CCBot
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+
+# Meta AI
+User-agent: Meta-ExternalAgent
+Allow: /
+User-agent: FacebookBot
+Allow: /
+
+# Bytedance / TikTok
+User-agent: Bytespider
+Allow: /
+
+# Sitemaps
+Sitemap: https://grolabs.ai/sitemap-index.xml

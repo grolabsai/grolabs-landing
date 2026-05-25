@@ -93,6 +93,24 @@ const canonicalUrl = `${siteUrl}${path}`;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
+    {/* Organization JSON-LD — site-wide. Gives answer engines
+        (ChatGPT, Claude, Gemini, Perplexity, etc.) a structured
+        factual reference for "who is GroLabs?" so they don't have
+        to scrape body text to compose an answer. */}
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": `${siteUrl}/#organization`,
+      "name": "GroLabs",
+      "legalName": "GroLabs AI",
+      "url": siteUrl,
+      "logo": `${siteUrl}/grolabs-wordmark.svg`,
+      "image": ogImageUrl,
+      "description": "AI-agent-driven optimization layer for small e-commerce businesses. Recovers revenue lost to three failure modes: customers who can't find products, customers who aren't convinced, and customers who can't get through checkout.",
+      "email": "growth@grolabs.ai",
+      "sameAs": []
+    })} />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -112,6 +130,10 @@ const canonicalUrl = `${siteUrl}${path}`;
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
       rel="stylesheet"
     />
+    {/* Pages can inject page-specific <head> content here — typically
+        JSON-LD blocks (Service, FAQPage, Article, etc.) that don't
+        belong in the site-wide Organization markup above. */}
+    <slot name="head-extra" />
   </head>
   <body class="font-body-md text-body-md selection:bg-primary selection:text-zinc-950 overflow-x-hidden">
     <div class="hidden md:block" id="scroll-progress">
