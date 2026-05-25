@@ -90,11 +90,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         Select the most convenient date and time for our call.
       </p>
       <!-- Calendly's inline widget renders an iframe inside this mount.
-           Dark widget + light text via URL params so the calendar
-           reads as a card sitting on the yellow section. overflow:hidden
-           clips trailing whitespace; the script below caps the height
-           at MAX_EMBED_HEIGHT so the widget never scrolls internally. -->
-      <div id="calendly-mount" style="min-width:320px; height:760px; width:100%; overflow:hidden; border-radius:16px; box-shadow: 0 24px 60px -16px rgba(0,0,0,0.45);"></div>
+           Dark widget + light text via URL params so it sits directly
+           on the yellow section with no intermediate frame. overflow:
+           hidden clips trailing whitespace; the script below caps the
+           height at MAX_EMBED_HEIGHT so the widget never scrolls
+           internally. -->
+      <div id="calendly-mount" style="min-width:320px; height:760px; width:100%; overflow:hidden;"></div>
     </div>
   </section>
 
