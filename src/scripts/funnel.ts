@@ -323,9 +323,9 @@ export function renderFunnel(root: HTMLElement): void {
       <path d="M 0 0 L 10 5 L 0 10 z" fill="${FORWARD_STROKE}" />
     </marker>
     <linearGradient id="leak-bar-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#7F1D1D" />
-      <stop offset="50%" stop-color="#991B1B" />
-      <stop offset="100%" stop-color="#7F1D1D" />
+      <stop offset="0%" stop-color="#3d2810" />
+      <stop offset="50%" stop-color="#5a3f1c" />
+      <stop offset="100%" stop-color="#3d2810" />
     </linearGradient>
   `;
   svg.appendChild(defs);
@@ -357,7 +357,7 @@ export function renderFunnel(root: HTMLElement): void {
     drop.setAttribute('cy', String(cy));
     drop.setAttribute('rx', '3');
     drop.setAttribute('ry', '4.5');
-    drop.setAttribute('fill', '#dc2626');
+    drop.setAttribute('fill', '#8a5820');
     drop.setAttribute('opacity', '0.92');
     drop.setAttribute('class', 'funnel-droplet');
     drop.dataset.leakId = leakId;
@@ -662,10 +662,10 @@ export function renderFunnel(root: HTMLElement): void {
   barTitle.setAttribute('y', String(BAR_Y + 118));
   barTitle.setAttribute('text-anchor', 'middle');
   barTitle.setAttribute('fill', '#ffffff');
-  barTitle.setAttribute('font-size', '23');
-  barTitle.setAttribute('font-weight', '700');
-  barTitle.setAttribute('font-family', '"Hanken Grotesk", system-ui, sans-serif');
-  barTitle.setAttribute('letter-spacing', '0.04em');
+  barTitle.setAttribute('font-size', '28');
+  barTitle.setAttribute('font-weight', '400');
+  barTitle.setAttribute('font-family', '"Permanent Marker", cursive');
+  barTitle.setAttribute('letter-spacing', '0.01em');
   barTitle.textContent = UI.barTitle;
   barGroup.appendChild(barTitle);
 
