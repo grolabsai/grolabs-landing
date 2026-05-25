@@ -29,11 +29,35 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 ---
 
 <BaseLayout>
+  {/* Header-anchored CTAs. Hidden by default; an IntersectionObserver
+      at the bottom of this page reveals them when the hero CTA row
+      scrolls out of view. Same Book primary + Contact ghost pair as
+      the hero. */}
+  <Fragment slot="header-ctas">
+    <div id="header-ctas" class="header-ctas" hidden>
+      <a
+        href="https://cal.com/tuncho-granados-uibzst/15min"
+        class="header-cta header-cta--primary cta-button-style"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-booking-cta
+      >
+        Book Growth Assessment Call
+      </a>
+      <a
+        href="mailto:growth@grolabs.ai"
+        class="header-cta header-cta--ghost"
+      >
+        Contact
+      </a>
+    </div>
+  </Fragment>
+
   <!-- Hero + Stats (v2) — merged into one viewport. Left column carries
        the headline / tagline / lede / CTAs; right column shows the three
        stat cards. The SEO and AEO cards from v1 have been pulled into a
        separate (future) section and are no longer in the hero. -->
-  <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-3xl pb-3xl overflow-hidden">
+  <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-2xl pb-2xl md:pt-3xl md:pb-3xl overflow-hidden">
     <div id="particles-container"></div>
 
     <div class="hero-v2-grid max-w-page mx-auto relative z-10 reveal active">
@@ -47,10 +71,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           Yes, it's possible. We will help you recover lost revenue and increase
           sales without paying for more traffic.
         </p>
-        <div class="hero-v2-ctas">
+        <div class="hero-v2-ctas" data-hero-ctas>
           <a
             href={bookingUrl}
-            class="hero-v2-btn hero-v2-btn--primary"
+            class="hero-v2-btn hero-v2-btn--primary cta-button-style"
             target="_blank"
             rel="noopener noreferrer"
             data-booking-cta
@@ -91,8 +115,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        hero CTA is clicked (see the inline script at the bottom of this
        page). The hero CTA also still carries an `href` + target="_blank"
        so the page degrades to "open Calendly in a new tab" if JS fails. -->
-  <section id="booking-embed" hidden class="bg-primary pt-2xl pb-md">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+  <section id="booking-embed" hidden class="bg-primary pt-xl pb-md md:pt-2xl px-margin-mobile md:px-margin-desktop">
+    <div class="max-w-page mx-auto">
       <p class="text-zinc-900 text-body-lg leading-relaxed max-w-2xl mb-lg">
         Select the most convenient date and time for our call.
       </p>
@@ -145,7 +169,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .hero-v2-tagline {
       font-family: monospace;
       color: #fae194;
-      font-size: clamp(16px, 1.8vw, 22px);
+      font-size: clamp(12px, 1.4vw, 18px);   /* -2pt again vs prior 14/16/20 clamp */
       line-height: 1.4;
       letter-spacing: 0.2em;
       text-transform: uppercase;
@@ -176,10 +200,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
     .hero-v2-btn--primary {
       color: #1A1A1A;
-      background: #fae194;
       box-shadow:
         inset 0 1px 0 rgba(255,255,255,0.35),
         0 8px 24px -4px rgba(250,225,148,0.35);
+    }
+
+    /* ─────────── Call-to-action button style ───────────
+       Reusable yellow gradient (light at top → deeper at bottom).
+       Add this class anywhere the primary Book CTA appears so the
+       gradient stays visually consistent across the page. The button's
+       size/padding/border/shadow live on the host class (.hero-v2-btn,
+       .header-cta, etc.); this class only sets the gradient background. */
+    .cta-button-style {
+      background: linear-gradient(180deg, #fbe9a8 0%, #fae194 55%, #f0d770 100%);
     }
     .hero-v2-btn--primary:hover { transform: translateY(-1px); }
     .hero-v2-btn--ghost {
@@ -247,24 +280,169 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .hero-v2-card--featured { grid-column: auto; }
       .hero-v2-card-title { white-space: normal; }
     }
+
+    /* ─────────── Revenue Leaks — equation card (right column) ──────────
+       Same lifted-card treatment as the hero cards: lighter fill on the
+       darker section bg + soft drop shadow + 1px inner top highlight. */
+    .leak-equation-card {
+      background: #1c1d24;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow:
+        0 1px 0 rgba(255,255,255,0.05) inset,
+        0 2px 4px rgba(0,0,0,0.5),
+        0 30px 60px -12px rgba(0,0,0,0.65),
+        0 60px 120px -24px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-self: start;
+    }
+    .leak-equation {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: "Permanent Marker", cursive;
+      font-weight: 400;
+      font-size: 28px;
+      color: #EDEAE0;
+      text-transform: uppercase;
+      line-height: 1.1;
+      flex-wrap: wrap;
+    }
+    .leak-equation-fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .leak-equation-num {
+      border-bottom: 1px solid rgba(237, 234, 224, 0.6);
+      padding: 0 8px 4px;
+      white-space: nowrap;
+    }
+    .leak-equation-den {
+      padding-top: 0;
+      white-space: nowrap;
+    }
+    .leak-equation-key {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 0;
+    }
+    .leak-equation-row {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+      align-items: baseline;
+    }
+    .leak-equation-row dt {
+      font-family: monospace;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #fae194;
+      font-weight: 400;
+    }
+    .leak-equation-row dd {
+      font-family: monospace;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+      margin: 0;
+    }
+
+    /* ─────────── Header-anchored CTAs ─────────── */
+    .header-ctas {
+      display: flex; align-items: center; gap: 10px; margin-left: 16px;
+      animation: header-ctas-in 200ms ease-out;
+    }
+    .header-ctas[hidden] { display: none; }
+    @keyframes header-ctas-in {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .header-cta {
+      font-family: "Hanken Grotesk", sans-serif;
+      font-weight: 600; font-size: 13px;
+      padding: 8px 16px; border-radius: 8px;
+      border: 1px solid transparent; text-decoration: none;
+      display: inline-flex; align-items: center;
+      transition: transform .15s, background .2s, color .2s, border-color .2s;
+    }
+    .header-cta--primary {
+      color: #1A1A1A;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 4px 14px -2px rgba(250,225,148,0.35);
+    }
+    .header-cta--primary:hover { transform: translateY(-1px); }
+    .header-cta--ghost {
+      background: transparent;
+      color: rgba(237, 234, 224, 0.6);
+      border-color: rgba(237, 234, 224, 0.35);
+    }
+    .header-cta--ghost:hover { color: rgba(237, 234, 224, 0.9); border-color: rgba(237, 234, 224, 0.6); }
+    @media (max-width: 768px) {
+      .header-cta--ghost { display: none; }
+      .header-cta { font-size: 12px; padding: 6px 12px; }
+      .header-ctas { margin-left: 8px; }
+    }
   </style>
 
   <!-- Funnel Benchmark / Revenue leaks. Dark section per the v2
        alternation (hero light → leaks dark → grow light → try it out
        dark). Inner flow-simulator wrapper inverts to the lighter
        canvas bg so the embedded block still reads as distinct. -->
-  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-    <div class="mb-xs">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Conversion Funnel
-      </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">Revenue leaks</h2>
-      <p class="text-body-lg text-secondary-fixed-dim max-w-3xl">
-        We have identified the most likely causes of lost revenue at each stage. These are
-        general e-commerce standard percentages, but you can change the values in order to
-        assess your particular situation.
-      </p>
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
+    {/* Eyebrow and section title both live in their own row above the
+        two-column block so the equation card (right) aligns with the
+        top of the paragraph below the title (left), not with the title
+        itself. */}
+    <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+      Conversion Funnel
+    </span>
+    <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">Revenue leaks</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-xl mb-xl">
+      {/* LEFT: definitions + synonyms line. */}
+      <div>
+        <p class="text-body-lg text-secondary-fixed-dim">
+          Revenue leakage is the gap between the revenue a business has earned and the
+          revenue it actually captures, caused by preventable friction, broken processes,
+          and missed opportunities.
+        </p>
+        <p class="text-body-lg text-secondary-fixed-dim mt-md">
+          Losses caused by our mistakes, not by competition or market conditions.
+        </p>
+        <p class="text-body-lg mt-md">
+          <span class="text-white">Business&apos;s unforced errors&nbsp;&mdash;</span>
+          <span class="text-primary">Tree-putts, walks, double faults, turnovers ...</span>
+        </p>
+      </div>
+
+      {/* RIGHT: equation card using the same lifted-card style as the hero. */}
+      <div class="leak-equation-card">
+        <div class="leak-equation">
+          <span class="leak-equation-lhs">Revenue Leaks (%)&nbsp;=</span>
+          <span class="leak-equation-fraction">
+            <span class="leak-equation-num">TPR&nbsp;−&nbsp;ACR</span>
+            <span class="leak-equation-den">TPR</span>
+          </span>
+          <span class="leak-equation-rhs">×&nbsp;100</span>
+        </div>
+        <dl class="leak-equation-key">
+          <div class="leak-equation-row">
+            <dt>TPR</dt>
+            <dd>Total Potential Revenue</dd>
+          </div>
+          <div class="leak-equation-row">
+            <dt>ACR</dt>
+            <dd>Actual Collected Revenue</dd>
+          </div>
+        </dl>
+      </div>
     </div>
     <div class="p-md md:p-xl mb-xl flex flex-col">
       <div id="funnel-root" data-locale="en" class="w-full overflow-x-auto"></div>
@@ -310,8 +488,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        tagged it, so search can't surface it by attribute.
        Sits on the lighter canvas bg so the search panel inside it can
        use the floating-card shadow treatment from the hero. -->
-  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+  <section class="relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Try it out
       </span>
@@ -335,7 +513,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
              "Attribute match visibility" item carries an extra
              yellow sub-label ("Reduces returns") spelling out the
              outcome. -->
-        <ul class="space-y-md">
+        <ul class="grid grid-cols-2 gap-md lg:grid-cols-1">
           <li class="flex items-start gap-md">
             <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">bolt</span>
             <div class="text-white text-body-md leading-relaxed">
@@ -383,8 +561,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        narrative; the RIGHT column hosts the phone-notification SVG
        starting at the same top edge so the phone visually aligns with
        the eyebrow. Dark section closing the v2 alternation. -->
-  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-xl items-start">
         <!-- LEFT: eyebrow + title + Gerber quote + monitoring paragraph +
              new no-news / if-needed line -->
@@ -591,5 +769,24 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       })();
     </script>
   )}
+
+  {/* Reveal the header CTAs as soon as the hero CTA row scrolls past
+      the top of the viewport, and hide them again when it scrolls back
+      in. Keeps a Book CTA anchored to the header from any scroll
+      position. */}
+  <script is:inline>
+    (function () {
+      const heroCtas = document.querySelector('[data-hero-ctas]');
+      const headerCtas = document.getElementById('header-ctas');
+      if (!heroCtas || !headerCtas) return;
+      const observer = new IntersectionObserver(
+        function (entries) {
+          headerCtas.hidden = entries[0].isIntersecting;
+        },
+        { threshold: 0 }
+      );
+      observer.observe(heroCtas);
+    })();
+  </script>
 
 </BaseLayout>
