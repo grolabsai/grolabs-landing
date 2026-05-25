@@ -90,11 +90,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         Select the most convenient date and time for our call.
       </p>
       <!-- Calendly's inline widget renders an iframe inside this mount.
-           overflow:hidden clips any trailing whitespace from the widget;
-           the inline script below sets the height to Calendly's reported
-           content height capped at MAX_EMBED_HEIGHT so the calendar
-           never scrolls internally and the bottom dead-space is hidden. -->
-      <div id="calendly-mount" style="min-width:320px; height:760px; width:100%; overflow:hidden;"></div>
+           Dark widget + light text via URL params so the calendar
+           reads as a card sitting on the yellow section. overflow:hidden
+           clips trailing whitespace; the script below caps the height
+           at MAX_EMBED_HEIGHT so the widget never scrolls internally. -->
+      <div id="calendly-mount" style="min-width:320px; height:760px; width:100%; overflow:hidden; border-radius:16px; box-shadow: 0 24px 60px -16px rgba(0,0,0,0.45);"></div>
     </div>
   </section>
 
@@ -445,9 +445,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       const sep = base.includes('?') ? '&' : '?';
       return base
         + sep
-        + 'background_color=fae194'    // yellow page bg inside Calendly
-        + '&text_color=18181b'          // near-black body text
-        + '&primary_color=18181b'       // near-black for accents + buttons
+        + 'background_color=131316'    // dark widget bg — contrasts with the yellow section
+        + '&text_color=EDEAE0'          // cream/white body text
+        + '&primary_color=fae194'       // brand yellow for accents + buttons
         + '&hide_event_type_details=1'
         + '&hide_landing_page_details=1'
         + '&hide_gdpr_banner=1'
