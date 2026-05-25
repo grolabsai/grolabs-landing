@@ -13,6 +13,12 @@ dist-ssr
 .astro
 *.local
 
+# Local env (PUBLIC_BOOKING_URL, etc.) — keep secrets out of git.
+# `.env.example` is committed as the template.
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

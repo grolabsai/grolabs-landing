@@ -109,6 +109,9 @@ export default {
         'button-text': ['"Hanken Grotesk"', 'sans-serif'],
         // The brand-mark / hero hand-drawn voice. Loaded by BaseLayout.
         marker: ['"Permanent Marker"', 'cursive'],
+        // Pen handwriting — softer than `marker`, used for secondary
+        // hand-drawn lines. Loaded by BaseLayout.
+        caveat: ['"Caveat"', 'cursive'],
         // Typewriter voice for closing copy. Also from the original site.
         typewriter: ['"Special Elite"', 'monospace'],
         mono: ['monospace'],
