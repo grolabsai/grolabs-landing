@@ -2,19 +2,17 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchDemo from '../components/SearchDemo.astro';
 import SearchCopyHelper from '../components/SearchCopyHelper.astro';
-import EquationCard from '../components/EquationCard.astro';
-import CapabilityCard from '../components/CapabilityCard.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 /**
- * Booking URL for the hero's "Book a free 15-minute consultation call"
- * CTA. Set PUBLIC_BOOKING_URL in `.env` to your provider's hosted
- * booking page (Cal.com, Calendly, SavvyCal, etc. — see .env.example).
- * Falls back to a mailto so the button never breaks if the env var
- * isn't set yet.
+ * Booking URL for the hero's "Book Growth Assessment Call" CTA.
+ * Defaults to the live Calendly booking page so the button works
+ * out-of-the-box in any environment (prod, preview, fresh checkout).
+ * Override with PUBLIC_BOOKING_URL in `.env` (or in the Vercel project
+ * env settings) if we ever switch providers without redeploying code.
  */
-const bookingUrl = import.meta.env.PUBLIC_BOOKING_URL || 'mailto:growth@grolabs.ai';
+const bookingUrl = import.meta.env.PUBLIC_BOOKING_URL || 'https://calendly.com/grolabs/15min-free-growth-assesment';
 const bookingIsExternal = bookingUrl.startsWith('http');
 // When the booking URL is a Calendly link, the page loads Calendly's
 // widget script so clicking the CTA opens an inline popup instead of
@@ -219,11 +217,11 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
     }
   </style>
 
-  <!-- Funnel Benchmark / Revenue leaks. Sits on the lighter canvas bg
-       so it alternates with the canvas-deeper Revenue uplift section
-       above and the canvas-deeper How section below. Inner blocks
-       (scenario + funnel) go canvas-deeper to invert the contrast. -->
-  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
+  <!-- Funnel Benchmark / Revenue leaks. Dark section per the v2
+       alternation (hero light → leaks dark → grow light → try it out
+       dark). Inner flow-simulator wrapper inverts to the lighter
+       canvas bg so the embedded block still reads as distinct. -->
+  <section class="relative mt-2xl py-3xl bg-canvas-deeper overflow-hidden reveal">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
     <div class="mb-xs">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
@@ -236,7 +234,7 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
         assess your particular situation.
       </p>
     </div>
-    <div class="bg-canvas-deeper border border-white/5 p-md md:p-xl rounded-xl mb-xl flex flex-col overflow-hidden">
+    <div class="bg-canvas border border-white/5 p-md md:p-xl rounded-xl mb-xl flex flex-col overflow-hidden">
       <div id="funnel-root" data-locale="en" class="w-full overflow-x-auto"></div>
 
       <div class="mt-md flex gap-xl items-stretch">
@@ -406,51 +404,6 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
     </div>
   </section>
 
-  <!-- Revenue equation section — moved to the bottom of the page in v2
-       so the leaks → equation → close flows visually. -->
-  <section id="revenue-equation" class="relative mt-3xl py-3xl bg-canvas-deeper overflow-hidden">
-    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
-      <div class="mb-2xl">
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-          Revenue uplift
-        </span>
-        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">
-          More money in your pocket
-        </h2>
-        <p class="text-zinc-400 text-lg leading-relaxed">
-          Either increase traffic or increase conversion, right?
-          <span class="text-primary">We specialize in conversion.</span>
-        </p>
-      </div>
-
-      <div
-        id="equation-container"
-        class="flex items-stretch gap-6 w-full transition-all duration-700 ease-out"
-      >
-        <EquationCard icon="groups" label="Traffic">
-          <p>We don't run your ads or generate leads, but we will:</p>
-          <ul>
-            <li>More <span class="text-primary">SEO</span> traffic, from richer product data.</li>
-            <li>More <span class="text-primary">AI agent referrals</span>, from making your store agent-ready.</li>
-          </ul>
-        </EquationCard>
-        <div class="equation-operator">×</div>
-        <EquationCard icon="percent" label="Conversion">
-          <p>We lift conversion at the three points where it usually breaks:</p>
-          <ul>
-            <li><span class="text-primary">Search</span> that finds what customers actually asked for.</li>
-            <li><span class="text-primary">Catalog</span> data rich enough to make search work — managed for you, not by you.</li>
-            <li><span class="text-primary">Checkout</span> without the account-creation wall.</li>
-          </ul>
-        </EquationCard>
-        <div class="equation-operator">=</div>
-        <EquationCard size="compact" icon="attach_money" label="Revenue">
-          <p>It's a bit more complicated than this, but we'll simplify it for illustration purposes.</p>
-        </EquationCard>
-      </div>
-    </div>
-  </section>
-
   {bookingIsCalendly && (
     <>
       {/* Calendly popup widget — loaded async so it doesn't block the
@@ -473,75 +426,5 @@ const bookingIsCalendly = bookingUrl.includes('calendly.com');
     </>
   )}
 
-  {/* AI-assisted modules / Tech stack — HIDDEN per latest spec. The
-      capability card set is preserved below inside `false && (…)` so
-      the markup is intact for when we bring this back; nothing renders
-      to the page until that guard flips to true (or gets removed). */}
-  {false && (
-  <section class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop mt-3xl relative reveal">
-    <div class="mb-2xl">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Tech stack
-      </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">AI-assisted modules</h2>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
-      <CapabilityCard
-        icon="inventory_2"
-        title="Product catalog enhancement"
-        description="Audit every product for missing attributes, weak descriptions, and broken images. AI-generated copy and metadata match your brand voice while respecting category rules. Continuous quality scoring surfaces problems before customers ever notice them."
-      />
-      <CapabilityCard
-        icon="search_check"
-        title="Enhanced search"
-        description="Synonym expansion, typo tolerance, and brand-aware ranking out of the box. Merchandisers promote stock, new arrivals, and sale items with inline boost rules. Sub-50 ms response times even on catalogs north of one million products."
-      />
-      <CapabilityCard
-        icon="bolt"
-        title="Fast checkout"
-        description="One-tap checkout that remembers shipping, payment, and address. The average flow collapses from seven form fields to a single confirm screen. Mobile abandonment falls 40–60% in the first week of release."
-      />
-      <CapabilityCard
-        icon="auto_awesome"
-        title="Agentic search"
-        description="AI agents understand shopper intent, not just keywords. Conversational follow-ups progressively refine the result set. Every answer plugs into your catalog so the recommendations reflect your store's actual stock and brand voice."
-      />
-      <CapabilityCard
-        icon="monitoring"
-        title="Traffic monitor"
-        description="Daily GA4 snapshots with anomaly detection on every traffic source. Alerts fire the moment a channel, campaign, or geo deviates from your baseline. One dashboard ties sessions, conversions, and revenue back to the funnel that produced them."
-      />
-      <CapabilityCard
-        icon="person_search"
-        title="User analytics tracking"
-        description="First-party event capture for clicks, searches, filters, and conversions — all stored in your stack. Per-shopper journeys show the full path before a purchase, not just last-click. Anonymized cohort exports feed retargeting, lookalike, and loyalty models."
-      />
-      <CapabilityCard icon="track_changes" title="Diagnose · Fix · Verify">
-        <div>
-          <span class="font-button-text text-zinc-200">Diagnose.</span>
-          Pinpoint where revenue is leaking with funnel data + analytics — no more vague hunches.
-        </div>
-        <div>
-          <span class="font-button-text text-zinc-200">Fix.</span>
-          Apply a targeted change at the specific stage that's losing customers.
-        </div>
-        <div>
-          <span class="font-button-text text-zinc-200">Verify.</span>
-          Re-measure within hours; the loop reopens automatically if the fix didn't hold.
-        </div>
-      </CapabilityCard>
-      <CapabilityCard
-        icon="notifications_active"
-        title="Automated monitoring &amp; alerts"
-        description="Real-time anomaly detection across every funnel stage and traffic source. Alerts route to Slack, email, or your incident tool of choice within seconds of a deviation. Threshold rules tune per stage, channel, device, and geo segment."
-      />
-      <CapabilityCard
-        icon="smart_toy"
-        title="AI catalog &amp; pricing"
-        description="AI proposes product copy, attribute fills, and category mappings — you approve before anything ships. Pricing rules adapt to competitor moves and inventory levels in real time. Manual overrides on every recommendation; never autopilot without you."
-      />
-    </div>
-  </section>
-  )}
 
 </BaseLayout>
