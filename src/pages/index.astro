@@ -9,6 +9,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchDemo from '../components/SearchDemo.astro';
 import SearchCopyHelper from '../components/SearchCopyHelper.astro';
+import DiagnosticWidget from '../components/DiagnosticWidget.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -685,6 +686,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
                                                      matches the lighter
                                                      section's perceived feel.
        Keep this calibration so all sections look balanced regardless of bg. -->
+
+  <!-- Free diagnostic — Prospectos widget. Lives between "Revenue leaks"
+       (problem framing) and "Search Demo" (solution preview). The
+       diagnostic IS the proof that we can identify revenue leaks in
+       any storefront, not just talk about them. Posts to Scout's public
+       diagnostic API; redirects to the report on Scout when done. -->
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
+      <DiagnosticWidget locale="en" />
+    </div>
+  </section>
 
   <!-- Try it out / Attribute Match Visibility. Live Meilisearch demo
        against the `demo` index — 4 snack bars with a deliberate
