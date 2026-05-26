@@ -140,21 +140,28 @@ const canonicalUrl = `${siteUrl}${path}`;
       <div id="scroll-indicator"></div>
     </div>
 
-    <!-- TopNavBar — 3-column grid: logo (left), Resources/Blog (centered),
-         CTAs + LocaleSwitcher (right). The 1fr_auto_1fr columns push
-         the middle nav to the centre of the header regardless of the
-         left/right groups' widths. The `header-ctas` slot lives to the
-         left of the LocaleSwitcher; when empty it takes no space, so
-         the language switcher's position doesn't shift when CTAs appear
-         on scroll. -->
+    <!-- TopNavBar — on desktop, 3-column grid (logo left, nav centered,
+         CTAs + LocaleSwitcher right). On mobile, flex-wrap: logo +
+         right-group share row 1; Resources/Blog wrap to row 2 under
+         the logo. Header height grows on mobile to fit two rows
+         (h-auto py-3) and <main> compensates with pt-[120px] md:pt-20. -->
     <header
-      class="fixed top-0 left-0 w-full backdrop-blur-md h-20 flex items-center px-margin-mobile md:px-margin-desktop border-b border-zinc-800 z-50 bg-canvas/80"
+      class="fixed top-0 left-0 w-full backdrop-blur-md h-auto py-3 md:h-20 md:py-0 flex items-center px-margin-mobile md:px-margin-desktop border-b border-zinc-800 z-50 bg-canvas/80"
     >
-      <div class="max-w-page mx-auto w-full grid grid-cols-[1fr_auto_1fr] items-center gap-md">
-        <a href={home} class="group justify-self-start">
+      <div class="max-w-page mx-auto w-full flex flex-wrap items-center gap-md md:grid md:grid-cols-[1fr_auto_1fr]">
+        <a href={home} class="group order-1 md:justify-self-start">
           <h1 class="font-marker text-3xl text-white leading-none group-hover:brightness-110 transition-all">GroLabs</h1>
         </a>
-        <nav class="justify-self-center self-end flex items-end gap-lg">
+        {/* Right group: CTAs + LocaleSwitcher. ml-auto pushes it to
+            the far right on mobile (where flex governs); md restores
+            grid placement. */}
+        <div class="order-2 ml-auto md:order-3 md:ml-0 md:justify-self-end flex items-center gap-md">
+          <slot name="header-ctas" />
+          <LocaleSwitcher />
+        </div>
+        {/* Nav: w-full forces it to wrap to row 2 on mobile;
+            md restores inline centered placement. */}
+        <nav class="order-3 w-full justify-center md:order-2 md:w-auto md:justify-self-center md:self-end flex items-center md:items-end gap-lg pt-1 md:pt-0">
           <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none" href={resourcesHref}>
             {t.nav.resources}
           </a>
@@ -162,14 +169,10 @@ const canonicalUrl = `${siteUrl}${path}`;
             {t.nav.blog}
           </a>
         </nav>
-        <div class="justify-self-end flex items-center gap-md">
-          <slot name="header-ctas" />
-          <LocaleSwitcher />
-        </div>
       </div>
     </header>
 
-    <main class="relative z-10 pt-20 min-h-screen bg-transparent">
+    <main class="relative z-10 pt-[120px] md:pt-20 min-h-screen bg-transparent">
       <slot />
 
       <footer class="bg-canvas-deeper pt-2xl md:pt-[120px] pb-xl">
