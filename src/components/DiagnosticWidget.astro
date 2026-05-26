@@ -1,0 +1,419 @@
+---
+/**
+ * Public Prospectos diagnostic widget for the landing page.
+ *
+ * Takes a URL, POSTs to Scout's `POST /api/v1/diagnostic/runs`, and
+ * redirects to the report page when the run completes. Runs are
+ * synchronous on the Scout side today (5–60s depending on which
+ * probes are enabled), so the widget shows rotating progress
+ * messaging while we wait. CORS on the Scout API is `*`.
+ *
+ * Scout base URL comes from PUBLIC_SCOUT_API_URL. When unset, the
+ * widget renders a disabled "coming soon" state — never an error.
+ *
+ * Locale-aware via the `locale` prop. The Spanish page passes 'es'.
+ */
+
+interface Props {
+  locale?: 'en' | 'es';
+}
+const { locale = 'en' } = Astro.props;
+
+const STRINGS = {
+  en: {
+    eyebrow: 'Free audit',
+    headline: 'See what your storefront is leaving on the table',
+    body: 'Paste your storefront URL. In about a minute, we score your search, your PDPs, your discoverability, and estimate the annual revenue uplift you’re leaving on the table — for free.',
+    placeholder: 'https://your-store.com',
+    button: 'Run free audit',
+    submitting: 'Running…',
+    statuses: [
+      'Fetching your homepage…',
+      'Detecting your industry…',
+      'Probing your search engine…',
+      'Auditing a product page…',
+      'Checking faceting on a category page…',
+      'Computing revenue uplift…',
+      'Almost done — finalizing the report…',
+    ],
+    legal:
+      'No signup. No card. We don’t store your visitors’ data — only the public pages we fetch.',
+    errorEmpty: 'Enter a URL to audit.',
+    errorRateLimit: 'You’ve run several audits recently. Please try again in an hour.',
+    errorGeneric: 'The audit couldn’t complete. Try again in a moment.',
+    errorConfig: 'The audit endpoint isn’t configured yet. Check back shortly.',
+    privacyHint: 'We only read pages your shoppers can already see.',
+  },
+  es: {
+    eyebrow: 'Diagnóstico gratis',
+    headline: 'Descubrí cuánto está dejando en la mesa tu tienda',
+    body: 'Pegá la URL de tu tienda. En aproximadamente un minuto puntuamos tu búsqueda, tus PDPs, tu visibilidad, y estimamos el ingreso anual que estás dejando ir — gratis.',
+    placeholder: 'https://tu-tienda.com',
+    button: 'Diagnosticar mi tienda',
+    submitting: 'Analizando…',
+    statuses: [
+      'Cargando tu home…',
+      'Detectando tu industria…',
+      'Probando tu buscador…',
+      'Auditando una página de producto…',
+      'Revisando facetas en una categoría…',
+      'Calculando uplift de ingresos…',
+      'Casi listo — armando el informe…',
+    ],
+    legal:
+      'Sin registro. Sin tarjeta. No guardamos datos de tus visitantes — sólo las páginas públicas que cargamos.',
+    errorEmpty: 'Ingresá una URL para diagnosticar.',
+    errorRateLimit: 'Ya corriste varios diagnósticos. Probá de nuevo en una hora.',
+    errorGeneric: 'No pudimos completar el diagnóstico. Intentá de nuevo en un momento.',
+    errorConfig: 'El servicio de diagnóstico aún no está conectado. Volvé pronto.',
+    privacyHint: 'Sólo leemos páginas que tus compradores ya pueden ver.',
+  },
+}[locale];
+
+const SCOUT_API_URL = import.meta.env.PUBLIC_SCOUT_API_URL ?? '';
+const isConfigured = !!SCOUT_API_URL;
+---
+
+<div
+  class="diagnostic-widget"
+  data-diagnostic-widget
+  data-locale={locale}
+  data-api-url={SCOUT_API_URL}
+  data-configured={isConfigured ? 'true' : 'false'}
+>
+  <div class="diagnostic-widget-inner">
+    <span class="diagnostic-eyebrow">{STRINGS.eyebrow}</span>
+    <h2 class="diagnostic-headline">{STRINGS.headline}</h2>
+    <p class="diagnostic-body">{STRINGS.body}</p>
+
+    <form class="diagnostic-form" data-diagnostic-form novalidate>
+      <label class="diagnostic-input-wrap">
+        <span class="diagnostic-input-icon" aria-hidden="true">→</span>
+        <input
+          type="url"
+          inputmode="url"
+          name="url"
+          data-diagnostic-input
+          class="diagnostic-input"
+          placeholder={STRINGS.placeholder}
+          autocomplete="off"
+          spellcheck="false"
+          required
+          disabled={!isConfigured}
+        />
+      </label>
+      <button
+        type="submit"
+        class="diagnostic-button"
+        data-diagnostic-button
+        data-label-default={STRINGS.button}
+        data-label-submitting={STRINGS.submitting}
+        disabled={!isConfigured}
+      >
+        {isConfigured ? STRINGS.button : STRINGS.errorConfig}
+      </button>
+    </form>
+
+    <p
+      class="diagnostic-status"
+      data-diagnostic-status
+      data-statuses={JSON.stringify(STRINGS.statuses)}
+      data-err-empty={STRINGS.errorEmpty}
+      data-err-rate={STRINGS.errorRateLimit}
+      data-err-generic={STRINGS.errorGeneric}
+      aria-live="polite"
+    >
+      {STRINGS.privacyHint}
+    </p>
+
+    <p class="diagnostic-legal">{STRINGS.legal}</p>
+  </div>
+</div>
+
+<script>
+  document
+    .querySelectorAll<HTMLElement>('[data-diagnostic-widget]')
+    .forEach((root) => {
+      const apiUrl = root.dataset.apiUrl ?? '';
+      const form = root.querySelector<HTMLFormElement>('[data-diagnostic-form]');
+      const input = root.querySelector<HTMLInputElement>('[data-diagnostic-input]');
+      const button = root.querySelector<HTMLButtonElement>('[data-diagnostic-button]');
+      const status = root.querySelector<HTMLParagraphElement>('[data-diagnostic-status]');
+      if (!form || !input || !button || !status) return;
+
+      const statuses: string[] = JSON.parse(status.dataset.statuses ?? '[]');
+      const ERR_EMPTY = status.dataset.errEmpty ?? '';
+      const ERR_RATE = status.dataset.errRate ?? '';
+      const ERR_GENERIC = status.dataset.errGeneric ?? '';
+      const labelDefault = button.dataset.labelDefault ?? button.textContent ?? '';
+      const labelSubmitting = button.dataset.labelSubmitting ?? '…';
+
+      function normalize(url: string): string {
+        const trimmed = url.trim();
+        if (!trimmed) return '';
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        return 'https://' + trimmed;
+      }
+
+      let statusTimer: number | undefined;
+      function cycleStatuses() {
+        let i = 0;
+        status!.textContent = statuses[0] ?? '';
+        statusTimer = window.setInterval(() => {
+          i = (i + 1) % statuses.length;
+          status!.textContent = statuses[i] ?? '';
+        }, 4500);
+      }
+
+      function stopStatuses() {
+        if (statusTimer !== undefined) {
+          window.clearInterval(statusTimer);
+          statusTimer = undefined;
+        }
+      }
+
+      function setError(msg: string) {
+        stopStatuses();
+        status!.textContent = msg;
+        status!.classList.add('diagnostic-status--error');
+      }
+
+      function clearError() {
+        status!.classList.remove('diagnostic-status--error');
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearError();
+        const rawUrl = input!.value;
+        const url = normalize(rawUrl);
+        if (!url) {
+          setError(ERR_EMPTY);
+          return;
+        }
+        if (!apiUrl) {
+          setError(ERR_GENERIC);
+          return;
+        }
+
+        button!.disabled = true;
+        input!.disabled = true;
+        button!.textContent = labelSubmitting;
+        cycleStatuses();
+
+        try {
+          const res = await fetch(apiUrl.replace(/\/$/, '') + '/api/v1/diagnostic/runs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url }),
+          });
+          if (res.status === 429) {
+            setError(ERR_RATE);
+            button!.disabled = false;
+            input!.disabled = false;
+            button!.textContent = labelDefault;
+            return;
+          }
+          if (!res.ok) {
+            setError(ERR_GENERIC);
+            button!.disabled = false;
+            input!.disabled = false;
+            button!.textContent = labelDefault;
+            return;
+          }
+          const data = (await res.json()) as { run_id?: string; report_url?: string };
+          stopStatuses();
+          // Navigate to the public report on Scout. Build the absolute
+          // URL from PUBLIC_SCOUT_API_URL + the path the API returned.
+          if (data.report_url) {
+            window.location.href = apiUrl.replace(/\/$/, '') + data.report_url;
+            return;
+          }
+          if (data.run_id) {
+            window.location.href = apiUrl.replace(/\/$/, '') + '/diagnostics/' + data.run_id;
+            return;
+          }
+          setError(ERR_GENERIC);
+          button!.disabled = false;
+          input!.disabled = false;
+          button!.textContent = labelDefault;
+        } catch (err) {
+          console.error('[diagnostic] fetch failed', err);
+          setError(ERR_GENERIC);
+          button!.disabled = false;
+          input!.disabled = false;
+          button!.textContent = labelDefault;
+        }
+      });
+    });
+</script>
+
+<style is:global>
+  .diagnostic-widget {
+    background: var(--color-canvas, #131316);
+    border: 1px solid rgba(250, 225, 148, 0.18);
+    border-radius: 16px;
+    padding: clamp(32px, 5vw, 64px) clamp(24px, 4vw, 56px);
+    max-width: 920px;
+    margin: 0 auto;
+    box-shadow:
+      0 30px 80px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .diagnostic-widget::before {
+    content: '';
+    position: absolute;
+    top: -120px;
+    left: 30%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(250, 225, 148, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .diagnostic-widget-inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .diagnostic-eyebrow {
+    display: inline-block;
+    color: #fae194;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-size: 11px;
+    margin-bottom: 14px;
+  }
+
+  .diagnostic-headline {
+    font-family: 'Permanent Marker', cursive;
+    text-transform: uppercase;
+    color: #ffffff;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1.15;
+    margin: 0 0 18px;
+    letter-spacing: 0.01em;
+  }
+
+  .diagnostic-body {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: clamp(15px, 1.4vw, 17px);
+    line-height: 1.6;
+    margin: 0 0 28px;
+    max-width: 640px;
+  }
+
+  .diagnostic-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .diagnostic-input-wrap {
+    flex: 1 1 320px;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 0 14px;
+    transition: border-color 0.18s ease, background 0.18s ease;
+  }
+
+  .diagnostic-input-wrap:focus-within {
+    border-color: rgba(250, 225, 148, 0.6);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .diagnostic-input-icon {
+    color: #fae194;
+    font-family: ui-monospace, monospace;
+    font-size: 18px;
+    margin-right: 10px;
+  }
+
+  .diagnostic-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-family: inherit;
+    padding: 16px 0;
+    min-width: 0;
+  }
+
+  .diagnostic-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .diagnostic-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .diagnostic-button {
+    flex: 0 0 auto;
+    background: #fae194;
+    color: #131316;
+    border: none;
+    border-radius: 10px;
+    padding: 0 26px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.18s ease, opacity 0.18s ease;
+    min-height: 52px;
+  }
+
+  .diagnostic-button:hover:not(:disabled) {
+    background: #fcebab;
+    transform: translateY(-1px);
+  }
+
+  .diagnostic-button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .diagnostic-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .diagnostic-status {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    margin: 0 0 14px;
+    min-height: 1.4em;
+    transition: color 0.2s ease;
+  }
+
+  .diagnostic-status--error {
+    color: #ff9b9b;
+  }
+
+  .diagnostic-legal {
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 11px;
+    margin: 0;
+    font-family: ui-monospace, monospace;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 640px) {
+    .diagnostic-button {
+      width: 100%;
+    }
+    .diagnostic-input-wrap {
+      flex: 1 1 100%;
+    }
+  }
+</style>
