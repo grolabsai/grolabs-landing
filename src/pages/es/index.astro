@@ -219,8 +219,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <div class="leak-equation-card">
         <div class="leak-equation">
           <span class="leak-equation-title">Fugas de ingresos (%)</span>
-          <span class="leak-equation-eq">=</span>
           <span class="leak-equation-body">
+            <span class="leak-equation-eq">=</span>
             <span class="leak-equation-fraction">
               <span class="leak-equation-num">IPT&nbsp;−&nbsp;IRC</span>
               <span class="leak-equation-den">IPT</span>
@@ -799,10 +799,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     line-height: 1.1;
     flex-wrap: wrap;
   }
+  .leak-equation-title {
+    flex: 1 0 100%;
+  }
   .leak-equation-body {
     display: inline-flex;
     align-items: center;
     gap: 14px;
+    margin-left: auto;
   }
   @media (max-width: 768px) {
     .leak-equation {
@@ -810,6 +814,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       align-items: flex-start;
       gap: 8px;
       font-size: 22px;
+    }
+    .leak-equation-body {
+      align-self: flex-end;
+      margin-left: 0;
     }
   }
   /* Mobile funnel — vertical 2-col table */
