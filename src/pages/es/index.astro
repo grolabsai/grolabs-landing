@@ -821,6 +821,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     flex-direction: column;
     gap: 8px;
   }
+  @media (min-width: 768px) {
+    .funnel-mobile { display: none !important; }
+  }
   .funnel-mobile-row {
     display: grid;
     grid-template-columns: 1fr auto;
