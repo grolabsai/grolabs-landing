@@ -316,7 +316,15 @@ export function renderFunnel(root: HTMLElement): void {
   );
   svg.classList.add('select-none');
 
-  // ---- Defs (forward arrow marker + leak-bar horizontal gradient) ----
+  // ---- Defs (forward arrow marker + leak-bar horizontal gradient
+  //           + stage-card drop-shadow filter) ----
+  // The stage-card filter has to be defined as an SVG filter (not a
+  // chained CSS `filter: drop-shadow(...) drop-shadow(...)`) because
+  // chained CSS drop-shadows compound — each shadow blurs the
+  // PREVIOUS shadow on top of the original element, producing a dark
+  // rectangular blob behind the card. Inside an SVG <filter>, each
+  // <feDropShadow> is composited as an independent layer via feMerge,
+  // mirroring how CSS box-shadow lists three independent halos.
   const defs = document.createElementNS(svgNS, 'defs');
   defs.innerHTML = `
     <marker id="arrow-forward" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -327,6 +335,23 @@ export function renderFunnel(root: HTMLElement): void {
       <stop offset="50%" stop-color="#a85050" />
       <stop offset="100%" stop-color="#a85050" />
     </linearGradient>
+    <filter id="stage-shadow" x="-50%" y="-50%" width="200%" height="400%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"  result="b1"/>
+      <feOffset in="b1" dy="2"  result="o1"/>
+      <feComponentTransfer in="o1" result="s1"><feFuncA type="linear" slope="0.5"/></feComponentTransfer>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="24" result="b2"/>
+      <feOffset in="b2" dy="30" result="o2"/>
+      <feComponentTransfer in="o2" result="s2"><feFuncA type="linear" slope="0.65"/></feComponentTransfer>
+      <feGaussianBlur in="SourceAlpha" stdDeviation="36" result="b3"/>
+      <feOffset in="b3" dy="60" result="o3"/>
+      <feComponentTransfer in="o3" result="s3"><feFuncA type="linear" slope="0.55"/></feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="s3"/>
+        <feMergeNode in="s2"/>
+        <feMergeNode in="s1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   `;
   svg.appendChild(defs);
 
@@ -538,6 +563,7 @@ export function renderFunnel(root: HTMLElement): void {
     rect.setAttribute('fill', STAGE_FILL);
     rect.setAttribute('stroke', STAGE_BORDER);
     rect.setAttribute('stroke-width', String(STAGE_BORDER_W));
+    rect.setAttribute('filter', 'url(#stage-shadow)');
     rect.style.transition = 'opacity 180ms ease, stroke 180ms ease';
     group.appendChild(rect);
 
