@@ -171,11 +171,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <h3 class="hero-v2-card-title">Returns of perfect products</h3>
           <p class="hero-v2-card-body">Returns linked to mismatched expectations caused by incomplete product data and discovery issues.</p>
         </article>
-      </div>
 
-      {/* Citation under the stat cards. The "Source" pill + popover
-          will come back once specific source URLs are available. */}
-      <p class="hero-v2-sources-text">Industry Benchmark — Mid-market e-commerce</p>
+        {/* Citation under the stat cards. Lives INSIDE .hero-v2-stage
+            so it aligns with the cards' left edge, not the hero copy
+            column. The "Source" pill + popover will come back once
+            specific source URLs are available. */}
+        <p class="hero-v2-sources-text">Industry Benchmark — Mid-market e-commerce</p>
+      </div>
     </div>
   </section>
 
@@ -352,12 +354,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .hero-v2-card--featured .hero-v2-card-body { font-size: 20px; }
     .hero-v2-highlight { color: #EDEAE0; white-space: nowrap; }
 
-    /* Citation line below the three stat cards. Tucked tight against
-       the cards (margin-top: 8px), left-aligned, eyebrow-styled. The
-       Source pill + popover that lived here was removed pending real
-       citation URLs; see the markup. */
+    /* Citation line below the three stat cards. Lives inside
+       .hero-v2-stage and spans both grid columns, so it aligns with
+       the cards' left edge. The Source pill + popover that lived
+       here was removed pending real citation URLs; see the markup. */
     .hero-v2-sources-text {
-      margin: 8px 0 0;
+      grid-column: 1 / -1;
+      margin: 0;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 11px;
       letter-spacing: 0.15em;
