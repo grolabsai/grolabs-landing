@@ -538,7 +538,7 @@ export function renderFunnel(root: HTMLElement): void {
     rect.setAttribute('fill', STAGE_FILL);
     rect.setAttribute('stroke', STAGE_BORDER);
     rect.setAttribute('stroke-width', String(STAGE_BORDER_W));
-    rect.style.transition = 'filter 180ms ease, stroke 180ms ease';
+    rect.style.transition = 'opacity 180ms ease, stroke 180ms ease';
     group.appendChild(rect);
 
     // Stacked layout: icon top-centered, uppercase label centered below.
@@ -584,7 +584,9 @@ export function renderFunnel(root: HTMLElement): void {
 
     stageGroup.appendChild(group);
   });
-  svg.appendChild(stageGroup);
+  // NOTE: stageGroup is appended LAST (after barGroup below) so the
+  // stage cards' drop-shadows render over the red bar rather than
+  // being painted under it.
 
   // ---- Red leak bar (background + per-stage %/cause labels + title) ----
   // Drops fall into the top of this bar; labels and the "Leaking funnel = Lost revenue" headline sit inside.
@@ -670,6 +672,8 @@ export function renderFunnel(root: HTMLElement): void {
   barGroup.appendChild(barTitle);
 
   svg.appendChild(barGroup);
+  // Stages painted LAST so their drop-shadows cast over the bar.
+  svg.appendChild(stageGroup);
 
   root.innerHTML = '';
   root.appendChild(svg);
@@ -719,7 +723,10 @@ export function renderFunnel(root: HTMLElement): void {
       const isTarget = g.dataset.stageId === stageId;
       const rectEl = g.firstChild as SVGRectElement;
       rectEl.style.stroke = isTarget ? STAGE_ACCENT : STAGE_BORDER;
-      rectEl.style.filter = isTarget ? 'none' : 'brightness(0.7)';
+      // Use opacity (not filter) to dim non-target cards so the CSS
+      // drop-shadow stays intact for everyone.
+      rectEl.style.removeProperty('filter');
+      rectEl.style.opacity = isTarget ? '1' : '0.6';
     });
     document.querySelectorAll<HTMLElement>('.stage-row').forEach((row) => {
       row.classList.toggle('is-active', row.dataset.stageId === stageId);
@@ -741,7 +748,11 @@ export function renderFunnel(root: HTMLElement): void {
     stageGroup.querySelectorAll<SVGGElement>('[data-stage-id]').forEach((g) => {
       const rectEl = g.firstChild as SVGRectElement;
       rectEl.style.stroke = STAGE_BORDER;
-      rectEl.style.filter = 'none';
+      // Don't set filter: 'none' — that would override the CSS
+      // drop-shadow rule. Clearing the inline value lets the rule
+      // reapply.
+      rectEl.style.removeProperty('filter');
+      rectEl.style.opacity = '1';
     });
     document.querySelectorAll<HTMLElement>('.stage-row').forEach((row) => {
       row.classList.remove('is-active');
