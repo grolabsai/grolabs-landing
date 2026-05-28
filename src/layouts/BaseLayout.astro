@@ -30,6 +30,7 @@ const defaults = {
       privacy: 'Privacy Policy',
       terms: 'Terms of Use',
       security: 'Security',
+      bookCtaNote: 'Free 15-minute call',
     },
   },
   es: {
@@ -47,6 +48,7 @@ const defaults = {
       privacy: 'Política de Privacidad',
       terms: 'Términos de Uso',
       security: 'Seguridad',
+      bookCtaNote: 'Llamada gratis de 15 minutos',
     },
   },
 } as const;
@@ -194,17 +196,24 @@ const canonicalUrl = `${siteUrl}${path}`;
             </div>
 
             {/* Center: yellow-gradient Book CTA + ghost Contact — same
-                styling as the hero CTAs. */}
+                styling as the hero CTAs. The Book CTA carries an
+                eyebrow-style "free 15-min call" caption directly
+                below it. */}
             <div class="flex flex-wrap items-center justify-start md:justify-center gap-sm">
-              <a
-                href="https://cal.com/tuncho-granados-uibzst/15min"
-                class="footer-cta footer-cta--primary cta-button-style"
-                target="_blank"
-                rel="noopener noreferrer"
-                data-booking-cta
-              >
-                Book Growth Assessment Call
-              </a>
+              <div class="flex flex-col items-start md:items-center gap-1">
+                <a
+                  href="https://cal.com/tuncho-granados-uibzst/15min"
+                  class="footer-cta footer-cta--primary cta-button-style"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-booking-cta
+                >
+                  Book Growth Assessment Call
+                </a>
+                <span class="font-mono tracking-[0.2em] text-[10px] uppercase text-zinc-500">
+                  {t.footer.bookCtaNote}
+                </span>
+              </div>
               <a
                 href="mailto:growth@grolabs.ai"
                 class="footer-cta footer-cta--ghost"
