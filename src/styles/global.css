@@ -135,21 +135,13 @@ body {
   transition: height 0.1s linear;
 }
 
-/* Funnel stage tiles — floating-card treatment that mirrors the hero
-   v2 card box-shadow exactly. The hero recipe is:
-     0 2px 4px rgba(0,0,0,0.5),
-     0 30px 60px -12px rgba(0,0,0,0.65),
-     0 60px 120px -24px rgba(0,0,0,0.55).
-   SVG `filter: drop-shadow()` has no spread parameter, so we fold the
-   negative spread into the blur (60 - 12·2 = 48; 120 - 24·2 = 72) to
-   keep the halo footprint at the same tightness. Applied to the rect
-   so the icon + label text stay crisp. */
-.funnel-stages > g > rect {
-  filter:
-    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))
-    drop-shadow(0 30px 48px rgba(0, 0, 0, 0.65))
-    drop-shadow(0 60px 72px rgba(0, 0, 0, 0.55));
-}
+/* Funnel stage tile shadow is defined as an SVG <filter> (#stage-shadow)
+   inside funnel.ts's <defs>. CSS `filter: drop-shadow()` was tried but
+   chained drop-shadows compound (each blurs the previous accumulated
+   output), producing a dark rectangular blob behind the card instead of
+   three independent halos like CSS box-shadow on the hero cards. The
+   SVG filter merges three independently-blurred SourceAlpha layers via
+   feMerge so each shadow is its own halo. */
 
 /* Leak droplets — falling drops convey the funnel bleeding revenue */
 .funnel-droplet {
