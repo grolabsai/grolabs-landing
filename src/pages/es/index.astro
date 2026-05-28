@@ -863,26 +863,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     line-height: 1.1;
     flex-wrap: wrap;
   }
-  .leak-equation-title {
-    flex: 1 0 100%;
-  }
   .leak-equation-body {
     display: inline-flex;
     align-items: center;
     gap: 14px;
-    margin-left: auto;
   }
+  /* Desktop renders inline: title = fraction × 100, all on one row.
+     Mobile (≤768px) breaks the title to its own row and right-aligns
+     the equation body underneath for legibility. */
   @media (max-width: 768px) {
-    .leak-equation {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-      font-size: 22px;
-    }
-    .leak-equation-body {
-      align-self: flex-end;
-      margin-left: 0;
-    }
+    .leak-equation { font-size: 22px; }
+    .leak-equation-title { flex: 1 0 100%; }
+    .leak-equation-body { margin-left: auto; }
   }
   /* Mobile funnel — vertical 2-col table */
   .funnel-mobile {
