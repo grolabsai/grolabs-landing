@@ -323,9 +323,9 @@ export function renderFunnel(root: HTMLElement): void {
       <path d="M 0 0 L 10 5 L 0 10 z" fill="${FORWARD_STROKE}" />
     </marker>
     <linearGradient id="leak-bar-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#4a1c1c" />
-      <stop offset="50%" stop-color="#5e2424" />
-      <stop offset="100%" stop-color="#4a1c1c" />
+      <stop offset="0%" stop-color="#a85050" />
+      <stop offset="50%" stop-color="#a85050" />
+      <stop offset="100%" stop-color="#a85050" />
     </linearGradient>
   `;
   svg.appendChild(defs);
