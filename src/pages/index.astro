@@ -252,13 +252,22 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Hanken Grotesk", sans-serif;
       font-size: 20px;
       line-height: 1.55;
-      color: rgba(237, 234, 224, 0.6);
+      /* Bone-white — was rgba(…, 0.6) which read as gray on the dark
+         hero. Solid bone gives the lede the same weight as the rest of
+         the hero copy so it reads as primary, not auxiliary. */
+      color: #EDEAE0;
       margin: 0 0 32px;
       max-width: 580px;
     }
 
+    /* CTA row — top-align so the Contact ghost sits flush with the top
+       of the Book button rather than centering against the (Book + note)
+       stack. align-items on the parent + align-self on the ghost is
+       belt-and-suspenders so flex-wrap or browser defaults can't push
+       the ghost down. */
     .hero-v2-ctas { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
     .hero-v2-cta-stack { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .hero-v2-btn--ghost { align-self: flex-start; }
     .hero-v2-cta-note {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 10px;
