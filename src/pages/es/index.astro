@@ -800,7 +800,24 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     margin: 0;
   }
   .hero-v2-card--featured .hero-v2-card-body { font-size: 20px; }
-  .hero-v2-highlight { color: #EDEAE0; white-space: nowrap; }
+  /*
+    .hero-v2-highlight — hand-drawn marker.
+    Yellow rectangle SVG runs through an feTurbulence + feDisplacementMap
+    filter so the edges look like a real brush stroke. See the EN
+    page for the full annotation.
+  */
+  .hero-v2-highlight {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 40' preserveAspectRatio='none'><defs><filter id='r' x='-5%25' y='-25%25' width='110%25' height='150%25'><feTurbulence type='fractalNoise' baseFrequency='0.045 0.13' numOctaves='2' seed='4'/><feDisplacementMap in='SourceGraphic' scale='5'/></filter></defs><rect x='3' y='6' width='194' height='28' fill='%23fae194' filter='url(%23r)' opacity='0.95'/></svg>");
+    background-repeat: no-repeat;
+    background-size: 100% 110%;
+    background-position: center 52%;
+    color: #000000;
+    padding: 2px 10px 3px 10px;
+    font-weight: 500;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+    white-space: nowrap;
+  }
 
   /* Citation line below the three stat cards. Lives inside
      .hero-v2-stage and spans both grid columns so it aligns with
