@@ -54,6 +54,23 @@ const defaults = {
 } as const;
 
 const t = defaults[locale];
+
+/**
+ * Legal pages live on Scout (app.grolabs.ai) — same content shown
+ * to authenticated customers, so a single source of truth. Scout's
+ * default locale is `es` (no URL prefix), `en` is the secondary.
+ * We point the EN landing at /en/legal/... and the ES landing at
+ * /legal/... (default-locale path).
+ */
+const scoutLegalBase =
+  locale === 'en'
+    ? 'https://app.grolabs.ai/en/legal'
+    : 'https://app.grolabs.ai/legal';
+const legalUrls = {
+  privacy: `${scoutLegalBase}/privacy`,
+  terms: `${scoutLegalBase}/terms`,
+  security: `${scoutLegalBase}/security`,
+};
 const {
   title = t.title,
   description = t.description,
@@ -198,8 +215,11 @@ const canonicalUrl = `${siteUrl}${path}`;
             {/* Center: yellow-gradient Book CTA + ghost Contact — same
                 styling as the hero CTAs. The Book CTA carries an
                 eyebrow-style "free 15-min call" caption directly
-                below it. */}
-            <div class="flex flex-wrap items-center justify-start md:justify-center gap-sm">
+                below it.
+                items-start so the Contact ghost pins to the TOP of the
+                Book CTA instead of centering against (Book + caption),
+                matching the hero treatment. */}
+            <div class="flex flex-wrap items-start justify-start md:justify-center gap-sm">
               <div class="flex flex-col items-start md:items-center gap-1">
                 <a
                   href="https://cal.com/tuncho-granados-uibzst/15min"
@@ -216,18 +236,20 @@ const canonicalUrl = `${siteUrl}${path}`;
               </div>
               <a
                 href="mailto:growth@grolabs.ai"
-                class="footer-cta footer-cta--ghost"
+                class="footer-cta footer-cta--ghost self-start"
               >
                 Contact
               </a>
             </div>
 
-            {/* Right: nav links on top, copyright underneath — all gray. */}
+            {/* Right: nav links on top, copyright underneath — all gray.
+                The three legal pages live on Scout; URLs are built per
+                locale at the top of the frontmatter. */}
             <div class="flex flex-col items-start md:items-end gap-sm">
               <div class="flex flex-wrap gap-lg">
-                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href="#">{t.footer.privacy}</a>
-                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href="#">{t.footer.terms}</a>
-                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href="#">{t.footer.security}</a>
+                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href={legalUrls.privacy}>{t.footer.privacy}</a>
+                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href={legalUrls.terms}>{t.footer.terms}</a>
+                <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href={legalUrls.security}>{t.footer.security}</a>
               </div>
               <p class="font-body-sm text-body-sm text-zinc-500">
                 © <span id="footer-year"></span> GroLabs AI. {t.footer.rights}
