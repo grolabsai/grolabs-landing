@@ -1,0 +1,94 @@
+---
+/**
+ * Cookie / analytics consent banner.
+ *
+ * Paired with Analytics.astro. Renders nothing unless PUBLIC_GA4_ID is
+ * set. Hidden by default; the inline script reveals it only when the
+ * visitor has not yet made a choice. "Accept" flips Consent Mode to
+ * granted and persists the choice; "Decline" persists a denied choice
+ * (analytics stays off). The stored key is read back by Analytics.astro
+ * on subsequent loads, so the banner appears at most once.
+ */
+interface Props {
+  locale?: 'en' | 'es';
+}
+const { locale = 'en' } = Astro.props;
+const gaId = import.meta.env.PUBLIC_GA4_ID;
+
+const copy = {
+  en: {
+    body: 'We use analytics cookies to understand how visitors use our site and improve it. No ads, no third-party tracking.',
+    accept: 'Accept',
+    decline: 'Decline',
+    privacy: 'Privacy Policy',
+    privacyHref: 'https://app.grolabs.ai/en/legal/privacy',
+  },
+  es: {
+    body: 'Usamos cookies de analítica para entender cómo se usa el sitio y mejorarlo. Sin anuncios ni rastreo de terceros.',
+    accept: 'Aceptar',
+    decline: 'Rechazar',
+    privacy: 'Política de Privacidad',
+    privacyHref: 'https://app.grolabs.ai/legal/privacy',
+  },
+}[locale];
+---
+
+{gaId && (
+  <div
+    id="consent-banner"
+    class="fixed bottom-0 left-0 w-full z-[60] hidden px-margin-mobile md:px-margin-desktop pb-4"
+    role="dialog"
+    aria-live="polite"
+    aria-label="Cookie consent"
+  >
+    <div class="max-w-page mx-auto rounded-xl border border-zinc-800 bg-zinc-900/95 backdrop-blur-md shadow-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center gap-4">
+      <p class="font-body-sm text-body-sm text-zinc-300 flex-1">
+        {copy.body}{' '}
+        <a href={copy.privacyHref} class="underline text-zinc-200 hover:text-primary transition-colors">{copy.privacy}</a>
+      </p>
+      <div class="flex items-center gap-3 shrink-0">
+        <button
+          id="consent-decline"
+          type="button"
+          class="font-body-sm text-body-sm text-zinc-400 hover:text-zinc-200 px-4 py-2 transition-colors"
+        >
+          {copy.decline}
+        </button>
+        <button
+          id="consent-accept"
+          type="button"
+          class="cta-button-style font-body-sm text-body-sm text-zinc-950 font-semibold px-5 py-2 rounded-lg hover:-translate-y-px transition-transform"
+        >
+          {copy.accept}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline>
+    (function () {
+      var KEY = 'grolabs-analytics-consent';
+      var banner = document.getElementById('consent-banner');
+      if (!banner) return;
+
+      var stored = null;
+      try { stored = localStorage.getItem(KEY); } catch (e) {}
+      if (stored !== 'granted' && stored !== 'denied') {
+        banner.classList.remove('hidden');
+      }
+
+      function choose(value) {
+        try { localStorage.setItem(KEY, value); } catch (e) {}
+        if (value === 'granted' && typeof window.gtag === 'function') {
+          window.gtag('consent', 'update', { analytics_storage: 'granted' });
+        }
+        banner.classList.add('hidden');
+      }
+
+      var accept = document.getElementById('consent-accept');
+      var decline = document.getElementById('consent-decline');
+      if (accept) accept.addEventListener('click', function () { choose('granted'); });
+      if (decline) decline.addEventListener('click', function () { choose('denied'); });
+    })();
+  </script>
+)}

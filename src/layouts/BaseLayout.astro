@@ -1,6 +1,8 @@
 ---
 import '../styles/global.css';
 import LocaleSwitcher from '../components/LocaleSwitcher.astro';
+import Analytics from '../components/Analytics.astro';
+import ConsentBanner from '../components/ConsentBanner.astro';
 
 interface Props {
   title?: string;
@@ -153,6 +155,8 @@ const canonicalUrl = `${siteUrl}${path}`;
         JSON-LD blocks (Service, FAQPage, Article, etc.) that don't
         belong in the site-wide Organization markup above. */}
     <slot name="head-extra" />
+
+    <Analytics />
   </head>
   <body class="font-body-md text-body-md selection:bg-primary selection:text-zinc-950 overflow-x-hidden">
     <div class="hidden md:block" id="scroll-progress">
@@ -259,6 +263,8 @@ const canonicalUrl = `${siteUrl}${path}`;
         </div>
       </footer>
     </main>
+
+    <ConsentBanner locale={locale} />
 
     <script>
       import '../scripts/main.ts';

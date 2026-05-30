@@ -1,0 +1,47 @@
+---
+/**
+ * Google Analytics 4 with Consent Mode v2.
+ *
+ * Renders nothing unless PUBLIC_GA4_ID is set, so local dev and any
+ * environment without the var configured stays analytics-free (same
+ * graceful-fallback pattern as the booking URL).
+ *
+ * Consent defaults to DENIED. GA4 loads but stores nothing and sends
+ * only cookieless "consent signals" until the visitor accepts via the
+ * ConsentBanner, which calls window.gtag('consent', 'update', ...).
+ * A previously-stored "granted" choice is re-applied on every load.
+ */
+const gaId = import.meta.env.PUBLIC_GA4_ID;
+const gtagSrc = gaId
+  ? `https://www.googletagmanager.com/gtag/js?id=${gaId}`
+  : '';
+---
+
+{gaId && (
+  <Fragment>
+    <script is:inline define:vars={{ gaId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      window.gtag = gtag;
+
+      // Default everything to denied until the visitor opts in.
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+      });
+
+      // Re-apply a stored "granted" choice from a previous visit.
+      try {
+        if (localStorage.getItem('grolabs-analytics-consent') === 'granted') {
+          gtag('consent', 'update', { analytics_storage: 'granted' });
+        }
+      } catch (e) {}
+
+      gtag('js', new Date());
+      gtag('config', gaId, { anonymize_ip: true });
+    </script>
+    <script is:inline async src={gtagSrc}></script>
+  </Fragment>
+)}
