@@ -17,6 +17,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import SearchDemo from '../../components/SearchDemo.astro';
 import DiagnosticWidget from '../../components/DiagnosticWidget.astro';
 import SearchCopyHelper from '../../components/SearchCopyHelper.astro';
+import VideoEmbed from '../../components/VideoEmbed.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -177,6 +178,27 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             para que se alinee con el borde izquierdo de las tarjetas. */}
         <p class="hero-v2-sources-text">Benchmark de industria — E-commerce de mercado medio</p>
       </div>
+    </div>
+  </section>
+
+  <!-- Video — Cloudflare Stream embed, directly below the hero. Sits on
+       the same canvas bg as the hero; the card's own border + floating
+       shadow give it separation, and the dark "Fugas de ingresos" section
+       below provides the next alternation break. Renders nothing unless
+       PUBLIC_CF_STREAM_URL is configured (see VideoEmbed.astro). -->
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Míralo
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+        Velo en acción
+      </h2>
+      <p class="text-body-lg text-secondary-fixed-dim mb-lg md:mb-[48px] max-w-2xl">
+        Un vistazo rápido a cómo GroLabs encuentra los ingresos que se
+        fugan de tu tienda — y te ayuda a recuperarlos.
+      </p>
+      <VideoEmbed title="Resumen del producto GroLabs" />
     </div>
   </section>
 

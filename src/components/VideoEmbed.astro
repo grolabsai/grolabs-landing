@@ -1,0 +1,67 @@
+---
+/**
+ * Cloudflare Stream video embed.
+ *
+ * ⚠️ Design tokens (colors, fonts, radius, shadow) come from
+ * docs/STYLEGUIDE.md. The 16:9 container uses the same lifted-card
+ * treatment as the hero stat cards (fill #1c1d24, hairline border,
+ * 16px radius, floating-card shadow).
+ *
+ * Renders NOTHING unless PUBLIC_CF_STREAM_URL is set, so local dev and
+ * any unconfigured environment stay clean — same graceful-fallback
+ * pattern as PUBLIC_BOOKING_URL (booking CTA) and PUBLIC_GA4_ID
+ * (Analytics). Never hardcode a video URL.
+ *
+ * The URL is the official Cloudflare Stream iframe src, copied from the
+ * video's "Embed" tab — e.g.
+ *   https://customer-<code>.cloudflarestream.com/<id>/iframe
+ */
+interface Props {
+  /** Accessible title for the iframe. */
+  title?: string;
+}
+
+const { title = 'GroLabs video' } = Astro.props;
+const streamUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
+---
+
+{streamUrl && (
+  <div class="video-embed max-w-page mx-auto">
+    <div class="video-embed-frame">
+      <iframe
+        src={streamUrl}
+        title={title}
+        loading="lazy"
+        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+)}
+
+<style>
+  /* 16:9 responsive container with the lifted-card treatment from the
+     style guide (hero stat cards / equation card). overflow:hidden so
+     the iframe's corners follow the 16px radius. */
+  .video-embed-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #1c1d24;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.05) inset,
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 30px 60px -12px rgba(0, 0, 0, 0.65),
+      0 60px 120px -24px rgba(0, 0, 0, 0.55);
+  }
+  .video-embed-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>

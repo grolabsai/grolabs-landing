@@ -10,6 +10,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchDemo from '../components/SearchDemo.astro';
 import SearchCopyHelper from '../components/SearchCopyHelper.astro';
 import DiagnosticWidget from '../components/DiagnosticWidget.astro';
+import VideoEmbed from '../components/VideoEmbed.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -178,6 +179,27 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             specific source URLs are available. */}
         <p class="hero-v2-sources-text">Industry Benchmark — Mid-market e-commerce</p>
       </div>
+    </div>
+  </section>
+
+  <!-- Video — Cloudflare Stream embed, directly below the hero. Sits on
+       the same canvas bg as the hero; the card's own border + floating
+       shadow give it separation, and the dark Revenue-leaks section
+       below provides the next alternation break. Renders nothing unless
+       PUBLIC_CF_STREAM_URL is configured (see VideoEmbed.astro). -->
+  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Watch
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+        See it in action
+      </h2>
+      <p class="text-body-lg text-secondary-fixed-dim mb-lg md:mb-[48px] max-w-2xl">
+        A quick look at how GroLabs finds the revenue leaking out of your
+        store — and helps you win it back.
+      </p>
+      <VideoEmbed title="GroLabs product overview" />
     </div>
   </section>
 
