@@ -19,10 +19,27 @@
 interface Props {
   /** Accessible title for the iframe. */
   title?: string;
+  /**
+   * Optional poster (preview) image URL shown before playback. Overrides
+   * the video's default Stream thumbnail. Pass the Stream thumbnail URL
+   * (with an optional ?time= frame), e.g.
+   *   https://customer-<code>.cloudflarestream.com/<id>/thumbnails/thumbnail.jpg?time=4s
+   * When omitted, the iframe uses the video's default thumbnail (set via
+   * the scrubber in the Cloudflare Stream dashboard).
+   */
+  poster?: string;
 }
 
-const { title = 'GroLabs video' } = Astro.props;
-const streamUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
+const { title = 'GroLabs video', poster } = Astro.props;
+const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
+
+// Append the poster as a query param (URL-encoded), respecting any query
+// string already present on the configured embed URL.
+const streamUrl = baseUrl
+  ? poster
+    ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}poster=${encodeURIComponent(poster)}`
+    : baseUrl
+  : undefined;
 ---
 
 {streamUrl && (
