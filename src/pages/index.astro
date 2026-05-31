@@ -14,6 +14,10 @@ import VideoEmbed from '../components/VideoEmbed.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
+// Gate the whole video section (heading + player) on the env var so an
+// unconfigured environment never renders an empty titled section.
+const hasVideo = !!import.meta.env.PUBLIC_CF_STREAM_URL;
+
 /**
  * Booking provider toggle. Flip `provider` between 'cal' and 'calendly'
  * to swap embeds without removing either's code path. The unused
@@ -182,29 +186,28 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
-  <!-- Video — Cloudflare Stream embed, directly below the hero. Sits on
-       the same canvas bg as the hero; the card's own border + floating
-       shadow give it separation, and the dark Revenue-leaks section
-       below provides the next alternation break. Renders nothing unless
-       PUBLIC_CF_STREAM_URL is configured (see VideoEmbed.astro). -->
-  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
-    <div class="max-w-page mx-auto">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Watch
-      </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-        See it in action
-      </h2>
-      <p class="text-body-lg text-secondary-fixed-dim mb-lg md:mb-[48px] max-w-2xl">
-        A quick look at how GroLabs finds the revenue leaking out of your
-        store — and helps you win it back.
-      </p>
-      <VideoEmbed
-        title="GroLabs product overview"
-        poster="https://customer-bytuml7t86cefopo.cloudflarestream.com/6090ca0b52caec0301f47fa952a4857f/thumbnails/thumbnail.jpg?time=60s"
-      />
-    </div>
-  </section>
+  {/* Video — Cloudflare Stream embed, directly below the hero. Sits on
+      the same canvas bg as the hero; the card's own border + floating
+      shadow give it separation, and the dark Revenue-leaks section
+      below provides the next alternation break. The whole section
+      (heading included) is gated on PUBLIC_CF_STREAM_URL so an
+      unconfigured environment never shows an empty titled section. */}
+  {hasVideo && (
+    <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+      <div class="max-w-page mx-auto">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+          Recoverable revenue
+        </span>
+        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+          What is Leak Revenue?
+        </h2>
+        <VideoEmbed
+          title="What is Leak Revenue?"
+          poster="https://customer-bytuml7t86cefopo.cloudflarestream.com/6090ca0b52caec0301f47fa952a4857f/thumbnails/thumbnail.jpg?time=60s"
+        />
+      </div>
+    </section>
+  )}
 
   <!-- Booking embed — Calendly's inline widget themed yellow + dark to
        match the inverted footer. Hidden by default; revealed when the
