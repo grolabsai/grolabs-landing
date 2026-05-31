@@ -57,15 +57,15 @@ const streamUrl = baseUrl
 )}
 
 <style>
-  /* 16:9 responsive container with the lifted-card treatment from the
-     style guide (hero stat cards / equation card). overflow:hidden so
-     the iframe's corners follow the 16px radius. */
+  /* 16:9 responsive container. Borderless, but carries the same
+     floating-card drop shadow as the hero stat cards (style guide
+     "lifted-card treatment"). overflow:hidden so the iframe's corners
+     follow the 16px radius. */
   .video-embed-frame {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
     background: #1c1d24;
-    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     overflow: hidden;
     box-shadow:
