@@ -15,17 +15,21 @@
  * The URL is the official Cloudflare Stream iframe src, copied from the
  * video's "Embed" tab — e.g.
  *   https://customer-<code>.cloudflarestream.com/<id>/iframe
+ *
+ * Swapping the video is a ONE-VARIABLE change: update PUBLIC_CF_STREAM_URL
+ * and the poster thumbnail is re-derived from it automatically (no code or
+ * per-page edits). Optional env knobs:
+ *   PUBLIC_CF_STREAM_POSTER_TIME — frame to grab as the poster, e.g. "60s".
+ *     Unset → Cloudflare uses the video's dashboard-configured thumbnail.
  */
 interface Props {
   /** Accessible title for the iframe. */
   title?: string;
   /**
-   * Optional poster (preview) image URL shown before playback. Overrides
-   * the video's default Stream thumbnail. Pass the Stream thumbnail URL
-   * (with an optional ?time= frame), e.g.
-   *   https://customer-<code>.cloudflarestream.com/<id>/thumbnails/thumbnail.jpg?time=4s
-   * When omitted, the iframe uses the video's default thumbnail (set via
-   * the scrubber in the Cloudflare Stream dashboard).
+   * Optional poster (preview) image URL — an explicit override. Normally
+   * LEAVE THIS UNSET: the poster is auto-derived from PUBLIC_CF_STREAM_URL
+   * (+ PUBLIC_CF_STREAM_POSTER_TIME) so a video swap needs no code change.
+   * Only pass this to point at a thumbnail that isn't this video's own.
    */
   poster?: string;
   /**
@@ -46,6 +50,16 @@ interface Props {
 
 const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
+const posterTime = import.meta.env.PUBLIC_CF_STREAM_POSTER_TIME;
+
+// Derive the poster from the embed URL so swapping the video is a single
+// env change. Strip `/iframe` (and any query) off the base to get the
+// video root, then point at its thumbnail endpoint. An explicit `poster`
+// prop still wins; PUBLIC_CF_STREAM_POSTER_TIME picks the frame.
+const derivedPoster = baseUrl
+  ? `${baseUrl.replace(/\/iframe.*$/, '')}/thumbnails/thumbnail.jpg${posterTime ? `?time=${encodeURIComponent(posterTime)}` : ''}`
+  : undefined;
+const effectivePoster = poster ?? derivedPoster;
 
 // Append player params (poster, primaryColor) — URLSearchParams handles
 // encoding, including the `#` in the hex color and the `?` inside the
@@ -54,7 +68,7 @@ const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
 let streamUrl: string | undefined;
 if (baseUrl) {
   const params = new URLSearchParams();
-  if (poster) params.set('poster', poster);
+  if (effectivePoster) params.set('poster', effectivePoster);
   if (primaryColor) params.set('primaryColor', primaryColor);
   const qs = params.toString();
   streamUrl = qs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${qs}` : baseUrl;

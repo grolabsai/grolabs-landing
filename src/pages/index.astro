@@ -17,6 +17,10 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // Gate the whole video section (heading + player) on the env var so an
 // unconfigured environment never renders an empty titled section.
 const hasVideo = !!import.meta.env.PUBLIC_CF_STREAM_URL;
+// Optional video length for the play button copy (e.g. "1.5"). Unset → a
+// generic "Play video" label, so a video swap never needs a code edit.
+const videoMinutes = import.meta.env.PUBLIC_CF_VIDEO_MINUTES;
+const watchVideoLabel = videoMinutes ? `Play ${videoMinutes} minute video` : 'Play video';
 
 /**
  * Booking provider toggle. Flip `provider` between 'cal' and 'calendly'
@@ -209,12 +213,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M8 5v14l11-7z" />
           </svg>
-          Play 1.5 minute video
+          {watchVideoLabel}
         </button>
         <VideoEmbed
           iframeId="gl-stream-video"
           title="What are revenue leaks?"
-          poster="https://customer-bytuml7t86cefopo.cloudflarestream.com/6090ca0b52caec0301f47fa952a4857f/thumbnails/thumbnail.jpg?time=60s"
         />
       </div>
       {/* Cloudflare Stream player SDK (no npm dep) — lets the "Watch video"
