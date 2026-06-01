@@ -76,18 +76,69 @@ if (baseUrl) {
 ---
 
 {streamUrl && (
-  <div class="video-embed max-w-page mx-auto">
-    <div class="video-embed-frame">
-      <iframe
-        id={iframeId}
-        src={streamUrl}
-        title={title}
-        loading="lazy"
-        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-        allowfullscreen
-      ></iframe>
+  <Fragment>
+    <div class="video-embed max-w-page mx-auto">
+      <div class="video-embed-frame">
+        <iframe
+          id={iframeId}
+          src={streamUrl}
+          title={title}
+          loading="lazy"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+          allowfullscreen
+        ></iframe>
+      </div>
     </div>
-  </div>
+    {/* Cloudflare Stream player SDK (no npm dep). Drives an optional
+        external [data-watch-video] button and forwards player events to
+        GA4, so all video stats live in Analytics — no need to read them
+        from the Cloudflare dashboard. gtag is a no-op until it loads /
+        consent is granted, so calls are always safe. */}
+    <script is:inline src="https://embed.cloudflarestream.com/embed/sdk.latest.js"></script>
+    <script is:inline>
+      (function () {
+        var iframe = document.querySelector('.video-embed-frame iframe');
+        if (!iframe || !window.Stream) return;
+        var player = window.Stream(iframe);
+
+        var btn = document.querySelector('[data-watch-video]');
+        if (btn) {
+          btn.addEventListener('click', function () {
+            iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            player.play().catch(function () {});
+          });
+        }
+
+        // GA4 video analytics — single source of truth in Analytics.
+        function track(name, percent) {
+          if (typeof window.gtag !== 'function') return;
+          window.gtag('event', name, {
+            video_provider: 'cloudflare',
+            video_title: iframe.title || 'GroLabs video',
+            video_percent: percent,
+          });
+        }
+        var started = false;
+        var milestones = [25, 50, 75];
+        player.addEventListener('play', function () {
+          if (started) return;
+          started = true;
+          track('video_start', 0);
+        });
+        player.addEventListener('timeupdate', function () {
+          var d = player.duration, t = player.currentTime;
+          if (!d) return;
+          var pct = (t / d) * 100;
+          while (milestones.length && pct >= milestones[0]) {
+            track('video_progress', milestones.shift());
+          }
+        });
+        player.addEventListener('ended', function () {
+          track('video_complete', 100);
+        });
+      })();
+    </script>
+  </Fragment>
 )}
 
 <style>
