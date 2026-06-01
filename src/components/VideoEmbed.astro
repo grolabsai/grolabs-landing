@@ -28,18 +28,31 @@ interface Props {
    * the scrubber in the Cloudflare Stream dashboard).
    */
   poster?: string;
+  /**
+   * Player accent color (Cloudflare Stream `primaryColor` param) — recolors
+   * the center play button and its ring, the progress bar, and other control
+   * accents. The iframe is cross-origin, so this is the ONLY way to restyle
+   * the play button; our own CSS can't reach inside. Defaults to the GroLabs
+   * brand yellow (#fae194 — see docs/STYLEGUIDE.md).
+   */
+  primaryColor?: string;
 }
 
-const { title = 'GroLabs video', poster } = Astro.props;
+const { title = 'GroLabs video', poster, primaryColor = '#fae194' } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
 
-// Append the poster as a query param (URL-encoded), respecting any query
-// string already present on the configured embed URL.
-const streamUrl = baseUrl
-  ? poster
-    ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}poster=${encodeURIComponent(poster)}`
-    : baseUrl
-  : undefined;
+// Append player params (poster, primaryColor) — URLSearchParams handles
+// encoding, including the `#` in the hex color and the `?` inside the
+// poster's own thumbnail URL. Respects any query string already on the
+// configured embed URL.
+let streamUrl: string | undefined;
+if (baseUrl) {
+  const params = new URLSearchParams();
+  if (poster) params.set('poster', poster);
+  if (primaryColor) params.set('primaryColor', primaryColor);
+  const qs = params.toString();
+  streamUrl = qs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${qs}` : baseUrl;
+}
 ---
 
 {streamUrl && (
