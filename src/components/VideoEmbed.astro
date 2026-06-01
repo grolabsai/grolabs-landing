@@ -36,9 +36,15 @@ interface Props {
    * brand yellow (#fae194 — see docs/STYLEGUIDE.md).
    */
   primaryColor?: string;
+  /**
+   * Optional DOM id for the underlying <iframe>. Set this when an external
+   * button needs to control playback via the Cloudflare Stream SDK
+   * (`Stream(document.getElementById(id)).play()`). Omit for a plain embed.
+   */
+  iframeId?: string;
 }
 
-const { title = 'GroLabs video', poster, primaryColor = '#fae194' } = Astro.props;
+const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
 
 // Append player params (poster, primaryColor) — URLSearchParams handles
@@ -59,6 +65,7 @@ if (baseUrl) {
   <div class="video-embed max-w-page mx-auto">
     <div class="video-embed-frame">
       <iframe
+        id={iframeId}
         src={streamUrl}
         title={title}
         loading="lazy"
