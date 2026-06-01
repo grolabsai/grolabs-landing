@@ -1,0 +1,104 @@
+---
+/**
+ * Cloudflare Stream video embed.
+ *
+ * ⚠️ Design tokens (colors, fonts, radius, shadow) come from
+ * docs/STYLEGUIDE.md. The 16:9 container uses the same lifted-card
+ * treatment as the hero stat cards (fill #1c1d24, hairline border,
+ * 16px radius, floating-card shadow).
+ *
+ * Renders NOTHING unless PUBLIC_CF_STREAM_URL is set, so local dev and
+ * any unconfigured environment stay clean — same graceful-fallback
+ * pattern as PUBLIC_BOOKING_URL (booking CTA) and PUBLIC_GA4_ID
+ * (Analytics). Never hardcode a video URL.
+ *
+ * The URL is the official Cloudflare Stream iframe src, copied from the
+ * video's "Embed" tab — e.g.
+ *   https://customer-<code>.cloudflarestream.com/<id>/iframe
+ */
+interface Props {
+  /** Accessible title for the iframe. */
+  title?: string;
+  /**
+   * Optional poster (preview) image URL shown before playback. Overrides
+   * the video's default Stream thumbnail. Pass the Stream thumbnail URL
+   * (with an optional ?time= frame), e.g.
+   *   https://customer-<code>.cloudflarestream.com/<id>/thumbnails/thumbnail.jpg?time=4s
+   * When omitted, the iframe uses the video's default thumbnail (set via
+   * the scrubber in the Cloudflare Stream dashboard).
+   */
+  poster?: string;
+  /**
+   * Player accent color (Cloudflare Stream `primaryColor` param) — recolors
+   * the center play button and its ring, the progress bar, and other control
+   * accents. The iframe is cross-origin, so this is the ONLY way to restyle
+   * the play button; our own CSS can't reach inside. Defaults to the GroLabs
+   * brand yellow (#fae194 — see docs/STYLEGUIDE.md).
+   */
+  primaryColor?: string;
+  /**
+   * Optional DOM id for the underlying <iframe>. Set this when an external
+   * button needs to control playback via the Cloudflare Stream SDK
+   * (`Stream(document.getElementById(id)).play()`). Omit for a plain embed.
+   */
+  iframeId?: string;
+}
+
+const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId } = Astro.props;
+const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
+
+// Append player params (poster, primaryColor) — URLSearchParams handles
+// encoding, including the `#` in the hex color and the `?` inside the
+// poster's own thumbnail URL. Respects any query string already on the
+// configured embed URL.
+let streamUrl: string | undefined;
+if (baseUrl) {
+  const params = new URLSearchParams();
+  if (poster) params.set('poster', poster);
+  if (primaryColor) params.set('primaryColor', primaryColor);
+  const qs = params.toString();
+  streamUrl = qs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${qs}` : baseUrl;
+}
+---
+
+{streamUrl && (
+  <div class="video-embed max-w-page mx-auto">
+    <div class="video-embed-frame">
+      <iframe
+        id={iframeId}
+        src={streamUrl}
+        title={title}
+        loading="lazy"
+        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+        allowfullscreen
+      ></iframe>
+    </div>
+  </div>
+)}
+
+<style>
+  /* 16:9 responsive container. Borderless, but carries the same
+     floating-card drop shadow as the hero stat cards (style guide
+     "lifted-card treatment"). overflow:hidden so the iframe's corners
+     follow the 16px radius. */
+  .video-embed-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #1c1d24;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.05) inset,
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      0 30px 60px -12px rgba(0, 0, 0, 0.65),
+      0 60px 120px -24px rgba(0, 0, 0, 0.55);
+  }
+  .video-embed-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>
