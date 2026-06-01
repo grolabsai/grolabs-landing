@@ -17,10 +17,6 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // Gate the whole video section (heading + player) on the env var so an
 // unconfigured environment never renders an empty titled section.
 const hasVideo = !!import.meta.env.PUBLIC_CF_STREAM_URL;
-// Optional video length for the play button copy (e.g. "1.5"). Unset → a
-// generic "Play video" label, so a video swap never needs a code edit.
-const videoMinutes = import.meta.env.PUBLIC_CF_VIDEO_MINUTES;
-const watchVideoLabel = videoMinutes ? `Play ${videoMinutes} minute video` : 'Play video';
 
 /**
  * Booking provider toggle. Flip `provider` between 'cal' and 'calendly'
@@ -213,7 +209,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M8 5v14l11-7z" />
           </svg>
-          {watchVideoLabel}
+          Play 1.5 minute video
         </button>
         <VideoEmbed
           iframeId="gl-stream-video"
@@ -337,6 +333,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Hanken Grotesk", sans-serif;
       font-weight: 600;
       font-size: 15px;
+      text-transform: uppercase;
       padding: 14px 28px;
       border-radius: 8px;
       border: 1px solid transparent;
@@ -730,6 +727,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .header-cta {
       font-family: "Hanken Grotesk", sans-serif;
       font-weight: 600; font-size: 13px;
+      text-transform: uppercase;
       padding: 8px 16px; border-radius: 8px;
       border: 1px solid transparent; text-decoration: none;
       display: inline-flex; align-items: center;
