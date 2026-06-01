@@ -185,23 +185,23 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
-  {/* Video — Cloudflare Stream embed, directly below the hero. Sits on
-      the same canvas bg as the hero; the card's own border + floating
-      shadow give it separation, and the dark "Fugas de ingresos" section
-      below provides the next alternation break. The whole section
-      (heading included) is gated on PUBLIC_CF_STREAM_URL so an
-      unconfigured environment never shows an empty titled section. */}
+  {/* Video — Cloudflare Stream embed, directly below the hero. Carries
+      the dark canvas (bg-canvas-deeper) the hidden "Fugas de ingresos"
+      section used to own, so the hero→dark alternation rhythm is preserved
+      while that section is parked. The whole section (heading included) is
+      gated on PUBLIC_CF_STREAM_URL so an unconfigured environment never
+      shows an empty titled section. */}
   {hasVideo && (
-    <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+    <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
       <div class="max-w-page mx-auto">
         <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
           Ingresos recuperables
         </span>
         <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-          ¿Qué es la fuga de ingresos?
+          ¿Qué son las fugas de ingresos?
         </h2>
         <VideoEmbed
-          title="¿Qué es la fuga de ingresos?"
+          title="¿Qué son las fugas de ingresos?"
           poster="https://customer-bytuml7t86cefopo.cloudflarestream.com/6090ca0b52caec0301f47fa952a4857f/thumbnails/thumbnail.jpg?time=60s"
         />
       </div>
@@ -225,8 +225,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
-  <!-- Funnel Benchmark / Revenue leaks (dark section per the v2 alternation). -->
-  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
+  <!-- Funnel Benchmark / Revenue leaks. HIDDEN FOR NOW (`hidden` class) —
+       the video section above now carries this section's dark canvas and
+       "fugas de ingresos" framing. Remove the `hidden` class to restore it. -->
+  <section class="hidden relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
     <div class="max-w-page mx-auto">
     <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
       Embudo de conversión
