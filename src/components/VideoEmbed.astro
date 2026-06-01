@@ -110,31 +110,59 @@ if (baseUrl) {
         }
 
         // GA4 video analytics — single source of truth in Analytics.
-        function track(name, percent) {
+        function track(name, params) {
           if (typeof window.gtag !== 'function') return;
-          window.gtag('event', name, {
+          window.gtag('event', name, Object.assign({
             video_provider: 'cloudflare',
             video_title: iframe.title || 'GroLabs video',
-            video_percent: percent,
-          });
+          }, params));
         }
         var started = false;
-        var milestones = [25, 50, 75];
+        var completed = false;
+        var dropSent = false;
+        var lastTime = 0;
+        var lastDuration = 0;
+        // Finer milestones than GA's default so the progress histogram
+        // doubles as a reliable (alive-page) aggregate drop-off curve.
+        var milestones = [10, 25, 50, 75];
         player.addEventListener('play', function () {
           if (started) return;
           started = true;
-          track('video_start', 0);
+          track('video_start', { video_percent: 0 });
         });
         player.addEventListener('timeupdate', function () {
           var d = player.duration, t = player.currentTime;
           if (!d) return;
+          lastTime = t;
+          lastDuration = d;
           var pct = (t / d) * 100;
           while (milestones.length && pct >= milestones[0]) {
-            track('video_progress', milestones.shift());
+            track('video_progress', { video_percent: milestones.shift() });
           }
         });
         player.addEventListener('ended', function () {
-          track('video_complete', 100);
+          completed = true;
+          track('video_complete', {
+            video_percent: 100,
+            video_seconds: Math.round(lastDuration),
+          });
+        });
+
+        // Best-effort exact drop-off point. Fires when the visitor truly
+        // leaves the page (pagehide) after starting but before finishing.
+        // gtag sends this via sendBeacon, so it's best-effort and may be
+        // dropped (esp. on mobile) — the progress milestones above are the
+        // reliable aggregate signal. pagehide (not visibilitychange) avoids
+        // false positives from tab-switching where the visitor returns.
+        window.addEventListener('pagehide', function () {
+          if (!started || completed || dropSent) return;
+          dropSent = true;
+          var pct = lastDuration ? Math.round((lastTime / lastDuration) * 100) : 0;
+          track('video_drop_off', {
+            video_percent: pct,
+            video_seconds: Math.round(lastTime),
+            video_duration: Math.round(lastDuration),
+          });
         });
       })();
     </script>
