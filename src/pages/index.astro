@@ -448,10 +448,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       }
 
       function runAll(url) {
-        var apiPromise = fetch("/api/diagnostic", {
+        // Call the app directly from the browser — CORS is open on app.grolabs.ai.
+        // Avoids Vercel serverless function timeout (the backend takes ~30s with
+        // Browserless; the browser has no such limit).
+        var apiPromise = fetch("https://app.grolabs.ai/api/v1/diagnostic/runs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: url }),
+          body: JSON.stringify({ url: url, version: "v5" }),
         })
           .then(function (r) { return r.ok ? r.json() : null; })
           .catch(function () { return null; });
