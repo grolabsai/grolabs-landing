@@ -222,26 +222,45 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         <h2 class="audit-carousel-title">This should be quick. <button type="button" class="audit-watch-link" data-watch-video>Watch the video</button> while we take care of this and come back for your results.</h2>
       </header>
 
-      <div class="audit-track">
-        <article class="audit-block" data-block="search">
-          <div class="audit-block-anim">
-            <iframe class="audit-frame" data-loader="/audit/search-loader.html" title="Search results audit"></iframe>
-          </div>
-          <aside class="audit-block-list">
-            <h4 class="audit-block-list-title">Search experience</h4>
-            <ul class="audit-checklist" data-checklist></ul>
-          </aside>
-        </article>
+      <!-- Score overlay wrapper — position:relative so the overlay can
+           sit absolutely on top of both cards. -->
+      <div class="audit-track-wrap">
+        <div class="audit-track">
+          <article class="audit-block" data-block="search">
+            <div class="audit-block-anim">
+              <iframe class="audit-frame" data-loader="/audit/search-loader.html" title="Search results audit"></iframe>
+            </div>
+            <aside class="audit-block-list">
+              <h4 class="audit-block-list-title">Search experience</h4>
+              <ul class="audit-checklist" data-checklist></ul>
+            </aside>
+          </article>
 
-        <article class="audit-block" data-block="pdp">
-          <div class="audit-block-anim">
-            <iframe class="audit-frame" data-loader="/audit/pdp-loader.html" title="Product page audit"></iframe>
+          <article class="audit-block" data-block="pdp">
+            <div class="audit-block-anim">
+              <iframe class="audit-frame" data-loader="/audit/pdp-loader.html" title="Product page audit"></iframe>
+            </div>
+            <aside class="audit-block-list">
+              <h4 class="audit-block-list-title">Product page</h4>
+              <ul class="audit-checklist" data-checklist></ul>
+            </aside>
+          </article>
+        </div>
+
+        <!-- Revenue Leak Score overlay — revealed at 30 s. Hidden by default. -->
+        <div class="audit-score-overlay" data-score-overlay hidden>
+          <div class="audit-score-card" data-score-card>
+            <div class="audit-score-num" data-score-num>--</div>
+            <p class="audit-score-sublabel">Revenue Leak Score</p>
+            <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
+            <a
+              href="https://cal.com/tuncho-granados-uibzst/15min"
+              class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Book growth assessment call</a>
           </div>
-          <aside class="audit-block-list">
-            <h4 class="audit-block-list-title">Product page</h4>
-            <ul class="audit-checklist" data-checklist></ul>
-          </aside>
-        </article>
+        </div>
       </div>
 
     </div>
@@ -318,20 +337,51 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
 
         await sleep(500);
+        // Paced to fill ~28 s so the score overlay appears right at 30 s.
+        // PDP (10 steps) × 2800 ms + 500 ms ≈ 28.5 s.
         for (var i = 0; i < cfg.steps.length; i++) {
           var s = cfg.steps[i], li = lis[i], ok = s.outcome === "pass";
           setCk(li, "scanning");
           try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "…"); } catch (e) {}
-          await sleep(900);
+          await sleep(2000);
           try { if (s.region) { ok ? api.pass(s.region, s.text) : api.fail(s.region, s.text); } } catch (e) {}
           setCk(li, ok ? "pass" : "fail", s.text);
-          await sleep(350);
+          await sleep(800);
         }
         try { if (api.complete) api.complete(); } catch (e) {}
       }
 
+      function calcLeakScore() {
+        var total = 0, fails = 0;
+        var blocks = Object.keys(SEQ);
+        for (var b = 0; b < blocks.length; b++) {
+          var steps = SEQ[blocks[b]].steps;
+          for (var i = 0; i < steps.length; i++) {
+            total++;
+            if (steps[i].outcome === "fail") fails++;
+          }
+        }
+        return Math.round((fails / total) * 100);
+      }
+
+      function showScore() {
+        var overlay = document.querySelector("[data-score-overlay]");
+        var card    = document.querySelector("[data-score-card]");
+        var numEl   = document.querySelector("[data-score-num]");
+        if (!overlay || !card || !numEl) return;
+
+        var score = calcLeakScore();
+        numEl.textContent = score;
+
+        var tier = score >= 60 ? "is-red" : score >= 35 ? "is-yellow" : "is-green";
+        card.classList.add(tier);
+        overlay.hidden = false;
+      }
+
       function runAll(url) {
         document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) { runBlock(b, url); });
+        // Show score overlay exactly at 30 s
+        setTimeout(showScore, 30000);
       }
 
       function init() {
@@ -778,8 +828,56 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* Real estate = two columns (Search | PDP). Inside each: ~75% loader +
        ~25% checklist. All cells min-width:0 so nothing overflows → no
        horizontal scrollbar; the checklist truncates with ellipsis instead. */
+    .audit-track-wrap { position: relative; }
     .audit-track { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
     @media (max-width: 900px) { .audit-track { grid-template-columns: 1fr; } }
+
+    /* ── Revenue Leak Score overlay ────────────────────────────────────── */
+    .audit-score-overlay {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(14, 14, 17, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      z-index: 20;
+      animation: score-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .audit-score-overlay[hidden] { display: none; }
+    @keyframes score-in {
+      from { opacity: 0; transform: scale(0.94) translateY(12px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .audit-score-card {
+      text-align: center;
+      padding: 48px 56px;
+      border-radius: 20px;
+      border: 1px solid currentColor;
+      max-width: 580px;
+      width: 90%;
+    }
+    .audit-score-card.is-red    { color: #f87171; background: rgba(248, 113, 113, 0.08); }
+    .audit-score-card.is-yellow { color: #fae194; background: rgba(250, 225, 148, 0.08); }
+    .audit-score-card.is-green  { color: #34d399; background: rgba(52, 211, 153, 0.08); }
+    .audit-score-num {
+      font-family: "Permanent Marker", cursive;
+      font-size: clamp(80px, 12vw, 128px);
+      line-height: 1;
+      color: inherit;
+    }
+    .audit-score-sublabel {
+      font-family: ui-monospace, monospace;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: inherit; opacity: 0.65;
+      margin: 10px 0 28px;
+    }
+    .audit-score-msg {
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: 17px; line-height: 1.6;
+      color: #EDEAE0;
+      margin: 0 0 32px;
+    }
+    .audit-score-cta { margin: 0 auto; }
     .audit-block {
       min-width: 0;
       display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 14px;
