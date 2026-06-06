@@ -285,12 +285,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       // results paint green/red/gray based on actual findings.
       var CHECKS = {
         search: { api: "SearchAudit", steps: [
-          { label: "Search box",        region: null,              category: "internal_search", idx: 0 },
-          { label: "Typo tolerance",    region: null,              category: "internal_search", idx: 2 },
-          { label: "Synonyms",          region: null,              category: "internal_search", idx: 3 },
-          { label: "No-results screen", region: "empty_state",     category: "internal_search", idx: 12 },
-          { label: "Brand relevance",   region: "brand_relevance", category: "internal_search", idx: 13 },
-          { label: "Search speed",      region: null,              category: "internal_search", idx: 1 },
+          // category + evKey: match by evidence content, not index (order varies by DB)
+          { label: "Search box",        region: null,              category: "internal_search", evKey: "engine" },
+          { label: "Typo tolerance",    region: null,              category: "internal_search", evKey: "tested" },
+          { label: "No-results screen", region: "empty_state",     category: "internal_search", evKey: "graceful" },
+          { label: "Brand relevance",   region: "brand_relevance", category: "internal_search", evKey: "brand_tests" },
+          { label: "Search speed",      region: null,              category: "internal_search", evKey: "latency_ms" },
+          { label: "Synonyms",          region: null,              category: "internal_search", evKey: "synonym_tests" },
           { label: "Facets present",    region: "facet_present" },
           { label: "Facet depth",       region: "facet_depth" },
         ] },
@@ -419,7 +420,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             for (var k = 0; k < cats.length; k++) {
               if (cats[k].category_code === step.category) { cat = cats[k]; break; }
             }
-            var finding = cat ? (cat.findings || [])[step.idx] : null;
+            var finding = null;
+            if (cat) {
+              var allFindings = cat.findings || [];
+              if (step.evKey) {
+                // Match by evidence content — robust against DB ordering changes
+                for (var m = 0; m < allFindings.length; m++) {
+                  var ev = allFindings[m].evidence;
+                  if (ev && Object.prototype.hasOwnProperty.call(ev, step.evKey)) {
+                    finding = allFindings[m]; break;
+                  }
+                }
+              } else {
+                finding = allFindings[step.idx] || null;
+              }
+            }
             paintFinding(row, step.region, api, finding);
           }
         }
