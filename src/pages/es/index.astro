@@ -136,8 +136,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         </h1>
         <p class="hero-v2-tagline">Sin pagar por más tráfico</p>
         <p class="hero-v2-lede">
-          ¡Sí, es posible!<br />
-          Te ayudamos a recuperar ingresos perdidos y aumentar las ventas sin pagar por más tráfico.
+          Ingresos actuales + <span class="hero-v2-lede-accent">Fugas de ingresos</span> = Ingresos potenciales
         </p>
         <div class="hero-v2-ctas" data-hero-ctas>
           <div class="hero-v2-cta-stack">
@@ -152,9 +151,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             </a>
             <span class="hero-v2-cta-note">Llamada gratis de 15 minutos</span>
           </div>
-          <a href="mailto:growth@grolabs.ai" class="hero-v2-btn hero-v2-btn--ghost">
-            Contacto
-          </a>
+          <button type="button" class="hero-v2-btn hero-v2-btn--video" data-watch-video>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Ver video
+          </button>
         </div>
       </div>
 
@@ -194,26 +196,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   {hasVideo && (
     <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
       <div class="max-w-page mx-auto">
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-lg block">
           Video explicativo
         </span>
-        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-          ¿Qué son las fugas de ingresos?
-        </h2>
-        <button
-          type="button"
-          class="hero-v2-btn hero-v2-btn--primary cta-button-style mb-lg"
-          data-watch-video
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-          Reproducir video de 1.5 minutos
-        </button>
         <VideoEmbed
           iframeId="gl-stream-video"
           title="¿Qué son las fugas de ingresos?"
           posterTime="1.5s"
+          playLabel="Reproducir video"
         />
       </div>
     </section>
@@ -755,6 +745,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     max-width: 580px;
   }
 
+  .hero-v2-lede-accent {
+    color: #fae194;
+  }
+
   /* CTA row — top-align so the Contact ghost sits flush with the top
      of the Book button rather than centering against the (Book + note)
      stack. align-items + align-self is belt-and-suspenders. */
@@ -793,6 +787,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   .hero-v2-btn--ghost:hover {
     color: rgba(237, 234, 224, 0.9);
     border-color: rgba(237, 234, 224, 0.6);
+  }
+  /* "Ver video" — yellow outline + yellow text, transparent fill.
+     Sibling to the primary Book CTA in the hero (mirrors EN --video). */
+  .hero-v2-btn--video {
+    align-self: flex-start;
+    background: transparent;
+    color: #fae194;
+    border-color: #fae194;
+    cursor: pointer;
+  }
+  .hero-v2-btn--video:hover {
+    transform: translateY(-1px);
+    background: rgba(250, 225, 148, 0.08);
   }
 
   /* Cards */
