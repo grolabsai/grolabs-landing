@@ -213,25 +213,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         <VideoEmbed
           iframeId="gl-stream-video"
           title="¿Qué son las fugas de ingresos?"
-          poster="https://customer-bytuml7t86cefopo.cloudflarestream.com/6090ca0b52caec0301f47fa952a4857f/thumbnails/thumbnail.jpg?time=60s"
         />
       </div>
-      {/* Cloudflare Stream player SDK (no npm dep) — lets the "Ver video"
-          button drive the cross-origin iframe via postMessage. Only loaded
-          when the video section renders. */}
-      <script is:inline src="https://embed.cloudflarestream.com/embed/sdk.latest.js"></script>
-      <script is:inline>
-        (function () {
-          var iframe = document.getElementById('gl-stream-video');
-          var btn = document.querySelector('[data-watch-video]');
-          if (!iframe || !btn || !window.Stream) return;
-          var player = window.Stream(iframe);
-          btn.addEventListener('click', function () {
-            iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            player.play().catch(function () {});
-          });
-        })();
-      </script>
     </section>
   )}
 

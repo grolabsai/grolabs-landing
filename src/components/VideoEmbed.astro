@@ -15,17 +15,21 @@
  * The URL is the official Cloudflare Stream iframe src, copied from the
  * video's "Embed" tab — e.g.
  *   https://customer-<code>.cloudflarestream.com/<id>/iframe
+ *
+ * Swapping the video is a ONE-VARIABLE change: update PUBLIC_CF_STREAM_URL
+ * and the poster thumbnail is re-derived from it automatically (no code or
+ * per-page edits). Optional env knobs:
+ *   PUBLIC_CF_STREAM_POSTER_TIME — frame to grab as the poster, e.g. "60s".
+ *     Unset → Cloudflare uses the video's dashboard-configured thumbnail.
  */
 interface Props {
   /** Accessible title for the iframe. */
   title?: string;
   /**
-   * Optional poster (preview) image URL shown before playback. Overrides
-   * the video's default Stream thumbnail. Pass the Stream thumbnail URL
-   * (with an optional ?time= frame), e.g.
-   *   https://customer-<code>.cloudflarestream.com/<id>/thumbnails/thumbnail.jpg?time=4s
-   * When omitted, the iframe uses the video's default thumbnail (set via
-   * the scrubber in the Cloudflare Stream dashboard).
+   * Optional poster (preview) image URL — an explicit override. Normally
+   * LEAVE THIS UNSET: the poster is auto-derived from PUBLIC_CF_STREAM_URL
+   * (+ PUBLIC_CF_STREAM_POSTER_TIME) so a video swap needs no code change.
+   * Only pass this to point at a thumbnail that isn't this video's own.
    */
   poster?: string;
   /**
@@ -46,6 +50,16 @@ interface Props {
 
 const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
+const posterTime = import.meta.env.PUBLIC_CF_STREAM_POSTER_TIME;
+
+// Derive the poster from the embed URL so swapping the video is a single
+// env change. Strip `/iframe` (and any query) off the base to get the
+// video root, then point at its thumbnail endpoint. An explicit `poster`
+// prop still wins; PUBLIC_CF_STREAM_POSTER_TIME picks the frame.
+const derivedPoster = baseUrl
+  ? `${baseUrl.replace(/\/iframe.*$/, '')}/thumbnails/thumbnail.jpg${posterTime ? `?time=${encodeURIComponent(posterTime)}` : ''}`
+  : undefined;
+const effectivePoster = poster ?? derivedPoster;
 
 // Append player params (poster, primaryColor) — URLSearchParams handles
 // encoding, including the `#` in the hex color and the `?` inside the
@@ -54,7 +68,7 @@ const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
 let streamUrl: string | undefined;
 if (baseUrl) {
   const params = new URLSearchParams();
-  if (poster) params.set('poster', poster);
+  if (effectivePoster) params.set('poster', effectivePoster);
   if (primaryColor) params.set('primaryColor', primaryColor);
   const qs = params.toString();
   streamUrl = qs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${qs}` : baseUrl;
@@ -62,18 +76,125 @@ if (baseUrl) {
 ---
 
 {streamUrl && (
-  <div class="video-embed max-w-page mx-auto">
-    <div class="video-embed-frame">
-      <iframe
-        id={iframeId}
-        src={streamUrl}
-        title={title}
-        loading="lazy"
-        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-        allowfullscreen
-      ></iframe>
+  <Fragment>
+    <div class="video-embed max-w-page mx-auto">
+      <div class="video-embed-frame">
+        <iframe
+          id={iframeId}
+          src={streamUrl}
+          title={title}
+          loading="lazy"
+          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+          allowfullscreen
+        ></iframe>
+        {/* Play affordance over the iframe. The Cloudflare player is
+            cross-origin so we can't restyle its native button; instead we
+            layer our own — the same pulsing yellow pill as the search-demo
+            copy button (SearchCopyHelper) — and start playback via the
+            Stream SDK on click. Hidden once playback begins. Also covers a
+            missing poster. */}
+        <div class="video-play-overlay">
+          <button type="button" class="video-play-pill" aria-label="Play video" data-video-play>
+            <span class="material-symbols-outlined video-play-pill-icon" aria-hidden="true">play_arrow</span>
+            <span class="video-play-pill-text">Play video</span>
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
+    {/* Cloudflare Stream player SDK (no npm dep). Drives an optional
+        external [data-watch-video] button and forwards player events to
+        GA4, so all video stats live in Analytics — no need to read them
+        from the Cloudflare dashboard. gtag is a no-op until it loads /
+        consent is granted, so calls are always safe. */}
+    <script is:inline src="https://embed.cloudflarestream.com/embed/sdk.latest.js"></script>
+    <script is:inline>
+      (function () {
+        var iframe = document.querySelector('.video-embed-frame iframe');
+        if (!iframe || !window.Stream) return;
+        var player = window.Stream(iframe);
+
+        // External "Watch video" buttons (hero + video section) scroll the
+        // player into view and start it. querySelectorAll so every such
+        // button is wired, not just the first.
+        document.querySelectorAll('[data-watch-video]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            player.play().catch(function () {});
+          });
+        });
+
+        // Our pill play button overlaying the iframe.
+        var overlay = document.querySelector('.video-play-overlay');
+        var playBtn = document.querySelector('[data-video-play]');
+        if (playBtn) {
+          playBtn.addEventListener('click', function () {
+            player.play().catch(function () {});
+          });
+        }
+        // Hide the overlay once playback begins, however it was triggered
+        // (pill, external button, or the player's own controls).
+        player.addEventListener('play', function () {
+          if (overlay) overlay.hidden = true;
+        });
+
+        // GA4 video analytics — single source of truth in Analytics.
+        function track(name, params) {
+          if (typeof window.gtag !== 'function') return;
+          window.gtag('event', name, Object.assign({
+            video_provider: 'cloudflare',
+            video_title: iframe.title || 'GroLabs video',
+          }, params));
+        }
+        var started = false;
+        var completed = false;
+        var dropSent = false;
+        var lastTime = 0;
+        var lastDuration = 0;
+        // Finer milestones than GA's default so the progress histogram
+        // doubles as a reliable (alive-page) aggregate drop-off curve.
+        var milestones = [10, 25, 50, 75];
+        player.addEventListener('play', function () {
+          if (started) return;
+          started = true;
+          track('video_start', { video_percent: 0 });
+        });
+        player.addEventListener('timeupdate', function () {
+          var d = player.duration, t = player.currentTime;
+          if (!d) return;
+          lastTime = t;
+          lastDuration = d;
+          var pct = (t / d) * 100;
+          while (milestones.length && pct >= milestones[0]) {
+            track('video_progress', { video_percent: milestones.shift() });
+          }
+        });
+        player.addEventListener('ended', function () {
+          completed = true;
+          track('video_complete', {
+            video_percent: 100,
+            video_seconds: Math.round(lastDuration),
+          });
+        });
+
+        // Best-effort exact drop-off point. Fires when the visitor truly
+        // leaves the page (pagehide) after starting but before finishing.
+        // gtag sends this via sendBeacon, so it's best-effort and may be
+        // dropped (esp. on mobile) — the progress milestones above are the
+        // reliable aggregate signal. pagehide (not visibilitychange) avoids
+        // false positives from tab-switching where the visitor returns.
+        window.addEventListener('pagehide', function () {
+          if (!started || completed || dropSent) return;
+          dropSent = true;
+          var pct = lastDuration ? Math.round((lastTime / lastDuration) * 100) : 0;
+          track('video_drop_off', {
+            video_percent: pct,
+            video_seconds: Math.round(lastTime),
+            video_duration: Math.round(lastDuration),
+          });
+        });
+      })();
+    </script>
+  </Fragment>
 )}
 
 <style>
@@ -100,5 +221,66 @@ if (baseUrl) {
     width: 100%;
     height: 100%;
     border: 0;
+  }
+  /* Play affordance — the same pulsing yellow pill as the search-demo
+     copy button (SearchCopyHelper). The overlay wrapper is a full-frame
+     flex-center layer with pointer-events:none so only the pill itself is
+     interactive and the rest of the poster stays clickable. */
+  .video-play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .video-play-overlay[hidden] { display: none; }
+  .video-play-pill {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fae194;
+    color: #0e0e11;
+    border: 0;
+    border-radius: 9999px;
+    padding: 10px 20px 10px 16px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 200ms ease, background 200ms ease;
+    /* Attention pulse — soft yellow ring expanding outward; stops on
+       hover / focus (matches the search-demo pill). */
+    animation: video-play-pulse 2s ease-in-out infinite;
+  }
+  .video-play-pill:hover,
+  .video-play-pill:focus-visible {
+    animation: none;
+    transform: translateY(-1px);
+    background: #fce8a8;
+    box-shadow: 0 4px 16px rgba(250, 225, 148, 0.32);
+  }
+  .video-play-pill:active { transform: translateY(0); }
+  .video-play-pill-icon { font-size: 20px; flex-shrink: 0; }
+  .video-play-pill-text { white-space: nowrap; }
+
+  @keyframes video-play-pulse {
+    0%, 100% {
+      box-shadow:
+        0 0 0 0 rgba(250, 225, 148, 0.55),
+        0 0 18px 0 rgba(250, 225, 148, 0.35);
+    }
+    50% {
+      box-shadow:
+        0 0 0 12px rgba(250, 225, 148, 0),
+        0 0 22px 4px rgba(250, 225, 148, 0.55);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .video-play-pill {
+      animation: none;
+      box-shadow: 0 0 18px 0 rgba(250, 225, 148, 0.3);
+    }
   }
 </style>

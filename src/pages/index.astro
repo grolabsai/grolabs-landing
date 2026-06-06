@@ -108,8 +108,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         rel="noopener noreferrer"
         data-booking-cta
       >
-        <span class="hidden md:inline">Book Growth Assessment Call</span>
-        <span class="md:hidden">Book Call</span>
+        <span class="hidden md:inline">Book growth assessment call</span>
+        <span class="md:hidden">Book call</span>
       </a>
       <a
         href="mailto:growth@grolabs.ai"
@@ -146,13 +146,16 @@ const bookingIsExternal = bookingUrl.startsWith('http');
               rel="noopener noreferrer"
               data-booking-cta
             >
-              Book Growth Assessment Call
+              Book growth assessment call
             </a>
             <span class="hero-v2-cta-note">Free 15-minute call</span>
           </div>
-          <a href="mailto:growth@grolabs.ai" class="hero-v2-btn hero-v2-btn--ghost">
-            Contact
-          </a>
+          <button type="button" class="hero-v2-btn hero-v2-btn--video" data-watch-video>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Watch Video
+          </button>
         </div>
       </div>
 
@@ -194,44 +197,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   {hasVideo && (
     <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
       <div class="max-w-page mx-auto">
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-lg block">
           Explainer video
         </span>
-        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-          What are revenue leaks?
-        </h2>
-        <button
-          type="button"
-          class="hero-v2-btn hero-v2-btn--primary cta-button-style mb-lg"
-          data-watch-video
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-          Play 1.5 minute video
-        </button>
         <VideoEmbed
           iframeId="gl-stream-video"
           title="What are revenue leaks?"
-          poster="https://customer-bytuml7t86cefopo.cloudflarestream.com/6090ca0b52caec0301f47fa952a4857f/thumbnails/thumbnail.jpg?time=60s"
         />
       </div>
-      {/* Cloudflare Stream player SDK (no npm dep) — lets the "Watch video"
-          button drive the cross-origin iframe via postMessage. Only loaded
-          when the video section renders. */}
-      <script is:inline src="https://embed.cloudflarestream.com/embed/sdk.latest.js"></script>
-      <script is:inline>
-        (function () {
-          var iframe = document.getElementById('gl-stream-video');
-          var btn = document.querySelector('[data-watch-video]');
-          if (!iframe || !btn || !window.Stream) return;
-          var player = window.Stream(iframe);
-          btn.addEventListener('click', function () {
-            iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            player.play().catch(function () {});
-          });
-        })();
-      </script>
     </section>
   )}
 
@@ -369,6 +342,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .hero-v2-btn--ghost:hover {
       color: rgba(237, 234, 224, 0.9);
       border-color: rgba(237, 234, 224, 0.6);
+    }
+    /* "Watch Video" — yellow outline + yellow text, transparent fill.
+       Sibling to the primary Book CTA in the hero. */
+    .hero-v2-btn--video {
+      align-self: flex-start;
+      background: transparent;
+      color: #fae194;
+      border-color: #fae194;
+      cursor: pointer;
+    }
+    .hero-v2-btn--video:hover {
+      transform: translateY(-1px);
+      background: rgba(250, 225, 148, 0.08);
     }
 
     /* ─────────── Cards ─────────── */
