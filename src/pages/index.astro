@@ -250,30 +250,32 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   <script is:inline>
     (function () {
       // Live diagnostic driver — wires the v5 diagnostic API to the audit
-      // carousel. PDP block shows real SEO + AEO checks. Search block runs
-      // the scan animation but stays visual-only (search signals not yet real).
+      // Mock simulator — hardcoded outcomes that play through the animation
+      // as if a real scan happened. Replaced by real API wiring on the
+      // feat/backend-wiring branch once the backend is stable.
+      var SAMPLE_URL = "wazu.com/products/merino-runner";
       var SEQ = {
         search: { api: "SearchAudit", steps: [
-          { label: "Search engine",       outcome: "na", text: "Detecting…" },
-          { label: "Search box",          outcome: "na", text: "Checking…" },
-          { label: "Typo tolerance",      outcome: "na", text: "Analyzing…" },
-          { label: "Synonym coverage",    outcome: "na", text: "Analyzing…" },
-          { label: "Facets present",      region: "facet_present",   outcome: "na", text: "Analyzing…" },
-          { label: "Facet depth",         region: "facet_depth",     outcome: "na", text: "Analyzing…" },
-          { label: "No-results screen",   region: "empty_state",     outcome: "na", text: "Analyzing…" },
-          { label: "Brand relevance",     region: "brand_relevance", outcome: "na", text: "Analyzing…" },
+          { label: "Search box present", outcome: "pass", text: "Found" },
+          { label: "Typo tolerance",     outcome: "fail", text: "Misspelling → 0 results" },
+          { label: "Synonyms",           outcome: "fail", text: "No coverage" },
+          { label: "Autocomplete",       outcome: "pass", text: "Present" },
+          { label: "No-results screen",  region: "empty_state",     outcome: "fail", text: "34 / 100" },
+          { label: "Brand relevance",    region: "brand_relevance", outcome: "pass", text: "72 / 100" },
+          { label: "Facets present",     region: "facet_present",   outcome: "pass", text: "Yes" },
+          { label: "Facet depth",        region: "facet_depth",     outcome: "fail", text: "45 / 100" },
         ] },
         pdp: { api: "PDPAudit", steps: [
-          // SEO checks (real)
-          { label: "JSON-LD schema",    region: "attributes",  category: "seo", findingIndex: 0 },
-          { label: "Product schema",    region: "breadcrumbs", category: "seo", findingIndex: 1 },
-          { label: "Canonical URL",     region: "description", category: "seo", findingIndex: 2 },
-          { label: "OG tags",           region: "images",      category: "seo", findingIndex: 3 },
-          { label: "Sitemap",           region: "tags",        category: "seo", findingIndex: 4 },
-          // AEO checks (real)
-          { label: "llms.txt",          region: "variants",    category: "aeo", findingIndex: 0 },
-          { label: "Robots AI policy",  region: "upsell",      category: "aeo", findingIndex: 1 },
-          { label: "FAQ schema",        region: "crosssell",   category: "aeo", findingIndex: 2 },
+          { label: "Breadcrumbs",      region: "breadcrumbs", outcome: "pass", text: "Present" },
+          { label: "Product images",   region: "images",      outcome: "pass", text: "6 images · alt OK" },
+          { label: "Variants",         region: "variants",    outcome: "fail", text: "No variant selector" },
+          { label: "Attributes",       region: "attributes",  outcome: "pass", text: "8 / 10" },
+          { label: "Description",      region: "description", outcome: "fail", text: "Thin · 38 words" },
+          { label: "Tags",             region: "tags",        outcome: "pass", text: "Tagged" },
+          { label: "Reviews",          outcome: "fail", text: "None found" },
+          { label: "Stock & delivery", outcome: "pass", text: "Clear" },
+          { label: "Upsell",           region: "upsell",      outcome: "fail", text: "Not configured" },
+          { label: "Cross-sell",       region: "crosssell",   outcome: "pass", text: "4 linked" },
         ] },
       };
       var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
@@ -290,102 +292,46 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         });
       }
       function setCk(li, state, val) {
-        li.className = "audit-row " + state; // scanning | pass | fail (audit-tokens.css)
+        li.className = "audit-row " + state;
         if (val != null) li.querySelector(".value").textContent = val;
       }
 
-      async function runBlock(block, url, apiPromise) {
+      async function runBlock(block, url) {
         var cfg = SEQ[block.dataset.block];
         if (!cfg) return;
         var iframe = block.querySelector(".audit-frame");
         var ul = block.querySelector("[data-checklist]");
         var lis = buildList(ul, cfg.steps);
 
-        // Load iframe + fire API in parallel.
-        // Poll for the loader API as a fallback — in some environments (headless,
-        // certain mobile browsers) iframe.onload fires before our handler is set,
-        // or not at all. Polling catches those cases without hanging forever.
         await new Promise(function (res) {
           var done = false;
           function finish() { if (!done) { done = true; res(); } }
           iframe.onload = finish;
           iframe.src = iframe.dataset.loader + "?demo=0&url=" + encodeURIComponent(url);
-          // Poll: resolve as soon as the loader API is accessible
           var poll = setInterval(function () {
             if (iframe.contentWindow && iframe.contentWindow[cfg.api]) { clearInterval(poll); finish(); }
           }, 120);
-          // Hard fallback — never hang more than 10s
           setTimeout(function () { clearInterval(poll); finish(); }, 10000);
         });
         var api = iframe.contentWindow && iframe.contentWindow[cfg.api];
         if (!api) return;
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
 
-        await sleep(400);
-
-        // Phase 1: scan all rows sequentially while API runs in background
+        await sleep(500);
         for (var i = 0; i < cfg.steps.length; i++) {
-          var s = cfg.steps[i], li = lis[i];
+          var s = cfg.steps[i], li = lis[i], ok = s.outcome === "pass";
           setCk(li, "scanning");
           try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "…"); } catch (e) {}
-          await sleep(700);
+          await sleep(900);
+          try { if (s.region) { ok ? api.pass(s.region, s.text) : api.fail(s.region, s.text); } } catch (e) {}
+          setCk(li, ok ? "pass" : "fail", s.text);
+          await sleep(350);
         }
-
-        // Phase 2: wait for API result then paint.
-        // result is null on network error; result.v5 missing on rate-limit / unexpected shape.
-        var result = null;
-        try { result = await apiPromise; } catch (e) {}
-        var hasV5 = !!(result && result.v5 && result.v5.categories);
-
-        for (var j = 0; j < cfg.steps.length; j++) {
-          var step = cfg.steps[j], row = lis[j];
-          var ok = false, text = "—";
-
-          if (hasV5 && step.category) {
-            // Find the matching category in the flat categories array
-            var cats = result.v5.categories || [];
-            var cat = null;
-            for (var k = 0; k < cats.length; k++) {
-              if (cats[k].category_code === step.category) { cat = cats[k]; break; }
-            }
-            if (cat) {
-              var finding = (cat.findings || [])[step.findingIndex];
-              if (finding && finding.status !== "na") {
-                var status = finding.status;
-                if (status === "pass" || status === "partial") { ok = true; text = status === "partial" ? "Partial" : "Present"; }
-                else if (status === "fail") { ok = false; text = "Missing"; }
-              } else {
-                // na or missing finding — show neutral, not fail
-                setCk(row, ""); try { if (step.region) api.fail(step.region, "—"); } catch (e) {} continue;
-              }
-            }
-          } else {
-            // No category (search rows) OR no v5 data (rate-limit / error) — neutral
-            setCk(row, "");
-            try { if (step.region) api.fail(step.region, "—"); } catch (e) {}
-            continue;
-          }
-
-          try { if (step.region) { ok ? api.pass(step.region, text) : api.fail(step.region, text); } } catch (e) {}
-          setCk(row, ok ? "pass" : "fail", text);
-        }
-
         try { if (api.complete) api.complete(); } catch (e) {}
       }
 
       function runAll(url) {
-        // Single API call shared by both blocks
-        var apiPromise = fetch("/api/diagnostic", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: url }),
-        })
-          .then(function (r) { return r.json(); })
-          .catch(function () { return null; });
-
-        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) {
-          runBlock(b, url, apiPromise);
-        });
+        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) { runBlock(b, url); });
       }
 
       function init() {
