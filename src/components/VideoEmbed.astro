@@ -53,9 +53,11 @@ interface Props {
    * env var (or the Cloudflare dashboard default) decides.
    */
   posterTime?: string;
+  /** Label for the overlay play pill. Localize per page (default English). */
+  playLabel?: string;
 }
 
-const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId, posterTime } = Astro.props;
+const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId, posterTime, playLabel = 'Play video' } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
 const effectivePosterTime = posterTime ?? import.meta.env.PUBLIC_CF_STREAM_POSTER_TIME;
 
@@ -109,9 +111,9 @@ if (baseUrl) {
             Stream SDK on click. Hidden once playback begins. Also covers a
             missing poster. */}
         <div class="video-play-overlay">
-          <button type="button" class="video-play-pill" aria-label="Play video" data-video-play>
+          <button type="button" class="video-play-pill" aria-label={playLabel} data-video-play>
             <span class="material-symbols-outlined video-play-pill-icon" aria-hidden="true">play_arrow</span>
-            <span class="video-play-pill-text">Play video</span>
+            <span class="video-play-pill-text">{playLabel}</span>
           </button>
         </div>
       </div>
