@@ -893,13 +893,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     @media (max-width: 560px) { .audit-block { grid-template-columns: 1fr; } }
     /* Match each loader's native aspect ratio so it fills the frame — no side letterboxing. */
     .audit-block-anim { border-radius: 12px; overflow: hidden; background: #0e0f13; }
-    /* Both cards the SAME height (shared near-square ratio). PDP's canvas
-       (784×760) fills it exactly. The Search canvas is landscape (880×600),
-       so inside this taller box it scales to width and pins to the TOP, with
-       the loader's black stage filling the remainder down to the card bottom
-       (top-align handled in search-loader.html). */
-    .audit-block[data-block="search"] .audit-block-anim { aspect-ratio: 784 / 760; }
-    .audit-block[data-block="pdp"] .audit-block-anim { aspect-ratio: 784 / 760; }
+    /* Both cards the SAME height (shared ratio) so their bottoms align. The
+       ratio is cropped to PDP's content height (its canvas is now 784×600 and
+       fills the box exactly — no wasted black below). The Search canvas is
+       landscape (880×600); scaled to width and pinned to the TOP it leaves a
+       small black margin at the bottom (top-align in search-loader.html). */
+    .audit-block[data-block="search"] .audit-block-anim { aspect-ratio: 784 / 600; }
+    .audit-block[data-block="pdp"] .audit-block-anim { aspect-ratio: 784 / 600; }
     .audit-frame { width: 100%; height: 100%; border: 0; display: block; }
     /* Distinct section tone: cooler + lighter than canvas-deeper (#0E0E11),
        different from the hero canvas (#131316), darker than the blocks

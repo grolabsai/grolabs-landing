@@ -44,7 +44,7 @@
     background: #000;
   }
   #frame {
-    width: 784px; height: 760px;
+    width: 784px; height: 600px;
     flex-shrink: 0;
     transform-origin: center center;
     background: var(--s-bg-deeper);
@@ -372,12 +372,12 @@
   </div>
 
 <script>
-  // Fit the fixed 1120×760 frame into the viewport
+  // Fit the fixed 784×600 frame into the viewport
   (function () {
     const frame = document.getElementById("frame");
     function fit() {
       const pad = 0;
-      const s = Math.min((innerWidth - pad) / 784, (innerHeight - pad) / 760);
+      const s = Math.min((innerWidth - pad) / 784, (innerHeight - pad) / 600);
       frame.style.transform = "scale(" + s + ")";
     }
     addEventListener("resize", fit); fit();
@@ -505,6 +505,7 @@
       complete(text) {
         page.classList.remove("active");
         spinner(false);
+        if (beamEl) beamEl.style.display = "none";   // audit done → stop the sweeping beam
         if (text) { hudText.textContent = text; return api; }
         let pass = 0, fail = 0;
         ORDER.forEach((id) => { const r = el(id); if (!r) return; if (r.classList.contains("pass")) pass++; else if (r.classList.contains("fail")) fail++; });
