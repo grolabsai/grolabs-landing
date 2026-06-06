@@ -25,13 +25,8 @@
 interface Props {
   /** Accessible title for the iframe. */
   title?: string;
-  /**
-   * Optional poster (preview) image URL — an explicit override. Normally
-   * LEAVE THIS UNSET: the poster is auto-derived from PUBLIC_CF_STREAM_URL
-   * (+ PUBLIC_CF_STREAM_POSTER_TIME) so a video swap needs no code change.
-   * Only pass this to point at a thumbnail that isn't this video's own.
-   */
-  poster?: string;
+  // Poster and posterTime removed — thumbnail is configured in the Cloudflare
+  // dashboard (Stream → video → Thumbnail) and the player loads it natively.
   /**
    * Player accent color (Cloudflare Stream `primaryColor` param) — recolors
    * the center play button and its ring, the progress bar, and other control
@@ -57,36 +52,23 @@ interface Props {
   playLabel?: string;
 }
 
-const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId, posterTime, playLabel = 'Play video' } = Astro.props;
+const { title = 'GroLabs video', primaryColor = '#fae194', iframeId, playLabel = 'Play video' } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
-const effectivePosterTime = posterTime ?? import.meta.env.PUBLIC_CF_STREAM_POSTER_TIME;
+// Poster is set in the Cloudflare dashboard (Stream → video → Thumbnail).
+// We no longer pass a poster= override in the URL — it caused the thumbnail
+// to be ignored when the CF player loaded its own configured thumbnail first.
 
-// Derive the poster from the embed URL so swapping the video is a single
-// env change. Strip `/iframe` (and any query) off the base to get the
-// video root, then point at its thumbnail endpoint. An explicit `poster`
-// prop still wins; PUBLIC_CF_STREAM_POSTER_TIME picks the frame.
-const derivedPoster = baseUrl
-  ? `${baseUrl.replace(/\/iframe.*$/, '')}/thumbnails/thumbnail.jpg${effectivePosterTime ? `?time=${encodeURIComponent(effectivePosterTime)}` : ''}`
-  : undefined;
-const effectivePoster = poster ?? derivedPoster;
-
-// Append player params (poster, primaryColor, controls) — URLSearchParams
-// handles encoding, including the `#` in the hex color and the `?` inside
-// the poster's own thumbnail URL. Respects any query string already on the
-// configured embed URL.
-//
-// controls=false hides the player's native UI — crucially the center play
-// button, which would otherwise overlap our own pill (.video-play-pill).
-// The cross-origin player exposes no way to hide just that button, so we
-// suppress all native controls up front and turn them back on via the SDK
-// (player.controls = true) the moment playback starts (see script below),
-// so viewers still get the scrubber / pause / fullscreen while watching.
+// Append player params — URLSearchParams handles encoding. We intentionally
+// do NOT pass controls=false. The CF SDK only toggles all controls or none;
+// there is no way to hide just its center play button (cross-origin iframe,
+// confirmed). So we start with native controls ON and our yellow pill sits
+// centered on top, covering CF's own play button. Clicking our pill hides
+// it and calls play — native controls (scrubber, volume, fullscreen) are
+// already visible underneath, so there is zero flash or hand-off jump.
 let streamUrl: string | undefined;
 if (baseUrl) {
   const params = new URLSearchParams();
-  if (effectivePoster) params.set('poster', effectivePoster);
   if (primaryColor) params.set('primaryColor', primaryColor);
-  params.set('controls', 'false');
   const qs = params.toString();
   streamUrl = qs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${qs}` : baseUrl;
 }
@@ -140,21 +122,21 @@ if (baseUrl) {
           });
         });
 
-        // Our pill play button overlaying the iframe.
+        // Our pill play button overlaying the iframe. Hide it immediately
+        // on click — native controls are already on underneath, so there
+        // is no flash or jump to a second play button.
         var overlay = document.querySelector('.video-play-overlay');
         var playBtn = document.querySelector('[data-video-play]');
         if (playBtn) {
           playBtn.addEventListener('click', function () {
+            if (overlay) overlay.hidden = true;
             player.play().catch(function () {});
           });
         }
-        // Hide our pill once playback begins, and restore the player's
-        // native controls (loaded with controls=false so its center play
-        // button never overlaps the pill) so viewers get scrubber / pause /
-        // fullscreen while watching.
+        // Also hide the overlay whenever playback starts from any trigger
+        // (external [data-watch-video] button, autoplay, etc.).
         player.addEventListener('play', function () {
           if (overlay) overlay.hidden = true;
-          player.controls = true;
         });
 
         // GA4 video analytics — single source of truth in Analytics.
@@ -265,9 +247,9 @@ if (baseUrl) {
     border: 0;
     border-radius: 9999px;
     padding: 10px 20px 10px 16px;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 14px;
-    font-weight: 500;
+    font-family: "Hanken Grotesk", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
     cursor: pointer;
     transition: transform 120ms ease, box-shadow 200ms ease, background 200ms ease;
     /* Attention pulse — soft yellow ring expanding outward; stops on
