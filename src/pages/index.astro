@@ -222,8 +222,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         <h2 class="audit-carousel-title">This should be quick. <button type="button" class="audit-watch-link" data-watch-video>Watch the video</button> while we take care of this and come back for your results.</h2>
       </header>
 
-      <!-- Score overlay wrapper — position:relative so the overlay can
-           sit absolutely on top of both cards. -->
       <div class="audit-track-wrap">
         <div class="audit-track">
           <article class="audit-block" data-block="search">
@@ -246,21 +244,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             </aside>
           </article>
         </div>
+      </div>
 
-        <!-- Revenue Leak Score overlay — revealed at 30 s. Hidden by default. -->
-        <div class="audit-score-overlay" data-score-overlay hidden>
-          <div class="audit-score-card" data-score-card>
-            <div class="audit-score-num" data-score-num>--</div>
-            <p class="audit-score-sublabel">Revenue Leak Score</p>
-            <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
-            <a
-              href="https://cal.com/tuncho-granados-uibzst/15min"
-              class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
-              target="_blank"
-              rel="noopener noreferrer"
-            >Book growth assessment call</a>
-          </div>
-        </div>
+      <!-- Revenue Leak Score — rendered as a full-width frame BELOW the
+           panels (revealed at 30 s) so it never overlays the recorded scan
+           results. Demo: red tones throughout; the CTA stays yellow. -->
+      <div class="audit-score-panel" data-score-overlay data-score-card hidden>
+        <div class="audit-score-num"><span data-score-num>--</span><span class="audit-score-max">/100</span></div>
+        <p class="audit-score-sublabel">Revenue Leak Score</p>
+        <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
+        <a
+          href="https://cal.com/tuncho-granados-uibzst/15min"
+          class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Book growth assessment call</a>
       </div>
 
     </div>
@@ -373,7 +371,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         var score = calcLeakScore();
         numEl.textContent = score;
 
-        var tier = score >= 60 ? "is-red" : score >= 35 ? "is-yellow" : "is-green";
+        // Color-code by score: red (bad) → orange → green (good). Orange,
+        // not yellow, so the tier never clashes with the brand yellow.
+        // Message text stays white; CTA stays yellow (set in CSS).
+        var tier = score >= 60 ? "is-red" : score >= 35 ? "is-orange" : "is-green";
         card.classList.add(tier);
         overlay.hidden = false;
       }
@@ -832,38 +833,42 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-track { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
     @media (max-width: 900px) { .audit-track { grid-template-columns: 1fr; } }
 
-    /* ── Revenue Leak Score overlay ────────────────────────────────────── */
-    .audit-score-overlay {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: rgba(14, 14, 17, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 16px;
-      z-index: 20;
-      animation: score-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-    .audit-score-overlay[hidden] { display: none; }
-    @keyframes score-in {
-      from { opacity: 0; transform: scale(0.94) translateY(12px); }
-      to   { opacity: 1; transform: scale(1) translateY(0); }
-    }
-    .audit-score-card {
+    /* ── Revenue Leak Score frame (full-width, BELOW the panels) ────────── */
+    /* Rendered as its own framed block under the two cards — never overlays
+       the recorded scan results. Same border + tinted background as the old
+       pop-up card. Demo: red tones; tier classes kept for the real flow. */
+    .audit-score-panel {
+      margin-top: 22px;
       text-align: center;
       padding: 48px 56px;
-      border-radius: 20px;
+      border-radius: 16px;
       border: 1px solid currentColor;
-      max-width: 580px;
-      width: 90%;
+      color: #f87171;                                 /* demo: red tones */
+      background: rgba(248, 113, 113, 0.08);
+      animation: score-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
-    .audit-score-card.is-red    { color: #f87171; background: rgba(248, 113, 113, 0.08); }
-    .audit-score-card.is-yellow { color: #fae194; background: rgba(250, 225, 148, 0.08); }
-    .audit-score-card.is-green  { color: #34d399; background: rgba(52, 211, 153, 0.08); }
+    .audit-score-panel[hidden] { display: none; }
+    @keyframes score-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .audit-score-panel.is-red    { color: #f87171; background: rgba(248, 113, 113, 0.08); }
+    /* Orange (not yellow) so the middle tier never clashes with brand yellow. */
+    .audit-score-panel.is-orange { color: #fb923c; background: rgba(251, 146, 60, 0.08); }
+    .audit-score-panel.is-green  { color: #34d399; background: rgba(52, 211, 153, 0.08); }
     .audit-score-num {
       font-family: "Permanent Marker", cursive;
       font-size: clamp(80px, 12vw, 128px);
       line-height: 1;
       color: inherit;
+    }
+    /* "/100" denominator — same red, smaller + dimmer so 44 stays dominant. */
+    .audit-score-max {
+      font-size: 0.38em;
+      color: inherit;
+      opacity: 0.55;
+      margin-left: 0.08em;
+      vertical-align: baseline;
     }
     .audit-score-sublabel {
       font-family: ui-monospace, monospace;
