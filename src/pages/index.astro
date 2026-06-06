@@ -390,6 +390,45 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         try { if (api.complete) api.complete(); } catch (e) {}
       }
 
+      function calcLeakScore() {
+        // Count only rows with a real result (pass or fail). na rows excluded.
+        var rows = document.querySelectorAll("[data-audit-carousel] .audit-row");
+        var real = 0, fails = 0;
+        for (var i = 0; i < rows.length; i++) {
+          if (rows[i].classList.contains("pass"))      { real++; }
+          else if (rows[i].classList.contains("fail")) { real++; fails++; }
+        }
+        return { real: real, score: real > 0 ? Math.round((fails / real) * 100) : null };
+      }
+
+      function showScore() {
+        var overlay    = document.querySelector("[data-score-overlay]");
+        var card       = document.querySelector("[data-score-card]");
+        var scored     = document.querySelector("[data-score-scored]");
+        var unmeasured = document.querySelector("[data-score-unmeasured]");
+        var numEl      = document.querySelector("[data-score-num]");
+        if (!overlay || !card) return;
+
+        var result = calcLeakScore();
+
+        if (result.real === 0) {
+          // All gray — site could not be measured
+          card.classList.add("is-gray");
+          if (scored) scored.hidden = true;
+          if (unmeasured) unmeasured.hidden = false;
+        } else {
+          var score = result.score;
+          if (numEl) numEl.textContent = String(score);
+          var tier = score >= 60 ? "is-red" : score >= 35 ? "is-orange" : "is-green";
+          card.classList.add(tier);
+          if (scored) scored.hidden = false;
+          if (unmeasured) unmeasured.hidden = true;
+        }
+
+        overlay.hidden = false;
+        overlay.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
       function runAll(url) {
         // One API call shared across both blocks
         var apiPromise = fetch("/api/diagnostic", {
