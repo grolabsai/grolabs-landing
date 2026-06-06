@@ -54,21 +54,28 @@ interface Props {
 
 const { title = 'GroLabs video', primaryColor = '#fae194', iframeId, playLabel = 'Play video' } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
-// Poster is set in the Cloudflare dashboard (Stream → video → Thumbnail).
-// We no longer pass a poster= override in the URL — it caused the thumbnail
-// to be ignored when the CF player loaded its own configured thumbnail first.
 
-// Append player params — URLSearchParams handles encoding. We intentionally
-// do NOT pass controls=false. The CF SDK only toggles all controls or none;
-// there is no way to hide just its center play button (cross-origin iframe,
-// confirmed). So we start with native controls ON and our yellow pill sits
-// centered on top, covering CF's own play button. Clicking our pill hides
-// it and calls play — native controls (scrubber, volume, fullscreen) are
-// already visible underneath, so there is zero flash or hand-off jump.
+// Build the poster URL from the base stream URL (strip /iframe, point at
+// the thumbnail endpoint with the configured time). This is the only way to
+// get CF's player to show a thumbnail reliably — omitting poster= results
+// in a black frame regardless of what's set in the CF dashboard.
+const posterUrl = baseUrl
+  ? `${baseUrl.replace(/\/iframe.*$/, '')}/thumbnails/thumbnail.jpg?time=1.5s`
+  : undefined;
+
+// controls=false hides CF's native control bar AND their big centered play
+// button, so our yellow pill is the only visible affordance. When the user
+// clicks the pill we hide it immediately (on click, not waiting for the play
+// event — that wait was the "jump") and call player.play(). Once playing,
+// CF's center button never reappears (it only shows when paused with controls
+// off). We then enable controls so the scrubber/volume/fullscreen are
+// available while the video runs.
 let streamUrl: string | undefined;
 if (baseUrl) {
   const params = new URLSearchParams();
+  if (posterUrl) params.set('poster', posterUrl);
   if (primaryColor) params.set('primaryColor', primaryColor);
+  params.set('controls', 'false');
   const qs = params.toString();
   streamUrl = qs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${qs}` : baseUrl;
 }
@@ -122,9 +129,11 @@ if (baseUrl) {
           });
         });
 
-        // Our pill play button overlaying the iframe. Hide it immediately
-        // on click — native controls are already on underneath, so there
-        // is no flash or jump to a second play button.
+        // Our pill overlays CF's big centered play button (hidden by controls=false).
+        // On click: hide our pill immediately (don't wait for play event — that
+        // delay was the visible "jump"), then call play. Once the video is actually
+        // playing we re-enable controls so the scrubber/fullscreen appear; by then
+        // the video is running so CF's center button won't re-show.
         var overlay = document.querySelector('.video-play-overlay');
         var playBtn = document.querySelector('[data-video-play]');
         if (playBtn) {
@@ -133,10 +142,12 @@ if (baseUrl) {
             player.play().catch(function () {});
           });
         }
-        // Also hide the overlay whenever playback starts from any trigger
-        // (external [data-watch-video] button, autoplay, etc.).
+        // Also hide overlay for external triggers (Watch Video link etc.).
         player.addEventListener('play', function () {
           if (overlay) overlay.hidden = true;
+          // Re-enable controls now that video is running — CF's center button
+          // only shows when paused, so turning controls back on mid-play is safe.
+          player.controls = true;
         });
 
         // GA4 video analytics — single source of truth in Analytics.
