@@ -198,22 +198,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   {hasVideo && (
     <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
       <div class="max-w-page mx-auto">
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-lg block">
           Explainer video
         </span>
-        <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
-          What are revenue leaks?
-        </h2>
-        <button
-          type="button"
-          class="hero-v2-btn hero-v2-btn--primary cta-button-style mb-lg"
-          data-watch-video
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M8 5v14l11-7z" />
-          </svg>
-          Play 1.5 minute video
-        </button>
         <VideoEmbed
           iframeId="gl-stream-video"
           title="What are revenue leaks?"
