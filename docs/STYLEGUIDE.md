@@ -177,7 +177,9 @@ box-shadow:
 |------------------------|---------------------------------------------------|-------|
 | `cta-button-style`     | Yellow gradient: `linear-gradient(180deg, #fbe9a8 0%, #fae194 55%, #f0d770 100%)`. Add this class wherever a primary CTA appears. | Hero, header, footer primaries |
 | `.hero-v2-btn--primary` | 14px 28px padding, 8px radius, dark text, inset top highlight, soft yellow halo | Hero |
-| `.hero-v2-btn--ghost`   | Transparent, light gray text (`rgba(237,234,224,0.55)`) + light gray border (`rgba(237,234,224,0.35)`) | Hero, footer |
+| `.hero-v2-btn--video`   | Transparent fill, **yellow** text + **yellow** border (`#fae194`), play-triangle icon | Hero "Watch Video" (EN). Pairs with the primary Book CTA. |
+| `.hero-v2-btn--ghost`   | Transparent, light gray text (`rgba(237,234,224,0.55)`) + light gray border (`rgba(237,234,224,0.35)`) | Hero "Contact" (ES only — EN hero uses `--video`), footer |
+| `.video-play-pill`      | Fully-round yellow pill (`#fae194`, 999px) with pulsing glow — same recipe as the search-demo copy pill (`.copy-helper-pill`). Black play-arrow icon + label. Overlays the video; only play affordance before playback. | Video player "Play video" |
 | `.header-cta--primary`  | Compact 8px 16px padding, otherwise same as hero primary | Header (anchored on scroll) |
 | `.header-cta--ghost`    | Compact ghost variant                              | Header |
 | `.footer-cta--primary`  | Same dimensions as hero primary (uses cta-button-style) | Footer |
