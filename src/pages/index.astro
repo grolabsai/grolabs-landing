@@ -285,14 +285,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       // results paint green/red/gray based on actual findings.
       var CHECKS = {
         search: { api: "SearchAudit", steps: [
-          { label: "Search box",        region: null },
-          { label: "Typo tolerance",    region: null },
-          { label: "Synonyms",          region: null },
-          { label: "Autocomplete",      region: null },
-          { label: "No-results screen", region: "empty_state" },
-          { label: "Brand relevance",   region: "brand_relevance" },
+          { label: "Search box",        region: null,             category: "internal_search", idx: 0 },
+          { label: "Typo tolerance",    region: null,             category: "internal_search", idx: 2 },
+          { label: "Synonyms",          region: null,             category: "internal_search", idx: 3 },
+          { label: "No-results screen", region: "empty_state",    category: "internal_search", idx: 4 },
+          { label: "Brand relevance",   region: "brand_relevance",category: "internal_search", idx: 5 },
           { label: "Facets present",    region: "facet_present" },
           { label: "Facet depth",       region: "facet_depth" },
+          { label: "Speed",             region: null,             category: "internal_search", idx: 1 },
         ] },
         pdp: { api: "PDPAudit", steps: [
           { label: "JSON-LD schema",   region: "attributes",  category: "seo", idx: 0 },
