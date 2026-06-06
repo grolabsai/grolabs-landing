@@ -337,10 +337,29 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           parts.push("Checked: " + short);
           if (ev.http_status) parts.push("HTTP " + ev.http_status);
         }
-        // Search scorers (future) — query + result info
-        if (ev.query)        parts.push("Searched: \u201c" + ev.query + "\u201d");
-        if (ev.typo_query)   parts.push("Typo variant: \u201c" + ev.typo_query + "\u201d");
-        if (ev.result_count !== undefined) parts.push("Results found: " + ev.result_count);
+        // Search scorers
+        if (ev.rule) parts.push(ev.rule);  // typo rule e.g. "2 errors / 7 chars = 28% (moderate)"
+        if (ev.tested && ev.tested.length) {
+          ev.tested.forEach(function(t) {
+            // [brackets] mark changed chars — convert to bold in HTML tooltip
+            var q = (t.highlighted || t.query).replace(/\[([^\]]+)\]/g, "<strong>$1</strong>");
+            parts.push((t.found ? "✓ " : "✗ ") + "“" + q + "”");
+          });
+        }
+        if (ev.query && ev.graceful !== undefined) {
+          var state = ev.graceful ? "graceful" : "broken";
+          parts.push("No-results page: " + state + (ev.has_fallback_content ? " + suggestions" : ""));
+        }
+        if (ev.brand_tests && ev.brand_tests.length) {
+          ev.brand_tests.forEach(function(b) {
+            parts.push((b.found ? "✓ " : "✗ ") + "Brand "" + b.brand + "" in top results");
+          });
+        }
+        if (ev.latency_ms !== undefined) parts.push("Latency: " + ev.latency_ms + "ms");
+        if (ev.url) {
+          var short = ev.url.replace(/^https?:\/\//, "");
+          parts.push("Checked: " + short + (ev.http_status ? " (HTTP " + ev.http_status + ")" : ""));
+        }
         if (ev.matched_brand) parts.push("Brand in results: " + ev.matched_brand);
         // Fallback: status reason note
         if (!parts.length && finding.note) parts.push(finding.note);
@@ -357,9 +376,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         var text = ok ? (finding.status === "partial" ? "Partial" : "Present") : "Missing";
         try { if (region) { ok ? api.pass(region, text) : api.fail(region, text); } } catch (e) {}
         setCk(li, ok ? "pass" : "fail", text);
-        // Attach tooltip with evidence detail
+        // Attach HTML tooltip with evidence detail (supports <strong> for typo chars)
         var tip = evidenceTooltip(li.querySelector(".name").textContent, finding);
-        if (tip) li.setAttribute("data-tooltip", tip);
+        if (tip) {
+          li.setAttribute("data-tooltip-html", tip);
+          // Inject a tooltip div (supports HTML, unlike CSS ::after)
+          var existing = li.querySelector(".row-tooltip");
+          if (existing) existing.remove();
+          var tipEl = document.createElement("div");
+          tipEl.className = "row-tooltip";
+          tipEl.innerHTML = tip;
+          li.appendChild(tipEl);
+        }
       }
 
       // Returns true if at least one finding has a real (non-na) status.
@@ -1063,21 +1091,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-row:not(.scanning):not(.pass):not(.fail) .ck-ico::before { content: "—"; font-size: 9px; color: rgba(237,234,224,0.25); }
     .audit-row:not(.scanning):not(.pass):not(.fail) .name { color: rgba(237,234,224,0.35); }
     .audit-row:not(.scanning):not(.pass):not(.fail) .value { color: rgba(237,234,224,0.25); }
-    /* Evidence tooltip — shows on hover when data-tooltip is set. */
-    .audit-row[data-tooltip] { position: relative; cursor: default; }
-    .audit-row[data-tooltip]::after {
-      content: attr(data-tooltip);
+    /* Evidence tooltip — HTML div (supports <strong> for bold typo chars). */
+    .audit-row[data-tooltip-html] { position: relative; cursor: default; }
+    .row-tooltip {
+      display: none;
       position: absolute; bottom: calc(100% + 6px); left: 0;
       background: #1c1d24; border: 1px solid rgba(255,255,255,0.12);
       color: rgba(237,234,224,0.85);
-      font-family: ui-monospace, monospace; font-size: 10px; line-height: 1.5;
+      font-family: ui-monospace, monospace; font-size: 10px; line-height: 1.6;
       white-space: nowrap; padding: 6px 10px; border-radius: 6px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.15s ease;
-      z-index: 30;
+      pointer-events: none; z-index: 30;
     }
-    .audit-row[data-tooltip]:hover::after { opacity: 1; }
+    .row-tooltip strong { color: #fae194; font-weight: 700; }
+    .audit-row[data-tooltip-html]:hover .row-tooltip { display: block; }
     .audit-email { margin-top: 36px; max-width: 560px; }
     .audit-email-label { display: block; font-family: "Hanken Grotesk", sans-serif; font-size: 15px; color: rgba(237,234,224,0.8); margin-bottom: 12px; }
     .audit-email-row { display: flex; gap: 10px; flex-wrap: wrap; }
