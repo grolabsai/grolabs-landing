@@ -1,6 +1,7 @@
 import { defineConfig, envField } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
+import vercel from '@astrojs/vercel';
 
 // `GITHUB_PAGES=true` is set by the deploy workflow so the site builds with
 // the `/grolabs-landing` subpath. Local dev and a future Vercel deploy both
@@ -33,8 +34,10 @@ export default defineConfig({
       CF_STREAM_API_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true }),
       CF_STREAM_VIDEO_NAME: envField.string({ context: 'server', access: 'secret', optional: true, default: 'explainer' }),
       PUBLIC_CF_STREAM_URL: envField.string({ context: 'client', access: 'public', optional: true }),
+      APP_URL: envField.string({ context: 'server', access: 'secret', optional: true }),
     },
   },
+  adapter: vercel(),
   integrations: [
     tailwind({ applyBaseStyles: false }),
     sitemap(),

@@ -249,33 +249,31 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
   <script is:inline>
     (function () {
-      // MOCK driver — replace each step's {outcome,text} with real engine
-      // results (scan(id) when a check starts, pass/fail(id, text) when it
-      // resolves). Blocks run in parallel; the side list mirrors the boxes
-      // and adds "background" checks (no box on the mock) flipping in the list.
-      var SAMPLE_URL = "wazu.com/products/merino-runner";
+      // Live diagnostic driver — wires the v5 diagnostic API to the audit
+      // carousel. PDP block shows real SEO + AEO checks. Search block runs
+      // the scan animation but stays visual-only (search signals not yet real).
       var SEQ = {
         search: { api: "SearchAudit", steps: [
-          { label: "Search box present", outcome: "pass", text: "Found" },
-          { label: "Typo tolerance",     outcome: "fail", text: "Misspelling → 0 results" },
-          { label: "Synonyms",           outcome: "fail", text: "No coverage" },
-          { label: "Autocomplete",       outcome: "pass", text: "Present" },
-          { label: "No-results screen",  region: "empty_state",     outcome: "fail", text: "34 / 100" },
-          { label: "Brand relevance",    region: "brand_relevance", outcome: "pass", text: "72 / 100" },
-          { label: "Facets present",     region: "facet_present",   outcome: "pass", text: "Yes" },
-          { label: "Facet depth",        region: "facet_depth",     outcome: "fail", text: "45 / 100" },
+          { label: "Search engine",       outcome: "na", text: "Detecting…" },
+          { label: "Search box",          outcome: "na", text: "Checking…" },
+          { label: "Typo tolerance",      outcome: "na", text: "Analyzing…" },
+          { label: "Synonym coverage",    outcome: "na", text: "Analyzing…" },
+          { label: "Facets present",      region: "facet_present",   outcome: "na", text: "Analyzing…" },
+          { label: "Facet depth",         region: "facet_depth",     outcome: "na", text: "Analyzing…" },
+          { label: "No-results screen",   region: "empty_state",     outcome: "na", text: "Analyzing…" },
+          { label: "Brand relevance",     region: "brand_relevance", outcome: "na", text: "Analyzing…" },
         ] },
         pdp: { api: "PDPAudit", steps: [
-          { label: "Breadcrumbs",      region: "breadcrumbs", outcome: "pass", text: "Present" },
-          { label: "Product images",   region: "images",      outcome: "pass", text: "6 images · alt OK" },
-          { label: "Variants",         region: "variants",    outcome: "fail", text: "No variant selector" },
-          { label: "Attributes",       region: "attributes",  outcome: "pass", text: "8 / 10" },
-          { label: "Description",      region: "description", outcome: "fail", text: "Thin · 38 words" },
-          { label: "Tags",             region: "tags",        outcome: "pass", text: "Tagged" },
-          { label: "Reviews",          outcome: "fail", text: "None found" },
-          { label: "Stock & delivery", outcome: "pass", text: "Clear" },
-          { label: "Upsell",           region: "upsell",      outcome: "fail", text: "Not configured" },
-          { label: "Cross-sell",       region: "crosssell",   outcome: "pass", text: "4 linked" },
+          // SEO checks (real)
+          { label: "JSON-LD schema",    region: "attributes",  category: "seo", findingIndex: 0 },
+          { label: "Product schema",    region: "breadcrumbs", category: "seo", findingIndex: 1 },
+          { label: "Canonical URL",     region: "description", category: "seo", findingIndex: 2 },
+          { label: "OG tags",           region: "images",      category: "seo", findingIndex: 3 },
+          { label: "Sitemap",           region: "tags",        category: "seo", findingIndex: 4 },
+          // AEO checks (real)
+          { label: "llms.txt",          region: "variants",    category: "aeo", findingIndex: 0 },
+          { label: "Robots AI policy",  region: "upsell",      category: "aeo", findingIndex: 1 },
+          { label: "FAQ schema",        region: "crosssell",   category: "aeo", findingIndex: 2 },
         ] },
       };
       var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
@@ -296,13 +294,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         if (val != null) li.querySelector(".value").textContent = val;
       }
 
-      async function runBlock(block, url) {
+      async function runBlock(block, url, apiPromise) {
         var cfg = SEQ[block.dataset.block];
         if (!cfg) return;
         var iframe = block.querySelector(".audit-frame");
         var ul = block.querySelector("[data-checklist]");
         var lis = buildList(ul, cfg.steps);
 
+        // Load iframe + fire API in parallel
         await new Promise(function (res) {
           iframe.onload = function () { res(); };
           iframe.src = iframe.dataset.loader + "?demo=0&url=" + encodeURIComponent(url);
@@ -311,21 +310,67 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         if (!api) return;
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
 
-        await sleep(500);
+        await sleep(400);
+
+        // Phase 1: scan all rows sequentially while API runs in background
         for (var i = 0; i < cfg.steps.length; i++) {
-          var s = cfg.steps[i], li = lis[i], ok = s.outcome === "pass";
+          var s = cfg.steps[i], li = lis[i];
           setCk(li, "scanning");
           try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "…"); } catch (e) {}
-          await sleep(900);
-          try { if (s.region) { ok ? api.pass(s.region, s.text) : api.fail(s.region, s.text); } } catch (e) {}
-          setCk(li, ok ? "pass" : "fail", s.text);
-          await sleep(350);
+          await sleep(700);
         }
+
+        // Phase 2: wait for API result then paint
+        var result = null;
+        try { result = await apiPromise; } catch (e) {}
+
+        for (var j = 0; j < cfg.steps.length; j++) {
+          var step = cfg.steps[j], row = lis[j];
+          var ok = false, text = "—";
+
+          if (result && result.v5 && step.category) {
+            // Find the matching category in the flat categories array
+            var cats = result.v5.categories || [];
+            var cat = null;
+            for (var k = 0; k < cats.length; k++) {
+              if (cats[k].category_code === step.category) { cat = cats[k]; break; }
+            }
+            if (cat) {
+              var finding = (cat.findings || [])[step.findingIndex];
+              if (finding) {
+                var status = finding.status;
+                if (status === "pass" || status === "partial") { ok = true; text = status === "partial" ? "Partial" : "Present"; }
+                else if (status === "fail") { ok = false; text = "Missing"; }
+                else { text = "—"; setCk(row, ""); try { if (step.region) api.fail(step.region, "—"); } catch (e) {} continue; }
+              }
+            }
+          } else if (!step.category || (result && step.outcome === "na")) {
+            // Search block or stub: neutral
+            setCk(row, "");
+            try { if (step.region) api.fail(step.region, "—"); } catch (e) {}
+            continue;
+          }
+
+          try { if (step.region) { ok ? api.pass(step.region, text) : api.fail(step.region, text); } } catch (e) {}
+          setCk(row, ok ? "pass" : "fail", text);
+        }
+
         try { if (api.complete) api.complete(); } catch (e) {}
       }
 
       function runAll(url) {
-        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) { runBlock(b, url); });
+        // Single API call shared by both blocks
+        var apiPromise = fetch("/api/diagnostic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: url }),
+        })
+          .then(function (r) { return r.json(); })
+          .catch(function () { return null; });
+
+        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) {
+          runBlock(b, url, apiPromise);
+        });
       }
 
       function init() {
@@ -816,6 +861,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-row.fail .ck-ico::before { content: "✕"; }
     .audit-row.fail .name { color: #EDEAE0; }
     .audit-row.fail .value { color: #f87171; }
+    .audit-row .ck-ico::before { content: ""; }
+    .audit-row:not(.scanning):not(.pass):not(.fail) .ck-ico::before { content: "—"; font-size: 9px; color: rgba(237,234,224,0.25); }
+    .audit-row:not(.scanning):not(.pass):not(.fail) .name { color: rgba(237,234,224,0.35); }
+    .audit-row:not(.scanning):not(.pass):not(.fail) .value { color: rgba(237,234,224,0.25); }
     .audit-email { margin-top: 36px; max-width: 560px; }
     .audit-email-label { display: block; font-family: "Hanken Grotesk", sans-serif; font-size: 15px; color: rgba(237,234,224,0.8); margin-bottom: 12px; }
     .audit-email-row { display: flex; gap: 10px; flex-wrap: wrap; }
