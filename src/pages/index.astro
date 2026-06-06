@@ -338,7 +338,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           if (ev.http_status) parts.push("HTTP " + ev.http_status);
         }
         // Search scorers
-        if (ev.rule) parts.push(ev.rule);  // typo rule e.g. "2 errors / 7 chars = 28% (moderate)"
+        if (ev.rule) parts.push(ev.rule);
+        if (ev.benchmark) parts.push(ev.benchmark);
         if (ev.tested && ev.tested.length) {
           ev.tested.forEach(function(t) {
             // [brackets] mark changed chars — convert to bold in HTML tooltip
