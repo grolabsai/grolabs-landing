@@ -46,18 +46,25 @@ interface Props {
    * (`Stream(document.getElementById(id)).play()`). Omit for a plain embed.
    */
   iframeId?: string;
+  /**
+   * Poster frame to grab, e.g. "1.1s". Takes precedence over the
+   * PUBLIC_CF_STREAM_POSTER_TIME env var — use it to pin the thumbnail
+   * frame in code when the deploy env can't be changed. When omitted, the
+   * env var (or the Cloudflare dashboard default) decides.
+   */
+  posterTime?: string;
 }
 
-const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId } = Astro.props;
+const { title = 'GroLabs video', poster, primaryColor = '#fae194', iframeId, posterTime } = Astro.props;
 const baseUrl = import.meta.env.PUBLIC_CF_STREAM_URL;
-const posterTime = import.meta.env.PUBLIC_CF_STREAM_POSTER_TIME;
+const effectivePosterTime = posterTime ?? import.meta.env.PUBLIC_CF_STREAM_POSTER_TIME;
 
 // Derive the poster from the embed URL so swapping the video is a single
 // env change. Strip `/iframe` (and any query) off the base to get the
 // video root, then point at its thumbnail endpoint. An explicit `poster`
 // prop still wins; PUBLIC_CF_STREAM_POSTER_TIME picks the frame.
 const derivedPoster = baseUrl
-  ? `${baseUrl.replace(/\/iframe.*$/, '')}/thumbnails/thumbnail.jpg${posterTime ? `?time=${encodeURIComponent(posterTime)}` : ''}`
+  ? `${baseUrl.replace(/\/iframe.*$/, '')}/thumbnails/thumbnail.jpg${effectivePosterTime ? `?time=${encodeURIComponent(effectivePosterTime)}` : ''}`
   : undefined;
 const effectivePoster = poster ?? derivedPoster;
 
