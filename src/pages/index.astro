@@ -323,6 +323,29 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         if (val != null) li.querySelector(".value").textContent = val;
       }
 
+      // Build a human-readable tooltip from the finding evidence.
+      // For SEO/AEO: shows what URL was checked + HTTP status.
+      // For search (future): will show what query was used + results found.
+      function evidenceTooltip(label, finding) {
+        if (!finding || !finding.evidence) return null;
+        var ev = finding.evidence;
+        var parts = [];
+        // URL + HTTP status (FETCH-based scorers: sitemap, OG, llms.txt, robots)
+        if (ev.url) {
+          var short = ev.url.replace(/^https?:\/\//, "");
+          parts.push("Checked: " + short);
+          if (ev.http_status) parts.push("HTTP " + ev.http_status);
+        }
+        // Search scorers (future) — query + result info
+        if (ev.query)        parts.push("Searched: \u201c" + ev.query + "\u201d");
+        if (ev.typo_query)   parts.push("Typo variant: \u201c" + ev.typo_query + "\u201d");
+        if (ev.result_count !== undefined) parts.push("Results found: " + ev.result_count);
+        if (ev.matched_brand) parts.push("Brand in results: " + ev.matched_brand);
+        // Fallback: status reason note
+        if (!parts.length && finding.note) parts.push(finding.note);
+        return parts.length ? parts.join("  ·  ") : null;
+      }
+
       // Paint one row from a v5 finding. na/missing finding → neutral gray.
       function paintFinding(li, region, api, finding) {
         if (!finding || finding.status === "na" || finding.status === null) {
@@ -333,6 +356,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         var text = ok ? (finding.status === "partial" ? "Partial" : "Present") : "Missing";
         try { if (region) { ok ? api.pass(region, text) : api.fail(region, text); } } catch (e) {}
         setCk(li, ok ? "pass" : "fail", text);
+        // Attach tooltip with evidence detail
+        var tip = evidenceTooltip(li.querySelector(".name").textContent, finding);
+        if (tip) li.setAttribute("data-tooltip", tip);
       }
 
       // Returns true if at least one finding has a real (non-na) status.
@@ -1028,6 +1054,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-row:not(.scanning):not(.pass):not(.fail) .ck-ico::before { content: "—"; font-size: 9px; color: rgba(237,234,224,0.25); }
     .audit-row:not(.scanning):not(.pass):not(.fail) .name { color: rgba(237,234,224,0.35); }
     .audit-row:not(.scanning):not(.pass):not(.fail) .value { color: rgba(237,234,224,0.25); }
+    /* Evidence tooltip — shows on hover when data-tooltip is set. */
+    .audit-row[data-tooltip] { position: relative; cursor: default; }
+    .audit-row[data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute; bottom: calc(100% + 6px); left: 0;
+      background: #1c1d24; border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(237,234,224,0.85);
+      font-family: ui-monospace, monospace; font-size: 10px; line-height: 1.5;
+      white-space: nowrap; padding: 6px 10px; border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.15s ease;
+      z-index: 30;
+    }
+    .audit-row[data-tooltip]:hover::after { opacity: 1; }
     .audit-email { margin-top: 36px; max-width: 560px; }
     .audit-email-label { display: block; font-family: "Hanken Grotesk", sans-serif; font-size: 15px; color: rgba(237,234,224,0.8); margin-bottom: 12px; }
     .audit-email-row { display: flex; gap: 10px; flex-wrap: wrap; }
