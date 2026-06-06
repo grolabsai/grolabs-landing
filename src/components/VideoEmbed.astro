@@ -87,6 +87,14 @@ if (baseUrl) {
           allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
           allowfullscreen
         ></iframe>
+        {/* Our own play button, layered over the iframe. The Cloudflare
+            player is cross-origin so we can't restyle its native button;
+            instead we draw a branded one (yellow CTA gradient + black
+            triangle) and start playback via the Stream SDK on click. It
+            hides as soon as the video plays. Also covers a missing poster. */}
+        <button type="button" class="video-play-overlay" aria-label="Play video" data-video-play>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+        </button>
       </div>
     </div>
     {/* Cloudflare Stream player SDK (no npm dep). Drives an optional
@@ -101,13 +109,28 @@ if (baseUrl) {
         if (!iframe || !window.Stream) return;
         var player = window.Stream(iframe);
 
-        var btn = document.querySelector('[data-watch-video]');
-        if (btn) {
+        // External "Watch video" buttons (hero + video section) scroll the
+        // player into view and start it. querySelectorAll so every such
+        // button is wired, not just the first.
+        document.querySelectorAll('[data-watch-video]').forEach(function (btn) {
           btn.addEventListener('click', function () {
             iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
             player.play().catch(function () {});
           });
+        });
+
+        // Our branded center play button overlaying the iframe.
+        var overlay = document.querySelector('[data-video-play]');
+        if (overlay) {
+          overlay.addEventListener('click', function () {
+            player.play().catch(function () {});
+          });
         }
+        // Hide the overlay once playback begins, however it was triggered
+        // (overlay, external button, or the player's own controls).
+        player.addEventListener('play', function () {
+          if (overlay) overlay.hidden = true;
+        });
 
         // GA4 video analytics — single source of truth in Analytics.
         function track(name, params) {
@@ -194,4 +217,35 @@ if (baseUrl) {
     height: 100%;
     border: 0;
   }
+  /* Branded play button — same yellow CTA gradient as the Book button
+     (docs/STYLEGUIDE.md: light at top → deeper at bottom) with a black
+     triangle. Centered over the iframe via inset:0 + margin:auto. */
+  .video-play-overlay {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 88px;
+    height: 88px;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #fbe9a8 0%, #fae194 55%, #f0d770 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 8px 24px -4px rgba(250, 225, 148, 0.45),
+      0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: transform .15s, box-shadow .2s;
+  }
+  .video-play-overlay:hover { transform: scale(1.06); }
+  /* Optical-center the triangle (a triangle's visual mass sits left). */
+  .video-play-overlay svg {
+    width: 34px;
+    height: 34px;
+    margin-left: 4px;
+    fill: #1A1A1A;
+  }
+  .video-play-overlay[hidden] { display: none; }
 </style>

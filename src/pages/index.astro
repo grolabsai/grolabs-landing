@@ -151,9 +151,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             </a>
             <span class="hero-v2-cta-note">Free 15-minute call</span>
           </div>
-          <a href="mailto:growth@grolabs.ai" class="hero-v2-btn hero-v2-btn--ghost">
-            Contact
-          </a>
+          <button type="button" class="hero-v2-btn hero-v2-btn--video" data-watch-video>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Watch Video
+          </button>
         </div>
       </div>
 
@@ -349,6 +352,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .hero-v2-btn--ghost:hover {
       color: rgba(237, 234, 224, 0.9);
       border-color: rgba(237, 234, 224, 0.6);
+    }
+    /* "Watch Video" — yellow outline + yellow text, transparent fill.
+       Sibling to the primary Book CTA in the hero. */
+    .hero-v2-btn--video {
+      align-self: flex-start;
+      background: transparent;
+      color: #fae194;
+      border-color: #fae194;
+      cursor: pointer;
+    }
+    .hero-v2-btn--video:hover {
+      transform: translateY(-1px);
+      background: rgba(250, 225, 148, 0.08);
     }
 
     /* ─────────── Cards ─────────── */
