@@ -280,33 +280,29 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
   <script is:inline>
     (function () {
-      // Live diagnostic driver — wires the v5 diagnostic API to the audit
-      // Mock simulator — hardcoded outcomes that play through the animation
-      // as if a real scan happened. Replaced by real API wiring on the
-      // feat/backend-wiring branch once the backend is stable.
-      var SAMPLE_URL = "wazu.com/products/merino-runner";
-      var SEQ = {
+      // Real diagnostic driver — calls the v5 backend, no faking.
+      // scan animation runs while API call is in progress;
+      // results paint green/red/gray based on actual findings.
+      var CHECKS = {
         search: { api: "SearchAudit", steps: [
-          { label: "Search box present", outcome: "pass", text: "Found" },
-          { label: "Typo tolerance",     outcome: "fail", text: "Misspelling → 0 results" },
-          { label: "Synonyms",           outcome: "fail", text: "No coverage" },
-          { label: "Autocomplete",       outcome: "pass", text: "Present" },
-          { label: "No-results screen",  region: "empty_state",     outcome: "fail", text: "34 / 100" },
-          { label: "Brand relevance",    region: "brand_relevance", outcome: "pass", text: "72 / 100" },
-          { label: "Facets present",     region: "facet_present",   outcome: "pass", text: "Yes" },
-          { label: "Facet depth",        region: "facet_depth",     outcome: "fail", text: "45 / 100" },
+          { label: "Search box",        region: null },
+          { label: "Typo tolerance",    region: null },
+          { label: "Synonyms",          region: null },
+          { label: "Autocomplete",      region: null },
+          { label: "No-results screen", region: "empty_state" },
+          { label: "Brand relevance",   region: "brand_relevance" },
+          { label: "Facets present",    region: "facet_present" },
+          { label: "Facet depth",       region: "facet_depth" },
         ] },
         pdp: { api: "PDPAudit", steps: [
-          { label: "Breadcrumbs",      region: "breadcrumbs", outcome: "pass", text: "Present" },
-          { label: "Product images",   region: "images",      outcome: "pass", text: "6 images · alt OK" },
-          { label: "Variants",         region: "variants",    outcome: "fail", text: "No variant selector" },
-          { label: "Attributes",       region: "attributes",  outcome: "pass", text: "8 / 10" },
-          { label: "Description",      region: "description", outcome: "fail", text: "Thin · 38 words" },
-          { label: "Tags",             region: "tags",        outcome: "pass", text: "Tagged" },
-          { label: "Reviews",          outcome: "fail", text: "None found" },
-          { label: "Stock & delivery", outcome: "pass", text: "Clear" },
-          { label: "Upsell",           region: "upsell",      outcome: "fail", text: "Not configured" },
-          { label: "Cross-sell",       region: "crosssell",   outcome: "pass", text: "4 linked" },
+          { label: "JSON-LD schema",   region: "attributes",  category: "seo", idx: 0 },
+          { label: "Product schema",   region: "breadcrumbs", category: "seo", idx: 1 },
+          { label: "Canonical URL",    region: "description", category: "seo", idx: 2 },
+          { label: "OG tags",          region: "images",      category: "seo", idx: 3 },
+          { label: "Sitemap",          region: "tags",        category: "seo", idx: 4 },
+          { label: "llms.txt",         region: "variants",    category: "aeo", idx: 0 },
+          { label: "Robots AI policy", region: "upsell",      category: "aeo", idx: 1 },
+          { label: "FAQ schema",       region: "crosssell",   category: "aeo", idx: 2 },
         ] },
       };
       var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
@@ -323,17 +319,30 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         });
       }
       function setCk(li, state, val) {
-        li.className = "audit-row " + state;
+        li.className = "audit-row " + (state || "");
         if (val != null) li.querySelector(".value").textContent = val;
       }
 
-      async function runBlock(block, url) {
-        var cfg = SEQ[block.dataset.block];
+      // Paint one row from a v5 finding. na/missing finding → neutral gray.
+      function paintFinding(li, region, api, finding) {
+        if (!finding || finding.status === "na" || finding.status === null) {
+          setCk(li, "");
+          return;
+        }
+        var ok = finding.status === "pass" || finding.status === "partial";
+        var text = ok ? (finding.status === "partial" ? "Partial" : "Present") : "Missing";
+        try { if (region) { ok ? api.pass(region, text) : api.fail(region, text); } } catch (e) {}
+        setCk(li, ok ? "pass" : "fail", text);
+      }
+
+      async function runBlock(block, url, apiPromise) {
+        var cfg = CHECKS[block.dataset.block];
         if (!cfg) return;
         var iframe = block.querySelector(".audit-frame");
         var ul = block.querySelector("[data-checklist]");
         var lis = buildList(ul, cfg.steps);
 
+        // Load iframe — poll for API (onload unreliable in some environments)
         await new Promise(function (res) {
           var done = false;
           function finish() { if (!done) { done = true; res(); } }
@@ -348,65 +357,52 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         if (!api) return;
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
 
-        await sleep(500);
-        // Paced to fill ~28 s so the score overlay appears right at 30 s.
-        // PDP (10 steps) × 2800 ms + 500 ms ≈ 28.5 s.
+        await sleep(400);
+
+        // Phase 1: scan animation runs while API call is in flight
         for (var i = 0; i < cfg.steps.length; i++) {
-          var s = cfg.steps[i], li = lis[i], ok = s.outcome === "pass";
+          var s = cfg.steps[i], li = lis[i];
           setCk(li, "scanning");
-          try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "…"); } catch (e) {}
+          try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "\u2026"); } catch (e) {}
           await sleep(2000);
-          try { if (s.region) { ok ? api.pass(s.region, s.text) : api.fail(s.region, s.text); } } catch (e) {}
-          setCk(li, ok ? "pass" : "fail", s.text);
-          await sleep(800);
         }
+
+        // Phase 2: paint real results (or gray if na / API error)
+        var result = null;
+        try { result = await apiPromise; } catch (e) {}
+        var cats = (result && result.v5 && result.v5.categories) || [];
+
+        for (var j = 0; j < cfg.steps.length; j++) {
+          var step = cfg.steps[j], row = lis[j];
+          if (!step.category) {
+            // Search block — no real signals yet
+            setCk(row, "");
+            continue;
+          }
+          var cat = null;
+          for (var k = 0; k < cats.length; k++) {
+            if (cats[k].category_code === step.category) { cat = cats[k]; break; }
+          }
+          var finding = cat ? (cat.findings || [])[step.idx] : null;
+          paintFinding(row, step.region, api, finding);
+        }
+
         try { if (api.complete) api.complete(); } catch (e) {}
       }
 
-      function calcLeakScore() {
-        // Count only rows that have a real result (pass or fail).
-        // Neutral/na rows are excluded — they don't penalise or reward the score.
-        var rows = document.querySelectorAll("[data-audit-carousel] .audit-row");
-        var real = 0, fails = 0;
-        for (var i = 0; i < rows.length; i++) {
-          if (rows[i].classList.contains("pass"))      { real++; }
-          else if (rows[i].classList.contains("fail")) { real++; fails++; }
-          // neutral rows: not counted
-        }
-        return { real: real, score: real > 0 ? Math.round((fails / real) * 100) : null };
-      }
-
-      function showScore() {
-        var overlay   = document.querySelector("[data-score-overlay]");
-        var card      = document.querySelector("[data-score-card]");
-        var scored    = document.querySelector("[data-score-scored]");
-        var unmeasured = document.querySelector("[data-score-unmeasured]");
-        var numEl     = document.querySelector("[data-score-num]");
-        if (!overlay || !card) return;
-
-        var result = calcLeakScore();
-
-        if (result.real === 0) {
-          // Every check returned na — could not measure this site.
-          card.classList.add("is-gray");
-          if (scored) scored.hidden = true;
-          if (unmeasured) unmeasured.hidden = false;
-        } else {
-          // At least some real results — show the score.
-          var score = result.score;
-          if (numEl) numEl.textContent = String(score);
-          var tier = score >= 60 ? "is-red" : score >= 35 ? "is-orange" : "is-green";
-          card.classList.add(tier);
-          if (scored) scored.hidden = false;
-          if (unmeasured) unmeasured.hidden = true;
-        }
-
-        overlay.hidden = false;
-      }
-
       function runAll(url) {
-        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) { runBlock(b, url); });
-        // Show score overlay exactly at 30 s
+        // One API call shared across both blocks
+        var apiPromise = fetch("/api/diagnostic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: url }),
+        })
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .catch(function () { return null; });
+
+        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) {
+          runBlock(b, url, apiPromise);
+        });
         setTimeout(showScore, 30000);
       }
 
