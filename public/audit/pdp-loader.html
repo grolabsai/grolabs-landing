@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PDP audit loader — GroLabs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --scout-accent: #fae194;
+    --scout-accent-on: #131316;
+    --s-bg: #131316;
+    --s-bg-deeper: #0E0E11;
+    --s-surface: #1c1d24;
+    --s-surface-alt: #16171c;
+    --s-surface-hover: #24262e;
+    --s-border: rgba(255,255,255,0.08);
+    --s-border-strong: rgba(255,255,255,0.16);
+    --s-text: #EDEAE0;
+    --s-text-strong: #FFFFFF;
+    --s-text-secondary: rgba(237,234,224,0.6);
+    --s-text-tertiary: rgba(237,234,224,0.4);
+    --s-text-muted: rgba(237,234,224,0.28);
+    --s-pass: #34d399;
+    --s-pass-bg: rgba(52,211,153,0.14);
+    --s-fail: #f87171;
+    --s-fail-bg: rgba(248,113,113,0.14);
+    --s-radius-sm: 6px;
+    --s-radius-md: 8px;
+    --s-radius-lg: 12px;
+    --s-font: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    --s-font-brand: "Permanent Marker", cursive;
+    --s-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #000; font-family: var(--s-font); overflow: hidden; }
+
+  /* Fit-to-viewport stage */
+  #stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #000;
+  }
+  #frame {
+    width: 784px; height: 760px;
+    flex-shrink: 0;
+    transform-origin: center center;
+    background: var(--s-bg-deeper);
+    border-radius: 0;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+
+  /* ─── Browser chrome ─────────────────────────────────────────────── */
+  .chrome {
+    height: 50px; flex-shrink: 0;
+    background: var(--s-bg);
+    border-bottom: 1px solid var(--s-border);
+    display: flex; align-items: center;
+    gap: 14px; padding: 0 18px;
+  }
+  .lights { display: flex; gap: 8px; }
+  .lights i { width: 12px; height: 12px; border-radius: 50%; background: var(--s-surface-hover); display: block; }
+  .navbtns { display: flex; gap: 14px; color: var(--s-text-muted); }
+  .navbtns svg { width: 16px; height: 16px; }
+  .addresspill {
+    flex: 1; height: 30px;
+    background: var(--s-surface-alt);
+    border: 1px solid var(--s-border);
+    border-radius: 999px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px; min-width: 0;
+  }
+  .addresspill .lock { width: 11px; height: 11px; flex-shrink: 0; color: var(--s-text-tertiary); }
+  .addresspill .favicon { width: 15px; height: 15px; border-radius: 3px; flex-shrink: 0; display: none; object-fit: contain; }
+  .addresspill .url {
+    font-family: var(--s-font-mono); font-size: 12px;
+    color: var(--scout-accent);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    flex: 1; min-width: 0;
+  }
+  .addresspill .reload { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--s-text-tertiary); flex-shrink: 0; }
+
+  /* HUD status (right side of chrome) */
+  .hud {
+    display: flex; align-items: center; gap: 9px;
+    font-family: var(--s-font-mono); font-size: 11px;
+    color: var(--s-text-secondary); white-space: nowrap;
+  }
+  .hud .spin {
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 1.5px solid rgba(250,225,148,0.25); border-top-color: var(--scout-accent);
+    animation: spin 0.85s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .hud .done-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--s-pass); }
+  .hud b { color: var(--s-text-strong); font-weight: 600; }
+  .hud .ok { color: var(--s-pass); }
+  .hud .bad { color: var(--s-fail); }
+
+  /* ─── Page viewport ──────────────────────────────────────────────── */
+  .viewport {
+    flex: 1; min-height: 0;
+    background: var(--s-bg-deeper);
+    display: flex; justify-content: center;
+    padding: 24px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page {
+    width: 720px;
+    display: flex; flex-direction: column;
+    gap: 20px;
+  }
+  /* Two-column PDP body: image left, details right */
+  .pdp-cols { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: start; }
+  .pdp-right { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Scanning light beam — sweeps top→bottom continuously over the page */
+  .scanbeam {
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 96px;
+    pointer-events: none;
+    z-index: 60;
+    background: linear-gradient(to bottom,
+      rgba(250,225,148,0) 0%,
+      rgba(250,225,148,0.04) 45%,
+      rgba(250,225,148,0.16) 82%,
+      rgba(250,225,148,0.42) 100%);
+    border-bottom: 1.5px solid rgba(250,225,148,0.75);
+    box-shadow: 0 0 34px 6px rgba(250,225,148,0.20);
+    animation: scanbeam 3s cubic-bezier(.45,.05,.55,.95) infinite;
+  }
+  @keyframes scanbeam {
+    0%   { transform: translateY(-96px); opacity: 0; }
+    6%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { transform: translateY(720px); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .scanbeam { display: none; } }
+
+  /* ─── Region wrapper + audit box ─────────────────────────────────── */
+  .region { position: relative; }
+  .rbox {
+    position: absolute; inset: -7px;
+    border: 1.5px dashed transparent;
+    border-radius: 7px;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .rtag {
+    position: absolute; top: -11px; left: 10px;
+    font-family: var(--s-font-mono); font-size: 10px; font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 7px; border-radius: 3px;
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 5px;
+    opacity: 0;
+    color: var(--scout-accent-on);
+  }
+  /* scanning */
+  .region.scanning .rbox { opacity: 1; border-color: var(--scout-accent); box-shadow: 0 0 16px rgba(250,225,148,0.22); animation: rblink 0.85s ease-in-out infinite; }
+  .region.scanning .rtag { opacity: 1; background: var(--scout-accent); }
+  @keyframes rblink { 0%,100% { opacity: 1; } 50% { opacity: 0.22; } }
+  /* pass */
+  .region.pass .rbox { opacity: 1; border-style: solid; border-color: var(--s-pass); box-shadow: 0 0 16px rgba(52,211,153,0.18); }
+  .region.pass .rtag { opacity: 1; background: var(--s-pass); }
+  /* fail */
+  .region.fail .rbox { opacity: 1; border-style: solid; border-color: var(--s-fail); box-shadow: 0 0 16px rgba(248,113,113,0.18); }
+  .region.fail .rtag { opacity: 1; background: var(--s-fail); }
+  /* dim un-scanned content slightly while a scan is active elsewhere — keeps focus */
+  .page.active .region:not(.scanning):not(.pass):not(.fail) { opacity: 0.55; transition: opacity 0.3s ease; }
+
+  /* ─── Skeleton styling for the PDP sections ──────────────────────── */
+  .sk { background: var(--s-surface-alt); border-radius: 3px; }
+  .sec-label { height: 9px; width: 120px; background: rgba(255,255,255,0.16); border-radius: 2px; margin-bottom: 10px; }
+
+  /* Breadcrumbs & tags */
+  .breadcrumbs { display: flex; align-items: center; justify-content: space-between; }
+  .crumbtrail { display: flex; align-items: center; gap: 8px; }
+  .crumbtrail .c { height: 7px; border-radius: 2px; background: var(--s-surface); }
+  .crumbtrail .sep { width: 4px; height: 4px; border-radius: 50%; background: var(--s-text-muted); }
+  .tagchips { display: flex; gap: 6px; }
+  .tagchips .t { height: 16px; width: 42px; border-radius: 999px; background: var(--s-surface); border: 1px solid var(--s-border); }
+
+  /* Images (left column gallery) */
+  .images-col { display: flex; flex-direction: column; gap: 10px; }
+  .img-main { width: 100%; aspect-ratio: 1 / 1; background: linear-gradient(135deg, var(--s-surface), var(--s-surface-alt)); border-radius: 8px; }
+  .img-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .img-thumb { aspect-ratio: 1 / 1; background: var(--s-surface-alt); border-radius: 5px; }
+  .img-thumb.active { outline: 1.5px solid var(--s-text-tertiary); }
+
+  /* Title + price (furniture, not audited) */
+  .furniture { display: flex; flex-direction: column; gap: 8px; }
+  .furniture .title { height: 16px; width: 70%; background: rgba(255,255,255,0.2); border-radius: 3px; }
+  .furniture .price { height: 22px; width: 28%; background: rgba(255,255,255,0.26); border-radius: 3px; }
+
+  /* Variants */
+  .variants { display: flex; flex-direction: column; gap: 10px; }
+  .swatches { display: flex; gap: 8px; }
+  .swatch { width: 22px; height: 22px; border-radius: 50%; background: var(--s-surface-hover); }
+  .swatch.sel { outline: 1.5px solid var(--s-text-tertiary); outline-offset: 2px; }
+  .sizes { display: flex; gap: 8px; }
+  .size { width: 38px; height: 26px; border-radius: 5px; background: var(--s-surface-alt); border: 1px solid var(--s-border); }
+
+  /* Attributes */
+  .attrs { display: flex; flex-direction: column; gap: 9px; }
+  .attr-row { display: flex; align-items: center; gap: 14px; }
+  .attr-row .k { height: 7px; width: 90px; background: var(--s-surface); border-radius: 2px; }
+  .attr-row .v { height: 7px; flex: 1; background: var(--s-surface-alt); border-radius: 2px; max-width: 260px; }
+
+  /* Description */
+  .desc { display: flex; flex-direction: column; gap: 8px; }
+  .desc .ln { height: 7px; background: var(--s-surface-alt); border-radius: 2px; }
+
+  /* Product card rows (upsell / cross-sell) */
+  .prow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .pcard { display: flex; flex-direction: column; gap: 7px; }
+  .pcard .pimg { height: 78px; background: var(--s-surface-alt); border-radius: 5px; }
+  .pcard .pl1 { height: 6px; width: 90%; background: var(--s-surface); border-radius: 2px; }
+  .pcard .pl2 { height: 6px; width: 50%; background: var(--s-surface); border-radius: 2px; }
+  /* Empty upsell state (renders when failing — "not configured") */
+  .prow.empty {
+    grid-template-columns: 1fr;
+    border: 1px dashed var(--s-border-strong);
+    border-radius: var(--s-radius-md);
+    height: 78px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .prow.empty .ph { height: 7px; width: 160px; background: var(--s-surface); border-radius: 2px; }
+
+  /* Tags (pill shapes) */
+  .tags { display: flex; gap: 8px; }
+  .tagpill { height: 24px; border-radius: 999px; background: var(--s-surface); border: 1px solid var(--s-border-strong); }
+
+  /* Related blocks (upsell + cross-sell) side by side */
+  .related-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  .related-cols .prow { grid-template-columns: 1fr 1fr; }
+</style>
+</head>
+<body>
+  <div id="stage">
+    <div id="frame">
+      <!-- Browser chrome -->
+      <div class="chrome">
+        <div class="lights"><i></i><i></i><i></i></div>
+        <div class="navbtns">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+        <div class="addresspill">
+          <img id="favicon" class="favicon" alt="" />
+          <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          <span class="url" id="addr">wazu.com/products/merino-runner</span>
+          <span class="reload"></span>
+        </div>
+        <div class="hud" id="hud">
+          <span class="spin"></span>
+          <span id="hud-text">Auditing PDP…</span>
+        </div>
+      </div>
+
+      <!-- Page being audited -->
+      <div class="viewport">
+        <div class="scanbeam"></div>
+        <div class="page" id="page">
+
+          <!-- 1 · Breadcrumbs -->
+          <div class="region" data-region="breadcrumbs">
+            <div class="breadcrumbs">
+              <div class="crumbtrail">
+                <div class="c" style="width:36px"></div><div class="sep"></div>
+                <div class="c" style="width:54px"></div><div class="sep"></div>
+                <div class="c" style="width:80px"></div>
+              </div>
+            </div>
+            <div class="rbox"><span class="rtag">Breadcrumbs</span></div>
+          </div>
+
+          <!-- two-column body: image left, details right -->
+          <div class="pdp-cols">
+
+            <!-- 2 · Images (left) -->
+            <div class="region" data-region="images">
+              <div class="images-col">
+                <div class="img-main"></div>
+                <div class="img-thumbs">
+                  <div class="img-thumb active"></div>
+                  <div class="img-thumb"></div>
+                  <div class="img-thumb"></div>
+                  <div class="img-thumb"></div>
+                </div>
+              </div>
+              <div class="rbox"><span class="rtag">Images</span></div>
+            </div>
+
+            <!-- right column: title/price + variants + attributes + description -->
+            <div class="pdp-right">
+              <div class="furniture">
+                <div class="title"></div>
+                <div class="price"></div>
+              </div>
+
+              <!-- 3 · Variants -->
+              <div class="region" data-region="variants">
+                <div class="variants">
+                  <div class="swatches"><div class="swatch sel"></div><div class="swatch"></div><div class="swatch"></div><div class="swatch"></div></div>
+                  <div class="sizes"><div class="size"></div><div class="size"></div><div class="size"></div><div class="size"></div></div>
+                </div>
+                <div class="rbox"><span class="rtag">Variants</span></div>
+              </div>
+
+              <!-- 4 · Attributes -->
+              <div class="region" data-region="attributes">
+                <div class="attrs">
+                  <div class="attr-row"><div class="k"></div><div class="v"></div></div>
+                  <div class="attr-row"><div class="k"></div><div class="v" style="max-width:200px"></div></div>
+                  <div class="attr-row"><div class="k"></div><div class="v" style="max-width:240px"></div></div>
+                </div>
+                <div class="rbox"><span class="rtag">Attributes</span></div>
+              </div>
+
+              <!-- 5 · Description -->
+              <div class="region" data-region="description">
+                <div class="desc">
+                  <div class="ln" style="width:96%"></div>
+                  <div class="ln" style="width:88%"></div>
+                  <div class="ln" style="width:40%"></div>
+                </div>
+                <div class="rbox"><span class="rtag">Description</span></div>
+              </div>
+
+              <!-- 6 · Tags (below description) -->
+              <div class="region" data-region="tags">
+                <div class="tags">
+                  <div class="tagpill" style="width:58px"></div>
+                  <div class="tagpill" style="width:74px"></div>
+                  <div class="tagpill" style="width:64px"></div>
+                </div>
+                <div class="rbox"><span class="rtag">Tags</span></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- related blocks side by side -->
+          <div class="related-cols">
+            <!-- 7 · Upsell products -->
+            <div class="region" data-region="upsell">
+              <div class="sec-label"></div>
+              <div class="prow empty"><div class="ph"></div></div>
+              <div class="rbox"><span class="rtag">Upsell products</span></div>
+            </div>
+
+            <!-- 8 · Cross-sell products -->
+            <div class="region" data-region="crosssell">
+              <div class="sec-label"></div>
+              <div class="prow">
+                <div class="pcard"><div class="pimg"></div><div class="pl1"></div><div class="pl2"></div></div>
+                <div class="pcard"><div class="pimg"></div><div class="pl1"></div><div class="pl2"></div></div>
+              </div>
+              <div class="rbox"><span class="rtag">Cross-sell products</span></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Fit the fixed 1120×760 frame into the viewport
+  (function () {
+    const frame = document.getElementById("frame");
+    function fit() {
+      const pad = 0;
+      const s = Math.min((innerWidth - pad) / 784, (innerHeight - pad) / 760);
+      frame.style.transform = "scale(" + s + ")";
+    }
+    addEventListener("resize", fit); fit();
+  })();
+
+  // ════════════════════════════════════════════════════════════════════
+  //  RUNTIME API  —  window.PDPAudit
+  //  The live analysis engine drives the animation through these calls.
+  //  Nothing runs on a fixed timer: a region stays in its pulsing-yellow
+  //  "scanning" state until YOU resolve it, so you can hold while the
+  //  backend evaluates, then call pass()/fail() with your own text.
+  //
+  //  Region ids (top → bottom; also at PDPAudit.regions):
+  //    "breadcrumbs", "images", "variants", "attributes",
+  //    "description", "tags", "upsell", "crosssell"
+  //
+  //  PDPAudit.setUrl("acme.com/products/x")      // address-bar text
+  //  PDPAudit.status("Analyzing variants…")       // HUD text (keeps spinner)
+  //  PDPAudit.scan("variants")                    // region → pulsing yellow (held)
+  //  PDPAudit.pass("variants", "6 variants")      // region → green + custom text
+  //  PDPAudit.fail("variants", "No variant imgs") // region → red + custom text
+  //  PDPAudit.reset("variants")                   // clear one region
+  //  PDPAudit.resetAll()                          // clear all regions + HUD
+  //  PDPAudit.complete()                          // HUD → "Audit complete · N passed · M issues"
+  //  PDPAudit.complete("Done in 4.2s")            // …or your own summary text
+  //  PDPAudit.beam(false)                         // sweeping light off / on
+  //
+  //  Wiring against a real backend (each region holds until its result):
+  //    for (const id of PDPAudit.regions) {
+  //      PDPAudit.scan(id);
+  //      const r = await fetch('/audit/' + id).then(x => x.json());
+  //      r.ok ? PDPAudit.pass(id, r.label) : PDPAudit.fail(id, r.label);
+  //    }
+  //    PDPAudit.complete();
+  // ════════════════════════════════════════════════════════════════════
+  const PDPAudit = (function () {
+    const ICON_OK = "✓", ICON_BAD = "✕";
+    const page = document.getElementById("page");
+    const hud = document.getElementById("hud");
+    const hudText = document.getElementById("hud-text");
+    const beamEl = document.querySelector(".scanbeam");
+
+    // Default human labels, used when the engine doesn't pass custom text.
+    const NAMES = {
+      breadcrumbs: "Breadcrumb trail", images: "Product images", variants: "Variants",
+      attributes: "Structured attributes", description: "Description", tags: "Tags",
+      upsell: "Upsell", crosssell: "Cross-sell",
+    };
+    const ORDER = ["breadcrumbs","images","variants","attributes","description","tags","upsell","crosssell"];
+
+    const el = (id) => page.querySelector('.region[data-region="' + id + '"]');
+    const tag = (id) => { const r = el(id); return r && r.querySelector(".rtag"); };
+
+    function spinner(on) {
+      const existing = hud.querySelector(".spin");
+      const dot = hud.querySelector(".done-dot");
+      if (on) { if (dot) dot.remove(); if (!existing) { const s = document.createElement("span"); s.className = "spin"; hud.prepend(s); } }
+      else if (existing) existing.remove();
+    }
+
+    const api = {
+      regions: ORDER.slice(),
+      names: NAMES,
+
+      setUrl(url) {
+        var clean = String(url).replace(/^https?:\/\//, "");
+        document.getElementById("addr").textContent = clean;
+        var host = clean.split("/")[0];
+        var fav = document.getElementById("favicon");
+        if (fav && host) {
+          fav.onerror = function () { fav.style.display = "none"; };
+          fav.onload = function () { fav.style.display = ""; };
+          fav.src = "https://www.google.com/s2/favicons?domain=" + encodeURIComponent(host) + "&sz=64";
+        }
+        return api;
+      },
+
+      // HUD status line (keeps the spinner running).
+      status(text) { spinner(true); hudText.textContent = text; return api; },
+
+      // Region → pulsing yellow "being evaluated". Held until pass()/fail().
+      scan(id, label) {
+        const r = el(id); if (!r) return api;
+        r.classList.remove("pass", "fail");
+        r.classList.add("scanning");
+        page.classList.add("active");
+        tag(id).textContent = label || NAMES[id] || id;
+        return api;
+      },
+
+      // Region → green. 'text' is whatever the engine wants shown (optional).
+      pass(id, text) {
+        const r = el(id); if (!r) return api;
+        r.classList.remove("scanning", "fail");
+        r.classList.add("pass");
+        tag(id).textContent = ICON_OK + " " + (text || NAMES[id] || id);
+        return api;
+      },
+
+      // Region → red. 'text' is the engine's message (optional).
+      fail(id, text) {
+        const r = el(id); if (!r) return api;
+        r.classList.remove("scanning", "pass");
+        r.classList.add("fail");
+        tag(id).textContent = ICON_BAD + " " + (text || NAMES[id] || id);
+        return api;
+      },
+
+      reset(id) {
+        const r = el(id); if (!r) return api;
+        r.classList.remove("scanning", "pass", "fail");
+        tag(id).textContent = NAMES[id] || id;
+        return api;
+      },
+
+      resetAll() {
+        ORDER.forEach((id) => api.reset(id));
+        page.classList.remove("active");
+        spinner(true);
+        hudText.textContent = "Auditing PDP…";
+        return api;
+      },
+
+      // HUD done state. Pass your own text, or omit to auto-count pass/fail.
+      complete(text) {
+        page.classList.remove("active");
+        spinner(false);
+        if (text) { hudText.textContent = text; return api; }
+        let pass = 0, fail = 0;
+        ORDER.forEach((id) => { const r = el(id); if (!r) return; if (r.classList.contains("pass")) pass++; else if (r.classList.contains("fail")) fail++; });
+        hudText.innerHTML = 'Audit complete · <b><span class="ok">' + pass + ' passed</span> · <span class="bad">' + fail + ' issues</span></b>';
+        return api;
+      },
+
+      beam(on) { if (beamEl) beamEl.style.display = on === false ? "none" : ""; return api; },
+    };
+    return api;
+  })();
+  window.PDPAudit = PDPAudit;
+
+  // ?url= override for quick framing in the preview.
+  (function () {
+    const u = new URLSearchParams(location.search).get("url");
+    if (u) PDPAudit.setUrl(u);
+  })();
+
+  // ════════════════════════════════════════════════════════════════════
+  //  DEMO PLAYBACK (preview only)
+  //  Drives the API on a timer so the file animates by itself. The real
+  //  product would NOT run this — it calls PDPAudit.scan/pass/fail as
+  //  results arrive. Disable with ?demo=0 in the URL.
+  // ════════════════════════════════════════════════════════════════════
+  // Demo outcomes — phrased as our PDP-quality findings. The real engine
+  // replaces this loop with scan()/pass()/fail() as each check resolves
+  // (pass = score above threshold → green; fail → red).
+  const DEMO = [
+    { id: "breadcrumbs", outcome: "pass", text: "Breadcrumb present" },
+    { id: "images",      outcome: "pass", text: "6 images · alt text OK" },
+    { id: "variants",    outcome: "fail", text: "No variant selector" },
+    { id: "attributes",  outcome: "pass", text: "All key attributes present" },
+    { id: "description", outcome: "fail", text: "Thin — 38 words" },
+    { id: "tags",        outcome: "pass", text: "Tagged" },
+    { id: "upsell",      outcome: "fail", text: "No upsell block" },
+    { id: "crosssell",   outcome: "pass", text: "4 cross-sell links" },
+  ];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  async function demoRun() {
+    PDPAudit.resetAll();
+    if (reduce) { // static final state for reduced-motion / print
+      DEMO.forEach((d) => d.outcome === "pass" ? PDPAudit.pass(d.id, d.text) : PDPAudit.fail(d.id, d.text));
+      PDPAudit.complete();
+      return;
+    }
+    await sleep(700);
+    for (const d of DEMO) {
+      PDPAudit.status("Scanning " + (PDPAudit.names[d.id] || d.id) + "…");
+      PDPAudit.scan(d.id);
+      await sleep(1150);              // ← real engine: await the backend result here
+      d.outcome === "pass" ? PDPAudit.pass(d.id, d.text) : PDPAudit.fail(d.id, d.text);
+      await sleep(520);
+    }
+    PDPAudit.complete();
+    await sleep(3400);
+    demoRun();
+  }
+
+  if (new URLSearchParams(location.search).get("demo") !== "0") {
+    demoRun();
+  }
+</script>
+</body>
+</html>

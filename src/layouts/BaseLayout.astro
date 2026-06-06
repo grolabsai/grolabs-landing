@@ -24,6 +24,7 @@ const defaults = {
     ogAlt:
       'GroLabs — recover lost revenue and grow your business without paying for more traffic.',
     nav: {
+      home: 'Home',
       resources: 'Resources',
       blog: 'Blog',
     },
@@ -42,6 +43,7 @@ const defaults = {
     ogAlt:
       'GroLabs — recupera los ingresos perdidos y haz crecer tu negocio sin pagar por más tráfico.',
     nav: {
+      home: 'Inicio',
       resources: 'Recursos',
       blog: 'Blog',
     },
@@ -184,11 +186,15 @@ const canonicalUrl = `${siteUrl}${path}`;
             grid placement. */}
         <div class="order-2 ml-auto md:order-3 md:ml-0 md:justify-self-end flex items-center gap-md">
           <slot name="header-ctas" />
-          <LocaleSwitcher />
+          {/* LocaleSwitcher hidden — EN/ES toggle suppressed for now. */}
+          {/* <LocaleSwitcher /> */}
         </div>
         {/* Nav: w-full forces it to wrap to row 2 on mobile;
             md restores inline centered placement. */}
         <nav class="order-3 w-full justify-center md:order-2 md:w-auto md:justify-self-center md:self-end flex items-center md:items-end gap-lg pt-1 md:pt-0">
+          <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none" href={home}>
+            {t.nav.home}
+          </a>
           <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none" href={resourcesHref}>
             {t.nav.resources}
           </a>
@@ -260,7 +266,7 @@ const canonicalUrl = `${siteUrl}${path}`;
                 <a class="font-body-sm text-body-sm text-zinc-500 hover:text-zinc-300 transition-colors" href={legalUrls.security}>{t.footer.security}</a>
               </div>
               <p class="font-body-sm text-body-sm text-zinc-500">
-                © <span id="footer-year"></span> GroLabs AI. {t.footer.rights}
+                © <span id="footer-year"></span> GroLabs LLC. {t.footer.rights}
               </p>
             </div>
           </div>

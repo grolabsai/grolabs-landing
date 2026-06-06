@@ -1,0 +1,93 @@
+/* ============================================================================
+   GroLabs — Audit UI tokens & state styles
+   Use these to render the REAL audit results in-product (tables, drawers,
+   badges) so they match the scan animations. Same variables the animations use.
+   ============================================================================ */
+
+:root {
+  /* Brand */
+  --scout-accent: #fae194;          /* kinetic yellow — scanning / brand */
+  --scout-accent-on: #131316;       /* text/icon on yellow */
+
+  /* Surfaces (dark theme) */
+  --s-bg: #131316;
+  --s-bg-deeper: #0E0E11;
+  --s-surface: #1c1d24;
+  --s-surface-alt: #16171c;
+  --s-surface-hover: #24262e;
+
+  /* Lines */
+  --s-border: rgba(255,255,255,0.08);
+  --s-border-strong: rgba(255,255,255,0.16);
+
+  /* Text */
+  --s-text: #EDEAE0;                /* default body */
+  --s-text-strong: #FFFFFF;
+  --s-text-secondary: rgba(237,234,224,0.6);
+  --s-text-tertiary: rgba(237,234,224,0.4);
+  --s-text-muted: rgba(237,234,224,0.28);
+
+  /* Status — the audit verdict colors */
+  --s-pass: #34d399;               /* green  = pass */
+  --s-pass-bg: rgba(52,211,153,0.14);
+  --s-fail: #f87171;               /* red    = fail / issue */
+  --s-fail-bg: rgba(248,113,113,0.14);
+  --s-scan: var(--scout-accent);   /* yellow = scanning / in progress */
+  --s-scan-bg: rgba(250,225,148,0.10);
+
+  /* Radius */
+  --s-radius-sm: 6px;
+  --s-radius-md: 8px;
+  --s-radius-lg: 12px;
+
+  /* Type */
+  --s-font: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --s-font-brand: "Permanent Marker", cursive;   /* headings/marks only */
+  --s-font-mono: ui-monospace, "SF Mono", Menlo, monospace; /* metrics, ids, values */
+}
+
+/* ---- Verdict badge (use for each metric's result) ------------------------- */
+.audit-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--s-font-mono); font-size: 11px; font-weight: 700;
+  padding: 3px 8px; border-radius: 999px; line-height: 1;
+}
+.audit-badge .dot { width: 7px; height: 7px; border-radius: 50%; }
+.audit-badge.pass { color: var(--s-pass); background: var(--s-pass-bg); }
+.audit-badge.pass .dot { background: var(--s-pass); }
+.audit-badge.fail { color: var(--s-fail); background: var(--s-fail-bg); }
+.audit-badge.fail .dot { background: var(--s-fail); }
+.audit-badge.scanning { color: var(--scout-accent-on); background: var(--scout-accent); }
+
+/* Glyphs: pass = "✓", fail = "✕", scanning = spinner */
+
+/* ---- Result row (a metric + its verdict + value) -------------------------- */
+.audit-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 12px;
+  border-radius: var(--s-radius-sm);
+  box-shadow: inset 2px 0 0 transparent;   /* left status rail */
+  font-family: var(--s-font);
+}
+.audit-row .name { flex: 1; font-size: 13px; color: var(--s-text); }
+.audit-row .meta { font-family: var(--s-font-mono); font-size: 10px; color: var(--s-text-muted); }
+.audit-row .value { font-family: var(--s-font-mono); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.audit-row.pass { box-shadow: inset 2px 0 0 var(--s-pass); }
+.audit-row.pass .value { color: var(--s-pass); }
+.audit-row.fail { box-shadow: inset 2px 0 0 var(--s-fail); }
+.audit-row.fail .value { color: var(--s-fail); }
+.audit-row.scanning { box-shadow: inset 2px 0 0 var(--s-scan); background: var(--s-scan-bg); }
+
+/* ---- Region overlay box (when annotating a live page screenshot) ---------- */
+.audit-box { position: absolute; border-radius: 7px; border: 1.5px solid transparent; pointer-events: none; }
+.audit-box.scanning { border-style: dashed; border-color: var(--s-scan); box-shadow: 0 0 16px rgba(250,225,148,0.22); }
+.audit-box.pass { border-color: var(--s-pass); box-shadow: 0 0 16px rgba(52,211,153,0.18); }
+.audit-box.fail { border-color: var(--s-fail); box-shadow: 0 0 16px rgba(248,113,113,0.18); }
+.audit-box .tag {
+  position: absolute; top: -11px; left: 10px;
+  font-family: var(--s-font-mono); font-size: 10px; font-weight: 700;
+  padding: 3px 7px; border-radius: 3px; white-space: nowrap; color: var(--scout-accent-on);
+}
+.audit-box.scanning .tag { background: var(--s-scan); }
+.audit-box.pass .tag { background: var(--s-pass); }
+.audit-box.fail .tag { background: var(--s-fail); }

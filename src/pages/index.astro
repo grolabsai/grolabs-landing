@@ -120,17 +120,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </Fragment>
 
-  <!-- Hero + Stats (v2) — merged into one viewport. Left column carries
-       the headline / tagline / lede / CTAs; right column shows the three
-       stat cards. The SEO and AEO cards from v1 have been pulled into a
-       separate (future) section and are no longer in the hero. -->
-  <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-2xl pb-2xl md:pt-3xl md:pb-3xl overflow-hidden">
-    <div id="particles-container"></div>
+  <!-- ============================================================
+       Audit hero — headline / tagline / lede / CTAs on the left;
+       the audit prompt + URL/email input on the right. (The original
+       stat-card hero was removed; this is now the only hero.)
+       ============================================================ -->
+  <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-2xl pb-2xl md:pt-3xl md:pb-3xl overflow-hidden" data-hero-audit>
+    <div id="particles-container-draft"></div>
 
     <div class="hero-v2-grid max-w-page mx-auto relative z-10 reveal active">
       <div class="hero-v2-copy">
         <h1 class="hero-v2-headline">
-          <span class="hero-v2-line">Recover lost revenue</span>
+          <span class="hero-v2-line">Recover <span style="color: #fae194">lost revenue</span></span>
           <span class="hero-v2-line"><span class="hero-v2-amp">&amp;</span> grow your business</span>
         </h1>
         <p class="hero-v2-tagline">Without paying for more traffic</p>
@@ -159,61 +160,265 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         </div>
       </div>
 
-      <div class="hero-v2-stage">
-        <article class="hero-v2-card hero-v2-card--featured">
-          <div class="hero-v2-stat">2&ndash;3&times;</div>
-          <h3 class="hero-v2-card-title">Search conversion uplift with catalog &amp; search optimization</h3>
-          <p class="hero-v2-card-body">
-            Users who search convert 2&ndash;3&times; more often than those who don't&mdash;<br>
-            <span class="hero-v2-highlight">if they find what they want</span>.
-          </p>
-        </article>
-        <article class="hero-v2-card">
-          <div class="hero-v2-stat">14&ndash;23%</div>
-          <h3 class="hero-v2-card-title">Product page drop-off</h3>
-          <p class="hero-v2-card-body">Shoppers leave product pages without adding to cart due to missing details and unclear information.</p>
-        </article>
-        <article class="hero-v2-card">
-          <div class="hero-v2-stat">19&ndash;24%</div>
-          <h3 class="hero-v2-card-title">Returns of perfect products</h3>
-          <p class="hero-v2-card-body">Returns linked to mismatched expectations caused by incomplete product data and discovery issues.</p>
-        </article>
+      <div class="hero-v2-stage-col">
+        <div class="hero-v2-stat-row">
+          <span class="hero-v2-stat-99">99%</span>
+          <p class="hero-v2-stat-text">of visitors never become customers in many online stores.</p>
+        </div>
 
-        {/* Citation under the stat cards. Lives INSIDE .hero-v2-stage
-            so it aligns with the cards' left edge, not the hero copy
-            column. The "Source" pill + popover will come back once
-            specific source URLs are available. */}
-        <p class="hero-v2-sources-text">Industry Benchmark — Mid-market e-commerce</p>
+        <div class="hero-v2-audit">
+          <p class="hero-v2-audit-headline">
+            What's preventing the sales you're capable of?
+          </p>
+          <p class="hero-v2-audit-sub"><svg class="hero-v2-audit-mag" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fae194" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M21 21l-4.6-4.6" /><path d="M6 10h1.8l1-2.6 1.7 5 1.1-3 0.7 0.6H14" stroke-width="1.6" /></svg> Perhaps we can help you find out.</p>
+
+          <form class="hero-v2-audit-form" data-audit-form novalidate>
+            <div class="audit-inputrow">
+              <div class="audit-inputs">
+                <div class="hero-v2-audit-field">
+                  <svg class="hero-v2-audit-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72" />
+                    <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72" />
+                  </svg>
+                  <input type="url" name="url" class="hero-v2-audit-input has-ico" placeholder="your-store.com/product/…" required />
+                </div>
+                <div class="hero-v2-audit-field">
+                  <svg class="hero-v2-audit-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="m3 7 9 6 9-6" />
+                  </svg>
+                  <input type="email" name="email" class="hero-v2-audit-input has-ico" placeholder="you@store.com" required />
+                </div>
+              </div>
+              <div class="audit-action">
+                <p class="hero-v2-audit-hint"><svg class="hint-info" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="#fae194" stroke-width="1.6" /><line x1="12" y1="7" x2="12" y2="13" stroke="#fae194" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="16.3" r="1.05" fill="#fae194" /></svg>Paste here the URL of your most important product page.</p>
+                <button type="submit" class="hero-v2-btn hero-v2-btn--video hero-v2-audit-btn">Start Diagnostic Scan</button>
+              </div>
+            </div>
+            <p class="audit-err" data-audit-err role="alert">
+              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3l10 17H2z" fill="#EDEAE0" />
+                <rect x="11" y="9" width="2" height="6" rx="1" fill="#16171d" />
+                <circle cx="12" cy="17.4" r="1.2" fill="#16171d" />
+              </svg>
+              <span data-audit-err-msg></span>
+            </p>
+          </form>
+        </div>
       </div>
     </div>
   </section>
 
-  {/* Video — Cloudflare Stream embed, directly below the hero. Carries
-      the dark canvas (bg-canvas-deeper) the hidden Revenue-leaks section
-      used to own, so the hero→dark alternation rhythm is preserved while
-      that section is parked. The whole section (heading included) is
-      gated on PUBLIC_CF_STREAM_URL so an unconfigured environment never
-      shows an empty titled section. */}
-  {hasVideo && (
-    <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
-      <div class="max-w-page mx-auto">
-        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-lg block">
-          Explainer video
-        </span>
-        <VideoEmbed
-          iframeId="gl-stream-video"
-          title="What are revenue leaks?"
-          posterTime="1.5s"
-        />
+  <!-- ============================================================
+       WIP audit carousel — FIRST DRAFT (below the WIP hero).
+       One block per page: live animation + side checklist flipping
+       pending → ✓/✕. Blocks animate in PARALLEL. MOCK-driven for now
+       (no backend); prospect storage + email send are out of scope.
+       ============================================================ -->
+  <section class="audit-carousel px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl overflow-hidden" data-audit-carousel hidden>
+    <div class="max-w-page mx-auto">
+      <header class="audit-carousel-head">
+        <span class="audit-carousel-eyebrow">Live Diagnostic</span>
+        <h2 class="audit-carousel-title">This should be quick. <button type="button" class="audit-watch-link" data-watch-video>Watch the video</button> while we take care of this and come back for your results.</h2>
+      </header>
+
+      <div class="audit-track">
+        <article class="audit-block" data-block="search">
+          <div class="audit-block-anim">
+            <iframe class="audit-frame" data-loader="/audit/search-loader.html" title="Search results audit"></iframe>
+          </div>
+          <aside class="audit-block-list">
+            <h4 class="audit-block-list-title">Search experience</h4>
+            <ul class="audit-checklist" data-checklist></ul>
+          </aside>
+        </article>
+
+        <article class="audit-block" data-block="pdp">
+          <div class="audit-block-anim">
+            <iframe class="audit-frame" data-loader="/audit/pdp-loader.html" title="Product page audit"></iframe>
+          </div>
+          <aside class="audit-block-list">
+            <h4 class="audit-block-list-title">Product page</h4>
+            <ul class="audit-checklist" data-checklist></ul>
+          </aside>
+        </article>
       </div>
-    </section>
-  )}
+
+    </div>
+  </section>
+
+  <script is:inline>
+    (function () {
+      // MOCK driver — replace each step's {outcome,text} with real engine
+      // results (scan(id) when a check starts, pass/fail(id, text) when it
+      // resolves). Blocks run in parallel; the side list mirrors the boxes
+      // and adds "background" checks (no box on the mock) flipping in the list.
+      var SAMPLE_URL = "wazu.com/products/merino-runner";
+      var SEQ = {
+        search: { api: "SearchAudit", steps: [
+          { label: "Search box present", outcome: "pass", text: "Found" },
+          { label: "Typo tolerance",     outcome: "fail", text: "Misspelling → 0 results" },
+          { label: "Synonyms",           outcome: "fail", text: "No coverage" },
+          { label: "Autocomplete",       outcome: "pass", text: "Present" },
+          { label: "No-results screen",  region: "empty_state",     outcome: "fail", text: "34 / 100" },
+          { label: "Brand relevance",    region: "brand_relevance", outcome: "pass", text: "72 / 100" },
+          { label: "Facets present",     region: "facet_present",   outcome: "pass", text: "Yes" },
+          { label: "Facet depth",        region: "facet_depth",     outcome: "fail", text: "45 / 100" },
+        ] },
+        pdp: { api: "PDPAudit", steps: [
+          { label: "Breadcrumbs",      region: "breadcrumbs", outcome: "pass", text: "Present" },
+          { label: "Product images",   region: "images",      outcome: "pass", text: "6 images · alt OK" },
+          { label: "Variants",         region: "variants",    outcome: "fail", text: "No variant selector" },
+          { label: "Attributes",       region: "attributes",  outcome: "pass", text: "8 / 10" },
+          { label: "Description",      region: "description", outcome: "fail", text: "Thin · 38 words" },
+          { label: "Tags",             region: "tags",        outcome: "pass", text: "Tagged" },
+          { label: "Reviews",          outcome: "fail", text: "None found" },
+          { label: "Stock & delivery", outcome: "pass", text: "Clear" },
+          { label: "Upsell",           region: "upsell",      outcome: "fail", text: "Not configured" },
+          { label: "Cross-sell",       region: "crosssell",   outcome: "pass", text: "4 linked" },
+        ] },
+      };
+      var sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+
+      function buildList(ul, steps) {
+        ul.innerHTML = "";
+        return steps.map(function (s) {
+          var li = document.createElement("li");
+          li.className = "audit-row";
+          li.innerHTML = '<span class="ck-ico"></span><span class="name"></span><span class="value"></span>';
+          li.querySelector(".name").textContent = s.label;
+          ul.appendChild(li);
+          return li;
+        });
+      }
+      function setCk(li, state, val) {
+        li.className = "audit-row " + state; // scanning | pass | fail (audit-tokens.css)
+        if (val != null) li.querySelector(".value").textContent = val;
+      }
+
+      async function runBlock(block, url) {
+        var cfg = SEQ[block.dataset.block];
+        if (!cfg) return;
+        var iframe = block.querySelector(".audit-frame");
+        var ul = block.querySelector("[data-checklist]");
+        var lis = buildList(ul, cfg.steps);
+
+        await new Promise(function (res) {
+          iframe.onload = function () { res(); };
+          iframe.src = iframe.dataset.loader + "?demo=0&url=" + encodeURIComponent(url);
+        });
+        var api = iframe.contentWindow[cfg.api];
+        if (!api) return;
+        try { api.resetAll(); api.setUrl(url); } catch (e) {}
+
+        await sleep(500);
+        for (var i = 0; i < cfg.steps.length; i++) {
+          var s = cfg.steps[i], li = lis[i], ok = s.outcome === "pass";
+          setCk(li, "scanning");
+          try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "…"); } catch (e) {}
+          await sleep(900);
+          try { if (s.region) { ok ? api.pass(s.region, s.text) : api.fail(s.region, s.text); } } catch (e) {}
+          setCk(li, ok ? "pass" : "fail", s.text);
+          await sleep(350);
+        }
+        try { if (api.complete) api.complete(); } catch (e) {}
+      }
+
+      function runAll(url) {
+        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) { runBlock(b, url); });
+      }
+
+      function init() {
+        var carousel = document.querySelector("[data-audit-carousel]");
+        if (!carousel) return;
+        var form = document.querySelector("[data-audit-form]");
+        if (!form) return;
+        // "Start Diagnostic Scan" reveals the (hidden) carousel like the
+        // booking section: unhide → open animation → smooth-scroll → run.
+        var err = form.querySelector("[data-audit-err]");
+        var errMsg = form.querySelector("[data-audit-err-msg]");
+        var urlInput = form.querySelector('input[name="url"]');
+        var emailInput = form.querySelector('input[name="email"]');
+
+        // The red error pill is MOVED next to the offending field so its
+        // pointer arrow points at the input that's actually wrong.
+        function showErr(input, msg) {
+          if (!err) return;
+          var field = input && input.closest(".hero-v2-audit-field");
+          if (field) field.appendChild(err);
+          if (errMsg) errMsg.textContent = msg;
+          err.classList.add("is-shown");
+        }
+        function clearErr() { if (err) err.classList.remove("is-shown"); }
+
+        function normalizeUrl(raw) {
+          var v = (raw || "").trim();
+          if (!v) return null;
+          if (!/^https?:\/\//i.test(v)) v = "https://" + v;
+          try {
+            var u = new URL(v);
+            if (!u.hostname || u.hostname.indexOf(".") === -1) return null;
+            return u.href;
+          } catch (e) { return null; }
+        }
+        function urlError() {
+          var url = normalizeUrl(urlInput && urlInput.value);
+          if (!url) return "That doesn't look like a valid store URL — check for a typo (e.g. your-store.com/product).";
+          var path = ""; try { path = new URL(url).pathname.replace(/\/+$/, ""); } catch (e) {}
+          if (!path) return "Please paste complete URL for a product page.";
+          return null;
+        }
+        function emailError() {
+          if (emailInput && !emailInput.checkValidity()) return "Please enter a valid email so we can send your results.";
+          return null;
+        }
+
+        // Validate on blur (lost focus); a valid blur normalizes + clears.
+        function wireField(input, getError) {
+          if (!input) return;
+          var field = input.closest(".hero-v2-audit-field");
+          input.addEventListener("blur", function () {
+            var msg = input.value.trim() ? getError() : null;
+            if (msg) { showErr(input, msg); return; }
+            if (err && err.parentElement === field) clearErr();
+            if (input === urlInput && input.value.trim()) { var u = normalizeUrl(input.value); if (u) input.value = u; }
+          });
+        }
+        wireField(urlInput, urlError);
+        wireField(emailInput, emailError);
+
+        // URL focus → the right-side hint turns yellow; blur → grey again.
+        var hintEl = form.querySelector(".hero-v2-audit-hint");
+        if (urlInput && hintEl) {
+          urlInput.addEventListener("focus", function () { hintEl.classList.add("is-active"); });
+          urlInput.addEventListener("blur", function () { hintEl.classList.remove("is-active"); });
+        }
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var ue = urlError();
+          if (ue) return showErr(urlInput, ue);
+          var u = normalizeUrl(urlInput.value); if (u) urlInput.value = u;
+          var ee = emailError();
+          if (ee) return showErr(emailInput, ee);
+          clearErr();
+          carousel.hidden = false;
+          carousel.classList.add("is-open");
+          requestAnimationFrame(function () { carousel.scrollIntoView({ behavior: "smooth", block: "start" }); });
+          runAll(normalizeUrl(urlInput.value));
+        });
+      }
+      if (document.readyState !== "loading") init();
+      else document.addEventListener("DOMContentLoaded", init);
+    })();
+  </script>
 
   <!-- Booking embed — Calendly's inline widget themed yellow + dark to
        match the inverted footer. Hidden by default; revealed when the
        hero CTA is clicked (see the inline script at the bottom of this
        page). The hero CTA also still carries an `href` + target="_blank"
-       so the page degrades to "open Calendly in a new tab" if JS fails. -->
+       so the page degrades to "open Calendly in a new tab" if JS fails.
+       Placed ABOVE the explainer video so the booked-demo flow reads first. -->
   <section id="booking-embed" hidden class="bg-primary pt-xl pb-md md:pt-2xl px-margin-mobile md:px-margin-desktop">
     <div class="max-w-page mx-auto">
       <p class="text-zinc-900 text-body-lg leading-relaxed mb-lg text-center">
@@ -234,12 +439,29 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
+  {/* Video — Cloudflare Stream embed. Gated on PUBLIC_CF_STREAM_URL so an
+      unconfigured environment never shows an empty titled section. */}
+  {hasVideo && (
+    <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
+      <div class="max-w-page mx-auto">
+        <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-lg block">
+          Quick Explainer Video
+        </span>
+        <VideoEmbed
+          iframeId="gl-stream-video"
+          title="What are revenue leaks?"
+          posterTime="1.5s"
+        />
+      </div>
+    </section>
+  )}
+
   <style is:global>
     /* ─────────── Hero v2 — merged hero + stats ─────────── */
     .hero-v2-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-      gap: 96px;
+      grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+      gap: 64px;
       align-items: center;
     }
     @media (max-width: 1100px) {
@@ -404,6 +626,203 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       line-height: 1.6;
       margin: 0;
     }
+
+    /* ─────────── Audit hero (WIP) — right column ───────────
+       Replaces the stat cards with the audit prompt + URL input.
+       Theme matched to hero-v2: bone-white #EDEAE0, yellow #fae194. */
+    .hero-v2-audit {
+      width: 100%;
+      max-width: 560px;
+      margin-left: auto;
+      display: flex;
+      flex-direction: column;
+      background: #1c1d24;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 30px 60px -12px rgba(0,0,0,0.55);
+    }
+    /* Top paragraph + sub line share ONE size (top smaller, sub larger). */
+    .hero-v2-audit-headline {
+      font-family: "Hanken Grotesk", sans-serif;
+      font-weight: 400;
+      color: #EDEAE0;
+      font-size: 20px;
+      line-height: 1.3;
+      margin: 0 0 16px;
+    }
+    .hero-v2-audit-accent { color: #fae194; }
+    .hero-v2-audit-sub {
+      font-family: "Hanken Grotesk", sans-serif;
+      color: #EDEAE0;
+      font-size: 20px;
+      line-height: 1.4;
+      margin: 0 0 24px;
+      text-align: right;
+      padding-right: 32px;
+    }
+    .hero-v2-audit-form { display: flex; flex-direction: column; gap: 10px; }
+    .hero-v2-audit-input {
+      width: 100%;
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: 16px;
+      color: #EDEAE0;
+      background: #1c1d24;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 10px;
+      padding: 16px 18px;
+      outline: none;
+      -webkit-appearance: none; appearance: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .hero-v2-audit-input::placeholder { color: rgba(237, 234, 224, 0.35); }
+    .hero-v2-audit-input:focus {
+      border-color: #fae194;
+      box-shadow: 0 0 0 3px rgba(250, 225, 148, 0.15);
+    }
+    /* Stop the browser's autofill from repainting the input light. */
+    .hero-v2-audit-input:-webkit-autofill,
+    .hero-v2-audit-input:-webkit-autofill:hover,
+    .hero-v2-audit-input:-webkit-autofill:focus {
+      -webkit-text-fill-color: #EDEAE0;
+      -webkit-box-shadow: 0 0 0 1000px #1c1d24 inset;
+      caret-color: #EDEAE0;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+    .hero-v2-audit-hint {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: rgba(237, 234, 224, 0.5);
+      margin: 0;
+      transition: color .2s;
+    }
+    .hero-v2-audit-hint.is-active { color: #fae194; }
+    /* Red error pill — anchored under the failing field with a pointer arrow. */
+    .audit-err {
+      display: none;
+      position: absolute; top: calc(100% + 9px); left: 0; z-index: 6;
+      align-items: center; gap: 7px;
+      background: #f87171; color: #131316;
+      font-family: "Hanken Grotesk", sans-serif; font-size: 13px; font-weight: 600;
+      padding: 8px 12px; border-radius: 9px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.45);
+      white-space: nowrap;
+    }
+    .audit-err.is-shown { display: inline-flex; }
+    .audit-err::before {
+      content: ""; position: absolute; bottom: 100%; left: 18px;
+      border: 6px solid transparent; border-bottom-color: #f87171;
+    }
+    .audit-err svg { flex-shrink: 0; }
+    .hint-info { display: inline-block; vertical-align: -2px; margin-right: 5px; }
+    .hero-v2-audit-mag { display: inline-block; vertical-align: -4px; margin-right: 5px; }
+    /* URL + email share the same horizontal space (stacked, equal width);
+       Start button occupies the right; OK lives inside the URL input. */
+    .audit-inputrow { display: flex; gap: 14px; align-items: stretch; margin-top: 16px; }
+    .audit-inputs { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+    /* Right area: hint on top (beside the URL), Start button at the bottom
+       (aligned with the email row). Width reserved so it doesn't shift when
+       the button appears. */
+    .audit-action { flex: 0 0 230px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+    .audit-action .hero-v2-audit-hint { margin: 0; }
+    .audit-action .hero-v2-audit-btn { width: 100%; justify-content: center; }
+
+    /* Right column: 99% stat + line on top, audit card moved below. */
+    [data-hero-audit] .hero-v2-grid { align-items: stretch; }
+    [data-hero-audit] .hero-v2-copy { display: flex; flex-direction: column; }
+    [data-hero-audit] .hero-v2-lede { margin-top: auto; }
+    .hero-v2-stage-col { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 560px; margin-left: auto; }
+    .hero-v2-stat-row { display: flex; gap: 18px; align-items: center; }
+    .hero-v2-stat-99 { font-family: "Permanent Marker", cursive; color: #fae194; font-size: clamp(68px, 8vw, 104px); line-height: 0.9; flex-shrink: 0; }
+    .hero-v2-stat-text { font-family: "Hanken Grotesk", sans-serif; color: #EDEAE0; font-size: 20px; line-height: 1.4; margin: 0; }
+    .hero-v2-stage-col .hero-v2-audit { max-width: none; margin-left: 0; }
+
+    /* Icons inside the URL + email inputs (lighter-gray shade). */
+    .hero-v2-audit-field { position: relative; display: block; }
+    .hero-v2-audit-ico { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: rgba(255, 255, 255, 0.28); pointer-events: none; }
+    .hero-v2-audit-input.has-ico { padding-left: 44px; }
+    .hero-v2-audit-btn { white-space: nowrap; cursor: pointer; }
+
+    /* Mobile: full-width stacked form. Collapse the row/column wrappers
+       (display: contents) so the URL field, hint, email field, and button
+       become direct flex items of .audit-inputrow, then reorder them to
+       URL → hint → email → button. Button spans the full screen width. */
+    @media (max-width: 767px) {
+      .audit-inputrow { flex-direction: column; align-items: stretch; gap: 12px; }
+      .audit-inputs, .audit-action { display: contents; }
+      .hero-v2-audit-field, .hero-v2-audit-input { width: 100%; }
+      .audit-inputs .hero-v2-audit-field:nth-child(1) { order: 1; }  /* URL */
+      .audit-action .hero-v2-audit-hint { order: 2; }
+      .audit-inputs .hero-v2-audit-field:nth-child(2) { order: 3; }  /* email */
+      .audit-action .hero-v2-audit-btn { order: 4; width: 100%; }
+    }
+
+    /* ─────────── Audit carousel (WIP first draft) ───────────
+       One block per page: live animation (iframe loader) + a side
+       checklist that flips pending → ✓/✕. Blocks animate in parallel.
+       Mock-driven for now; theme matched to hero-v2. */
+    .audit-carousel-head { margin-bottom: 28px; }
+    .audit-carousel-eyebrow { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fae194; }
+    .audit-carousel-title { font-family: "Hanken Grotesk", sans-serif; font-weight: 400; color: #EDEAE0; font-size: 16px; line-height: 24px; margin: 10px 0 0; }
+    /* Inline "watch the video" — yellow, clickable; reuses the [data-watch-video]
+       handler (scrolls to the video section + starts playback). */
+    .audit-watch-link { font: inherit; color: #fae194; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color .2s; }
+    .audit-watch-link:hover { color: #ffffff; }
+    /* Real estate = two columns (Search | PDP). Inside each: ~75% loader +
+       ~25% checklist. All cells min-width:0 so nothing overflows → no
+       horizontal scrollbar; the checklist truncates with ellipsis instead. */
+    .audit-track { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+    @media (max-width: 900px) { .audit-track { grid-template-columns: 1fr; } }
+    .audit-block {
+      min-width: 0;
+      display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 14px;
+      align-items: start;
+      background: #1c1d24; border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.5), 0 30px 60px -12px rgba(0,0,0,0.55);
+    }
+    @media (max-width: 560px) { .audit-block { grid-template-columns: 1fr; } }
+    /* Match each loader's native aspect ratio so it fills the frame — no side letterboxing. */
+    .audit-block-anim { border-radius: 12px; overflow: hidden; background: #0e0f13; }
+    /* Both cards the SAME height (shared near-square ratio). PDP's canvas
+       (784×760) fills it exactly. The Search canvas is landscape (880×600),
+       so inside this taller box it scales to width and pins to the TOP, with
+       the loader's black stage filling the remainder down to the card bottom
+       (top-align handled in search-loader.html). */
+    .audit-block[data-block="search"] .audit-block-anim { aspect-ratio: 784 / 760; }
+    .audit-block[data-block="pdp"] .audit-block-anim { aspect-ratio: 784 / 760; }
+    .audit-frame { width: 100%; height: 100%; border: 0; display: block; }
+    /* Distinct section tone: cooler + lighter than canvas-deeper (#0E0E11),
+       different from the hero canvas (#131316), darker than the blocks
+       (#1c1d24) so their drop shadow reads. */
+    .audit-carousel { background: #16171d; }
+    @keyframes audit-open { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+    .audit-carousel.is-open { animation: audit-open .5s ease both; }
+    .audit-block-list-title { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #fae194; margin: 0 0 14px; }
+    .audit-checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    /* Compact row: tiny ✓/✕ + truncating label + value. No left rail, tight margins. */
+    .audit-row { display: flex; align-items: center; gap: 7px; padding: 4px 0; min-width: 0; font-family: "Hanken Grotesk", sans-serif; }
+    .audit-row .ck-ico { width: 12px; flex-shrink: 0; text-align: center; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 700; line-height: 1; color: rgba(237,234,224,0.3); }
+    .audit-row .name { flex: 1; min-width: 0; font-size: 11.5px; color: rgba(237,234,224,0.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audit-row .value { flex-shrink: 0; max-width: 46%; font-family: ui-monospace, monospace; font-size: 10.5px; font-weight: 600; color: rgba(237,234,224,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .audit-row.scanning .ck-ico { color: #fae194; }
+    .audit-row.scanning .ck-ico::before { content: "•"; }
+    .audit-row.scanning .name { color: #EDEAE0; }
+    .audit-row.pass .ck-ico { color: #34d399; }
+    .audit-row.pass .ck-ico::before { content: "✓"; }
+    .audit-row.pass .name { color: #EDEAE0; }
+    .audit-row.pass .value { color: #34d399; }
+    .audit-row.fail .ck-ico { color: #f87171; }
+    .audit-row.fail .ck-ico::before { content: "✕"; }
+    .audit-row.fail .name { color: #EDEAE0; }
+    .audit-row.fail .value { color: #f87171; }
+    .audit-email { margin-top: 36px; max-width: 560px; }
+    .audit-email-label { display: block; font-family: "Hanken Grotesk", sans-serif; font-size: 15px; color: rgba(237,234,224,0.8); margin-bottom: 12px; }
+    .audit-email-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .audit-email-input { flex: 1; min-width: 220px; font-family: "Hanken Grotesk", sans-serif; font-size: 16px; color: #EDEAE0; background: #1c1d24; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 14px 16px; outline: none; transition: border-color .2s, box-shadow .2s; }
+    .audit-email-input:focus { border-color: #fae194; box-shadow: 0 0 0 3px rgba(250,225,148,0.15); }
+    .audit-email-sent { display: none; margin: 12px 0 0; font-family: "Hanken Grotesk", sans-serif; font-size: 13px; color: #34d399; }
+    .audit-email.is-sent .audit-email-sent { display: block; }
     /* Intentional exception: featured card body runs at 20px. */
     .hero-v2-card--featured .hero-v2-card-body { font-size: 20px; }
     /*
@@ -969,7 +1388,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        tagged it, so search can't surface it by attribute.
        Sits on the lighter canvas bg so the search panel inside it can
        use the floating-card shadow treatment from the hero. -->
-  <section class="relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+  <!-- Search Demo section hidden for now (per request). Remove `hidden` to restore. -->
+  <section class="hidden relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Try it out
@@ -1044,57 +1464,45 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        the eyebrow. Dark section closing the v2 alternation. -->
   <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
     <div class="max-w-page mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-lg items-end">
-        <!-- LEFT: eyebrow + title (on yellow); body content lives inside
-             a gray card below so the dense paragraphs read against a
-             quieter surface. -->
-        <div>
-          <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
-            Entrepreneurs' Priority
-          </span>
-          <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-lg md:mb-[48px]">
-            Grow a company
-          </h2>
+      <!-- Eyebrow + title on the yellow surface. -->
+      <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
+        Entrepreneurs' Priority
+      </span>
+      <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-lg md:mb-[48px]">
+        Grow a company
+      </h2>
 
-          <div class="bg-canvas rounded-xl p-lg md:p-xl text-secondary-fixed-dim text-body-md leading-relaxed">
-            <blockquote class="border-l border-primary/30 pl-md mb-xl">
-              <p class="text-white text-body-lg italic leading-snug mb-sm">
-                &ldquo;Most entrepreneurs fail because they're working
-                <span class="text-primary font-medium not-italic">in their business</span>
-                rather than
-                <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
-              </p>
-              <footer class="text-body-sm text-zinc-500 not-italic">
-                — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
-              </footer>
-            </blockquote>
-
-            <p class="mb-md">
-              Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
-              hour you spend in the dashboard is an hour you're not spending on
-              the company — on the strategy, the team, the next product, the
-              partnerships only you can build.
+      <!-- Narrow dark card (quote + punchline) on the LEFT; the supporting
+           narrative is moved OUT of the card to the RIGHT as low-contrast
+           text on the yellow surface. items-start + matching top padding
+           (lg:pt-xl ↔ the card's md:p-xl) aligns the paragraph's first
+           line with the quote's first line. Phone mockup removed. -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg lg:gap-2xl items-start">
+        <div class="bg-canvas rounded-xl p-lg md:p-xl text-secondary-fixed-dim text-body-md leading-relaxed">
+          <blockquote class="border-l border-primary/30 pl-md mb-xl">
+            <p class="text-white text-body-lg italic leading-snug mb-sm">
+              &ldquo;Most entrepreneurs fail because they're working
+              <span class="text-primary font-medium not-italic">in their business</span>
+              rather than
+              <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
             </p>
+            <footer class="text-body-sm text-zinc-500 not-italic">
+              — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
+            </footer>
+          </blockquote>
 
-            <p>
-              <span class="text-primary font-medium">No news = good news.</span>
-              <span class="text-white">If something requires your attention, we'll let you know.</span>
-            </p>
-          </div>
+          <p>
+            <span class="text-primary font-medium">No news = good news.</span>
+            <span class="text-white">If something requires your attention, we'll let you know.</span>
+          </p>
         </div>
 
-        <!-- RIGHT: phone notification mockup. items-end on the grid
-             aligns the phone's bottom edge with the bottom of the
-             dark content card on the left. Column width tightened
-             from 360px to 220px to bring the phone closer. -->
-        <div class="flex justify-center lg:justify-end">
-          <img
-            src={`${base}/agent-notification.svg`}
-            alt="GroLabs push notification: Hello Peter, I'm afraid traffic dropped 6% yesterday. With a More info link."
-            class="w-full max-w-[180px] h-auto block"
-            loading="lazy"
-          />
-        </div>
+        <p class="text-black/45 text-body-md leading-relaxed mt-md lg:mt-0 lg:pt-xl">
+          Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
+          hour you spend in the dashboard is an hour you're not spending on
+          the company — on the strategy, the team, the next product, the
+          partnerships only you can build.
+        </p>
       </div>
     </div>
   </section>

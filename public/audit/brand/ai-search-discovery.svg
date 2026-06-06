@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+  <defs>
+    <radialGradient id="bg" cx="48%" cy="40%" r="78%">
+      <stop offset="0" stop-color="#1b1c23"></stop>
+      <stop offset="1" stop-color="#0d0d10"></stop>
+    </radialGradient>
+    <radialGradient id="lens" cx="40%" cy="36%" r="85%">
+      <stop offset="0" stop-color="#23242e"></stop>
+      <stop offset="1" stop-color="#131318"></stop>
+    </radialGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="14"></feGaussianBlur>
+    </filter>
+    <filter id="softglow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="34"></feGaussianBlur>
+    </filter>
+    <clipPath id="lensclip"><circle cx="470" cy="470" r="196"></circle></clipPath>
+  </defs>
+
+  <rect width="1080" height="1080" fill="url(#bg)"></rect>
+
+  
+  <g fill="none" stroke="#fae194" stroke-width="2">
+    <circle cx="470" cy="470" r="300" opacity="0.08"></circle>
+    <circle cx="470" cy="470" r="388" opacity="0.05"></circle>
+    <circle cx="470" cy="470" r="476" opacity="0.03"></circle>
+  </g>
+
+  
+  <circle cx="470" cy="470" r="200" fill="#fae194" opacity="0.18" filter="url(#softglow)"></circle>
+
+  
+  <line x1="612" y1="612" x2="806" y2="806" stroke="#fae194" stroke-width="50" stroke-linecap="round"></line>
+  <line x1="612" y1="612" x2="806" y2="806" stroke="#131318" stroke-width="14" stroke-linecap="round" opacity="0.35"></line>
+
+  
+  <circle cx="470" cy="470" r="210" fill="url(#lens)" stroke="#fae194" stroke-width="26"></circle>
+
+  
+  <g clip-path="url(#lensclip)">
+    <rect x="352" y="352" width="132" height="132" rx="16" fill="#EDEAE0" opacity="0.10"></rect>
+    <rect x="352" y="500" width="132" height="132" rx="16" fill="#EDEAE0" opacity="0.10"></rect>
+    <rect x="500" y="500" width="132" height="132" rx="16" fill="#EDEAE0" opacity="0.10"></rect>
+    
+    <rect x="500" y="352" width="132" height="132" rx="16" fill="#fae194" opacity="0.16"></rect>
+    <rect x="492" y="344" width="148" height="148" rx="18" fill="none" stroke="#fae194" stroke-width="3" stroke-dasharray="10 8"></rect>
+  </g>
+
+  
+  <g fill="#fae194">
+    <g filter="url(#glow)" opacity="0.5">
+      <circle cx="800" cy="300" r="36"></circle>
+      <circle cx="258" cy="330" r="20"></circle>
+      <circle cx="840" cy="566" r="16"></circle>
+    </g>
+    <g transform="translate(800,300) scale(60)"><path d="M0,-1 C0.13,-0.3 0.3,-0.13 1,0 C0.3,0.13 0.13,0.3 0,1 C-0.13,0.3 -0.3,0.13 -1,0 C-0.3,-0.13 -0.13,-0.3 0,-1 Z"></path></g>
+    <g transform="translate(258,330) scale(34)"><path d="M0,-1 C0.13,-0.3 0.3,-0.13 1,0 C0.3,0.13 0.13,0.3 0,1 C-0.13,0.3 -0.3,0.13 -1,0 C-0.3,-0.13 -0.13,-0.3 0,-1 Z"></path></g>
+    <g transform="translate(840,566) scale(26)"><path d="M0,-1 C0.13,-0.3 0.3,-0.13 1,0 C0.3,0.13 0.13,0.3 0,1 C-0.13,0.3 -0.3,0.13 -1,0 C-0.3,-0.13 -0.13,-0.3 0,-1 Z"></path></g>
+  </g>
+</svg>
