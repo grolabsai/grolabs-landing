@@ -355,21 +355,22 @@ const bookingIsExternal = bookingUrl.startsWith('http');
                 if (status === "pass" || status === "partial") { ok = true; text = status === "partial" ? "Partial" : "Present"; }
                 else if (status === "fail") { ok = false; text = "Missing"; }
               } else {
-                // na or missing finding — show neutral, not fail
-                setCk(row, ""); try { if (step.region) api.fail(step.region, "—"); } catch (e) {} continue;
+                // na or missing — neutral row, leave loader region in last scan state (not red)
+                setCk(row, ""); continue;
               }
             }
           } else {
-            // No category (search rows) OR no v5 data (rate-limit / error) — neutral
-            setCk(row, "");
-            try { if (step.region) api.fail(step.region, "—"); } catch (e) {}
-            continue;
+            // No category (search rows) OR no v5 data (rate-limit / error)
+            // Leave loader region as-is after scan — don't call fail() which would show red
+            setCk(row, ""); continue;
           }
 
+          // Real result: pass or fail
           try { if (step.region) { ok ? api.pass(step.region, text) : api.fail(step.region, text); } } catch (e) {}
           setCk(row, ok ? "pass" : "fail", text);
         }
 
+        // Only call complete if at least one row has a real result
         try { if (api.complete) api.complete(); } catch (e) {}
       }
 
