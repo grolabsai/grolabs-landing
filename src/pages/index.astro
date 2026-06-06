@@ -394,40 +394,34 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         if (!api) { if (onDone) onDone(); return; }
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
 
-        // Hold on "Checking your store…" while API runs.
-        // No animation yet — if unreachable we stop immediately.
-        try { if (api.status) api.status("Checking your store…"); } catch (e) {}
-
-        var result = null;
-        try { result = await apiPromise; } catch (e) {}
-        var cats = (result && result.v5 && result.v5.categories) || [];
-
-        if (!hasRealResults(cats)) {
-          // Nothing measurable — stop immediately, no animation.
-          for (var n = 0; n < lis.length; n++) setCk(lis[n], "");
-          try { if (api.complete) api.complete(); } catch (e) {}
-          if (onDone) onDone();
-          return;
-        }
-
-        // Real results — animate through them now.
-        await sleep(300);
+        // Phase 1: scan animation starts immediately so the user sees
+        // the loader working. API call runs in parallel in the background.
+        await sleep(400);
         for (var i = 0; i < cfg.steps.length; i++) {
           var s = cfg.steps[i], li = lis[i];
           setCk(li, "scanning");
           try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "…"); } catch (e) {}
-          await sleep(900);
-          if (!s.category) {
-            setCk(li, "");
+          await sleep(1800);
+        }
+
+        // Phase 2: scan done — wait for API if still running, then paint results.
+        try { if (api.status) api.status("Finalizing results…"); } catch (e) {}
+        var result = null;
+        try { result = await apiPromise; } catch (e) {}
+        var cats = (result && result.v5 && result.v5.categories) || [];
+
+        for (var j = 0; j < cfg.steps.length; j++) {
+          var step = cfg.steps[j], row = lis[j];
+          if (!step.category) {
+            setCk(row, "");
           } else {
             var cat = null;
             for (var k = 0; k < cats.length; k++) {
-              if (cats[k].category_code === s.category) { cat = cats[k]; break; }
+              if (cats[k].category_code === step.category) { cat = cats[k]; break; }
             }
-            var finding = cat ? (cat.findings || [])[s.idx] : null;
-            paintFinding(li, s.region, api, finding);
+            var finding = cat ? (cat.findings || [])[step.idx] : null;
+            paintFinding(row, step.region, api, finding);
           }
-          await sleep(300);
         }
 
         try { if (api.complete) api.complete(); } catch (e) {}
