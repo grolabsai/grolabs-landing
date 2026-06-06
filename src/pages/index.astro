@@ -301,12 +301,23 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         var ul = block.querySelector("[data-checklist]");
         var lis = buildList(ul, cfg.steps);
 
-        // Load iframe + fire API in parallel
+        // Load iframe + fire API in parallel.
+        // Poll for the loader API as a fallback — in some environments (headless,
+        // certain mobile browsers) iframe.onload fires before our handler is set,
+        // or not at all. Polling catches those cases without hanging forever.
         await new Promise(function (res) {
-          iframe.onload = function () { res(); };
+          var done = false;
+          function finish() { if (!done) { done = true; res(); } }
+          iframe.onload = finish;
           iframe.src = iframe.dataset.loader + "?demo=0&url=" + encodeURIComponent(url);
+          // Poll: resolve as soon as the loader API is accessible
+          var poll = setInterval(function () {
+            if (iframe.contentWindow && iframe.contentWindow[cfg.api]) { clearInterval(poll); finish(); }
+          }, 120);
+          // Hard fallback — never hang more than 10s
+          setTimeout(function () { clearInterval(poll); finish(); }, 10000);
         });
-        var api = iframe.contentWindow[cfg.api];
+        var api = iframe.contentWindow && iframe.contentWindow[cfg.api];
         if (!api) return;
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
 
@@ -320,15 +331,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           await sleep(700);
         }
 
-        // Phase 2: wait for API result then paint
+        // Phase 2: wait for API result then paint.
+        // result is null on network error; result.v5 missing on rate-limit / unexpected shape.
         var result = null;
         try { result = await apiPromise; } catch (e) {}
+        var hasV5 = !!(result && result.v5 && result.v5.categories);
 
         for (var j = 0; j < cfg.steps.length; j++) {
           var step = cfg.steps[j], row = lis[j];
           var ok = false, text = "—";
 
-          if (result && result.v5 && step.category) {
+          if (hasV5 && step.category) {
             // Find the matching category in the flat categories array
             var cats = result.v5.categories || [];
             var cat = null;
@@ -337,15 +350,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             }
             if (cat) {
               var finding = (cat.findings || [])[step.findingIndex];
-              if (finding) {
+              if (finding && finding.status !== "na") {
                 var status = finding.status;
                 if (status === "pass" || status === "partial") { ok = true; text = status === "partial" ? "Partial" : "Present"; }
                 else if (status === "fail") { ok = false; text = "Missing"; }
-                else { text = "—"; setCk(row, ""); try { if (step.region) api.fail(step.region, "—"); } catch (e) {} continue; }
+              } else {
+                // na or missing finding — show neutral, not fail
+                setCk(row, ""); try { if (step.region) api.fail(step.region, "—"); } catch (e) {} continue;
               }
             }
-          } else if (!step.category || (result && step.outcome === "na")) {
-            // Search block or stub: neutral
+          } else {
+            // No category (search rows) OR no v5 data (rate-limit / error) — neutral
             setCk(row, "");
             try { if (step.region) api.fail(step.region, "—"); } catch (e) {}
             continue;
