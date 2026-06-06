@@ -361,7 +361,9 @@
       complete(text) {
         page.classList.remove("active");
         spinner(false);
-        if (beamEl) beamEl.style.display = "none";   // audit done → stop the sweeping beam
+        if (beamEl) beamEl.style.display = "none";
+        // Clear any regions still in scanning state so no yellow borders remain
+        page.querySelectorAll(".region.scanning").forEach(r => r.classList.remove("scanning"));
         if (text) { hudText.textContent = text; return api; }
         let pass = 0, fail = 0;
         ORDER.forEach((id) => { const r = el(id); if (!r) return; if (r.classList.contains("pass")) pass++; else if (r.classList.contains("fail")) fail++; });

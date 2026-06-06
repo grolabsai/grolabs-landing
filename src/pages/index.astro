@@ -478,9 +478,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             return u.href;
           } catch (e) { return null; }
         }
+        // Marketplaces we can't scan — their bot protection blocks server requests.
+        var BLOCKED_HOSTS = ["amazon.", "ebay.", "etsy.", "aliexpress.", "walmart.", "mercadolibre.", "mercadolivre."];
         function urlError() {
           var url = normalizeUrl(urlInput && urlInput.value);
           if (!url) return "That doesn't look like a valid store URL — check for a typo (e.g. your-store.com/product).";
+          var hostname = ""; try { hostname = new URL(url).hostname.toLowerCase(); } catch (e) {}
+          for (var m = 0; m < BLOCKED_HOSTS.length; m++) {
+            if (hostname.indexOf(BLOCKED_HOSTS[m]) !== -1) {
+              return "Please paste a URL from your own store — we can't scan marketplace listings (Amazon, eBay, Etsy…).";
+            }
+          }
           var path = ""; try { path = new URL(url).pathname.replace(/\/+$/, ""); } catch (e) {}
           if (!path) return "Please paste complete URL for a product page.";
           return null;
