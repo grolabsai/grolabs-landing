@@ -68,15 +68,23 @@ const derivedPoster = baseUrl
   : undefined;
 const effectivePoster = poster ?? derivedPoster;
 
-// Append player params (poster, primaryColor) — URLSearchParams handles
-// encoding, including the `#` in the hex color and the `?` inside the
-// poster's own thumbnail URL. Respects any query string already on the
+// Append player params (poster, primaryColor, controls) — URLSearchParams
+// handles encoding, including the `#` in the hex color and the `?` inside
+// the poster's own thumbnail URL. Respects any query string already on the
 // configured embed URL.
+//
+// controls=false hides the player's native UI — crucially the center play
+// button, which would otherwise overlap our own pill (.video-play-pill).
+// The cross-origin player exposes no way to hide just that button, so we
+// suppress all native controls up front and turn them back on via the SDK
+// (player.controls = true) the moment playback starts (see script below),
+// so viewers still get the scrubber / pause / fullscreen while watching.
 let streamUrl: string | undefined;
 if (baseUrl) {
   const params = new URLSearchParams();
   if (effectivePoster) params.set('poster', effectivePoster);
   if (primaryColor) params.set('primaryColor', primaryColor);
+  params.set('controls', 'false');
   const qs = params.toString();
   streamUrl = qs ? `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${qs}` : baseUrl;
 }
@@ -138,10 +146,13 @@ if (baseUrl) {
             player.play().catch(function () {});
           });
         }
-        // Hide the overlay once playback begins, however it was triggered
-        // (pill, external button, or the player's own controls).
+        // Hide our pill once playback begins, and restore the player's
+        // native controls (loaded with controls=false so its center play
+        // button never overlaps the pill) so viewers get scrubber / pause /
+        // fullscreen while watching.
         player.addEventListener('play', function () {
           if (overlay) overlay.hidden = true;
+          player.controls = true;
         });
 
         // GA4 video analytics — single source of truth in Analytics.
