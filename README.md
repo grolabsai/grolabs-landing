@@ -25,7 +25,10 @@ src/
 │   ├── EquationCard.astro     ← Luminous Equation cards (variants: default | returns)
 │   ├── CapabilityCard.astro   ← AI-assisted module cards (slot for structured body)
 │   ├── StatBlock.astro        ← big-number social-proof blocks above the footer
-│   └── FunnelStageRow.astro   ← one row of the diagnostic table under the funnel SVG
+│   ├── FunnelStageRow.astro   ← one row of the diagnostic table under the funnel SVG
+│   ├── SearchDemo.astro       ← live Meilisearch demo panel (locale-aware)
+│   ├── SearchCopyHelper.astro ← yellow pulsing copy pill above the search demo
+│   └── VideoEmbed.astro       ← Cloudflare Stream explainer video (see "Video" below)
 ├── pages/
 │   ├── index.astro            ← marketing landing — composes the components above
 │   └── blog/
@@ -143,6 +146,26 @@ npm run build      # astro check + astro build → dist/
 npm run preview    # serve the production build locally
 ```
 
+## Video (Cloudflare Stream)
+
+The explainer video below the hero is a cross-origin Cloudflare Stream iframe rendered by [`src/components/VideoEmbed.astro`](./src/components/VideoEmbed.astro). The whole section is gated on `PUBLIC_CF_STREAM_URL`, so an unconfigured environment renders nothing.
+
+**Environment variables** (set in Vercel; see [`.env.example`](./.env.example)):
+
+| Var | Purpose |
+|---|---|
+| `PUBLIC_CF_STREAM_URL` | The Stream **iframe embed URL** (`…/<id>/iframe`), copied from the video's Embed tab. Swapping the video is a one-variable change. |
+| `PUBLIC_CF_STREAM_POSTER_TIME` | Frame to grab as the poster, e.g. `1.5s`. **Overridden by the `posterTime` prop** (below) when set. |
+
+**Key behaviors:**
+
+- **Poster** is auto-derived from `PUBLIC_CF_STREAM_URL` → `…/thumbnails/thumbnail.jpg?time=<t>`. Cloudflare generates the JPEG on-demand and edge-caches it (~10 days). Both homepages pass `posterTime="1.5s"`, which **takes precedence** over the env var — pinning the frame in code so a stale Vercel value can't override it.
+- **Play button:** the player's native controls are loaded with `controls=false` (so its center play button doesn't overlap ours), and we layer our own `.video-play-pill`. The Stream SDK starts playback on click and flips `player.controls = true` on play, restoring scrubber / pause / fullscreen while watching.
+- **Hero "Watch Video" CTA** (`[data-watch-video]`, EN page) scrolls to the player and starts it via the same SDK.
+- **Analytics:** the SDK forwards `video_start` / `video_progress` / `video_complete` / `video_drop_off` to GA4, so all video stats live in Analytics.
+
+> The local `.env` points at a different, origin-restricted test video, so the player **cannot render on localhost** — verify video changes on the live deploy.
+
 ## Deployment
 
 Connected to **Vercel** with auto-deploy from `main` (same pattern as the Scout admin). Each push to `main` triggers a Vercel build; preview deploys for every PR.
@@ -153,7 +176,7 @@ If the connection is ever lost:
 2. Vercel auto-detects Astro (framework preset: Astro, build command `astro build`, output `dist/`) — accept defaults.
 3. Deploy. Subsequent pushes to `main` redeploy automatically.
 
-The production `site` URL is set in [astro.config.mjs](./astro.config.mjs) as `https://grolabs.io` — update if the canonical domain changes.
+The production `site` URL is set in [astro.config.mjs](./astro.config.mjs) as `https://grolabs.ai` (served at `www.grolabs.ai`) — update if the canonical domain changes.
 
 ## Why this is separate from Scout
 
