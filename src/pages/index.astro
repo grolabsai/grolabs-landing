@@ -335,14 +335,25 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         setCk(li, ok ? "pass" : "fail", text);
       }
 
-      async function runBlock(block, url, apiPromise) {
+      // Returns true if at least one finding has a real (non-na) status.
+      function hasRealResults(cats) {
+        for (var i = 0; i < cats.length; i++) {
+          var findings = cats[i].findings || [];
+          for (var j = 0; j < findings.length; j++) {
+            var s = findings[j].status;
+            if (s === "pass" || s === "partial" || s === "fail") return true;
+          }
+        }
+        return false;
+      }
+
+      async function runBlock(block, url, apiPromise, onDone) {
         var cfg = CHECKS[block.dataset.block];
         if (!cfg) return;
         var iframe = block.querySelector(".audit-frame");
         var ul = block.querySelector("[data-checklist]");
         var lis = buildList(ul, cfg.steps);
 
-        // Load iframe — poll for API (onload unreliable in some environments)
         await new Promise(function (res) {
           var done = false;
           function finish() { if (!done) { done = true; res(); } }
@@ -354,40 +365,47 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           setTimeout(function () { clearInterval(poll); finish(); }, 10000);
         });
         var api = iframe.contentWindow && iframe.contentWindow[cfg.api];
-        if (!api) return;
+        if (!api) { if (onDone) onDone(); return; }
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
 
-        await sleep(400);
+        // Hold on "Checking your store…" while API runs.
+        // No animation yet — if unreachable we stop immediately.
+        try { if (api.status) api.status("Checking your store…"); } catch (e) {}
 
-        // Phase 1: scan animation runs while API call is in flight
-        for (var i = 0; i < cfg.steps.length; i++) {
-          var s = cfg.steps[i], li = lis[i];
-          setCk(li, "scanning");
-          try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "\u2026"); } catch (e) {}
-          await sleep(2000);
-        }
-
-        // Phase 2: paint real results (or gray if na / API error)
         var result = null;
         try { result = await apiPromise; } catch (e) {}
         var cats = (result && result.v5 && result.v5.categories) || [];
 
-        for (var j = 0; j < cfg.steps.length; j++) {
-          var step = cfg.steps[j], row = lis[j];
-          if (!step.category) {
-            // Search block — no real signals yet
-            setCk(row, "");
-            continue;
+        if (!hasRealResults(cats)) {
+          // Nothing measurable — stop immediately, no animation.
+          for (var n = 0; n < lis.length; n++) setCk(lis[n], "");
+          try { if (api.complete) api.complete(); } catch (e) {}
+          if (onDone) onDone();
+          return;
+        }
+
+        // Real results — animate through them now.
+        await sleep(300);
+        for (var i = 0; i < cfg.steps.length; i++) {
+          var s = cfg.steps[i], li = lis[i];
+          setCk(li, "scanning");
+          try { if (s.region) api.scan(s.region); if (api.status) api.status("Checking " + s.label + "…"); } catch (e) {}
+          await sleep(900);
+          if (!s.category) {
+            setCk(li, "");
+          } else {
+            var cat = null;
+            for (var k = 0; k < cats.length; k++) {
+              if (cats[k].category_code === s.category) { cat = cats[k]; break; }
+            }
+            var finding = cat ? (cat.findings || [])[s.idx] : null;
+            paintFinding(li, s.region, api, finding);
           }
-          var cat = null;
-          for (var k = 0; k < cats.length; k++) {
-            if (cats[k].category_code === step.category) { cat = cats[k]; break; }
-          }
-          var finding = cat ? (cat.findings || [])[step.idx] : null;
-          paintFinding(row, step.region, api, finding);
+          await sleep(300);
         }
 
         try { if (api.complete) api.complete(); } catch (e) {}
+        if (onDone) onDone();
       }
 
       function calcLeakScore() {
@@ -430,7 +448,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       }
 
       function runAll(url) {
-        // One API call shared across both blocks
         var apiPromise = fetch("/api/diagnostic", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -439,10 +456,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           .then(function (r) { return r.ok ? r.json() : null; })
           .catch(function () { return null; });
 
-        document.querySelectorAll("[data-audit-carousel] .audit-block").forEach(function (b) {
-          runBlock(b, url, apiPromise);
-        });
-        setTimeout(showScore, 30000);
+        var blocks = document.querySelectorAll("[data-audit-carousel] .audit-block");
+        var total = blocks.length, done = 0;
+        function onDone() {
+          done++;
+          if (done === total) showScore();
+        }
+        blocks.forEach(function (b) { runBlock(b, url, apiPromise, onDone); });
       }
 
       function init() {
