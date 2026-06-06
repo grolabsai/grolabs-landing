@@ -246,19 +246,33 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         </div>
       </div>
 
-      <!-- Revenue Leak Score — rendered as a full-width frame BELOW the
-           panels (revealed at 30 s) so it never overlays the recorded scan
-           results. Demo: red tones throughout; the CTA stays yellow. -->
+      <!-- Revenue Leak Score — revealed at 30 s (or when real API responds).
+           Two states: scored (red/orange/green) and unmeasured (gray).
+           data-score-state is set by showScore() before un-hiding. -->
       <div class="audit-score-panel" data-score-overlay data-score-card hidden>
-        <div class="audit-score-num"><span data-score-num>--</span><span class="audit-score-max">/100</span></div>
-        <p class="audit-score-sublabel">Revenue Leak Score</p>
-        <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
-        <a
-          href="https://cal.com/tuncho-granados-uibzst/15min"
-          class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Book growth assessment call</a>
+        <!-- Scored state -->
+        <div class="audit-score-scored" data-score-scored>
+          <div class="audit-score-num"><span data-score-num>--</span><span class="audit-score-max">/100</span></div>
+          <p class="audit-score-sublabel">Revenue Leak Score</p>
+          <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
+          <a
+            href="https://cal.com/tuncho-granados-uibzst/15min"
+            class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Book growth assessment call</a>
+        </div>
+        <!-- Unmeasured state — all checks returned na (hidden by default) -->
+        <div class="audit-score-unmeasured" data-score-unmeasured hidden>
+          <p class="audit-score-sublabel">Diagnostic complete</p>
+          <p class="audit-score-msg audit-score-msg--unmeasured">We were not able to perform the test for this URL.<br>This can happen when a site has bot protection enabled.</p>
+          <a
+            href="https://cal.com/tuncho-granados-uibzst/15min"
+            class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Book growth assessment call</a>
+        </div>
       </div>
 
     </div>
@@ -350,32 +364,43 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       }
 
       function calcLeakScore() {
-        var total = 0, fails = 0;
-        var blocks = Object.keys(SEQ);
-        for (var b = 0; b < blocks.length; b++) {
-          var steps = SEQ[blocks[b]].steps;
-          for (var i = 0; i < steps.length; i++) {
-            total++;
-            if (steps[i].outcome === "fail") fails++;
-          }
+        // Count only rows that have a real result (pass or fail).
+        // Neutral/na rows are excluded — they don't penalise or reward the score.
+        var rows = document.querySelectorAll("[data-audit-carousel] .audit-row");
+        var real = 0, fails = 0;
+        for (var i = 0; i < rows.length; i++) {
+          if (rows[i].classList.contains("pass"))      { real++; }
+          else if (rows[i].classList.contains("fail")) { real++; fails++; }
+          // neutral rows: not counted
         }
-        return Math.round((fails / total) * 100);
+        return { real: real, score: real > 0 ? Math.round((fails / real) * 100) : null };
       }
 
       function showScore() {
-        var overlay = document.querySelector("[data-score-overlay]");
-        var card    = document.querySelector("[data-score-card]");
-        var numEl   = document.querySelector("[data-score-num]");
-        if (!overlay || !card || !numEl) return;
+        var overlay   = document.querySelector("[data-score-overlay]");
+        var card      = document.querySelector("[data-score-card]");
+        var scored    = document.querySelector("[data-score-scored]");
+        var unmeasured = document.querySelector("[data-score-unmeasured]");
+        var numEl     = document.querySelector("[data-score-num]");
+        if (!overlay || !card) return;
 
-        var score = calcLeakScore();
-        numEl.textContent = score;
+        var result = calcLeakScore();
 
-        // Color-code by score: red (bad) → orange → green (good). Orange,
-        // not yellow, so the tier never clashes with the brand yellow.
-        // Message text stays white; CTA stays yellow (set in CSS).
-        var tier = score >= 60 ? "is-red" : score >= 35 ? "is-orange" : "is-green";
-        card.classList.add(tier);
+        if (result.real === 0) {
+          // Every check returned na — could not measure this site.
+          card.classList.add("is-gray");
+          if (scored) scored.hidden = true;
+          if (unmeasured) unmeasured.hidden = false;
+        } else {
+          // At least some real results — show the score.
+          var score = result.score;
+          if (numEl) numEl.textContent = String(score);
+          var tier = score >= 60 ? "is-red" : score >= 35 ? "is-orange" : "is-green";
+          card.classList.add(tier);
+          if (scored) scored.hidden = false;
+          if (unmeasured) unmeasured.hidden = true;
+        }
+
         overlay.hidden = false;
       }
 
@@ -856,6 +881,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* Orange (not yellow) so the middle tier never clashes with brand yellow. */
     .audit-score-panel.is-orange { color: #fb923c; background: rgba(251, 146, 60, 0.08); }
     .audit-score-panel.is-green  { color: #34d399; background: rgba(52, 211, 153, 0.08); }
+    /* Gray — all checks returned na, site could not be measured. */
+    .audit-score-panel.is-gray   { color: rgba(237,234,224,0.4); background: rgba(237,234,224,0.04); border-color: rgba(237,234,224,0.15); }
+    /* Two inner content states — JS hides whichever is inactive. */
+    .audit-score-scored    { display: contents; }
+    .audit-score-unmeasured { display: contents; }
+    .audit-score-unmeasured[hidden] { display: none; }
+    .audit-score-scored[hidden]     { display: none; }
+    .audit-score-msg--unmeasured { opacity: 0.7; }
     .audit-score-num {
       font-family: "Permanent Marker", cursive;
       font-size: clamp(80px, 12vw, 128px);
