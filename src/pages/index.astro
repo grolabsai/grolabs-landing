@@ -434,10 +434,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           await sleep(1800);
         }
 
-        // Phase 2: scan done — wait for API if still running, then paint results.
+        // Phase 2: scan done — wait for API (max 90s), then paint results.
         try { if (api.status) api.status("Finalizing results…"); } catch (e) {}
         var result = null;
-        try { result = await apiPromise; } catch (e) {}
+        try {
+          result = await Promise.race([
+            apiPromise,
+            new Promise(function(res) { setTimeout(function() { res(null); }, 92000); })
+          ]);
+        } catch (e) { result = null; }
         var cats = (result && result.v5 && result.v5.categories) || [];
 
         for (var j = 0; j < cfg.steps.length; j++) {
@@ -515,10 +520,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         // Call the app directly from the browser — CORS is open on app.grolabs.ai.
         // Avoids Vercel serverless function timeout (the backend takes ~30s with
         // Browserless; the browser has no such limit).
+        // 90s hard timeout — browser fetch has no default timeout
         var apiPromise = fetch("https://app.grolabs.ai/api/v1/diagnostic/runs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: url, version: "v5" }),
+          signal: AbortSignal.timeout(90000),
         })
           .then(function (r) { return r.ok ? r.json() : null; })
           .catch(function () { return null; });
