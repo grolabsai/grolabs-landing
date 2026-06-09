@@ -353,7 +353,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         }
         if (ev.brand_tests && ev.brand_tests.length) {
           ev.brand_tests.forEach(function(b) {
-            parts.push((b.found ? "✓ " : "✗ ") + "Brand "" + b.brand + "" in top results");
+            parts.push((b.found ? "✓ " : "✗ ") + "Brand \"" + b.brand + "\" in top results");
           });
         }
         if (ev.latency_ms !== undefined) parts.push("Latency: " + ev.latency_ms + "ms");
