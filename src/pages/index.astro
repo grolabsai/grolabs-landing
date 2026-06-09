@@ -520,14 +520,39 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         // Call the app directly from the browser — CORS is open on app.grolabs.ai.
         // Avoids Vercel serverless function timeout (the backend takes ~30s with
         // Browserless; the browser has no such limit).
-        // 90s hard timeout — browser fetch has no default timeout
+        // Fire-and-forget POST — returns run_id immediately (<2s).
+        // Then poll /v5 endpoint every 5s until results are ready.
         var apiPromise = fetch("https://app.grolabs.ai/api/v1/diagnostic/runs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: url, version: "v5" }),
-          signal: AbortSignal.timeout(90000),
+          signal: AbortSignal.timeout(15000),
         })
-          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(init) {
+            if (!init) return null;
+            var runId = (init.v5 && init.v5.run_id) || init.run_id;
+            if (!runId) return null;
+            // Poll until completed or 120s
+            var started = Date.now();
+            function poll() {
+              if (Date.now() - started > 120000) return Promise.resolve(null);
+              return fetch("https://app.grolabs.ai/api/v1/diagnostic/runs/" + runId + "/v5", {
+                signal: AbortSignal.timeout(10000),
+              })
+                .then(function(r) { return r.ok ? r.json() : null; })
+                .then(function(d) {
+                  if (!d) return null;
+                  if (d.status === "processing") {
+                    return new Promise(function(res) { setTimeout(function() { res(poll()); }, 5000); });
+                  }
+                  // Wrap in the shape runBlock expects: { v5: { categories: [...] } }
+                  return { v5: { categories: d.categories || [] } };
+                })
+                .catch(function() { return null; });
+            }
+            return poll();
+          })
           .catch(function () { return null; });
 
         var blocks = document.querySelectorAll("[data-audit-carousel] .audit-block");
