@@ -370,17 +370,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           runAll(normalizeUrl(urlInput.value));
         });
 
-        // The section is always visible now, so auto-play the demo scan once it
-        // scrolls into view (otherwise the scan frames sit empty until submit).
-        var autoRan = false;
-        // hold on the ghost loaders for a beat so they read as "ready", then scan
-        function autoRun() { if (!autoRan) { autoRan = true; carousel.classList.add("is-open"); setTimeout(function () { runAll(SAMPLE_URL); }, 1100); } }
+        // The scan does NOT auto-start. Until the visitor submits "Start
+        // Diagnostic Scan", the frames stay as grey ghost loaders. On scroll
+        // into view we only play the section's entrance fade.
         if ("IntersectionObserver" in window) {
           var io = new IntersectionObserver(function (entries) {
-            if (entries[0].isIntersecting) { io.disconnect(); autoRun(); }
-          }, { threshold: 0.2 });
+            if (entries[0].isIntersecting) { io.disconnect(); carousel.classList.add("is-open"); }
+          }, { threshold: 0.15 });
           io.observe(carousel);
-        } else { autoRun(); }
+        } else { carousel.classList.add("is-open"); }
       }
       if (document.readyState !== "loading") init();
       else document.addEventListener("DOMContentLoaded", init);
@@ -539,15 +537,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <div class="audit-track-wrap">
         <div class="audit-track">
           <article class="audit-block" data-block="search">
+            <span class="audit-block-tag">Search experience</span>
             <div class="audit-block-anim">
-              <span class="audit-block-tag">Search experience</span>
               <iframe class="audit-frame" data-loader="/audit/search-loader.html" title="Search results audit"></iframe>
               <div class="audit-ghost" aria-hidden="true">
-                <span class="gl" style="height:16px;width:55%"></span>
-                <span class="gl gl-grow"></span>
-                <span class="gl" style="height:12px;width:80%"></span>
-                <span class="gl" style="height:12px;width:65%"></span>
-                <span class="gl" style="height:46px"></span>
+                <span class="gl gl-bar"></span>
+                <div class="gl-grid"><span class="gl"></span><span class="gl"></span><span class="gl"></span><span class="gl"></span><span class="gl"></span><span class="gl"></span></div>
+                <span class="gl gl-line"></span>
+                <span class="gl gl-line gl-short"></span>
               </div>
             </div>
             <aside class="audit-block-list">
@@ -557,15 +554,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           </article>
 
           <article class="audit-block" data-block="pdp">
+            <span class="audit-block-tag">Product page completeness</span>
             <div class="audit-block-anim">
-              <span class="audit-block-tag">Product page</span>
               <iframe class="audit-frame" data-loader="/audit/pdp-loader.html" title="Product page audit"></iframe>
               <div class="audit-ghost" aria-hidden="true">
-                <span class="gl" style="height:16px;width:60%"></span>
-                <span class="gl gl-grow"></span>
-                <span class="gl" style="height:12px;width:75%"></span>
-                <span class="gl" style="height:12px;width:50%"></span>
-                <span class="gl" style="height:46px"></span>
+                <span class="gl gl-bar"></span>
+                <div class="gl-grid"><span class="gl"></span><span class="gl"></span><span class="gl"></span><span class="gl"></span><span class="gl"></span><span class="gl"></span></div>
+                <span class="gl gl-line"></span>
+                <span class="gl gl-line gl-short"></span>
               </div>
             </div>
             <aside class="audit-block-list">
@@ -1056,8 +1052,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        They're removed once the block goes live (.is-live, set in JS when
        the loader iframe is ready). */
     .audit-ghost { position: absolute; inset: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #0e0f13; }
-    .audit-ghost .gl, .audit-ghost-rows li { background: rgba(255,255,255,0.055); border-radius: 6px; position: relative; overflow: hidden; }
-    .audit-ghost .gl.gl-grow { flex: 1 1 auto; }
+    .audit-ghost .gl, .audit-ghost-rows li { background: rgba(255,255,255,0.05); border-radius: 6px; position: relative; overflow: hidden; }
+    /* greyscale page skeleton: header bar, a grid of cards, a couple of lines */
+    .audit-ghost .gl-bar { height: 24px; width: 60%; }
+    .audit-ghost .gl-grid { flex: 1 1 auto; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 1fr; gap: 10px; }
+    .audit-ghost .gl-grid .gl { height: 100%; }
+    .audit-ghost .gl-line { height: 11px; }
+    .audit-ghost .gl-line.gl-short { width: 48%; }
     .audit-ghost-rows { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
     .audit-ghost-rows li { height: 11px; width: 100%; }
     .audit-ghost-rows li:nth-child(2n) { width: 82%; }
@@ -1090,14 +1091,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-carousel { background: #16171d; }
     @keyframes audit-open { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
     .audit-carousel.is-open { animation: audit-open .5s ease both; }
-    /* Block title — yellow, pinned to the upper-left corner of the frame box,
-       on a dark pill so it stays legible over the scanned page (and the ghost). */
+    /* Block title — yellow, in its OWN row above the frame (spans the full
+       block width); the only colour in the block before the scan runs. */
     .audit-block-tag {
-      position: absolute; top: 10px; left: 10px; z-index: 4;
-      font-family: ui-monospace, monospace; font-size: 12px; font-weight: 600;
+      grid-column: 1 / -1;
+      font-family: ui-monospace, monospace; font-size: 13px; font-weight: 600;
       letter-spacing: 0.14em; text-transform: uppercase; color: #fae194;
-      background: rgba(8, 9, 12, 0.74); border: 1px solid rgba(250, 225, 148, 0.28);
-      padding: 6px 11px; border-radius: 8px;
+      margin: 2px 0 2px;
     }
     .audit-checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
     /* Compact row: tiny ✓/✕ + truncating label + value. No left rail, tight margins. */
