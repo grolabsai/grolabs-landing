@@ -1799,40 +1799,78 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         Grow a company
       </h2>
 
-      <!-- Narrow dark card (quote + punchline) on the LEFT; the supporting
-           narrative is moved OUT of the card to the RIGHT as low-contrast
-           text on the yellow surface. items-start + matching top padding
-           (lg:pt-xl ↔ the card's md:p-xl) aligns the paragraph's first
-           line with the quote's first line. Phone mockup removed. -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg lg:gap-2xl items-start">
-        <div class="rounded-xl p-lg md:p-xl text-body-md leading-relaxed" style="background:#1c1d24; color:rgba(237,234,224,0.7);">
-          <blockquote class="border-l border-primary/30 pl-md mb-xl">
-            <p class="text-white text-body-lg italic leading-snug mb-sm">
-              &ldquo;Most entrepreneurs fail because they're working
-              <span class="text-primary font-medium not-italic">in their business</span>
-              rather than
-              <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
-            </p>
-            <footer class="text-body-sm text-zinc-500 not-italic">
-              — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
-            </footer>
-          </blockquote>
+      <!-- 40/60 split. LEFT (40%): the dark quote/punchline card with the
+           supporting narrative moved underneath it. RIGHT (60%): the animated
+           traffic-monitoring dashboard (iframe, transparent so the yellow band
+           shows through; auto-plays once on scroll). -->
+      <div class="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-lg lg:gap-2xl items-start lg:items-stretch">
+        <div class="lg:flex lg:flex-col lg:justify-between">
+          <div class="rounded-xl p-lg md:p-xl text-body-md leading-relaxed" style="background:#1c1d24; color:rgba(237,234,224,0.7);">
+            <blockquote class="border-l border-primary/30 pl-md mb-xl">
+              <p class="text-white text-body-lg italic leading-snug mb-sm">
+                &ldquo;Most entrepreneurs fail because they're working
+                <span class="text-primary font-medium not-italic">in their business</span>
+                rather than
+                <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
+              </p>
+              <footer class="text-body-sm text-zinc-500 not-italic">
+                — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
+              </footer>
+            </blockquote>
 
-          <p>
-            <span class="text-primary font-medium">No news = good news.</span>
-            <span class="text-white">If something requires your attention, we'll let you know.</span>
+            <p>
+              <span class="text-primary font-medium">No news = good news.</span>
+              <span class="text-white">If something requires your attention, we'll let you know.</span>
+            </p>
+          </div>
+
+          <p class="text-black/45 text-body-md leading-relaxed mt-lg">
+            Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
+            hour you spend in the dashboard is an hour you're not spending on
+            the company — on the strategy, the team, the next product, the
+            partnerships only you can build.
           </p>
         </div>
 
-        <p class="text-black/45 text-body-md leading-relaxed mt-md lg:mt-0 lg:pt-xl">
-          Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
-          hour you spend in the dashboard is an hour you're not spending on
-          the company — on the strategy, the team, the next product, the
-          partnerships only you can build.
-        </p>
+        <div class="td-frame-wrap">
+          <iframe
+            class="td-frame"
+            src={`${base}/anim/traffic-dashboard.html`}
+            title="Traffic monitoring dashboard — live animation"
+            loading="lazy"
+            scrolling="no"
+          ></iframe>
+        </div>
       </div>
     </div>
   </section>
+
+  <style is:global>
+    .td-frame-wrap { width: 100%; }
+    .td-frame {
+      width: 100%;
+      height: 820px;            /* initial; resized to content via postMessage */
+      border: 0;
+      display: block;
+      background: transparent;   /* transparent → the yellow band shows through */
+      color-scheme: light;
+    }
+    @media (max-width: 1023px) { .td-frame { height: 1500px; } }
+  </style>
+
+  <script is:inline>
+    // Size the traffic-dashboard iframe to its reported content height.
+    (function () {
+      var frame = document.querySelector('.td-frame');
+      if (!frame) return;
+      window.addEventListener('message', function (e) {
+        var d = e.data;
+        if (d && d.type === 'td-height' && typeof d.height === 'number') {
+          frame.style.height = Math.max(320, d.height) + 'px';
+        }
+      });
+    })();
+  </script>
 
   {provider === 'calendly' && (
     <>

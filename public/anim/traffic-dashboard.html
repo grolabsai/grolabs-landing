@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GRO — Traffic Monitoring Dashboard (embed reference)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* ════════════════════════════════════════════════════════════════════
+     GRO Traffic Monitoring Dashboard — embeddable block
+     - Self-contained. All styles scoped under .gro-td.
+     - The dashboard itself has a TRANSPARENT background (dark glass tiles),
+       so it sits on any surface.
+     - PARAMETER: set data-bg="yellow" | "dark" | "light" on the .gro-td
+       wrapper to drop a backdrop behind it. Omit (or "transparent") to
+       inherit whatever section it's placed in (e.g. the page's yellow band).
+     ════════════════════════════════════════════════════════════════════ */
+  .gro-td {
+    --accent: #fae194;
+    --tile: rgba(18,18,22,0.92);
+    --border: rgba(255,255,255,0.08);
+    --text: #EDEAE0;
+    --text-strong: #FFFFFF;
+    --t2: rgba(237,234,224,0.6);
+    --t3: rgba(237,234,224,0.4);
+    --success: #34d399;
+    --success-bg: rgba(16,185,129,0.14);
+    --danger: #fca5a5;
+    --danger-bg: rgba(239,68,68,0.14);
+    --warning: #fbbf24;
+    --font: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+
+    display: flex;
+    justify-content: center;
+    background: transparent;
+    font-family: var(--font);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* ── data-bg parameter ── */
+  .gro-td[data-bg="yellow"] { background: #fae194; padding: 48px 24px; }
+  .gro-td[data-bg="dark"]   { background: #0c0c0f; padding: 48px 24px; }
+  .gro-td[data-bg="light"]  { background: #f4f3ef; padding: 48px 24px; }
+
+  .gro-td * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .gro-td .dash {
+    width: 100%;
+    max-width: 1280px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 10px;
+    background: transparent;
+  }
+
+  .gro-td .tile {
+    position: relative;
+    background: var(--tile);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 14px;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 8px 24px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* Section eyebrow row */
+  .gro-td .sec-label { grid-column: span 12; display: flex; align-items: center; gap: 10px; margin-top: 0; }
+  .gro-td .sec-label .txt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t3); white-space: nowrap; }
+  .gro-td .sec-label .rule { flex: 1; height: 1px; background: var(--border); }
+  .gro-td .sec-label .meta { font-family: var(--mono); font-size: 10px; color: rgba(237,234,224,0.26); letter-spacing: 0.04em; }
+
+  /* Tile header */
+  .gro-td .tile-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .gro-td .tile-label { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--t3); }
+  .gro-td .tile-sub { font-family: var(--mono); font-size: 9px; color: rgba(237,234,224,0.26); letter-spacing: 0.05em; }
+
+  /* KPI tiles */
+  .gro-td .kpi { grid-column: span 2; }
+  .gro-td .kpi .big { font-size: 24px; font-weight: 700; color: var(--text-strong); font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: -0.01em; white-space: nowrap; }
+  .gro-td .kpi-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: 2px; }
+  .gro-td .delta { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; padding: 2px 6px; border-radius: 5px; }
+  .gro-td .delta.up { color: var(--success); background: var(--success-bg); }
+  .gro-td .delta.down { color: var(--danger); background: var(--danger-bg); }
+  .gro-td .delta svg { width: 9px; height: 9px; }
+  .gro-td .spark { width: 100%; height: 30px; margin-top: 9px; }
+
+  /* Funnel */
+  .gro-td .funnel-step { display: flex; flex-direction: column; gap: 3px; margin-bottom: 7px; }
+  .gro-td .funnel-step:last-child { margin-bottom: 0; }
+  .gro-td .fs-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .gro-td .fs-name { font-size: 11.5px; color: var(--text); font-weight: 500; }
+  .gro-td .fs-val { font-family: var(--mono); font-size: 11px; color: var(--text-strong); font-variant-numeric: tabular-nums; }
+  .gro-td .fs-bar { height: 9px; border-radius: 3px; background: rgba(255,255,255,0.05); overflow: hidden; }
+  .gro-td .fs-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #fae194, #d9bd6a); }
+  .gro-td .fs-pct { font-family: var(--mono); font-size: 9.5px; color: var(--t3); }
+
+  /* Gauge / donut */
+  .gro-td .ring-wrap { display: flex; align-items: center; gap: 14px; flex: 1; }
+  .gro-td .ring { position: relative; width: 96px; height: 96px; flex-shrink: 0; }
+  .gro-td .ring .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .gro-td .ring .center .v { font-size: 19px; font-weight: 700; color: var(--text-strong); font-variant-numeric: tabular-nums; line-height: 1; }
+  .gro-td .ring .center .l { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t3); margin-top: 3px; }
+  .gro-td .ring-legend { display: flex; flex-direction: column; gap: 8px; font-size: 11px; }
+  .gro-td .ring-legend .row { display: flex; align-items: center; gap: 7px; color: var(--t2); }
+  .gro-td .ring-legend .dot { width: 8px; height: 8px; border-radius: 2px; }
+  .gro-td .ring-legend .row .num { margin-left: auto; font-family: var(--mono); color: var(--text); font-variant-numeric: tabular-nums; }
+
+  /* Line chart tiles */
+  .gro-td .line-tile { grid-column: span 4; }
+  .gro-td .chart-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  .gro-td .chart-figure { display: flex; align-items: baseline; gap: 8px; }
+  .gro-td .chart-figure .v { font-size: 18px; font-weight: 700; color: var(--text-strong); font-variant-numeric: tabular-nums; }
+  .gro-td .chart { width: 100%; height: 96px; }
+
+  /* Alert (Traffic) tile — full width, bottom */
+  .gro-td .alert-tile { grid-column: span 12; }
+  .gro-td .alert-tile .chart-tall { height: 150px; }
+  .gro-td .alert-tile.alarm { border-color: rgba(239,68,68,0.85); box-shadow: 0 0 0 1px rgba(239,68,68,0.5), 0 16px 50px rgba(239,68,68,0.3); transition: box-shadow .4s ease, border-color .4s ease; }
+  .gro-td .thresh-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em; fill: var(--danger); }
+
+  /* Dim the rest of the dashboard when the alert fires */
+  .gro-td .dash.dimmed .tile:not(.alert-tile), .gro-td .dash.dimmed .sec-label { opacity: 0.32; filter: saturate(0.5); transition: opacity 0.6s ease, filter 0.6s ease; }
+  .gro-td .dash.dimmed .alert-tile { transform: translateY(-6px) scale(1.012); transition: transform 0.6s cubic-bezier(.2,.8,.2,1); z-index: 5; }
+
+  /* In-block alert card (inside the Traffic tile) */
+  .gro-td .alert-card {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 410px; max-width: calc(100% - 40px);
+    background: rgba(24,25,31,0.94);
+    backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid rgba(239,68,68,0.6); border-radius: 16px;
+    box-shadow: 0 18px 55px rgba(239,68,68,0.5), 0 0 0 1px rgba(239,68,68,0.3);
+    padding: 13px 16px; display: flex; gap: 13px; align-items: center;
+    z-index: 8; opacity: 0; pointer-events: none;
+  }
+  .gro-td .alert-card.show { animation: groAlertBlink 1.2s ease forwards; }
+  @keyframes groAlertBlink { 0%{opacity:0;} 12%{opacity:1;} 27%{opacity:0;} 42%{opacity:1;} 57%{opacity:0;} 72%,100%{opacity:1;} }
+  .gro-td .ac-icon { width: 36px; height: 36px; border-radius: 9px; background: #ef4444; display: grid; place-items: center; flex-shrink: 0; box-shadow: 0 4px 14px rgba(239,68,68,0.5); }
+  .gro-td .ac-icon span { font-size: 22px; font-weight: 800; color: #fff; line-height: 1; }
+  .gro-td .ac-body { flex: 1; min-width: 0; }
+  .gro-td .ac-title { font-size: 14px; font-weight: 700; color: var(--text-strong); }
+  .gro-td .ac-title b { color: #fca5a5; }
+  .gro-td .ac-msg { font-size: 12.5px; color: var(--t2); line-height: 1.45; margin-top: 2px; }
+
+  /* ── ANIMATION: ghost-loader base state (data elements hidden until reveal) ── */
+  .gro-td .dash.anim .big,
+  .gro-td .dash.anim .ring .center .v,
+  .gro-td .dash.anim .chart-figure .v,
+  .gro-td .dash.anim .fs-val, .gro-td .dash.anim .goal-val, .gro-td .dash.anim .stack-val,
+  .gro-td .dash.anim .tile-sub,
+  .gro-td .dash.anim .delta { opacity: 0; }
+  .gro-td .dash.anim .fs-fill, .gro-td .dash.anim .goal-fill, .gro-td .dash.anim .stack-fill { transition: width 0.65s cubic-bezier(.4,0,.2,1); }
+  .gro-td .dash.anim .line-path, .gro-td .dash.anim .ring-val, .gro-td .dash.anim .area-fill, .gro-td .dash.anim .end-dot { opacity: 0; }
+  .gro-td .dash.anim .area-fill, .gro-td .dash.anim .end-dot { transition: opacity 0.5s ease; }
+  .gro-td .dash.anim .bar { transform: scaleY(0); transform-box: fill-box; transform-origin: 50% 100%; transition: transform 0.5s cubic-bezier(.3,1.1,.5,1); }
+  .gro-td .dash.anim .tile.pending::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%);
+    background-size: 220% 100%; animation: groShimmer 1.5s linear infinite;
+  }
+  @keyframes groShimmer { 0% { background-position: 130% 0; } 100% { background-position: -130% 0; } }
+
+  @media (max-width: 1040px) {
+    .gro-td .kpi { grid-column: span 4; }
+    .gro-td .line-tile { grid-column: span 6; }
+  }
+  @media (max-width: 720px) {
+    .gro-td .kpi { grid-column: span 6; }
+    .gro-td .line-tile, .gro-td [data-col] { grid-column: span 12 !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gro-td .alert-card.show { animation: none; opacity: 1; }
+  }
+</style>
+</head>
+<body style="margin:0;">
+
+<!-- ░░ DROP-IN BLOCK — set data-bg to "yellow" | "dark" | "light", or remove it to inherit the page ░░ -->
+<section class="gro-td">
+  <div class="dash anim" data-screen-label="Traffic Monitoring Dashboard">
+
+    <!-- ═══ ACQUISITION & ENGAGEMENT — 6 GA metric tiles ═══ -->
+    <div class="sec-label">
+      <span class="txt">Acquisition &amp; Engagement</span>
+      <span class="rule"></span>
+      <span class="meta">6 metrics · auto-refresh 60s</span>
+    </div>
+
+    <div class="tile kpi">
+      <div class="tile-head"><span class="tile-label">Active users</span></div>
+      <div class="kpi-row"><span class="big">12,481</span><span class="delta up"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7 L5 3 L8 7"/></svg>4.2%</span></div>
+      <svg class="spark" data-chart="spark" data-seed="11" data-color="#fae194"></svg>
+    </div>
+    <div class="tile kpi">
+      <div class="tile-head"><span class="tile-label">Sessions</span></div>
+      <div class="kpi-row"><span class="big">38,902</span><span class="delta up"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7 L5 3 L8 7"/></svg>2.1%</span></div>
+      <svg class="spark" data-chart="spark" data-seed="23" data-color="#fae194"></svg>
+    </div>
+    <div class="tile kpi">
+      <div class="tile-head"><span class="tile-label">Engagement rate</span></div>
+      <div class="kpi-row"><span class="big">61.4%</span><span class="delta up"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7 L5 3 L8 7"/></svg>0.8%</span></div>
+      <svg class="spark" data-chart="spark" data-seed="7" data-color="#9bb38a"></svg>
+    </div>
+    <div class="tile kpi">
+      <div class="tile-head"><span class="tile-label">Avg. engagement</span></div>
+      <div class="kpi-row"><span class="big">2m 14s</span><span class="delta down"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 3 L5 7 L8 3"/></svg>3.1%</span></div>
+      <svg class="spark" data-chart="spark" data-seed="42" data-color="#fca5a5"></svg>
+    </div>
+    <div class="tile kpi">
+      <div class="tile-head"><span class="tile-label">Event count</span></div>
+      <div class="kpi-row"><span class="big">184.2K</span><span class="delta up"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7 L5 3 L8 7"/></svg>6.7%</span></div>
+      <svg class="spark" data-chart="spark" data-seed="55" data-color="#fae194"></svg>
+    </div>
+    <div class="tile kpi">
+      <div class="tile-head"><span class="tile-label">New users</span></div>
+      <div class="kpi-row"><span class="big">7,233</span><span class="delta up"><svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7 L5 3 L8 7"/></svg>1.4%</span></div>
+      <svg class="spark" data-chart="spark" data-seed="68" data-color="#9bb38a"></svg>
+    </div>
+
+    <!-- ═══ CONVERSIONS & FUNNELS — 3 blocks ═══ -->
+    <div class="sec-label">
+      <span class="txt">Conversions &amp; Funnels</span>
+      <span class="rule"></span>
+      <span class="meta">3 funnels · goal tracking on</span>
+    </div>
+
+    <div class="tile" data-col style="grid-column: span 6;">
+      <div class="tile-head"><span class="tile-label">Purchase funnel</span><span class="tile-sub">overall CVR 3.8%</span></div>
+      <div class="funnel-step">
+        <div class="fs-top"><span class="fs-name">Sessions</span><span class="fs-val">38,902</span></div>
+        <div class="fs-bar"><div class="fs-fill" style="width:100%"></div></div>
+      </div>
+      <div class="funnel-step">
+        <div class="fs-top"><span class="fs-name">Product views</span><span class="fs-val">19,440 · <span class="fs-pct">50.0%</span></span></div>
+        <div class="fs-bar"><div class="fs-fill" style="width:50%"></div></div>
+      </div>
+      <div class="funnel-step">
+        <div class="fs-top"><span class="fs-name">Add to cart</span><span class="fs-val">6,210 · <span class="fs-pct">31.9%</span></span></div>
+        <div class="fs-bar"><div class="fs-fill" style="width:31.9%"></div></div>
+      </div>
+      <div class="funnel-step">
+        <div class="fs-top"><span class="fs-name">Begin checkout</span><span class="fs-val">3,104 · <span class="fs-pct">50.0%</span></span></div>
+        <div class="fs-bar"><div class="fs-fill" style="width:16%"></div></div>
+      </div>
+      <div class="funnel-step">
+        <div class="fs-top"><span class="fs-name">Purchase</span><span class="fs-val">1,478 · <span class="fs-pct">47.6%</span></span></div>
+        <div class="fs-bar"><div class="fs-fill" style="width:7.6%"></div></div>
+      </div>
+    </div>
+
+    <div class="tile" data-col style="grid-column: span 3;">
+      <div class="tile-head"><span class="tile-label">Conversion rate</span><span class="tile-sub">target 4.0%</span></div>
+      <div class="ring-wrap">
+        <div class="ring"><svg viewBox="0 0 100 100" data-chart="gauge" data-value="3.8" data-max="5" data-color="#fae194"></svg>
+          <div class="center"><span class="v">3.8%</span><span class="l">CVR</span></div>
+        </div>
+        <div class="ring-legend">
+          <div class="row"><span class="dot" style="background:#fae194"></span>Achieved<span class="num">3.8%</span></div>
+          <div class="row"><span class="dot" style="background:rgba(255,255,255,0.14)"></span>To target<span class="num">0.2%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tile" data-col style="grid-column: span 3;">
+      <div class="tile-head"><span class="tile-label">Checkout completion</span></div>
+      <div class="ring-wrap">
+        <div class="ring"><svg viewBox="0 0 100 100" data-chart="donut" data-value="47.6" data-color="#9bb38a"></svg>
+          <div class="center"><span class="v">47.6%</span><span class="l">completed</span></div>
+        </div>
+        <div class="ring-legend">
+          <div class="row"><span class="dot" style="background:#9bb38a"></span>Completed<span class="num">1,478</span></div>
+          <div class="row"><span class="dot" style="background:rgba(255,255,255,0.14)"></span>Dropped<span class="num">1,626</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TRENDS — 3 line charts (Traffic shown as the bottom alert row) ═══ -->
+    <div class="sec-label">
+      <span class="txt">Trends</span>
+      <span class="rule"></span>
+      <span class="meta">3 time series</span>
+    </div>
+
+    <div class="tile line-tile">
+      <div class="chart-head">
+        <div><span class="tile-label">Revenue · 30 days</span><div class="chart-figure" style="margin-top:4px;"><span class="v">$214.7K</span><span class="delta up" style="font-size:10px;">+8.9%</span></div></div>
+      </div>
+      <svg class="chart" data-chart="area" data-seed="9" data-color="#9bb38a"></svg>
+    </div>
+
+    <div class="tile line-tile">
+      <div class="chart-head">
+        <div><span class="tile-label">Bounce rate</span><div class="chart-figure" style="margin-top:4px;"><span class="v">38.6%</span><span class="delta down" style="font-size:10px;">−1.2%</span></div></div>
+      </div>
+      <svg class="chart" data-chart="line" data-seed="33" data-color="#fbbf24"></svg>
+    </div>
+
+    <div class="tile line-tile">
+      <div class="chart-head">
+        <div><span class="tile-label">Realtime users · /min</span><div class="chart-figure" style="margin-top:4px;"><span class="v">428</span><span class="delta up" style="font-size:10px;">live</span></div></div>
+      </div>
+      <svg class="chart" data-chart="bars" data-seed="61" data-color="#fae194"></svg>
+    </div>
+
+    <!-- Alert row — Traffic, full width at the bottom -->
+    <div class="tile alert-tile" id="gro-alert-tile">
+      <div class="chart-head">
+        <div><span class="tile-label">Traffic · live · last 24h</span><div class="chart-figure" style="margin-top:4px;"><span class="v" id="gro-alert-val">11,902</span><span class="delta up" id="gro-alert-delta" style="font-size:11px;">+4.2%</span></div></div>
+        <span class="tile-sub" id="gro-alert-sub">vs. prior 24h · threshold −5%</span>
+      </div>
+      <svg class="chart chart-tall" id="gro-alert-chart"></svg>
+      <!-- In-block alert: blinks twice, then stays -->
+      <div class="alert-card" id="gro-alert-card">
+        <div class="ac-icon"><span>!</span></div>
+        <div class="ac-body">
+          <div class="ac-title">Traffic dropped <b>5.3%</b></div>
+          <div class="ac-msg">Live traffic fell below your 5% threshold in the last hour.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+(function(){
+  const ROOT = document.querySelector(".gro-td");
+  const dash = ROOT.querySelector(".dash");
+
+  // ── deterministic PRNG so chart shapes are stable ──
+  function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+  function series(seed,n,opts){opts=opts||{};const rnd=mulberry32(seed);const trend=opts.trend==null?0.4:opts.trend;const noise=opts.noise==null?0.5:opts.noise;const pts=[];let v=0.45+rnd()*0.1;for(let i=0;i<n;i++){v+=(rnd()-0.5)*noise*0.12+(trend/n)*0.5;v=Math.max(0.08,Math.min(0.95,v));pts.push(v);}return pts;}
+  function toCoords(vals,w,h,pad){pad=pad||0;const n=vals.length;return vals.map((v,i)=>({x:pad+(i/(n-1))*(w-2*pad),y:h-pad-v*(h-2*pad)}));}
+  function smoothPath(c){if(c.length<2)return"";let d=`M ${c[0].x.toFixed(1)} ${c[0].y.toFixed(1)}`;for(let i=0;i<c.length-1;i++){const p0=c[i],p1=c[i+1];const mx=(p0.x+p1.x)/2;d+=` C ${mx.toFixed(1)} ${p0.y.toFixed(1)} ${mx.toFixed(1)} ${p1.y.toFixed(1)} ${p1.x.toFixed(1)} ${p1.y.toFixed(1)}`;}return d;}
+  const SVGNS="http://www.w3.org/2000/svg";
+  function el(tag,attrs){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+  function gridLines(svg,w,h,rows){for(let i=1;i<rows;i++){const y=(i/rows)*h;svg.appendChild(el("line",{x1:0,y1:y,x2:w,y2:y,stroke:"rgba(255,255,255,0.05)","stroke-width":1}));}}
+  function polar(cx,cy,r,deg){const a=(deg-90)*Math.PI/180;return{x:+(cx+r*Math.cos(a)).toFixed(2),y:+(cy+r*Math.sin(a)).toFixed(2)};}
+  function arcPath(cx,cy,r,a0,a1){const p0=polar(cx,cy,r,a0),p1=polar(cx,cy,r,a1);const large=(a1-a0)>180?1:0;return `M ${p0.x} ${p0.y} A ${r} ${r} 0 ${large} 1 ${p1.x} ${p1.y}`;}
+
+  function renderSpark(svg){const w=200,h=30;svg.setAttribute("viewBox",`0 0 ${w} ${h}`);svg.setAttribute("preserveAspectRatio","none");const color=svg.dataset.color||"#fae194";const c=toCoords(series(+svg.dataset.seed,18,{trend:0.5,noise:0.6}),w,h,3);const grad="g"+Math.random().toString(36).slice(2,7);const defs=el("defs",{}),lg=el("linearGradient",{id:grad,x1:0,y1:0,x2:0,y2:1});lg.appendChild(el("stop",{offset:"0%","stop-color":color,"stop-opacity":0.28}));lg.appendChild(el("stop",{offset:"100%","stop-color":color,"stop-opacity":0}));defs.appendChild(lg);svg.appendChild(defs);svg.appendChild(el("path",{d:smoothPath(c)+` L ${w-3} ${h} L 3 ${h} Z`,fill:`url(#${grad})`,class:"area-fill"}));svg.appendChild(el("path",{d:smoothPath(c),fill:"none",stroke:color,"stroke-width":1.6,"stroke-linecap":"round",class:"line-path"}));const last=c[c.length-1];svg.appendChild(el("circle",{cx:last.x,cy:last.y,r:2,fill:color,class:"end-dot"}));}
+  function renderAreaOrLine(svg,withArea){const w=320,h=96;svg.setAttribute("viewBox",`0 0 ${w} ${h}`);svg.setAttribute("preserveAspectRatio","none");const color=svg.dataset.color||"#fae194";gridLines(svg,w,h,4);const c=toCoords(series(+svg.dataset.seed,30,{trend:withArea?0.5:0.2,noise:0.7}),w,h,6);if(withArea){const grad="g"+Math.random().toString(36).slice(2,7);const defs=el("defs",{}),lg=el("linearGradient",{id:grad,x1:0,y1:0,x2:0,y2:1});lg.appendChild(el("stop",{offset:"0%","stop-color":color,"stop-opacity":0.26}));lg.appendChild(el("stop",{offset:"100%","stop-color":color,"stop-opacity":0}));defs.appendChild(lg);svg.appendChild(defs);svg.appendChild(el("path",{d:smoothPath(c)+` L ${w-6} ${h} L 6 ${h} Z`,fill:`url(#${grad})`,class:"area-fill"}));}svg.appendChild(el("path",{d:smoothPath(c),fill:"none",stroke:color,"stroke-width":2,"stroke-linecap":"round","stroke-linejoin":"round",class:"line-path"}));const last=c[c.length-1];svg.appendChild(el("circle",{cx:last.x,cy:last.y,r:2.5,fill:color,class:"end-dot"}));}
+  function renderBars(svg){const w=320,h=96;svg.setAttribute("viewBox",`0 0 ${w} ${h}`);svg.setAttribute("preserveAspectRatio","none");const color=svg.dataset.color||"#fae194";gridLines(svg,w,h,4);const vals=series(+svg.dataset.seed,30,{trend:0.1,noise:0.9});const n=vals.length,gap=2,bw=(w-12-(n-1)*gap)/n;vals.forEach((v,i)=>{const bh=v*(h-12),x=6+i*(bw+gap);svg.appendChild(el("rect",{x:x.toFixed(1),y:(h-bh).toFixed(1),width:bw.toFixed(1),height:bh.toFixed(1),rx:1.2,fill:color,opacity:i>=n-1?1:0.55,class:"bar"}));});}
+  function renderRing(svg,isDonut){const value=+svg.dataset.value,max=+svg.dataset.max||100,color=svg.dataset.color||"#fae194";const cx=50,cy=50,r=38,sw=10;svg.setAttribute("viewBox","0 0 100 100");const frac=Math.max(0.001,Math.min(0.999,value/(isDonut?100:max)));if(isDonut){svg.appendChild(el("circle",{cx,cy,r,fill:"none",stroke:"rgba(255,255,255,0.10)","stroke-width":sw}));svg.appendChild(el("path",{d:arcPath(cx,cy,r,0,360*frac),fill:"none",stroke:color,"stroke-width":sw,"stroke-linecap":"round",class:"ring-val"}));}else{const start=135,sweep=270;svg.appendChild(el("path",{d:arcPath(cx,cy,r,start,start+sweep),fill:"none",stroke:"rgba(255,255,255,0.10)","stroke-width":sw,"stroke-linecap":"round"}));svg.appendChild(el("path",{d:arcPath(cx,cy,r,start,start+sweep*frac),fill:"none",stroke:color,"stroke-width":sw,"stroke-linecap":"round",class:"ring-val"}));}}
+  function renderAlert(svg){const w=1200,h=150;svg.setAttribute("viewBox",`0 0 ${w} ${h}`);svg.setAttribute("preserveAspectRatio","none");gridLines(svg,w,h,4);const ys=[0.40,0.43,0.45,0.44,0.48,0.50,0.52,0.51,0.55,0.58,0.60,0.62,0.66,0.34];const c=toCoords(ys,w,h,12);const thy=(h-12-0.50*(h-24)).toFixed(1);svg.appendChild(el("line",{x1:12,y1:thy,x2:w-104,y2:thy,stroke:"rgba(252,165,165,0.65)","stroke-width":1.3,"stroke-dasharray":"6 6",class:"thresh",opacity:0}));const lbl=el("text",{x:w-98,y:(+thy+4),"font-size":13,class:"thresh-label",opacity:0});lbl.textContent="threshold −5%";svg.appendChild(lbl);const rising=c.slice(0,13);const grad="ga"+Math.random().toString(36).slice(2,7);const defs=el("defs",{}),lg=el("linearGradient",{id:grad,x1:0,y1:0,x2:0,y2:1});lg.appendChild(el("stop",{offset:"0%","stop-color":"#fae194","stop-opacity":0.22}));lg.appendChild(el("stop",{offset:"100%","stop-color":"#fae194","stop-opacity":0}));defs.appendChild(lg);svg.appendChild(defs);svg.appendChild(el("path",{d:smoothPath(rising)+` L ${rising[12].x} ${h} L ${rising[0].x} ${h} Z`,fill:`url(#${grad})`,class:"area-fill"}));svg.appendChild(el("path",{d:smoothPath(rising),fill:"none",stroke:"#fae194","stroke-width":2.5,"stroke-linecap":"round","stroke-linejoin":"round",class:"line-path"}));svg.appendChild(el("path",{d:`M ${c[12].x} ${c[12].y} L ${c[13].x} ${c[13].y}`,fill:"none",stroke:"#ef4444","stroke-width":3,"stroke-linecap":"round",class:"drop-path",opacity:0}));svg.appendChild(el("circle",{cx:c[13].x,cy:c[13].y,r:4.5,fill:"#ef4444",class:"end-dot",opacity:0}));}
+
+  // build charts
+  ROOT.querySelectorAll("[data-chart]").forEach(svg=>{const t=svg.dataset.chart;if(t==="spark")renderSpark(svg);else if(t==="area")renderAreaOrLine(svg,true);else if(t==="line")renderAreaOrLine(svg,false);else if(t==="bars")renderBars(svg);else if(t==="gauge")renderRing(svg,false);else if(t==="donut")renderRing(svg,true);});
+  renderAlert(ROOT.querySelector("#gro-alert-chart"));
+
+  const TEXTNUMS=".big, .ring .center .v, .chart-figure .v, .tile-sub, .fs-val, .goal-val, .stack-val";
+  ROOT.querySelectorAll(TEXTNUMS).forEach(n=>n._target=n.textContent.trim());
+  ROOT.querySelectorAll(".fs-fill,.goal-fill,.stack-fill").forEach(f=>{f.dataset.w=f.style.width||"0%";f.style.width="0%";});
+
+  function drawStroke(p,dur,delay){const len=p.getTotalLength();p.style.transition="none";p.style.strokeDasharray=len;p.style.strokeDashoffset=len;p.getBoundingClientRect();p.style.opacity=1;p.style.transition=`stroke-dashoffset ${dur}ms cubic-bezier(.4,0,.2,1) ${delay||0}ms`;requestAnimationFrame(()=>{p.style.strokeDashoffset=0;});setTimeout(()=>{p.style.strokeDashoffset=0;},(delay||0)+30);}
+  function fadeIn(elm,delay){elm.style.transition="opacity .45s ease";setTimeout(()=>{elm.style.opacity=1;},delay||0);}
+  function parseNum(s){const m=String(s).match(/^(\D*?)([\d][\d,]*(?:\.\d+)?)(\D*)$/);if(!m)return null;const num=m[2];return{pre:m[1],suf:m[3],val:parseFloat(num.replace(/,/g,"")),dec:(num.split(".")[1]||"").length,comma:num.includes(",")};}
+  function fmtNum(p,v){const useC=p.comma||(!p.dec&&p.val>=1000);const r=p.dec?+v.toFixed(p.dec):Math.round(v);let n=String(r);if(useC)n=Number(r).toLocaleString("en-US",{minimumFractionDigits:p.dec,maximumFractionDigits:p.dec});return p.pre+n+p.suf;}
+  function countUp(elm,dur,delay){const p=parseNum(elm._target);if(!p){fadeIn(elm,delay);return;}setTimeout(()=>{elm.style.transition="none";elm.style.opacity=1;const t0=performance.now();(function tick(now){const k=Math.min(1,(now-t0)/dur);const e=1-Math.pow(1-k,3);elm.textContent=fmtNum(p,p.val*e);if(k<1)requestAnimationFrame(tick);})(t0);setTimeout(()=>{elm.textContent=elm._target;elm.style.opacity=1;},dur+80);},delay||0);}
+  function countTo(elm,from,to,dur,fmt){const t0=performance.now();(function tick(now){const k=Math.min(1,(now-t0)/dur);const e=1-Math.pow(1-k,3);elm.textContent=fmt(from+(to-from)*e);if(k<1)requestAnimationFrame(tick);})(t0);}
+
+  function revealTile(tile){
+    tile.classList.remove("pending");
+    tile.querySelectorAll(".line-path").forEach((p,i)=>drawStroke(p,680,i*130));
+    tile.querySelectorAll(".ring-val").forEach(p=>drawStroke(p,760,60));
+    tile.querySelectorAll(".area-fill").forEach(p=>{p.style.opacity=1;});
+    tile.querySelectorAll(".end-dot").forEach(p=>setTimeout(()=>{p.style.opacity=1;},560));
+    tile.querySelectorAll(".bar").forEach((b,i)=>setTimeout(()=>{b.style.transform="scaleY(1)";},i*20));
+    tile.querySelectorAll(".fs-fill,.goal-fill,.stack-fill").forEach((f,i)=>setTimeout(()=>{f.style.width=f.dataset.w;},i*70));
+    tile.querySelectorAll(".big, .ring .center .v, .chart-figure .v").forEach(n=>countUp(n,720,40));
+    tile.querySelectorAll(".tile-sub, .fs-val, .goal-val, .stack-val").forEach(n=>fadeIn(n,120));
+    tile.querySelectorAll(".delta").forEach(n=>fadeIn(n,340));
+  }
+  function revealAlert(tile){
+    tile.classList.remove("pending");
+    const val=ROOT.querySelector("#gro-alert-val"),delta=ROOT.querySelector("#gro-alert-delta"),sub=ROOT.querySelector("#gro-alert-sub");
+    tile.querySelectorAll(".area-fill").forEach(p=>{p.style.opacity=1;});
+    drawStroke(tile.querySelector(".line-path"),1050,0);
+    fadeIn(sub,150);
+    val.style.transition="none"; val.style.opacity=1; delta.style.opacity=1;
+    countTo(val,0,12540,1050,v=>Math.round(v).toLocaleString("en-US"));
+    setTimeout(()=>{
+      drawStroke(tile.querySelector(".drop-path"),460,0);
+      tile.querySelectorAll(".end-dot").forEach(d=>{d.style.transition="opacity .3s";d.style.opacity=1;});
+      tile.querySelectorAll(".thresh,.thresh-label").forEach(t=>{t.style.transition="opacity .4s";t.style.opacity=1;});
+      countTo(val,12540,11876,560,v=>Math.round(v).toLocaleString("en-US"));
+      setTimeout(()=>{val.textContent="11,876";},640);
+      delta.classList.remove("up"); delta.classList.add("down");
+      delta.innerHTML='<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 3 L5 7 L8 3"/></svg>5.3%';
+      triggerAlarm();
+    },1200);
+  }
+  function triggerAlarm(){
+    ROOT.querySelector("#gro-alert-tile").classList.add("alarm");
+    dash.classList.add("dimmed");
+    setTimeout(()=>{ROOT.querySelector("#gro-alert-card").classList.add("show");},700);
+  }
+  function reset(){
+    dash.classList.remove("dimmed");
+    ROOT.querySelector("#gro-alert-tile").classList.remove("alarm");
+    ROOT.querySelector("#gro-alert-card").classList.remove("show");
+    ROOT.querySelectorAll(".tile").forEach(t=>t.classList.add("pending"));
+    ROOT.querySelectorAll(TEXTNUMS).forEach(n=>{n.style.transition="none";n.style.opacity=0;if(n._target!==undefined)n.textContent=n._target;});
+    ROOT.querySelectorAll(".delta").forEach(n=>{n.style.transition="none";n.style.opacity=0;});
+    const ad=ROOT.querySelector("#gro-alert-delta"); ad.classList.remove("down"); ad.classList.add("up");
+    ad.innerHTML='<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 7 L5 3 L8 7"/></svg>4.2%';
+    ROOT.querySelectorAll(".line-path,.ring-val,.drop-path").forEach(p=>{p.style.transition="none";const len=p.getTotalLength();p.style.strokeDasharray=len;p.style.strokeDashoffset=len;p.style.opacity=0;});
+    ROOT.querySelectorAll(".area-fill,.end-dot,.thresh,.thresh-label").forEach(p=>{p.style.transition="none";p.style.opacity=0;});
+    ROOT.querySelectorAll(".bar").forEach(b=>{b.style.transition="none";b.style.transform="scaleY(0)";});
+    ROOT.querySelectorAll(".fs-fill,.goal-fill,.stack-fill").forEach(f=>{f.style.transition="none";f.style.width="0%";});
+    dash.getBoundingClientRect();
+    ROOT.querySelectorAll(".bar,.fs-fill,.goal-fill,.stack-fill,.area-fill,.end-dot").forEach(x=>{x.style.transition="";});
+  }
+  function gapFor(u){if(u.classList.contains("kpi"))return 150;if(u.classList.contains("line-tile"))return 190;return 230;}
+  let timers=[];
+  function play(){
+    timers.forEach(clearTimeout); timers=[];
+    reset();
+    const units=[...ROOT.querySelectorAll(".tile")];
+    let t=500;
+    units.forEach(u=>{const isAlert=u.id==="gro-alert-tile";if(isAlert)t+=450;const at=t;timers.push(setTimeout(()=>isAlert?revealAlert(u):revealTile(u),at));if(!isAlert)t+=gapFor(u);});
+  }
+
+  // Expose controls + auto-play when scrolled into view (once)
+  window.GROTrafficDashboard = { play, reset };
+  let played=false;
+  function start(){ if(played) return; played=true; play(); }
+  if("IntersectionObserver" in window){
+    const io=new IntersectionObserver((es)=>{es.forEach(e=>{ if(e.isIntersecting){ start(); io.disconnect(); } });},{threshold:0.35});
+    io.observe(dash);
+  } else {
+    requestAnimationFrame(()=>requestAnimationFrame(start));
+  }
+})();
+</script>
+<script>
+  /* Report content height to the host page so it can size the iframe. */
+  (function(){
+    var root = document.querySelector('.gro-td');
+    if(!root) return;
+    function postH(){ parent.postMessage({ type:'td-height', height: Math.ceil(root.getBoundingClientRect().height) + 6 }, '*'); }
+    if(window.ResizeObserver){ new ResizeObserver(postH).observe(root); }
+    addEventListener('load', postH); addEventListener('resize', postH);
+  })();
+</script>
+</body>
+</html>
