@@ -513,7 +513,97 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </section>
   )}
 
+  {/* ============================================================
+       GRO Optimization Engine — self-contained Canvas animation
+       (design handoff: vanilla JS engine shipped as-is at
+       /js/gro-section.js, driven by window.GRO_CONFIG below).
+       The page supplies the heading/intro; the engine renders the
+       finite ~15s "leak identified → classified → fixed → revenue
+       recovered" story. Autoplays on scroll, runs once, then Replay.
+       ============================================================ */}
+  <section class="gro-opt-section reveal" data-screen-label="Optimization Engine">
+    <div class="max-w-page mx-auto w-full">
+      <header class="gro-opt-head">
+        <span class="gro-opt-eyebrow">The Optimization Engine</span>
+        <h2 class="gro-opt-title">
+          We find the leak, then <span class="gro-opt-accent">fix it at the source</span>.
+        </h2>
+        <p class="gro-opt-lede">
+          Every lost search is revenue walking out the door. Watch the engine
+          catch a leak in real time, route it to the right fix — search or
+          catalog — and turn it back into recovered revenue.
+        </p>
+      </header>
+      <div class="gro-opt-canvas-wrap">
+        <canvas id="cv"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    window.GRO_CONFIG = {
+      canvasId: "cv",
+      ambient: ["running shoes","linen shirt","wireless earbuds","yoga mat","cast iron pan","desk lamp","wool socks","coffee grinder","rain jacket","ceramic mug","water bottle","throw blanket","phone case","sun hat","denim jacket","standing desk","cotton tee","hiking poles","wool beanie","steel kettle"],
+      leaks: [
+        { item: "trainers",          classify: "seo",     kind: "synonym",   reason: "0 results · searched by a synonym",      fix: "synonym · trainers → running shoes",   before: "0 results", after: "42 results", revenue: 22600 },
+        { item: "size 11 wide",      classify: "catalog", kind: "attribute", reason: "0 results · width not in product data",  fix: "enriched · width = Wide on 38 SKUs",    before: "0 results", after: "38 results", revenue: 14200 },
+        { item: "waterproff jacket", classify: "seo",     kind: "typo",      reason: "0 results · spelling typo",              fix: "typo tolerance · +1 edit distance",     before: "0 results", after: "19 results", revenue: 9300 },
+        { item: "merino",            classify: "catalog", kind: "attribute", reason: "thin results · material not in catalog", fix: "enriched · material = Merino wool",     before: "3 results", after: "27 results", revenue: 16400 },
+        { item: "keep coffee hot",   classify: "seo",     kind: "semantic",  reason: "0 results · intent not understood",      fix: "semantic match → insulated travel mug", before: "0 results", after: "31 results", revenue: 18400 },
+      ],
+    };
+  </script>
+  <script is:inline src="/js/gro-section.js"></script>
+
   <style is:global>
+    /* ─────────── GRO Optimization Engine (Canvas section) ───────────
+       Self-contained handoff section below the video. The radial bg +
+       canvas-wrap rules come from the design handoff verbatim; the
+       heading/intro above the canvas is authored here from the brand
+       tokens. .gro-opt-canvas-wrap MUST stay position:relative — the
+       engine's Replay button positions itself against it. */
+    .gro-opt-section {
+      background: radial-gradient(130% 130% at 26% 18%, #15161d 0%, #0c0c0f 58%, #07070a 100%);
+      padding: 72px 24px;
+      display: flex;
+      justify-content: center;
+      font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .gro-opt-head { max-width: 720px; margin: 0 0 40px; }
+    .gro-opt-eyebrow {
+      display: block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #fae194;
+      margin-bottom: 16px;
+    }
+    .gro-opt-title {
+      font-family: "Permanent Marker", cursive;
+      font-weight: 400;
+      color: #EDEAE0;
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height: 1.1;
+      margin: 0 0 18px;
+    }
+    .gro-opt-accent { color: #fae194; }
+    .gro-opt-lede {
+      font-family: "Hanken Grotesk", sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: rgba(237, 234, 224, 0.6);
+      margin: 0;
+      max-width: 620px;
+    }
+    .gro-opt-canvas-wrap { position: relative; width: 100%; max-width: 1240px; }
+    .gro-opt-canvas-wrap canvas { display: block; width: 100%; height: auto; }
+    @media (max-width: 859px) {
+      .gro-opt-section { padding: 48px 16px; }
+      .gro-opt-head { margin-bottom: 28px; }
+      .gro-opt-canvas-wrap { max-width: 600px; }
+    }
+
     /* ─────────── Hero v2 — merged hero + stats ─────────── */
     .hero-v2-grid {
       display: grid;
