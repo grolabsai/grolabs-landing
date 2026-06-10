@@ -223,6 +223,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         var iframe = block.querySelector(".audit-frame");
         var ul = block.querySelector("[data-checklist]");
         var lis = buildList(ul, cfg.steps);
+        block.classList.add("is-live");   // real (pending) checklist replaces the ghost rows
 
         await new Promise(function (res) {
           var done = false;
@@ -234,6 +235,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           }, 120);
           setTimeout(function () { clearInterval(poll); finish(); }, 10000);
         });
+        block.classList.add("is-loaded");  // loader iframe ready → drop the ghost frame
         var api = iframe.contentWindow && iframe.contentWindow[cfg.api];
         if (!api) return;
         try { api.resetAll(); api.setUrl(url); } catch (e) {}
@@ -275,10 +277,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         var score = calcLeakScore();
         numEl.textContent = score;
 
-        // Color-code by score: red (bad) → orange → green (good). Orange,
-        // not yellow, so the tier never clashes with the brand yellow.
-        // Message text stays white; CTA stays yellow (set in CSS).
-        var tier = score >= 60 ? "is-red" : score >= 35 ? "is-orange" : "is-green";
+        // Palette is yellow / red / green only (no orange). Anything not
+        // clearly healthy reads red; thresholds can be refined later.
+        var tier = score >= 35 ? "is-red" : "is-green";
         card.classList.add(tier);
         overlay.hidden = false;
       }
@@ -372,7 +373,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         // The section is always visible now, so auto-play the demo scan once it
         // scrolls into view (otherwise the scan frames sit empty until submit).
         var autoRan = false;
-        function autoRun() { if (!autoRan) { autoRan = true; carousel.classList.add("is-open"); runAll(SAMPLE_URL); } }
+        // hold on the ghost loaders for a beat so they read as "ready", then scan
+        function autoRun() { if (!autoRan) { autoRan = true; carousel.classList.add("is-open"); setTimeout(function () { runAll(SAMPLE_URL); }, 1100); } }
         if ("IntersectionObserver" in window) {
           var io = new IntersectionObserver(function (entries) {
             if (entries[0].isIntersecting) { io.disconnect(); autoRun(); }
@@ -506,6 +508,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
       {/* URL + email + Start — horizontal, at the top (relocated from the hero). */}
       <form class="audit-scan-form" data-audit-form novalidate>
+        <p class="hero-v2-audit-hint audit-scan-hint"><svg class="hint-info" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="#fae194" stroke-width="1.6" /><line x1="12" y1="7" x2="12" y2="13" stroke="#fae194" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="16.3" r="1.05" fill="#fae194" /></svg>Paste here the URL of your most important product page.</p>
         <div class="audit-scan-row">
           <div class="hero-v2-audit-field">
             <svg class="hero-v2-audit-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
@@ -523,7 +526,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           </div>
           <button type="submit" class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-scan-btn">Start Diagnostic Scan</button>
         </div>
-        <p class="hero-v2-audit-hint"><svg class="hint-info" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="#fae194" stroke-width="1.6" /><line x1="12" y1="7" x2="12" y2="13" stroke="#fae194" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="16.3" r="1.05" fill="#fae194" /></svg>Paste here the URL of your most important product page.</p>
         <p class="audit-err" data-audit-err role="alert">
           <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 3l10 17H2z" fill="#EDEAE0" />
@@ -538,37 +540,57 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         <div class="audit-track">
           <article class="audit-block" data-block="search">
             <div class="audit-block-anim">
+              <span class="audit-block-tag">Search experience</span>
               <iframe class="audit-frame" data-loader="/audit/search-loader.html" title="Search results audit"></iframe>
+              <div class="audit-ghost" aria-hidden="true">
+                <span class="gl" style="height:16px;width:55%"></span>
+                <span class="gl gl-grow"></span>
+                <span class="gl" style="height:12px;width:80%"></span>
+                <span class="gl" style="height:12px;width:65%"></span>
+                <span class="gl" style="height:46px"></span>
+              </div>
             </div>
             <aside class="audit-block-list">
-              <h4 class="audit-block-list-title">Search experience</h4>
               <ul class="audit-checklist" data-checklist></ul>
+              <ul class="audit-ghost-rows" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li><li></li></ul>
             </aside>
           </article>
 
           <article class="audit-block" data-block="pdp">
             <div class="audit-block-anim">
+              <span class="audit-block-tag">Product page</span>
               <iframe class="audit-frame" data-loader="/audit/pdp-loader.html" title="Product page audit"></iframe>
+              <div class="audit-ghost" aria-hidden="true">
+                <span class="gl" style="height:16px;width:60%"></span>
+                <span class="gl gl-grow"></span>
+                <span class="gl" style="height:12px;width:75%"></span>
+                <span class="gl" style="height:12px;width:50%"></span>
+                <span class="gl" style="height:46px"></span>
+              </div>
             </div>
             <aside class="audit-block-list">
-              <h4 class="audit-block-list-title">Product page</h4>
               <ul class="audit-checklist" data-checklist></ul>
+              <ul class="audit-ghost-rows" aria-hidden="true"><li></li><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>
             </aside>
           </article>
         </div>
       </div>
 
-      {/* Revenue Leak Score — full-width frame below the panels (revealed at 30s). */}
+      {/* Revenue Leak Score — single row: number on the left, copy on the right. */}
       <div class="audit-score-panel" data-score-overlay data-score-card hidden>
-        <div class="audit-score-num"><span data-score-num>--</span><span class="audit-score-max">/100</span></div>
-        <p class="audit-score-sublabel">Revenue Leak Score</p>
-        <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
-        <a
-          href="https://cal.com/tuncho-granados-uibzst/15min"
-          class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Book growth assessment call</a>
+        <div class="audit-score-left">
+          <div class="audit-score-num"><span data-score-num>--</span><span class="audit-score-max">/100</span></div>
+          <p class="audit-score-sublabel">Revenue Leak Score</p>
+        </div>
+        <div class="audit-score-right">
+          <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
+          <a
+            href="https://cal.com/tuncho-granados-uibzst/15min"
+            class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Book growth assessment call</a>
+        </div>
       </div>
 
     </div>
@@ -944,7 +966,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-scan-row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
     .audit-scan-row .hero-v2-audit-field { flex: 1 1 240px; min-width: 0; }
     .audit-scan-btn { flex: 0 0 auto; white-space: nowrap; cursor: pointer; }
-    .audit-carousel .hero-v2-audit-hint { margin: 12px 0 0; }
+    /* Hint sits ABOVE the inputs, in our bone white (not pure #fff). */
+    .audit-scan-hint { margin: 0 0 14px; color: #EDEAE0; }
     @media (max-width: 680px) {
       .audit-scan-row { flex-direction: column; align-items: stretch; }
       .audit-scan-btn { width: 100%; justify-content: center; }
@@ -966,11 +989,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        pop-up card. Demo: red tones; tier classes kept for the real flow. */
     .audit-score-panel {
       margin-top: 22px;
-      text-align: center;
-      padding: 48px 56px;
+      display: flex; align-items: center; gap: 40px;
+      text-align: left;
+      padding: 32px 44px;
       border-radius: 16px;
       border: 1px solid currentColor;
-      color: #f87171;                                 /* demo: red tones */
+      color: #f87171;                                 /* red tones */
       background: rgba(248, 113, 113, 0.08);
       animation: score-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
@@ -979,17 +1003,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    /* Palette is yellow / red / green only — no orange. */
     .audit-score-panel.is-red    { color: #f87171; background: rgba(248, 113, 113, 0.08); }
-    /* Orange (not yellow) so the middle tier never clashes with brand yellow. */
-    .audit-score-panel.is-orange { color: #fb923c; background: rgba(251, 146, 60, 0.08); }
+    .audit-score-panel.is-orange { color: #f87171; background: rgba(248, 113, 113, 0.08); }
     .audit-score-panel.is-green  { color: #34d399; background: rgba(52, 211, 153, 0.08); }
+    .audit-score-left { flex: 0 0 auto; text-align: center; }
+    .audit-score-right { flex: 1 1 auto; min-width: 0; }
     .audit-score-num {
       font-family: "Permanent Marker", cursive;
-      font-size: clamp(80px, 12vw, 128px);
+      font-size: clamp(72px, 10vw, 116px);
       line-height: 1;
       color: inherit;
     }
-    /* "/100" denominator — same red, smaller + dimmer so 44 stays dominant. */
+    /* "/100" denominator — smaller + dimmer so the score stays dominant. */
     .audit-score-max {
       font-size: 0.38em;
       color: inherit;
@@ -1000,16 +1026,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-score-sublabel {
       font-family: ui-monospace, monospace;
       font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
-      color: inherit; opacity: 0.65;
-      margin: 10px 0 28px;
+      color: inherit; opacity: 0.7;
+      margin: 8px 0 0;
     }
     .audit-score-msg {
       font-family: "Hanken Grotesk", sans-serif;
       font-size: 17px; line-height: 1.6;
       color: #EDEAE0;
-      margin: 0 0 32px;
+      margin: 0 0 20px;
     }
-    .audit-score-cta { margin: 0 auto; }
+    .audit-score-cta { margin: 0; }
+    @media (max-width: 640px) {
+      .audit-score-panel { flex-direction: column; align-items: flex-start; gap: 22px; padding: 28px 24px; }
+    }
     .audit-block {
       min-width: 0;
       display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 1fr); gap: 14px;
@@ -1019,7 +1048,34 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
     @media (max-width: 560px) { .audit-block { grid-template-columns: 1fr; } }
     /* Match each loader's native aspect ratio so it fills the frame — no side letterboxing. */
-    .audit-block-anim { border-radius: 12px; overflow: hidden; background: #0e0f13; }
+    .audit-block-anim { border-radius: 12px; overflow: hidden; background: #0e0f13; position: relative; }
+
+    /* ── Ghost loaders ──────────────────────────────────────────────────
+       Before a block's scan runs, the frame + checklist show colourless
+       grey skeletons with a subtle shimmer (no scan colours/animation yet).
+       They're removed once the block goes live (.is-live, set in JS when
+       the loader iframe is ready). */
+    .audit-ghost { position: absolute; inset: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px; background: #0e0f13; }
+    .audit-ghost .gl, .audit-ghost-rows li { background: rgba(255,255,255,0.055); border-radius: 6px; position: relative; overflow: hidden; }
+    .audit-ghost .gl.gl-grow { flex: 1 1 auto; }
+    .audit-ghost-rows { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+    .audit-ghost-rows li { height: 11px; width: 100%; }
+    .audit-ghost-rows li:nth-child(2n) { width: 82%; }
+    .audit-ghost-rows li:nth-child(3n) { width: 90%; }
+    .audit-ghost .gl::after, .audit-ghost-rows li::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      transform: translateX(-100%); animation: auditGhostShimmer 1.6s ease-in-out infinite;
+    }
+    @keyframes auditGhostShimmer { 100% { transform: translateX(100%); } }
+    @media (prefers-reduced-motion: reduce) {
+      .audit-ghost .gl::after, .audit-ghost-rows li::after { animation: none; }
+    }
+    /* scan starts → real checklist replaces the ghost rows; the frame ghost
+       lingers until the loader iframe is actually ready (.is-loaded). */
+    .audit-block.is-live .audit-ghost-rows { display: none; }
+    .audit-block.is-loaded .audit-ghost { display: none; }
+    .audit-block:not(.is-loaded) .audit-frame { visibility: hidden; }
     /* Both cards the SAME height (shared ratio) so their bottoms align. The
        ratio is cropped to PDP's content height (its canvas is now 784×600 and
        fills the box exactly — no wasted black below). The Search canvas is
@@ -1034,7 +1090,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-carousel { background: #16171d; }
     @keyframes audit-open { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
     .audit-carousel.is-open { animation: audit-open .5s ease both; }
-    .audit-block-list-title { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #fae194; margin: 0 0 14px; }
+    /* Block title — yellow, pinned to the upper-left corner of the frame box,
+       on a dark pill so it stays legible over the scanned page (and the ghost). */
+    .audit-block-tag {
+      position: absolute; top: 10px; left: 10px; z-index: 4;
+      font-family: ui-monospace, monospace; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase; color: #fae194;
+      background: rgba(8, 9, 12, 0.74); border: 1px solid rgba(250, 225, 148, 0.28);
+      padding: 6px 11px; border-radius: 8px;
+    }
     .audit-checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
     /* Compact row: tiny ✓/✕ + truncating label + value. No left rail, tight margins. */
     .audit-row { display: flex; align-items: center; gap: 7px; padding: 4px 0; min-width: 0; font-family: "Hanken Grotesk", sans-serif; }
