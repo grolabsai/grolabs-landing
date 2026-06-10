@@ -514,63 +514,79 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   )}
 
   {/* ============================================================
-       GRO Optimization Engine — self-contained Canvas animation
-       (design handoff: vanilla JS engine shipped as-is at
-       /js/gro-section.js, driven by window.GRO_CONFIG below).
-       The page supplies the heading/intro; the engine renders the
-       finite ~15s "leak identified → classified → fixed → revenue
-       recovered" story. Autoplays on scroll, runs once, then Replay.
+       Revenue Recovery Engine — animated section.
+       The animation is a self-contained DOM/JS document served from
+       /anim/recovery-engine.html and embedded in an iframe (fully
+       isolated styles/scripts). It autoplays on scroll, runs the full
+       leak→fix→recover pipeline for 8 leaks, holds 10s on the closing
+       graph, then loops. The iframe reports its content height via
+       postMessage; the inline script below sizes it to fit. The page
+       supplies the heading + copy.
        ============================================================ */}
-  <section class="gro-opt-section reveal" data-screen-label="Optimization Engine">
+  <section class="rre-section reveal" data-screen-label="Revenue Recovery Engine">
     <div class="max-w-page mx-auto w-full">
-      <header class="gro-opt-head">
-        <span class="gro-opt-eyebrow">The Optimization Engine</span>
-        <h2 class="gro-opt-title">
-          We find the leak, then <span class="gro-opt-accent">fix it at the source</span>.
-        </h2>
-        <p class="gro-opt-lede">
-          Every lost search is revenue walking out the door. Watch the engine
-          catch a leak in real time, route it to the right fix — search or
-          catalog — and turn it back into recovered revenue.
+      <header class="rre-head">
+        <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
+        <h2 class="rre-title">Revenue Recovery Engine</h2>
+        <p class="rre-lede">
+          Every search is a signal. We learn from all of them, catch the queries
+          quietly leaking revenue, and fix them — in the search engine or your
+          product catalog. Then we verify the fix and measure the revenue recovered.
         </p>
       </header>
-      <div class="gro-opt-canvas-wrap">
-        <canvas id="cv"></canvas>
+      <div class="rre-frame-wrap">
+        <iframe
+          class="rre-frame"
+          data-src-desktop={`${base}/anim/recovery-engine.html`}
+          data-src-mobile={`${base}/anim/recovery-engine-mobile.html`}
+          title="Revenue Recovery Engine — live animation"
+          loading="lazy"
+          scrolling="no"
+        ></iframe>
       </div>
     </div>
   </section>
 
   <script is:inline>
-    window.GRO_CONFIG = {
-      canvasId: "cv",
-      ambient: ["running shoes","linen shirt","wireless earbuds","yoga mat","cast iron pan","desk lamp","wool socks","coffee grinder","rain jacket","ceramic mug","water bottle","throw blanket","phone case","sun hat","denim jacket","standing desk","cotton tee","hiking poles","wool beanie","steel kettle"],
-      leaks: [
-        { item: "trainers",          classify: "seo",     kind: "synonym",   reason: "0 results · searched by a synonym",      fix: "synonym · trainers → running shoes",   before: "0 results", after: "42 results", revenue: 22600 },
-        { item: "size 11 wide",      classify: "catalog", kind: "attribute", reason: "0 results · width not in product data",  fix: "enriched · width = Wide on 38 SKUs",    before: "0 results", after: "38 results", revenue: 14200 },
-        { item: "waterproff jacket", classify: "seo",     kind: "typo",      reason: "0 results · spelling typo",              fix: "typo tolerance · +1 edit distance",     before: "0 results", after: "19 results", revenue: 9300 },
-        { item: "merino",            classify: "catalog", kind: "attribute", reason: "thin results · material not in catalog", fix: "enriched · material = Merino wool",     before: "3 results", after: "27 results", revenue: 16400 },
-        { item: "keep coffee hot",   classify: "seo",     kind: "semantic",  reason: "0 results · intent not understood",      fix: "semantic match → insulated travel mug", before: "0 results", after: "31 results", revenue: 18400 },
-      ],
-    };
+    // Load the desktop or the simplified mobile animation per viewport, and
+    // size the iframe to whichever one reports its height.
+    (function () {
+      var frame = document.querySelector('.rre-frame');
+      if (!frame) return;
+      var mq = window.matchMedia('(max-width: 1000px)');
+      var current = null;
+      function pick() {
+        var want = mq.matches ? frame.dataset.srcMobile : frame.dataset.srcDesktop;
+        if (want !== current) { current = want; frame.style.height = ''; frame.src = want; }
+      }
+      pick();
+      if (mq.addEventListener) mq.addEventListener('change', pick);
+      else if (mq.addListener) mq.addListener(pick);
+      window.addEventListener('message', function (e) {
+        var d = e.data;
+        if (d && d.type === 'rre-height' && typeof d.height === 'number') {
+          // grow-only: settle to the tallest state once, then stay put so the
+          // page below doesn't reflow as the table empties/refills each loop.
+          var h = Math.max(320, d.height);
+          var cur = parseInt(frame.style.height, 10) || 0;
+          if (h > cur) frame.style.height = h + 'px';
+        }
+      });
+    })();
   </script>
-  <script is:inline src="/js/gro-section.js"></script>
 
   <style is:global>
-    /* ─────────── GRO Optimization Engine (Canvas section) ───────────
-       Self-contained handoff section below the video. The radial bg +
-       canvas-wrap rules come from the design handoff verbatim; the
-       heading/intro above the canvas is authored here from the brand
-       tokens. .gro-opt-canvas-wrap MUST stay position:relative — the
-       engine's Replay button positions itself against it. */
-    .gro-opt-section {
+    /* ─────────── Revenue Recovery Engine (animated iframe section) ───────────
+       The animation lives in /anim/recovery-engine.html (isolated). Here we
+       style only the surrounding heading + the iframe frame. The iframe body
+       is transparent, so this section's radial background shows through. */
+    .rre-section {
       background: radial-gradient(130% 130% at 26% 18%, #15161d 0%, #0c0c0f 58%, #07070a 100%);
       padding: 72px 24px;
-      display: flex;
-      justify-content: center;
       font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .gro-opt-head { max-width: 720px; margin: 0 0 40px; }
-    .gro-opt-eyebrow {
+    .rre-head { max-width: 760px; margin: 0 0 36px; }
+    .rre-eyebrow {
       display: block;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 12px;
@@ -579,7 +595,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       color: #fae194;
       margin-bottom: 16px;
     }
-    .gro-opt-title {
+    .rre-title {
       font-family: "Permanent Marker", cursive;
       font-weight: 400;
       color: #EDEAE0;
@@ -587,21 +603,31 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       line-height: 1.1;
       margin: 0 0 18px;
     }
-    .gro-opt-accent { color: #fae194; }
-    .gro-opt-lede {
+    .rre-lede {
       font-family: "Hanken Grotesk", sans-serif;
       font-size: 18px;
       line-height: 1.6;
       color: rgba(237, 234, 224, 0.6);
       margin: 0;
-      max-width: 620px;
+      max-width: 640px;
     }
-    .gro-opt-canvas-wrap { position: relative; width: 100%; max-width: 1240px; }
-    .gro-opt-canvas-wrap canvas { display: block; width: 100%; height: auto; }
+    .rre-frame-wrap { width: 100%; max-width: 1400px; margin: 0 auto; }
+    .rre-frame {
+      width: 100%;
+      height: 760px;            /* initial; resized to content via postMessage */
+      border: 0;
+      display: block;
+      background: #0c0c0f;        /* dark fallback so the frame never flashes white */
+      color-scheme: dark;
+    }
+    /* Below 1000px the iframe loads the simplified single-column mobile
+       animation; give it a closer initial height (JS resizes to exact). */
+    @media (max-width: 1000px) {
+      .rre-frame { height: 940px; }
+    }
     @media (max-width: 859px) {
-      .gro-opt-section { padding: 48px 16px; }
-      .gro-opt-head { margin-bottom: 28px; }
-      .gro-opt-canvas-wrap { max-width: 600px; }
+      .rre-section { padding: 48px 16px; }
+      .rre-head { margin-bottom: 28px; }
     }
 
     /* ─────────── Hero v2 — merged hero + stats ─────────── */

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Revenue Recovery Engine — mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --gold:#fae194; --blue:#9ec5ff; --pass:#34d399;
+    --leak:#f0a3a3; --leak-s:#ef4444; --surface:#1a1b22; --bone:#EDEAE0;
+    --mono:ui-monospace,Menlo,monospace; --sans:"Hanken Grotesk",-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:radial-gradient(130% 130% at 26% 18%, #15161d 0%, #0c0c0f 58%, #07070a 100%);
+    font-family:var(--sans); color:var(--bone); padding:12px; overflow:hidden;
+  }
+  .m-wrap{max-width:460px; margin:0 auto; display:flex; flex-direction:column; gap:12px;}
+  .m-panel{background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:14px; box-shadow:0 10px 22px rgba(0,0,0,.5); display:flex; flex-direction:column;}
+  .m-h{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase;}
+  .m-h .s{display:block; font-size:9.5px; letter-spacing:.03em; color:rgba(237,234,224,.4); margin-top:4px; text-transform:none;}
+  .green{color:var(--pass);} .gold{color:var(--gold);} .blue{color:var(--blue);} .red{color:var(--leak);} .white{color:var(--bone);}
+
+  /* demand */
+  .m-search{display:flex; align-items:center; gap:8px; background:#0f1015; border:1px solid rgba(255,255,255,.12); border-radius:10px; padding:10px 12px; margin-top:11px;}
+  .m-search .q{font-size:15px;}
+  .m-caret{display:inline-block; width:1.5px; height:14px; background:var(--pass); animation:blink 1s steps(1) infinite;}
+  @keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
+  .m-stream{position:relative; height:54px; overflow:hidden; margin:8px 0 8px;}
+  .m-stream .w{position:absolute; top:-4px; font-size:12.5px; white-space:nowrap;}
+  .m-stream .w.drop{animation:mDrop 2.8s linear forwards;}
+  @keyframes mDrop{0%{transform:translateY(0);opacity:0;}14%{opacity:1;}62%{opacity:1;}100%{transform:translateY(54px);opacity:0;}}
+  .m-scan{position:relative; height:18px; border-radius:6px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); overflow:hidden; display:flex; align-items:center;}
+  .m-sweep{position:absolute; top:0; bottom:0; width:64px; left:-64px; background:linear-gradient(90deg,rgba(250,225,148,0),rgba(250,225,148,.5)50%,rgba(250,225,148,0)); animation:mSweep 1.8s linear infinite;}
+  @keyframes mSweep{0%{left:-64px;}100%{left:100%;}}
+  .m-scan span:last-child{position:relative; font-family:var(--mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); padding-left:10px;}
+
+  /* pipeline (leak → fix) */
+  .m-pipe{min-height:104px; transition:border-color .3s;}
+  .m-pipe.leak{border-color:var(--leak-s);}
+  .m-pipe.search{border-color:var(--gold);} .m-pipe.catalog{border-color:var(--blue);}
+  .m-pipe.idle{opacity:.5;}
+  .m-pipe-item{font-size:17px; font-weight:600; margin:10px 0 8px; min-height:22px;}
+  .m-pipe-act{font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:rgba(237,234,224,.5); margin-bottom:3px; min-height:11px;}
+  .m-pipe-tag{display:inline-flex; align-self:flex-start; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; padding:4px 9px; border-radius:6px; border:1px solid; opacity:0; transition:opacity .3s;}
+  .m-pipe-tag.show{opacity:1;}
+  .m-pipe-tag.leak{color:var(--leak); border-color:rgba(239,68,68,.5); background:rgba(239,68,68,.08);}
+  .m-pipe-tag.search{color:var(--gold); border-color:rgba(250,225,148,.5); background:rgba(250,225,148,.1);}
+  .m-pipe-tag.catalog{color:var(--blue); border-color:rgba(158,197,255,.5); background:rgba(158,197,255,.1);}
+  .m-pipe.hit{animation:mHit .6s ease;}
+  @keyframes mHit{0%,100%{box-shadow:0 10px 22px rgba(0,0,0,.5);}35%{box-shadow:0 10px 22px rgba(0,0,0,.5),0 0 0 1px rgba(239,68,68,.55),0 0 24px rgba(239,68,68,.28);}}
+
+  /* recovery */
+  .m-legend{display:flex; gap:14px; margin:10px 0 4px;}
+  .m-legend span{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:rgba(237,234,224,.55);}
+  .m-sw{width:9px;height:9px;border-radius:3px;} .m-sw.search{background:var(--gold);} .m-sw.catalog{background:var(--blue);}
+  /* reserve room for all 8 rows up front so the iframe height is stable from
+     the first frame (rows fill into the reserved space; no row-by-row growth). */
+  .m-table{display:flex; flex-direction:column; min-height:296px;}
+  .m-row{display:grid; grid-template-columns:3px 1fr auto auto; gap:9px; align-items:center; padding:7px 2px; border-bottom:1px solid rgba(255,255,255,.06); overflow:hidden;}
+  .m-row:last-child{border-bottom:0;}
+  .m-row .bar{width:3px; height:22px; border-radius:2px;}
+  .m-row.search .bar{background:var(--gold);} .m-row.catalog .bar{background:var(--blue);}
+  .m-row .nm{min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:12px; font-weight:600;}
+  .m-row .sl{font-family:var(--mono); font-size:10px; color:var(--pass); text-align:right;}
+  .m-row .mo{font-family:var(--mono); font-size:12px; font-weight:600; text-align:right; min-width:54px;}
+  .m-row.reserved{animation:mSlot .4s ease both; outline:1px dashed rgba(255,255,255,.12); outline-offset:-2px; border-radius:6px;}
+  .m-row.reserved .bar{opacity:.25;} .m-row.reserved .nm,.m-row.reserved .sl,.m-row.reserved .mo{opacity:0;}
+  .m-row .nm,.m-row .sl,.m-row .mo{transition:opacity .3s;}
+  @keyframes mSlot{from{max-height:0;opacity:0;padding-top:0;padding-bottom:0;}to{max-height:40px;opacity:1;}}
+  .m-row.flash{animation:mFlash 1s ease;}
+  @keyframes mFlash{0%,100%{background:transparent;}35%{background:rgba(52,211,153,.12);}}
+
+  .m-graph{max-height:0; opacity:0; overflow:hidden; transition:max-height .5s ease,opacity .4s ease,margin .5s ease;}
+  .m-graph.show{max-height:110px; opacity:1; margin:12px 0 4px;}
+  .m-graph svg{display:block; width:100%; height:66px;}
+  .m-graph.show svg{animation:mWipe 1.2s cubic-bezier(.4,.1,.2,1) both;}
+  @keyframes mWipe{from{clip-path:inset(0 100% 0 0);}to{clip-path:inset(0 0 0 0);}}
+  .m-glegend{display:flex; gap:12px; margin-top:6px; font-family:var(--mono); font-size:8px; letter-spacing:.05em; text-transform:uppercase;}
+  .m-glegend span{display:inline-flex; align-items:center; gap:5px;}
+  .m-glegend span::before{content:""; width:8px; height:8px; border-radius:2px;}
+  .m-gprev{color:rgba(250,225,148,.8);} .m-gprev::before{background:var(--gold);}
+  .m-grec{color:rgba(52,211,153,.9);} .m-grec::before{background:var(--pass);}
+
+  .m-total{border-top:1px solid rgba(255,255,255,.1); margin-top:10px; padding-top:12px; text-align:right;}
+  .m-total-lab{font-family:var(--mono); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--pass);}
+  .m-total-val{font-family:"Permanent Marker",cursive; font-size:34px; line-height:1; color:var(--pass); margin:6px 0 4px;}
+  .m-total-val .u{font-size:.42em; opacity:.65;}
+  .m-total-sub{font-family:var(--mono); font-size:10px; color:rgba(237,234,224,.55);}
+  .m-total-sub b{color:var(--pass);}
+  .m-recovery.done{border-color:rgba(52,211,153,.45); box-shadow:0 10px 22px rgba(0,0,0,.5),0 0 0 1px rgba(52,211,153,.22),0 0 30px rgba(52,211,153,.12);}
+
+  #mFlyer{position:fixed; left:0; top:0; z-index:90; pointer-events:none; opacity:0; font-family:var(--mono); font-size:10px; font-weight:600; padding:5px 9px; border-radius:7px; border:1px solid; white-space:nowrap; box-shadow:0 6px 18px rgba(0,0,0,.5);}
+</style>
+</head>
+<body>
+<div class="m-wrap">
+
+  <div class="m-panel">
+    <div class="m-h green">Demand Monitor<span class="s">every search scored — green passes, red leaks</span></div>
+    <div class="m-search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(237,234,224,.5)" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="q" id="mQ"></span><span class="m-caret"></span></div>
+    <div class="m-stream" id="mStream"></div>
+    <div class="m-scan"><span class="m-sweep"></span><span>Analyzing…</span></div>
+  </div>
+
+  <div class="m-panel m-pipe idle" id="mPipe">
+    <div class="m-h red" id="mPipeH">⬤ Revenue leak</div>
+    <div class="m-pipe-act" id="mAct"></div>
+    <div class="m-pipe-item" id="mItem">awaiting query</div>
+    <div class="m-pipe-tag" id="mTag">idle</div>
+  </div>
+
+  <div class="m-panel m-recovery" id="mRecovery">
+    <div class="m-h green">Recovery Monitor<span class="s">recovered revenue per fix</span></div>
+    <div class="m-legend"><span><i class="m-sw search"></i> Search fix</span><span><i class="m-sw catalog"></i> Catalog fix</span></div>
+    <div class="m-table" id="mTable"></div>
+    <div class="m-graph" id="mGraph">
+      <svg viewBox="0 0 300 80" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="mgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".5"/><stop offset="1" stop-color="#34d399" stop-opacity=".04"/></linearGradient>
+          <linearGradient id="mgY" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fae194" stop-opacity=".22"/><stop offset="1" stop-color="#fae194" stop-opacity=".03"/></linearGradient>
+        </defs>
+        <path d="M0,56 L300,56 L300,80 L0,80 Z" fill="url(#mgY)"/>
+        <line x1="0" y1="56" x2="300" y2="56" stroke="#fae194" stroke-width="1.5" stroke-opacity=".75"/>
+        <path d="M0,56 L37.5,49.3 L75,46.5 L112.5,41.3 L150,35.9 L187.5,30.6 L225,25.2 L262.5,18.4 L300,14 L300,56 Z" fill="url(#mgG)"/>
+        <path d="M0,56 L37.5,49.3 L75,46.5 L112.5,41.3 L150,35.9 L187.5,30.6 L225,25.2 L262.5,18.4 L300,14" fill="none" stroke="#34d399" stroke-width="2"/>
+      </svg>
+      <div class="m-glegend"><span class="m-gprev">Previous revenue (flat)</span><span class="m-grec">Recovered revenue</span></div>
+    </div>
+    <div class="m-total">
+      <div class="m-total-lab">Revenue recovered</div>
+      <div class="m-total-val" id="mRev">$0<span class="u"> /mo</span></div>
+      <div class="m-total-sub"><span id="mLeaks">0</span> leaks fixed · <b>+<span id="mSales">0</span> sales</b></div>
+    </div>
+  </div>
+
+</div>
+<div id="mFlyer"></div>
+
+<script>
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  const money = n => '$'+Math.round(n).toLocaleString();
+
+  const WORDS=['running shoes','linen shirt','yoga mat','cast iron pan','desk lamp','wool socks','rain jacket','ceramic mug','sun hat','denim jacket','cotton tee'];
+  const EVENTS=[
+    {item:'trainers', type:'search', act:'Create synonym', detail:'trainers → running shoes', tag:'Search engine', row:{type:'search', nm:'trainers → running shoes', sl:64, mo:6080}},
+    {item:'keep coffee hot', type:'search', act:'Semantic match', detail:'→ insulated travel mug', tag:'Search engine', row:{type:'search', nm:'keep coffee hot → travel mug', sl:90, mo:2520}},
+    {item:'winter boots', type:'search', act:'Re-rank results', detail:'boost in-stock + best-sellers', tag:'Search engine', row:{type:'search', nm:'winter boots · re-ranked', sl:33, mo:4785}},
+    {item:'trail shoes', type:'search', act:'Create synonym', detail:'trail shoes → hiking shoes', tag:'Search engine', row:{type:'search', nm:'trail shoes → hiking shoes', sl:41, mo:4920}},
+    {item:'size 11 wide', type:'catalog', act:'Add attribute', detail:'width = Wide · 38 SKUs', tag:'Data enrichment', row:{type:'catalog', nm:'size 11 wide · width=Wide', sl:52, mo:4940}},
+    {item:'merino', type:'catalog', act:'Add attribute', detail:'material = Merino wool', tag:'Data enrichment', row:{type:'catalog', nm:'merino · material=Merino', sl:58, mo:4930}},
+    {item:'office chair', type:'search', act:'Re-rank results', detail:'boost in-stock + best-sellers', tag:'Search engine', row:{type:'search', nm:'office chair · re-ranked', sl:26, mo:6240}},
+    {item:'vegan leather', type:'catalog', act:'Add attribute', detail:'material = Vegan leather', tag:'Data enrichment', row:{type:'catalog', nm:'vegan leather · material added', sl:38, mo:4370}},
+  ];
+  const COL={ search:{bg:'rgba(250,225,148,.16)',fg:'#fae194',bd:'rgba(250,225,148,.6)'},
+              catalog:{bg:'rgba(158,197,255,.16)',fg:'#9ec5ff',bd:'rgba(158,197,255,.6)'},
+              leak:{bg:'rgba(239,68,68,.18)',fg:'#f0a3a3',bd:'rgba(239,68,68,.6)'} };
+
+  let totRev=0, totSales=0, totLeaks=0, RUN=0, visible=false, ambientOn=false, wi=0;
+
+  function rc(el){const r=el.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2};}
+  function streamWord(){
+    const w=document.createElement('span'); w.className='w drop';
+    w.textContent=WORDS[(wi++)%WORDS.length]; w.style.left=(4+Math.random()*54)+'%';
+    w.style.color = Math.random()<.5 ? 'var(--pass)' : 'rgba(237,234,224,.30)';
+    w.addEventListener('animationend',()=>w.remove()); $('#mStream').appendChild(w);
+  }
+  function startAmbient(){ if(ambientOn||reduce) return; ambientOn=true; (function t(){ if(visible) streamWord(); setTimeout(t, 560+Math.random()*420); })(); }
+
+  function fly(from,to,color,text,dur,endColor){
+    return new Promise(res=>{
+      const f=$('#mFlyer'), a=rc(from), b=rc(to);
+      f.style.transition='none'; f.style.background=color.bg; f.style.color=color.fg; f.style.borderColor=color.bd;
+      f.textContent=text; f.style.transform=`translate(${a.x}px,${a.y}px) translate(-50%,-50%) scale(.85)`; f.style.opacity='0'; f.getBoundingClientRect();
+      requestAnimationFrame(()=>{
+        f.style.transition=`transform ${dur}ms cubic-bezier(.45,.05,.2,1), opacity .25s, background .5s, color .5s, border-color .5s`;
+        f.style.opacity='1'; f.style.transform=`translate(${b.x}px,${b.y}px) translate(-50%,-50%) scale(1)`;
+        if(endColor) setTimeout(()=>{ f.style.background=endColor.bg; f.style.color=endColor.fg; f.style.borderColor=endColor.bd; }, Math.round(dur*0.4));
+        setTimeout(()=>{ f.style.opacity='0'; setTimeout(res,180); }, dur);
+      });
+    });
+  }
+
+  function typeQuery(text){ return new Promise(res=>{ const el=$('#mQ'); el.textContent=''; let i=0; (function s(){ el.textContent=text.slice(0,++i); i<text.length?setTimeout(s,55+Math.random()*45):setTimeout(res,200); })(); }); }
+  function setRev(rev,sales,leaks){ $('#mRev').innerHTML=money(rev)+'<span class="u"> /mo</span>'; $('#mSales').textContent=sales; $('#mLeaks').textContent=leaks; }
+  function resetPipe(){ const p=$('#mPipe'); p.className='m-panel m-pipe idle'; $('#mPipeH').textContent='⬤ Revenue leak'; $('#mPipeH').className='m-h red'; $('#mAct').textContent=''; $('#mItem').textContent='awaiting query'; const t=$('#mTag'); t.className='m-pipe-tag'; t.textContent='idle'; }
+
+  function addRow(r,reserved){
+    const el=document.createElement('div'); el.className='m-row '+r.type+(reserved?' reserved':'');
+    const sl=reserved?0:r.sl, mo=reserved?0:r.mo;
+    el.innerHTML='<span class="bar"></span><span class="nm">'+r.nm+'</span><span class="sl">+'+sl+'</span><span class="mo">'+money(mo)+'</span>';
+    $('#mTable').appendChild(el); return el;
+  }
+  function rollRow(el,r,dur){
+    return new Promise(res=>{
+      const baseR=totRev, baseS=totSales, leaks=totLeaks+1, t0=performance.now(); dur=dur||1200;
+      (function step(t){ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);
+        el.querySelector('.sl').textContent='+'+Math.round(r.sl*e); el.querySelector('.mo').textContent=money(r.mo*e);
+        setRev(baseR+r.mo*e, Math.round(baseS+r.sl*e), leaks);
+        k<1?requestAnimationFrame(step):res();
+      })(performance.now());
+    });
+  }
+
+  async function runEvent(ev, my, spd){
+    spd=spd||1; const S=ms=>Math.round(ms*spd); const live=()=>my===RUN;
+    // type query + caught red word drops into the pipeline as a LEAK
+    resetPipe(); await typeQuery(ev.item); if(!live()) return;
+    const lw=document.createElement('span'); lw.className='w'; lw.textContent=ev.item; lw.style.left='12%'; lw.style.top='6px'; lw.style.color='var(--leak-s)'; lw.style.fontWeight='600';
+    $('#mStream').appendChild(lw);
+    await sleep(S(500)); if(!live()){ lw.remove(); return; }
+    await fly(lw, $('#mPipe'), COL.leak, '✕ '+ev.item, S(900)); if(!live()){ lw.remove(); return; }
+    lw.remove();
+    const p=$('#mPipe'); p.classList.remove('idle'); p.classList.add('leak','hit');
+    $('#mItem').textContent='"'+ev.item+'"'; const tag=$('#mTag'); tag.className='m-pipe-tag show leak'; tag.textContent='Revenue leak';
+    await sleep(S(1400)); if(!live()) return;
+    // morph the leak → the proposed fix (same card)
+    p.classList.remove('leak','hit'); p.classList.add(ev.type);
+    $('#mPipeH').textContent='⚙ Proposed fix'; $('#mPipeH').className='m-h white';
+    $('#mAct').textContent=ev.act; $('#mItem').textContent=ev.detail;
+    tag.className='m-pipe-tag show '+ev.type; tag.textContent='→ '+ev.tag;
+    await sleep(S(1100)); if(!live()) return;
+    // the fix flies down into the exact Recovery Monitor row
+    const rowEl=addRow(ev.row, true);
+    await sleep(S(220)); if(!live()){ rowEl.remove(); return; }
+    await fly($('#mPipe'), rowEl, ev.type==='catalog'?COL.catalog:COL.search, ev.row.nm, S(950)); if(!live()){ rowEl.remove(); return; }
+    rowEl.classList.remove('reserved'); rowEl.classList.add('flash');
+    resetPipe();
+    await rollRow(rowEl, ev.row, S(1200)); if(!live()) return;
+    totRev+=ev.row.mo; totSales+=ev.row.sl; totLeaks++;
+    await sleep(S(220)); if(!live()) return;
+  }
+
+  async function play(){
+    const my=++RUN; $('#mFlyer').style.opacity='0'; startAmbient();
+    $('#mTable').innerHTML=''; totRev=0; totSales=0; totLeaks=0; setRev(0,0,0);
+    resetPipe(); $('#mQ').textContent=''; $('#mGraph').classList.remove('show'); $('#mRecovery').classList.remove('done');
+    if(reduce){ EVENTS.forEach(ev=>{ addRow(ev.row,false); totRev+=ev.row.mo; totSales+=ev.row.sl; totLeaks++; }); setRev(totRev,totSales,totLeaks); $('#mGraph').classList.add('show'); $('#mRecovery').classList.add('done'); return; }
+    await sleep(500); if(my!==RUN) return;
+    for(let i=0;i<EVENTS.length;i++){ if(my!==RUN) return; await runEvent(EVENTS[i], my, i<2 ? 1 : 0.6); }
+    if(my===RUN){ $('#mGraph').classList.add('show'); $('#mRecovery').classList.add('done'); }
+  }
+
+  function postHeight(){ parent.postMessage({ type:'rre-height', height: Math.ceil($('.m-wrap').getBoundingClientRect().height)+12 }, '*'); }
+  if(window.ResizeObserver){ new ResizeObserver(postHeight).observe($('.m-wrap')); }
+  addEventListener('load', postHeight); addEventListener('resize', postHeight);
+
+  new IntersectionObserver(es=>{ visible = es[0].isIntersecting; }, {threshold:.1}).observe($('.m-wrap'));
+  (async function loop(){ for(;;){ if(visible){ await play(); await sleep(10000); } else { await sleep(400); } } })();
+})();
+</script>
+</body>
+</html>
