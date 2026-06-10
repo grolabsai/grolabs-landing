@@ -35,6 +35,7 @@
 
     display: flex;
     justify-content: center;
+    position: relative;          /* anchor for the alert-phone overlay */
     background: transparent;
     font-family: var(--font);
     color: var(--text);
@@ -137,9 +138,9 @@
 
   /* In-block alert card (inside the Traffic tile) */
   .gro-td .alert-card {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 410px; max-width: calc(100% - 40px);
+    position: absolute; top: 50%; left: 16px;
+    transform: translateY(-50%);
+    width: 300px; max-width: calc(100% - 32px);
     background: rgba(24,25,31,0.94);
     backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
     border: 1px solid rgba(239,68,68,0.6); border-radius: 16px;
@@ -155,6 +156,43 @@
   .gro-td .ac-title { font-size: 14px; font-weight: 700; color: var(--text-strong); }
   .gro-td .ac-title b { color: #fca5a5; }
   .gro-td .ac-msg { font-size: 12.5px; color: var(--t2); line-height: 1.45; margin-top: 2px; }
+
+  /* ── Hand-off: fade the dashboard to a faint backdrop, a phone overlays it
+        on the LEFT and takes focus, and the alert flies up into the phone. ── */
+  .gro-td .dash.faded { opacity: 0.12; filter: saturate(0.4); transition: opacity .8s ease, filter .8s ease; pointer-events: none; }
+
+  .gro-td .gro-phone {
+    position: absolute; top: 50%; left: 20px;
+    transform: translateY(-50%) translateX(-26px) scale(.97);
+    width: 244px; opacity: 0; pointer-events: none; z-index: 6;
+    transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
+  }
+  .gro-td .gro-phone.show { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
+  .gro-td .phone-frame {
+    background: linear-gradient(160deg, #20222a, #121319);
+    border: 1px solid rgba(255,255,255,0.12); border-radius: 36px; padding: 9px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .gro-td .phone-screen {
+    position: relative; aspect-ratio: 9 / 18.6;
+    background: radial-gradient(130% 90% at 50% 0%, #1a1d24, #0a0b0e 72%);
+    border-radius: 28px; overflow: hidden; padding: 30px 13px 14px;
+  }
+  .gro-td .phone-notch { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 84px; height: 19px; background:#000; border-radius: 0 0 13px 13px; }
+  .gro-td .phone-time { text-align:center; font-family: var(--font); font-weight: 600; font-size: 34px; color:#fff; line-height: 1; margin-top: 14px; }
+  .gro-td .phone-date { text-align:center; font-family: var(--font); font-size: 11.5px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+  .gro-td .phone-slot { margin-top: 26px; }
+
+  .gro-td .gro-phone .alert-card.in-phone {
+    position: static; transform: none; top: auto; left: auto;
+    width: 100%; max-width: none; padding: 11px 12px; gap: 11px;
+    background: rgba(28,29,36,0.97);
+    box-shadow: 0 10px 30px rgba(239,68,68,0.35), 0 0 0 1px rgba(239,68,68,0.45);
+  }
+  .gro-td .gro-phone .alert-card.in-phone .ac-icon { width: 30px; height: 30px; border-radius: 8px; }
+  .gro-td .gro-phone .alert-card.in-phone .ac-icon span { font-size: 18px; }
+  .gro-td .gro-phone .alert-card.in-phone .ac-title { font-size: 12.5px; }
+  .gro-td .gro-phone .alert-card.in-phone .ac-msg { font-size: 11px; }
 
   /* ── ANIMATION: ghost-loader base state (data elements hidden until reveal) ── */
   .gro-td .dash.anim .big,
@@ -341,6 +379,18 @@
     </div>
 
   </div>
+
+  <!-- Phone overlay (left) — the alert flies up into it at the end -->
+  <div class="gro-phone" id="gro-phone" aria-hidden="true">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="phone-notch"></div>
+        <div class="phone-time">9:41</div>
+        <div class="phone-date">GroLabs · Live monitor</div>
+        <div class="phone-slot" id="gro-phone-slot"></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <script>
@@ -414,10 +464,38 @@
   function triggerAlarm(){
     ROOT.querySelector("#gro-alert-tile").classList.add("alarm");
     dash.classList.add("dimmed");
-    setTimeout(()=>{ROOT.querySelector("#gro-alert-card").classList.add("show");},700);
+    var card=ROOT.querySelector("#gro-alert-card");
+    setTimeout(()=>{ card.classList.add("show"); }, 700);
+    // hand off: fade the dashboard to a faint backdrop, bring the phone forward,
+    // and fly the (same) alert element up into the phone as a notification.
+    setTimeout(()=>{
+      var phone=ROOT.querySelector("#gro-phone"), slot=ROOT.querySelector("#gro-phone-slot");
+      dash.classList.remove("dimmed"); dash.classList.add("faded");
+      phone.classList.add("show");
+      // FLIP: measure the alert in the dashboard, reparent into the phone slot,
+      // then animate from the old position/size to the new (it rises into the phone).
+      var first=card.getBoundingClientRect();
+      card.classList.remove("show");
+      slot.appendChild(card);
+      card.classList.add("in-phone");
+      card.style.opacity="1"; card.style.pointerEvents="none";
+      var last=card.getBoundingClientRect();
+      var dx=first.left-last.left, dy=first.top-last.top, sx=last.width? first.width/last.width : 1;
+      card.style.transformOrigin="top left";
+      card.style.transition="none";
+      card.style.transform="translate("+dx+"px,"+dy+"px) scale("+sx+")";
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){
+        card.style.transition="transform .8s cubic-bezier(.2,.8,.2,1)";
+        card.style.transform="none";
+      }); });
+    }, 700 + 1800);
   }
   function reset(){
-    dash.classList.remove("dimmed");
+    dash.classList.remove("dimmed"); dash.classList.remove("faded");
+    ROOT.querySelector("#gro-phone").classList.remove("show");
+    // restore the alert back into the Traffic tile if it was handed to the phone
+    var card=ROOT.querySelector("#gro-alert-card"), atile=ROOT.querySelector("#gro-alert-tile");
+    if(card.parentElement !== atile){ card.classList.remove("in-phone"); card.style.transform=""; card.style.transition=""; card.style.opacity=""; card.style.pointerEvents=""; atile.appendChild(card); }
     ROOT.querySelector("#gro-alert-tile").classList.remove("alarm");
     ROOT.querySelector("#gro-alert-card").classList.remove("show");
     ROOT.querySelectorAll(".tile").forEach(t=>t.classList.add("pending"));
