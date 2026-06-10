@@ -20,7 +20,9 @@
     font-family:var(--sans); color:var(--bone); padding:12px; overflow:hidden;
   }
   .m-wrap{max-width:460px; margin:0 auto; display:flex; flex-direction:column; gap:12px;}
-  .m-panel{background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:14px; box-shadow:0 10px 22px rgba(0,0,0,.5); display:flex; flex-direction:column;}
+  .m-panel{background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:14px; box-shadow:0 10px 22px rgba(0,0,0,.5); display:flex; flex-direction:column; transition:filter .8s ease, opacity .8s ease;}
+  /* ended state — grey out everything except the recovered-revenue block */
+  .m-wrap.ended .m-panel:not(.m-recovery){ filter:grayscale(1); opacity:.4; }
   .m-h{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase;}
   .m-h .s{display:block; font-size:9.5px; letter-spacing:.03em; color:rgba(237,234,224,.4); margin-top:4px; text-transform:none;}
   .green{color:var(--pass);} .gold{color:var(--gold);} .blue{color:var(--blue);} .red{color:var(--leak);} .white{color:var(--bone);}
@@ -172,7 +174,7 @@
     w.style.color = Math.random()<.5 ? 'var(--pass)' : 'rgba(237,234,224,.30)';
     w.addEventListener('animationend',()=>w.remove()); $('#mStream').appendChild(w);
   }
-  function startAmbient(){ if(ambientOn||reduce) return; ambientOn=true; (function t(){ if(visible) streamWord(); setTimeout(t, 560+Math.random()*420); })(); }
+  function startAmbient(){ if(ambientOn||reduce) return; ambientOn=true; (function t(){ if(visible && !$('.m-wrap').classList.contains('ended')) streamWord(); setTimeout(t, 560+Math.random()*420); })(); }
 
   function fly(from,to,color,text,dur,endColor){
     return new Promise(res=>{
@@ -239,21 +241,23 @@
   }
 
   async function play(){
-    const my=++RUN; $('#mFlyer').style.opacity='0'; startAmbient();
+    const my=++RUN; $('.m-wrap').classList.remove('ended'); $('#mFlyer').style.opacity='0'; startAmbient();
     $('#mTable').innerHTML=''; totRev=0; totSales=0; totLeaks=0; setRev(0,0,0);
     resetPipe(); $('#mQ').textContent=''; $('#mGraph').classList.remove('show'); $('#mRecovery').classList.remove('done');
     if(reduce){ EVENTS.forEach(ev=>{ addRow(ev.row,false); totRev+=ev.row.mo; totSales+=ev.row.sl; totLeaks++; }); setRev(totRev,totSales,totLeaks); $('#mGraph').classList.add('show'); $('#mRecovery').classList.add('done'); return; }
     await sleep(500); if(my!==RUN) return;
     for(let i=0;i<EVENTS.length;i++){ if(my!==RUN) return; await runEvent(EVENTS[i], my, i<2 ? 1 : 0.6); }
-    if(my===RUN){ $('#mGraph').classList.add('show'); $('#mRecovery').classList.add('done'); }
+    if(my===RUN){ $('#mGraph').classList.add('show'); $('#mRecovery').classList.add('done'); $('.m-wrap').classList.add('ended'); }
   }
 
   function postHeight(){ parent.postMessage({ type:'rre-height', height: Math.ceil($('.m-wrap').getBoundingClientRect().height)+12 }, '*'); }
   if(window.ResizeObserver){ new ResizeObserver(postHeight).observe($('.m-wrap')); }
   addEventListener('load', postHeight); addEventListener('resize', postHeight);
 
-  new IntersectionObserver(es=>{ visible = es[0].isIntersecting; }, {threshold:.1}).observe($('.m-wrap'));
-  (async function loop(){ for(;;){ if(visible){ await play(); await sleep(10000); } else { await sleep(400); } } })();
+  let started=false;
+  function maybeStart(){ if(!started && visible){ started=true; play(); } }
+  new IntersectionObserver(es=>{ visible = es[0].isIntersecting; maybeStart(); }, {threshold:.1}).observe($('.m-wrap'));
+  addEventListener('message', e=>{ if(e && e.data && e.data.type==='rre-replay') play(); });
 })();
 </script>
 </body>

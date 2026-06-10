@@ -442,7 +442,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     <div class="max-w-page mx-auto w-full">
       <header class="rre-head">
         <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
-        <h2 class="rre-title">Revenue Recovery Engine</h2>
+        <div class="rre-title-row">
+          <h2 class="rre-title">Revenue Recovery Engine</h2>
+          <button type="button" class="rre-replay" data-rre-replay aria-label="Replay animation">↻ Replay</button>
+        </div>
         <p class="rre-lede">
           Every search is a signal. We learn from all of them, catch the queries
           quietly leaking revenue, and fix them — in the search engine or your
@@ -486,6 +489,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           var cur = parseInt(frame.style.height, 10) || 0;
           if (h > cur) frame.style.height = h + 'px';
         }
+      });
+      // Replay button → tell the animation iframe to restart from the beginning.
+      var replay = document.querySelector('[data-rre-replay]');
+      if (replay) replay.addEventListener('click', function () {
+        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'rre-replay' }, '*');
       });
     })();
   </script>
@@ -612,14 +620,29 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       color: #fae194;
       margin-bottom: 16px;
     }
+    .rre-title-row {
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+      margin: 0 0 18px;
+    }
     .rre-title {
       font-family: "Permanent Marker", cursive;
       font-weight: 400;
       color: #EDEAE0;
       font-size: clamp(28px, 3.4vw, 44px);
       line-height: 1.1;
-      margin: 0 0 18px;
+      margin: 0;
     }
+    /* Replay control — yellow border + yellow text, transparent fill. */
+    .rre-replay {
+      flex: 0 0 auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #fae194; background: transparent;
+      border: 1px solid #fae194; border-radius: 999px;
+      padding: 8px 16px; cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .rre-replay:hover { background: rgba(250, 225, 148, 0.1); transform: translateY(-1px); }
     .rre-lede {
       font-family: "Hanken Grotesk", sans-serif;
       font-size: 18px;

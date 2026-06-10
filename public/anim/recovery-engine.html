@@ -33,8 +33,10 @@
   .stage { display:grid; grid-template-columns: 1fr 1.15fr 0.95fr; gap:20px; align-items:stretch; }
   .col { display:flex; flex-direction:column; gap:16px; min-width:0; }
 
-  .panel { background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:16px 18px; box-shadow:0 12px 26px rgba(0,0,0,.5); display:flex; flex-direction:column; }
+  .panel { background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:16px 18px; box-shadow:0 12px 26px rgba(0,0,0,.5); display:flex; flex-direction:column; transition:filter .8s ease, opacity .8s ease; }
   .grow { flex:1 1 auto; }
+  /* ended state — everything greys out except the recovered-revenue block */
+  .stage.ended .panel:not(.revenue) { filter:grayscale(1); opacity:.4; }
 
   .ph { margin-bottom:12px; }
   .ph .t { font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; }
@@ -451,7 +453,7 @@
     w.addEventListener('animationend',()=>{ if(green) bumpConversion(); w.remove(); });
     $('#stream').appendChild(w);
   }
-  function startAmbient(){ if(ambientOn||reduce) return; ambientOn=true; (function tick(){ if(visible) streamWord(); setTimeout(tick, 520+Math.random()*460); })(); }
+  function startAmbient(){ if(ambientOn||reduce) return; ambientOn=true; (function tick(){ if(visible && !document.querySelector('.stage').classList.contains('ended')) streamWord(); setTimeout(tick, 520+Math.random()*460); })(); }
 
   // roll a freshly-fixed row's sales + money up from 0, with the bottom total
   // rolling in lockstep (total = committed base + this row's live value).
@@ -577,6 +579,7 @@
 
   async function play(){
     const my=++RUN;                 // supersede any run already in flight
+    document.querySelector('.stage').classList.remove('ended');  // un-grey for a fresh run
     $('#flyer').style.opacity='0';  // kill any token mid-flight
     startAmbient();                 // green queries keep streaming throughout
     // reset
@@ -604,8 +607,9 @@
     await sleep(600); if(my!==RUN) return;
     // first two leaks play slow so the eye can follow; the rest accelerate
     for(let i=0;i<EVENTS.length;i++){ if(my!==RUN) return; await runEvent(EVENTS[i], my, i<2 ? 1 : 0.55); }
-    // last fix has landed → reveal the closing Previous vs Recovered revenue graph
-    if(my===RUN) $('#revGraph').classList.add('show');
+    // last fix has landed → reveal the closing graph and grey out everything
+    // except the recovered-revenue block (no loop; Replay restarts it).
+    if(my===RUN){ $('#revGraph').classList.add('show'); document.querySelector('.stage').classList.add('ended'); }
   }
 
   // ── height reporting — tell the host page how tall to size the iframe ──
@@ -616,17 +620,14 @@
   if(window.ResizeObserver){ new ResizeObserver(postHeight).observe(document.querySelector('.wrap')); }
   addEventListener('load', postHeight); addEventListener('resize', postHeight);
 
-  // ── visibility-gated loop — only animate while the section is on screen, so
-  //    it consumes nothing (no ambient stream, no replays) when scrolled away. ──
-  let visible=false;
-  new IntersectionObserver((es)=>{ visible = es[0].isIntersecting; }, {threshold:.12})
+  // Autoplay ONCE when the section scrolls into view (no loop); it ends greyed
+  // out with only the recovered-revenue block in colour. The host page's Replay
+  // button posts 'rre-replay' to restart from the beginning.
+  let visible=false, started=false;
+  function maybeStart(){ if(!started && visible){ started=true; play(); } }
+  new IntersectionObserver((es)=>{ visible = es[0].isIntersecting; maybeStart(); }, {threshold:.12})
     .observe(document.querySelector('.stage'));
-  (async function loop(){
-    for(;;){
-      if(visible){ await play(); await sleep(10000); }   // run a full cycle, hold 10s
-      else { await sleep(400); }                          // idle cheaply until on screen
-    }
-  })();
+  addEventListener('message', (e)=>{ if(e && e.data && e.data.type==='rre-replay') play(); });
 })();
 </script>
 </body>
