@@ -194,6 +194,34 @@
   .gro-td .gro-phone .alert-card.in-phone .ac-title { font-size: 12.5px; }
   .gro-td .gro-phone .alert-card.in-phone .ac-msg { font-size: 11px; }
 
+  /* ── Weekly insights email (desktop), overlaid on the RIGHT of the faded
+        dashboard — the "we synthesise & recommend, you decide" message. ── */
+  .gro-td .gro-email {
+    position: absolute; top: 50%; right: 16px;
+    transform: translateY(-50%) translateX(26px) scale(.97);
+    width: 404px; opacity: 0; pointer-events: none; z-index: 5;
+    transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
+  }
+  .gro-td .gro-email.show { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
+  .gro-td .email-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.42), 0 0 0 1px rgba(0,0,0,0.06); color: #1a1b1f; }
+  .gro-td .email-head { display: flex; align-items: center; gap: 11px; padding: 12px 16px; border-bottom: 1px solid #ededed; }
+  .gro-td .email-avatar { width: 34px; height: 34px; border-radius: 50%; background: #fae194; color: #1a1b1f; font-weight: 800; font-size: 15px; display: grid; place-items: center; flex-shrink: 0; }
+  .gro-td .email-meta { flex: 1; min-width: 0; }
+  .gro-td .email-from { font-size: 11px; color: #8a8d93; }
+  .gro-td .email-from span { color: #b6b9bf; }
+  .gro-td .email-subject { font-size: 13.5px; font-weight: 700; color: #16171a; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gro-td .email-date { font-size: 11px; color: #a3a6ac; flex-shrink: 0; align-self: flex-start; margin-top: 2px; }
+  .gro-td .email-body { padding: 13px 16px 15px; }
+  .gro-td .email-intro { font-size: 12.5px; line-height: 1.5; color: #45474d; margin: 0 0 12px; }
+  .gro-td .email-insight-title { font-size: 12.5px; font-weight: 700; color: #16171a; margin: 0 0 7px; }
+  .gro-td .email-graph { display: block; width: 100%; height: 78px; }
+  .gro-td .email-graph .eg-grid { stroke: #efefef; stroke-width: 1; }
+  .gro-td .email-interp { font-size: 11.5px; line-height: 1.5; color: #45474d; margin: 7px 0 0; }
+  .gro-td .email-interp b { color: #16171a; }
+  .gro-td .email-rec { font-size: 11.5px; line-height: 1.5; color: #45474d; margin: 12px 0 13px; padding: 9px 12px; background: #faf6e7; border-left: 3px solid #fae194; border-radius: 0 8px 8px 0; }
+  .gro-td .email-rec b { color: #16171a; }
+  .gro-td .email-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #1a1b1f; background: linear-gradient(180deg,#fbe9a8,#f0d770); padding: 9px 15px; border-radius: 9px; text-decoration: none; }
+
   /* ── ANIMATION: ghost-loader base state (data elements hidden until reveal) ── */
   .gro-td .dash.anim .big,
   .gro-td .dash.anim .ring .center .v,
@@ -364,8 +392,8 @@
     <!-- Alert row — Traffic, full width at the bottom -->
     <div class="tile alert-tile" id="gro-alert-tile">
       <div class="chart-head">
-        <div><span class="tile-label">Traffic · live · last 24h</span><div class="chart-figure" style="margin-top:4px;"><span class="v" id="gro-alert-val">11,902</span><span class="delta up" id="gro-alert-delta" style="font-size:11px;">+4.2%</span></div></div>
-        <span class="tile-sub" id="gro-alert-sub">vs. prior 24h · threshold −5%</span>
+        <div><span class="tile-label">Daily traffic · last 14 days</span><div class="chart-figure" style="margin-top:4px;"><span class="v" id="gro-alert-val">11,902</span><span class="delta up" id="gro-alert-delta" style="font-size:11px;">+4.2%</span></div></div>
+        <span class="tile-sub" id="gro-alert-sub">vs. prior day · threshold −5%</span>
       </div>
       <svg class="chart chart-tall" id="gro-alert-chart"></svg>
       <!-- In-block alert: blinks twice, then stays -->
@@ -373,7 +401,7 @@
         <div class="ac-icon"><span>!</span></div>
         <div class="ac-body">
           <div class="ac-title">Traffic dropped <b>5.3%</b></div>
-          <div class="ac-msg">Live traffic fell below your 5% threshold in the last hour.</div>
+          <div class="ac-msg">Yesterday's visits fell 5.3% below your daily threshold.</div>
         </div>
       </div>
     </div>
@@ -388,6 +416,34 @@
         <div class="phone-time">9:41</div>
         <div class="phone-date">GroLabs · Live monitor</div>
         <div class="phone-slot" id="gro-phone-slot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly insights email (desktop) — overlays the right of the faded dashboard -->
+  <div class="gro-email" id="gro-email" aria-hidden="true">
+    <div class="email-card">
+      <div class="email-head">
+        <div class="email-avatar">G</div>
+        <div class="email-meta">
+          <div class="email-from">GroLabs Weekly <span>· insights@grolabs.ai</span></div>
+          <div class="email-subject">This week: the one fix worth +$3.8k/mo</div>
+        </div>
+        <div class="email-date">Mon 9:00</div>
+      </div>
+      <div class="email-body">
+        <p class="email-intro">Good morning. We watched everything this week — no dashboards for you to read. Here's the one move that actually moves the needle, and what we'd do about it.</p>
+        <div class="email-insight-title">Checkout completion is slipping</div>
+        <svg class="email-graph" viewBox="0 0 320 78" preserveAspectRatio="none">
+          <defs><linearGradient id="egGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e06a6a" stop-opacity=".26"/><stop offset="1" stop-color="#e06a6a" stop-opacity="0"/></linearGradient></defs>
+          <line class="eg-grid" x1="0" y1="26" x2="320" y2="26"/>
+          <line class="eg-grid" x1="0" y1="52" x2="320" y2="52"/>
+          <path d="M4,18 L66,22 L128,28 L190,38 L252,50 L316,58 L316,78 L4,78 Z" fill="url(#egGrad)"/>
+          <path d="M4,18 L66,22 L128,28 L190,38 L252,50 L316,58" fill="none" stroke="#e06a6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+        </svg>
+        <p class="email-interp">Down to <b>47.6%</b> (−3.1pt over 6 weeks). Most carts die at the shipping step — about <b>$3.8k/mo</b> walking out the door.</p>
+        <p class="email-rec"><b>Our recommendation:</b> collapse the shipping form from 5 fields to 1 with autofill. Projected recovery: <b>+$3.8k/mo</b>.</p>
+        <a class="email-cta" href="#">Review the full plan →</a>
       </div>
     </div>
   </div>
@@ -472,6 +528,8 @@
       var phone=ROOT.querySelector("#gro-phone"), slot=ROOT.querySelector("#gro-phone-slot");
       dash.classList.remove("dimmed"); dash.classList.add("faded");
       phone.classList.add("show");
+      // the weekly-insights email slides in on the right a beat later
+      setTimeout(function(){ var em=ROOT.querySelector("#gro-email"); if(em) em.classList.add("show"); }, 450);
       // FLIP: measure the alert in the dashboard, reparent into the phone slot,
       // then animate from the old position/size to the new (it rises into the phone).
       var first=card.getBoundingClientRect();
@@ -493,6 +551,7 @@
   function reset(){
     dash.classList.remove("dimmed"); dash.classList.remove("faded");
     ROOT.querySelector("#gro-phone").classList.remove("show");
+    var gem=ROOT.querySelector("#gro-email"); if(gem) gem.classList.remove("show");
     // restore the alert back into the Traffic tile if it was handed to the phone
     var card=ROOT.querySelector("#gro-alert-card"), atile=ROOT.querySelector("#gro-alert-tile");
     if(card.parentElement !== atile){ card.classList.remove("in-phone"); card.style.transform=""; card.style.transition=""; card.style.opacity=""; card.style.pointerEvents=""; atile.appendChild(card); }
