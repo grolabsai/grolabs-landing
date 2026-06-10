@@ -179,6 +179,13 @@
   @media (prefers-reduced-motion: reduce) {
     .gro-td .alert-card.show { animation: none; opacity: 1; }
   }
+
+  /* Embedded mode (set by JS when the host iframe is desktop-width): keep the
+     full desktop layout — 6 KPIs per row, the three trend graphs in ONE row —
+     rendered at a fixed design width and zoomed down to fit, so the whole
+     dashboard reads about half-size (just to convey the idea). */
+  .gro-td.td-forced .kpi { grid-column: span 2 !important; }
+  .gro-td.td-forced .line-tile { grid-column: span 4 !important; }
 </style>
 </head>
 <body style="margin:0;">
@@ -442,13 +449,31 @@
 })();
 </script>
 <script>
-  /* Report content height to the host page so it can size the iframe. */
+  /* Fit the dashboard to the host iframe + report its (scaled) height. */
   (function(){
     var root = document.querySelector('.gro-td');
-    if(!root) return;
+    var dash = root && root.querySelector('.dash');
+    if(!root || !dash) return;
+    var DESIGN = 1200;   // logical width the full desktop layout is laid out at
+    function fit(){
+      var vw = document.documentElement.clientWidth || window.innerWidth;
+      if(vw >= 680){
+        // desktop-width embed → full layout at DESIGN px, zoomed down to fit
+        root.classList.add('td-forced');
+        dash.style.width = DESIGN + 'px';
+        dash.style.zoom = (vw / DESIGN).toFixed(4);
+      } else {
+        // narrow (mobile, stacked) → natural responsive layout, no zoom
+        root.classList.remove('td-forced');
+        dash.style.width = '';
+        dash.style.zoom = '';
+      }
+    }
     function postH(){ parent.postMessage({ type:'td-height', height: Math.ceil(root.getBoundingClientRect().height) + 6 }, '*'); }
+    function update(){ fit(); postH(); }
     if(window.ResizeObserver){ new ResizeObserver(postH).observe(root); }
-    addEventListener('load', postH); addEventListener('resize', postH);
+    addEventListener('load', update); addEventListener('resize', update);
+    fit(); update();
   })();
 </script>
 </body>
