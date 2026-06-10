@@ -18,6 +18,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // unconfigured environment never renders an empty titled section.
 const hasVideo = !!import.meta.env.PUBLIC_CF_STREAM_URL;
 
+// Explainer-video section hidden per request. Flip back to true to restore it.
+const showExplainerVideo = false;
+
 /**
  * Booking provider toggle. Flip `provider` between 'cal' and 'calendly'
  * to swap embeds without removing either's code path. The unused
@@ -151,12 +154,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             </a>
             <span class="hero-v2-cta-note">Free 15-minute call</span>
           </div>
-          <button type="button" class="hero-v2-btn hero-v2-btn--video" data-watch-video>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-            Watch Video
-          </button>
         </div>
       </div>
 
@@ -166,103 +163,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <p class="hero-v2-stat-text">of visitors never become customers in many online stores.</p>
         </div>
 
-        <div class="hero-v2-audit">
-          <p class="hero-v2-audit-headline">
-            What's preventing the sales you're capable of?
-          </p>
-          <p class="hero-v2-audit-sub"><svg class="hero-v2-audit-mag" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fae194" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M21 21l-4.6-4.6" /><path d="M6 10h1.8l1-2.6 1.7 5 1.1-3 0.7 0.6H14" stroke-width="1.6" /></svg> Perhaps we can help you find out.</p>
-
-          <form class="hero-v2-audit-form" data-audit-form novalidate>
-            <div class="audit-inputrow">
-              <div class="audit-inputs">
-                <div class="hero-v2-audit-field">
-                  <svg class="hero-v2-audit-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-                    <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72" />
-                    <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72" />
-                  </svg>
-                  <input type="url" name="url" class="hero-v2-audit-input has-ico" placeholder="your-store.com/product/…" required />
-                </div>
-                <div class="hero-v2-audit-field">
-                  <svg class="hero-v2-audit-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <rect x="3" y="5" width="18" height="14" rx="2" />
-                    <path d="m3 7 9 6 9-6" />
-                  </svg>
-                  <input type="email" name="email" class="hero-v2-audit-input has-ico" placeholder="you@store.com" required />
-                </div>
-              </div>
-              <div class="audit-action">
-                <p class="hero-v2-audit-hint"><svg class="hint-info" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="#fae194" stroke-width="1.6" /><line x1="12" y1="7" x2="12" y2="13" stroke="#fae194" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="16.3" r="1.05" fill="#fae194" /></svg>Paste here the URL of your most important product page.</p>
-                <button type="submit" class="hero-v2-btn hero-v2-btn--video hero-v2-audit-btn">Start Diagnostic Scan</button>
-              </div>
-            </div>
-            <p class="audit-err" data-audit-err role="alert">
-              <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 3l10 17H2z" fill="#EDEAE0" />
-                <rect x="11" y="9" width="2" height="6" rx="1" fill="#16171d" />
-                <circle cx="12" cy="17.4" r="1.2" fill="#16171d" />
-              </svg>
-              <span data-audit-err-msg></span>
-            </p>
-          </form>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- ============================================================
-       WIP audit carousel — FIRST DRAFT (below the WIP hero).
-       One block per page: live animation + side checklist flipping
-       pending → ✓/✕. Blocks animate in PARALLEL. MOCK-driven for now
-       (no backend); prospect storage + email send are out of scope.
-       ============================================================ -->
-  <section class="audit-carousel px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl overflow-hidden" data-audit-carousel hidden>
-    <div class="max-w-page mx-auto">
-      <header class="audit-carousel-head">
-        <span class="audit-carousel-eyebrow">Live Diagnostic</span>
-        <h2 class="audit-carousel-title">This should be quick. <button type="button" class="audit-watch-link" data-watch-video>Watch the video</button> while we take care of this and come back for your results.</h2>
-      </header>
-
-      <div class="audit-track-wrap">
-        <div class="audit-track">
-          <article class="audit-block" data-block="search">
-            <div class="audit-block-anim">
-              <iframe class="audit-frame" data-loader="/audit/search-loader.html" title="Search results audit"></iframe>
-            </div>
-            <aside class="audit-block-list">
-              <h4 class="audit-block-list-title">Search experience</h4>
-              <ul class="audit-checklist" data-checklist></ul>
-            </aside>
-          </article>
-
-          <article class="audit-block" data-block="pdp">
-            <div class="audit-block-anim">
-              <iframe class="audit-frame" data-loader="/audit/pdp-loader.html" title="Product page audit"></iframe>
-            </div>
-            <aside class="audit-block-list">
-              <h4 class="audit-block-list-title">Product page</h4>
-              <ul class="audit-checklist" data-checklist></ul>
-            </aside>
-          </article>
-        </div>
-      </div>
-
-      <!-- Revenue Leak Score — rendered as a full-width frame BELOW the
-           panels (revealed at 30 s) so it never overlays the recorded scan
-           results. Demo: red tones throughout; the CTA stays yellow. -->
-      <div class="audit-score-panel" data-score-overlay data-score-card hidden>
-        <div class="audit-score-num"><span data-score-num>--</span><span class="audit-score-max">/100</span></div>
-        <p class="audit-score-sublabel">Revenue Leak Score</p>
-        <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
-        <a
-          href="https://cal.com/tuncho-granados-uibzst/15min"
-          class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
-          target="_blank"
-          rel="noopener noreferrer"
-        >Book growth assessment call</a>
-      </div>
-
-    </div>
-  </section>
 
   <script is:inline>
     (function () {
@@ -464,6 +368,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           requestAnimationFrame(function () { carousel.scrollIntoView({ behavior: "smooth", block: "start" }); });
           runAll(normalizeUrl(urlInput.value));
         });
+
+        // The section is always visible now, so auto-play the demo scan once it
+        // scrolls into view (otherwise the scan frames sit empty until submit).
+        var autoRan = false;
+        function autoRun() { if (!autoRan) { autoRan = true; carousel.classList.add("is-open"); runAll(SAMPLE_URL); } }
+        if ("IntersectionObserver" in window) {
+          var io = new IntersectionObserver(function (entries) {
+            if (entries[0].isIntersecting) { io.disconnect(); autoRun(); }
+          }, { threshold: 0.2 });
+          io.observe(carousel);
+        } else { autoRun(); }
       }
       if (document.readyState !== "loading") init();
       else document.addEventListener("DOMContentLoaded", init);
@@ -496,9 +411,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
-  {/* Video — Cloudflare Stream embed. Gated on PUBLIC_CF_STREAM_URL so an
-      unconfigured environment never shows an empty titled section. */}
-  {hasVideo && (
+  {/* Video — Cloudflare Stream embed. Hidden via showExplainerVideo (set
+      false per request); still gated on PUBLIC_CF_STREAM_URL otherwise. */}
+  {hasVideo && showExplainerVideo && (
     <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal">
       <div class="max-w-page mx-auto">
         <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-lg block">
@@ -574,6 +489,90 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       });
     })();
   </script>
+
+  {/* ============================================================
+       Quick assessment — diagnostic scan. Always visible, placed BELOW
+       the Revenue Recovery Engine animation. The URL/email/Start fields
+       (moved out of the hero) sit horizontally at the top; the scan
+       blocks auto-play when the section scrolls into view and re-run on
+       submit with the entered URL. Mock-driven (backend out of scope).
+       ============================================================ */}
+  <section class="audit-carousel px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl overflow-hidden" data-audit-carousel>
+    <div class="max-w-page mx-auto">
+      <header class="audit-carousel-head">
+        <span class="audit-carousel-eyebrow">Quick assessment</span>
+        <h2 class="audit-carousel-title">How much revenue is your funnel leaking?</h2>
+      </header>
+
+      {/* URL + email + Start — horizontal, at the top (relocated from the hero). */}
+      <form class="audit-scan-form" data-audit-form novalidate>
+        <div class="audit-scan-row">
+          <div class="hero-v2-audit-field">
+            <svg class="hero-v2-audit-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+              <path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72" />
+              <path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72" />
+            </svg>
+            <input type="url" name="url" class="hero-v2-audit-input has-ico" placeholder="your-store.com/product/…" required />
+          </div>
+          <div class="hero-v2-audit-field">
+            <svg class="hero-v2-audit-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+            <input type="email" name="email" class="hero-v2-audit-input has-ico" placeholder="you@store.com" required />
+          </div>
+          <button type="submit" class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-scan-btn">Start Diagnostic Scan</button>
+        </div>
+        <p class="hero-v2-audit-hint"><svg class="hint-info" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9.5" stroke="#fae194" stroke-width="1.6" /><line x1="12" y1="7" x2="12" y2="13" stroke="#fae194" stroke-width="1.8" stroke-linecap="round" /><circle cx="12" cy="16.3" r="1.05" fill="#fae194" /></svg>Paste here the URL of your most important product page.</p>
+        <p class="audit-err" data-audit-err role="alert">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l10 17H2z" fill="#EDEAE0" />
+            <rect x="11" y="9" width="2" height="6" rx="1" fill="#16171d" />
+            <circle cx="12" cy="17.4" r="1.2" fill="#16171d" />
+          </svg>
+          <span data-audit-err-msg></span>
+        </p>
+      </form>
+
+      <div class="audit-track-wrap">
+        <div class="audit-track">
+          <article class="audit-block" data-block="search">
+            <div class="audit-block-anim">
+              <iframe class="audit-frame" data-loader="/audit/search-loader.html" title="Search results audit"></iframe>
+            </div>
+            <aside class="audit-block-list">
+              <h4 class="audit-block-list-title">Search experience</h4>
+              <ul class="audit-checklist" data-checklist></ul>
+            </aside>
+          </article>
+
+          <article class="audit-block" data-block="pdp">
+            <div class="audit-block-anim">
+              <iframe class="audit-frame" data-loader="/audit/pdp-loader.html" title="Product page audit"></iframe>
+            </div>
+            <aside class="audit-block-list">
+              <h4 class="audit-block-list-title">Product page</h4>
+              <ul class="audit-checklist" data-checklist></ul>
+            </aside>
+          </article>
+        </div>
+      </div>
+
+      {/* Revenue Leak Score — full-width frame below the panels (revealed at 30s). */}
+      <div class="audit-score-panel" data-score-overlay data-score-card hidden>
+        <div class="audit-score-num"><span data-score-num>--</span><span class="audit-score-max">/100</span></div>
+        <p class="audit-score-sublabel">Revenue Leak Score</p>
+        <p class="audit-score-msg">We are pretty confident there is a significant amount of revenue we can help you recover.</p>
+        <a
+          href="https://cal.com/tuncho-granados-uibzst/15min"
+          class="hero-v2-btn hero-v2-btn--primary cta-button-style audit-score-cta"
+          target="_blank"
+          rel="noopener noreferrer"
+        >Book growth assessment call</a>
+      </div>
+
+    </div>
+  </section>
 
   <style is:global>
     /* ─────────── Revenue Recovery Engine (animated iframe section) ───────────
@@ -935,9 +934,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        One block per page: live animation (iframe loader) + a side
        checklist that flips pending → ✓/✕. Blocks animate in parallel.
        Mock-driven for now; theme matched to hero-v2. */
-    .audit-carousel-head { margin-bottom: 28px; }
-    .audit-carousel-eyebrow { font-family: ui-monospace, monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #fae194; }
-    .audit-carousel-title { font-family: "Hanken Grotesk", sans-serif; font-weight: 400; color: #EDEAE0; font-size: 16px; line-height: 24px; margin: 10px 0 0; }
+    .audit-carousel-head { margin-bottom: 24px; }
+    .audit-carousel-eyebrow { font-family: ui-monospace, monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #fae194; }
+    .audit-carousel-title { font-family: "Permanent Marker", cursive; font-weight: 400; color: #EDEAE0; font-size: clamp(26px, 3.2vw, 40px); line-height: 1.1; margin: 12px 0 0; }
+
+    /* Diagnostic-scan form — URL + email + Start in one horizontal row at the
+       top of the section (reuses the hero field/input/error styles + JS). */
+    .audit-scan-form { margin: 0 0 32px; max-width: 940px; }
+    .audit-scan-row { display: flex; gap: 14px; align-items: stretch; flex-wrap: wrap; }
+    .audit-scan-row .hero-v2-audit-field { flex: 1 1 240px; min-width: 0; }
+    .audit-scan-btn { flex: 0 0 auto; white-space: nowrap; cursor: pointer; }
+    .audit-carousel .hero-v2-audit-hint { margin: 12px 0 0; }
+    @media (max-width: 680px) {
+      .audit-scan-row { flex-direction: column; align-items: stretch; }
+      .audit-scan-btn { width: 100%; justify-content: center; }
+    }
     /* Inline "watch the video" — yellow, clickable; reuses the [data-watch-video]
        handler (scrolls to the video section + starts playback). */
     .audit-watch-link { font: inherit; color: #fae194; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color .2s; }
