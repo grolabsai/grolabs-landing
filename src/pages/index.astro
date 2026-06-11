@@ -759,10 +759,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <h2 class="rre-title">Revenue Recovery Engine</h2>
         </div>
         <p class="rre-lede">
-          Conversion isn't guesswork. That's why we run <span class="rre-lede-brand">labs</span>.<br />
+          Conversion isn't guesswork.<br class="md:hidden" /> That's why we run <span class="rre-lede-brand">labs</span>.<br />
           Behind every conversion improvement is a disciplined process of
-          <b class="rre-lede-step">measuring</b>, <b class="rre-lede-step">diagnosing</b>,
-          <b class="rre-lede-step">optimizing</b>, and <b class="rre-lede-step">validating</b>.
+          <span class="rre-lede-step">measuring</span>, <span class="rre-lede-step">diagnosing</span>,
+          <span class="rre-lede-step">optimizing</span>, and <span class="rre-lede-step">validating</span>.
         </p>
       </header>
       <div class="rre-frame-wrap">
@@ -987,16 +987,16 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* Replay sits below the animation, lower right — same placement as
        the yellow section's control. */
     .rre-replay-row { display: flex; justify-content: flex-end; margin-top: 12px; }
-    /* "labs" reads as the GroLabs brand: caps + the marker face. */
+    /* "labs" reads as the GroLabs brand: caps + the marker face, yellow. */
     .rre-lede-brand {
       font-family: "Permanent Marker", cursive;
       text-transform: uppercase;
-      color: #EDEAE0;
+      color: #fae194;
       font-size: 0.95em;
       letter-spacing: 0.02em;
     }
-    /* The four process steps pop out of the muted lede: white + bold. */
-    .rre-lede-step { color: #ffffff; font-weight: 700; }
+    /* The four process steps pop out of the muted lede: yellow, regular weight. */
+    .rre-lede-step { color: #fae194; }
     .rre-lede {
       font-family: "Hanken Grotesk", sans-serif;
       font-size: 18px;
