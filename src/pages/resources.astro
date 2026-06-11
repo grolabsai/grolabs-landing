@@ -22,7 +22,11 @@ const locale = 'en' as const;
   title="Resources | GroLabs"
   description="The books, articles, and citations that shape how GroLabs thinks about catalog, search, and conversion."
 >
-  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
+  {/* No `reveal` here: this is the page's whole body and on mobile the
+      single-column grid is ~21,000px tall, so its max intersection ratio
+      (~0.04) never crosses the reveal observer's 0.15 threshold — the
+      section would stay at opacity 0 and the page renders blank. */}
+  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Resources

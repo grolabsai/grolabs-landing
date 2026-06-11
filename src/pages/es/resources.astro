@@ -18,7 +18,10 @@ const locale = 'es' as const;
 ---
 
 <BaseLayout>
-  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden reveal">
+  {/* No `reveal` here: see EN resources.astro — a tall single-column
+      mobile grid never crosses the reveal observer's 0.15 threshold, so
+      the section would stay at opacity 0 and render blank. */}
+  <section class="relative mt-2xl py-2xl bg-canvas overflow-hidden">
     <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
         Recursos
