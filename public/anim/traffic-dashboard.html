@@ -163,14 +163,14 @@
 
   /* Phone + email share the same top/bottom so their edges line up. */
   .gro-td .gro-phone {
-    /* Vertically centered with a capped height so the phone keeps a
-       believable aspect even when the embed is full-width (tall).
-       Horizontally, phone + email form one CENTERED pair
-       (218 + 58 gap + 404 = 680 wide) instead of hugging the edges. */
-    position: absolute; top: 50%; left: calc(50% - 340px);
-    height: min(600px, calc(100% - 56px));
+    /* Locked to a natural handset aspect (12:25 ≈ iPhone) — height is
+       capped to the dashboard, width derives from the ratio. Phone +
+       email form one CENTERED pair instead of hugging the edges. */
+    position: absolute; top: 50%; left: calc(50% - 352px);
+    height: min(500px, calc(100% - 56px));
+    aspect-ratio: 12 / 25;
     transform: translateY(-50%) translateX(-26px) scale(.97);
-    width: 218px; opacity: 0; pointer-events: none; z-index: 6;
+    opacity: 0; pointer-events: none; z-index: 6;
     display: flex;
     transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
   }
@@ -209,7 +209,7 @@
        bottom edges stay aligned at any embed size; right half of the
        centered pair. */
     position: absolute; top: 50%; right: calc(50% - 340px);
-    height: min(600px, calc(100% - 56px));
+    height: min(500px, calc(100% - 56px));   /* same cap as the phone — edges stay aligned */
     transform: translateY(-50%) translateX(26px) scale(.97);
     width: 404px; opacity: 0; pointer-events: none; z-index: 5;
     display: flex;
