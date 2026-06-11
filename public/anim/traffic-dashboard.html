@@ -160,7 +160,13 @@
 
   /* ── Hand-off: fade the dashboard to a faint backdrop, a phone overlays it
         on the LEFT and takes focus, and the alert flies up into the phone. ── */
-  .gro-td .dash.faded { opacity: 0.12; filter: saturate(0.4); transition: opacity .8s ease, filter .8s ease; pointer-events: none; }
+  /* Fade only the dashboard's own content — NOT the phone/email, which live
+     inside .dash (so they zoom with it) but must stay solid on the backdrop.
+     Opacity multiplies through descendants, so we must exclude them here. */
+  .gro-td .dash.faded > *:not(#gro-phone):not(#gro-email) {
+    opacity: 0.12; filter: saturate(0.4); pointer-events: none;
+    transition: opacity .8s ease, filter .8s ease;
+  }
 
   /* Phone + email: absolutely positioned inside .dash so they zoom with it. */
   .gro-td .gro-phone {
