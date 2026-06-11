@@ -173,6 +173,286 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
+  {/* ============================================================
+       GRO Framework — scroll-scrubbed "handwritten" revenue formula.
+       The stage (1080×520 design units) sits in a box on the right;
+       the section pins (sticky) inside a tall track and scroll
+       progress 0→1 draws the annotation layer one stroke at a time
+       (see design_handoff_revenue_formula_animation README).
+       ============================================================ */}
+  <section class="rf-section" data-rf data-screen-label="GRO Framework">
+    <div class="rf-track" data-rf-track>
+      <div class="rf-pin">
+        <div class="rf-inner max-w-page mx-auto">
+          <header class="rf-head">
+            <span class="rf-eyebrow">How?</span>
+            <h2 class="rf-title">GRO Framework</h2>
+          </header>
+
+          <div class="rf-grid">
+            <div class="rf-copy">
+              <p>
+                The GRO Framework allows entrepreneurs and executives to focus on
+                <span class="rf-cap">G</span>rowing the business&mdash;not chasing
+                operational revenue leaks.
+              </p>
+              <p>
+                You focus on strategy, products, customers, and expansion.
+                We <span class="rf-cap">R</span>ecover lost revenue and
+                <span class="rf-cap">O</span>ptimize the product discovery and
+                conversion engine.
+              </p>
+            </div>
+
+            <div class="rf-box">
+              <div class="rf-stage-wrap" data-rf-wrap>
+                <div class="rf-stage" data-rf-stage>
+                  <svg class="rf-marks" viewBox="0 0 1080 520" preserveAspectRatio="none" aria-hidden="true">
+                    <path id="rfRule1" class="rf-ruleln" pathLength="1" d="M 300 246 C 430 244 560 248 680 245 C 730 244 770 247 800 246" />
+                    <path id="rfRule2" class="rf-ruleln" pathLength="1" d="M 300 398 C 430 401 560 396 680 399 C 730 400 770 398 800 398" />
+                    <path id="rfArA"   pathLength="1" d="M 230 136 C 150 132 140 200 152 268 C 162 322 196 344 238 352" />
+                    <path id="rfArAh1" pathLength="1" d="M 238 352 L 214 346" />
+                    <path id="rfArAh2" pathLength="1" d="M 238 352 L 228 330" />
+                    <path id="rfArB"   pathLength="1" d="M 230 206 C 128 204 106 262 124 314 C 140 350 196 366 234 360" />
+                    <path id="rfArBh1" pathLength="1" d="M 234 360 L 210 355" />
+                    <path id="rfArBh2" pathLength="1" d="M 234 360 L 224 338" />
+                    <path id="rfArD"   pathLength="1" d="M 248 372 C 214 384 210 410 230 428 C 236 433 243 436 250 436" />
+                    <path id="rfArDh1" pathLength="1" d="M 250 436 L 232 431" />
+                    <path id="rfArDh2" pathLength="1" d="M 250 436 L 240 419" />
+                    <path id="rfCirc1" class="rf-circle" pathLength="1" d="M 250 448 C 244 414 440 402 560 404 C 700 406 802 412 798 442 C 802 470 700 478 560 476 C 420 474 250 472 248 446 C 247 432 268 422 296 418" />
+                    <path id="rfCirc2" class="rf-circle" pathLength="1" d="M 242 454 C 236 412 440 396 566 398 C 712 400 812 408 808 444 C 812 474 704 484 560 482 C 412 480 244 478 242 450 C 241 434 266 422 296 414" />
+                  </svg>
+
+                  <div class="rf-op rf-row rf-auto" id="rfOpConv" style="top:136px;">&times;</div>
+                  <div class="rf-op rf-row rf-auto" id="rfOpAov"  style="top:206px;">&times;</div>
+                  <div class="rf-op rf-row rf-auto" id="rfOpAct"  style="top:288px;">=</div>
+                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpRec" style="top:358px;">+</div>
+                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpPot" style="top:442px;">=</div>
+
+                  <div class="rf-word rf-row" style="top:66px;">Traffic</div>
+                  <div class="rf-word rf-row" style="top:136px;">Conversion</div>
+                  <div class="rf-word rf-row" style="top:206px;">Average order value</div>
+                  <div class="rf-word rf-row" style="top:288px;">Actual revenue</div>
+                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWRec" style="top:358px;">Recovered revenue</div>
+                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWPot" style="top:442px;">Potential revenue</div>
+
+                  <div class="rf-sym rf-row" style="top:66px;">
+                    <svg viewBox="0 0 64 64" aria-label="traffic"><circle cx="32" cy="21" r="11" fill="currentColor"/><path d="M11 56 C11 38 53 38 53 56 Z" fill="currentColor"/></svg>
+                  </div>
+                  <div class="rf-sym rf-row" style="top:136px;">%</div>
+                  <div class="rf-sym rf-row" style="top:206px;">$</div>
+                  <div class="rf-sym rf-row" style="top:288px;">$</div>
+                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSRec" style="top:358px;">$</div>
+                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSPot" style="top:442px;">$$</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    /* ─────────── GRO Framework (scroll-scrubbed revenue formula) ─────────── */
+    .rf-section {
+      background: #0c0c0f;
+      font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .rf-track { position: relative; height: 280vh; }
+    .rf-pin {
+      position: sticky; top: 0; min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 48px 24px;
+    }
+    .rf-inner { width: 100%; }
+    .rf-head { margin: 0 0 36px; }
+    .rf-eyebrow {
+      display: block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: #fae194; margin-bottom: 16px;
+    }
+    .rf-title {
+      font-family: "Permanent Marker", cursive; font-weight: 400;
+      color: #EDEAE0; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.1; margin: 0;
+    }
+    .rf-grid {
+      display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center;
+    }
+    @media (min-width: 1024px) { .rf-grid { grid-template-columns: 2fr 3fr; gap: 56px; } }
+    .rf-copy p {
+      font-size: 19px; line-height: 1.65; color: rgba(237, 234, 224, 0.7);
+      margin: 0 0 22px;
+    }
+    .rf-copy p:last-child { margin-bottom: 0; }
+    .rf-cap {
+      font-family: "Permanent Marker", cursive;
+      color: #fae194; font-size: 1.35em; line-height: 1;
+    }
+    .rf-box {
+      background: #131316;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px 20px;
+      overflow: hidden;
+    }
+
+    /* Stage: fixed 1080×520 design space, uniformly scaled to the box width */
+    .rf-stage-wrap { position: relative; width: 100%; overflow: hidden; }
+    .rf-stage {
+      position: absolute; top: 0; left: 0;
+      width: 1080px; height: 520px;
+      transform-origin: top left;
+      color: #fff;
+    }
+    .rf-row { position: absolute; transform: translateY(-50%); white-space: nowrap; }
+    .rf-op {
+      left: 222px; width: 64px; text-align: right;
+      font-family: "Permanent Marker", cursive; font-size: 44px; line-height: 1;
+      opacity: 0; color: #fff;
+    }
+    /* Phase-1 operators write in once the section is on screen (.rf-go) */
+    @keyframes rfOpIn {
+      from { opacity: 0; transform: translateY(-50%) translateX(-7px); }
+      to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+    }
+    .rf-go #rfOpConv { animation: rfOpIn .26s cubic-bezier(.5,.05,.3,1) .22s both; }
+    .rf-go #rfOpAov  { animation: rfOpIn .26s cubic-bezier(.5,.05,.3,1) .50s both; }
+    .rf-go #rfOpAct  { animation: rfOpIn .26s cubic-bezier(.5,.05,.3,1) .78s both; }
+    .rf-word { left: 300px; font-size: 44px; font-weight: 500; letter-spacing: -0.01em; color: #fff; }
+    .rf-sym  { left: 712px; text-align: left; width: 240px; font-size: 44px; font-weight: 600; color: #fff; }
+    .rf-sym svg { width: 38px; height: 38px; vertical-align: -5px; }
+    .rf-hand { font-family: "Permanent Marker", cursive; font-weight: 400; letter-spacing: 0.005em; }
+    .rf-ltr { display: inline-block; opacity: 0; }
+    .rf-marker { color: #fae194; }
+    .rf-hidden { opacity: 0; }
+    .rf-marks { position: absolute; inset: 0; width: 1080px; height: 520px; pointer-events: none; overflow: visible; }
+    .rf-marks path {
+      fill: none; stroke: #fae194; stroke-width: 4.5;      /* arrows = yellow */
+      stroke-linecap: round; stroke-linejoin: round;
+      /* gap (2) longer than the dash (1): hidden state parks mid-gap at
+         offset 1.5 — at a dash boundary (offset 1) the round cap paints a
+         stray dot on the path even though the stroke is "hidden" */
+      stroke-dasharray: 1 2; stroke-dashoffset: 1.5;
+    }
+    .rf-marks .rf-ruleln { stroke: #fff; stroke-width: 3; }   /* dividers = white */
+    .rf-marks .rf-circle { stroke: #34d399; stroke-width: 4; }/* green = answer circle only */
+    @keyframes rfDrawln { to { stroke-dashoffset: 0; } }
+    .rf-go #rfRule1 { animation: rfDrawln .5s ease 1.06s both; }
+  </style>
+
+  <script is:inline>
+    // GRO Framework — scroll-scrubbed annotation timeline ("one pen": a single
+    // stroke draws at any moment; arrowheads only after their shaft; signs
+    // complete before their word writes letter-by-letter).
+    (function () {
+      var section = document.querySelector('[data-rf]');
+      if (!section) return;
+      var track = section.querySelector('[data-rf-track]');
+      var wrap = section.querySelector('[data-rf-wrap]');
+      var stage = section.querySelector('[data-rf-stage]');
+
+      // Uniformly scale the 1080×520 stage to the box width.
+      function fit() {
+        var s = wrap.clientWidth / 1080;
+        stage.style.transform = 'scale(' + s + ')';
+        wrap.style.height = Math.round(520 * s) + 'px';
+      }
+      window.addEventListener('resize', fit);
+      fit();
+
+      function splitLetters(el) {
+        var text = el.textContent; el.textContent = '';
+        var spans = [];
+        for (var i = 0; i < text.length; i++) {
+          var s = document.createElement('span');
+          s.className = 'rf-ltr';
+          s.textContent = text[i] === ' ' ? ' ' : text[i];
+          el.appendChild(s); spans.push(s);
+        }
+        return spans;
+      }
+      var recLetters = splitLetters(document.getElementById('rfWRec'));
+      var potLetters = splitLetters(document.getElementById('rfWPot'));
+
+      function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+      function seg(t, a, b) { return clamp((t - a) / (b - a), 0, 1); }
+      function P(id) { return document.getElementById(id); }
+
+      var arA = [P('rfArA'), P('rfArAh1'), P('rfArAh2')];
+      var arB = [P('rfArB'), P('rfArBh1'), P('rfArBh2')];
+      var arD = [P('rfArD'), P('rfArDh1'), P('rfArDh2')];
+      var rule2 = P('rfRule2'), c1 = P('rfCirc1'), c2 = P('rfCirc2');
+
+      // Reduced motion (or no scrub): render the fully-drawn final frame.
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        ['rfOpConv','rfOpAov','rfOpAct','rfOpRec','rfOpPot','rfSRec','rfSPot'].forEach(function (id) {
+          var e = P(id); e.style.animation = 'none'; e.style.opacity = '1';
+        });
+        ['rfRule1','rfRule2','rfArA','rfArAh1','rfArAh2','rfArB','rfArBh1','rfArBh2','rfArD','rfArDh1','rfArDh2','rfCirc1','rfCirc2'].forEach(function (id) {
+          P(id).style.strokeDashoffset = 0;
+        });
+        recLetters.concat(potLetters).forEach(function (s) { s.style.opacity = '1'; });
+        return;
+      }
+
+      // Phase 1 (printed-statement operators + divider 1) plays once on sight.
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { section.classList.add('rf-go'); io.disconnect(); }
+          });
+        }, { threshold: 0.2 });
+        io.observe(track);
+      } else {
+        section.classList.add('rf-go');
+      }
+
+      // p=0 parks the offset mid-gap (1.5) — at a dash boundary the round
+      // cap paints a stray dot even though the stroke is "hidden".
+      function dash(el, p) { el.style.strokeDashoffset = p <= 0 ? 1.5 : 1 - p; }
+      function arrow(g, t, a, b, c) {
+        dash(g[0], seg(t, a, b));
+        var h = seg(t, b, c);
+        dash(g[1], h);
+        dash(g[2], h);
+      }
+      function showEl(el, p) { el.style.opacity = p; }
+      function writeLetters(letters, p) {
+        var shown = p * letters.length;
+        for (var i = 0; i < letters.length; i++) {
+          letters[i].style.opacity = clamp(shown - i, 0, 1);
+        }
+      }
+
+      // Phase 2 — scrubbed by progress through the pinned track (true scrub:
+      // reverse scrolling un-draws).
+      function update() {
+        var r = track.getBoundingClientRect();
+        var total = track.offsetHeight - window.innerHeight;
+        if (total <= 0) return;
+        var t = clamp(-r.top / total, 0, 1);
+
+        arrow(arA, t, 0.00, 0.08, 0.11);
+        arrow(arB, t, 0.13, 0.21, 0.24);
+        showEl(P('rfOpRec'), seg(t, 0.26, 0.30));
+        writeLetters(recLetters, seg(t, 0.31, 0.44));
+        showEl(P('rfSRec'), seg(t, 0.45, 0.48));
+        dash(rule2, seg(t, 0.50, 0.57));
+        arrow(arD, t, 0.59, 0.68, 0.71);
+        showEl(P('rfOpPot'), seg(t, 0.73, 0.77));
+        writeLetters(potLetters, seg(t, 0.78, 0.90));
+        showEl(P('rfSPot'), seg(t, 0.90, 0.93));
+        dash(c1, seg(t, 0.93, 0.965));
+        dash(c2, seg(t, 0.965, 1.0));
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+  </script>
+
 
   <script is:inline>
     (function () {
