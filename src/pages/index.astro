@@ -218,13 +218,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
           <div class="rf-grid">
             <div class="rf-copy">
-              {/* One concept sentence — same on every viewport. */}
+              {/* One concept sentence, broken so each G/R/O verb owns a line. */}
               <p>
-                The <span class="rf-cap">GRO</span> Framework frees you to
-                <span class="rf-cap">G</span>row the business while we
-                <span class="rf-cap">R</span>ecover lost revenue and
-                <span class="rf-cap">O</span>ptimize the product discovery
-                and conversion engine.
+                The GRO Framework frees you to<br />
+                <span class="rf-cap">G</span>row the business while we<br />
+                <span class="rf-cap">R</span>ecover lost revenue and<br />
+                <span class="rf-cap">O</span>ptimize the product discovery and conversion engine.
               </p>
             </div>
 
@@ -311,13 +310,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
     @media (min-width: 1024px) { .rf-grid { grid-template-columns: 2fr 3fr; gap: 56px; } }
     .rf-copy p {
-      font-size: 19px; line-height: 1.65; color: rgba(237, 234, 224, 0.7);
+      font-size: 23px; line-height: 1.65; color: rgba(237, 234, 224, 0.7);
       margin: 0 0 22px;
     }
     .rf-copy p:last-child { margin-bottom: 0; }
     /* Mobile tightens the type and the box. */
     @media (max-width: 767px) {
-      .rf-copy p { font-size: 16.5px; line-height: 1.55; }
+      .rf-copy p { font-size: 20.5px; line-height: 1.55; }
       .rf-box { padding: 16px 10px; }
       .rf-grid { gap: 24px; }
     }
@@ -2192,11 +2191,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         Entrepreneurs' Priority
       </span>
       <h2 class="font-marker uppercase text-black text-3xl md:text-5xl mb-md">
-        Grow a company without distractions
+        Grow a company
       </h2>
       <p class="text-black/60 text-body-md md:text-body-lg leading-relaxed mb-lg md:mb-[48px]">
-        We monitor thousands of indicators, metrics, and dashboards so you can focus on growing the business.<br class="hidden md:block" />
-        You'll receive business insights on a need-to-know basis.
+        Business insights, delivered on a need-to-know basis.<br />
+        We monitor the signals behind the scenes and notify you only when action is required.
       </p>
 
       <div class="td-frame-wrap">
