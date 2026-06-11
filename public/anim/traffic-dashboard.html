@@ -219,21 +219,21 @@
 
   /* Narrow embeds (mobile): we're throwing a concept, not the whole
      product — tell the story with ONE block (the daily-traffic alert
-     tile), then end on the EMAIL alone; the phone overlay is dropped
-     entirely (the JS skips the phone hand-off when hidden). */
+     tile). The phone overlay is dropped entirely, and the EMAIL sits in
+     the flow BELOW the dashboard (not overlaid), so the triggered alert
+     stays readable next to the email that follows it. */
   @media (max-width: 679px) {
-    .gro-td { min-height: 480px; }   /* floor so the email always fits */
+    .gro-td { flex-direction: column; align-items: stretch; }
     .gro-td .sec-label { display: none; }
     .gro-td .tile { display: none; }
     .gro-td .alert-tile { display: flex; grid-column: span 12 !important; }
     .gro-td .gro-phone { display: none; }
     .gro-td .gro-email {
-      right: auto; left: 50%; top: 50%;
-      height: auto; max-height: calc(100% - 16px);   /* size to content */
-      width: min(404px, calc(100vw - 24px));
-      transform: translateY(-50%) translateX(calc(-50% + 26px)) scale(.97);
+      position: static; height: auto;
+      width: min(404px, 100%); margin: 14px auto 0;
+      transform: translateY(14px) scale(.98);
     }
-    .gro-td .gro-email.show { transform: translateY(-50%) translateX(-50%) scale(1); }
+    .gro-td .gro-email.show { transform: none; }
   }
   .gro-td .email-card { flex: 1; display: flex; flex-direction: column; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.42), 0 0 0 1px rgba(0,0,0,0.06); color: #1a1b1f; }
   .gro-td .email-head { display: flex; align-items: center; gap: 11px; padding: 12px 16px; border-bottom: 1px solid #ededed; }
@@ -559,13 +559,15 @@
     // and fly the (same) alert element up into the phone as a notification.
     setTimeout(()=>{
       var phone=ROOT.querySelector("#gro-phone"), slot=ROOT.querySelector("#gro-phone-slot");
-      dash.classList.remove("dimmed"); dash.classList.add("faded");
-      // Mobile (two-block) layout hides the phone entirely — the email
-      // alone carries the ending, and the alert stays in its tile.
+      dash.classList.remove("dimmed");
+      // Mobile layout hides the phone entirely — keep the dashboard (and
+      // its triggered alert) fully visible and slide the email in BELOW
+      // it, so the alert and the email read together.
       if(!phone.offsetParent){
         var emOnly=ROOT.querySelector("#gro-email"); if(emOnly) emOnly.classList.add("show");
         return;
       }
+      dash.classList.add("faded");
       phone.classList.add("show");
       // the weekly-insights email slides in on the right a beat later
       setTimeout(function(){ var em=ROOT.querySelector("#gro-email"); if(em) em.classList.add("show"); }, 450);
