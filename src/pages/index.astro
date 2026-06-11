@@ -264,14 +264,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .rf-track { position: relative; height: 240vh; }
-    /* Pin the content to the top of the viewport with the same padding
-       the other sections use — no 100vh centering, so the section
-       doesn't read as empty space above/below the content. */
+    /* Generous padding on the pinned content (plus extra space after the
+       track) so the framework never reads as mixed into the neighboring
+       sections. */
+    .rf-section { padding-bottom: 60px; }
     .rf-pin {
       position: sticky; top: 0;
-      padding: 72px 24px;
+      padding: 100px 24px;
     }
-    @media (max-width: 767px) { .rf-pin { padding: 40px 16px; } }
+    @media (max-width: 767px) { .rf-section { padding-bottom: 24px; } .rf-pin { padding: 40px 16px; } }
     .rf-inner { width: 100%; }
     .rf-head { margin: 0 0 36px; }
     .rf-eyebrow {
@@ -900,7 +901,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        is transparent, so this section's radial background shows through. */
     .rre-section {
       background: radial-gradient(130% 130% at 26% 18%, #15161d 0%, #0c0c0f 58%, #07070a 100%);
-      padding: 72px 24px;
+      padding: 160px 24px;   /* match the yellow section's py-3xl rhythm */
       font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .rre-head { max-width: 760px; margin: 0 0 36px; }
@@ -964,11 +965,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
 
     /* ─────────── Hero v2 — merged hero + stats ─────────── */
+    /* Fill the first viewport (minus the header) with the hero alone so
+       the opening view isn't distracted by the section below; content
+       stays vertically centered in that space. */
+    @media (min-width: 768px) {
+      .hero-v2 {
+        display: flex; flex-direction: column; justify-content: center;
+        min-height: calc(100svh - 80px);   /* viewport minus the site header */
+      }
+    }
     .hero-v2-grid {
       display: grid;
-      grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+      grid-template-columns: minmax(0, 50fr) minmax(0, 50fr);
       gap: 64px;
       align-items: center;
+      width: 100%;
     }
     @media (max-width: 1100px) {
       .hero-v2-grid { grid-template-columns: 1fr; gap: 56px; }
@@ -982,7 +993,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Permanent Marker", cursive;
       font-weight: 400;
       color: #EDEAE0;
-      font-size: clamp(36px, 3.9vw, 54px);
+      font-size: clamp(38px, 4.8vw, 66px);
       line-height: 1;
       letter-spacing: 0.005em;
       white-space: nowrap;
@@ -2111,9 +2122,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-md">
         Grow a company without distractions
       </h2>
-      <p class="text-black/60 text-body-lg leading-relaxed mb-lg md:mb-[48px] max-w-[760px]">
-        We monitor thousands of indicators, metrics, and dashboards so you can
-        focus on growing the business.<br />
+      <p class="text-black/60 text-body-lg leading-relaxed mb-lg md:mb-[48px]">
+        We monitor thousands of indicators, metrics, and dashboards so you can focus on growing the business.<br />
         You'll receive business insights on a need-to-know basis.
       </p>
 
