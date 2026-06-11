@@ -174,6 +174,32 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
+  <!-- Booking embed — Calendly's inline widget themed yellow + dark to
+       match the inverted footer. Hidden by default; revealed when the
+       hero CTA is clicked (see the inline script at the bottom of this
+       page). The hero CTA also still carries an `href` + target="_blank"
+       so the page degrades to "open Calendly in a new tab" if JS fails.
+       Placed directly BELOW the hero so booking opens right under the CTA. -->
+  <section id="booking-embed" hidden class="bg-primary pt-xl pb-md md:pt-2xl px-margin-mobile md:px-margin-desktop">
+    <div class="max-w-page mx-auto">
+      <p class="text-zinc-900 text-body-lg leading-relaxed mb-lg text-center">
+        Select the most convenient date and time for our call.
+      </p>
+      {/* Mount shared by both providers. Cal.com's embed.js auto-resizes
+          the iframe to its content, so it just needs a starting
+          min-height; Calendly's iframe requires an explicit fixed
+          height + overflow:hidden so trailing whitespace gets clipped. */}
+      <div
+        id="booking-mount"
+        style={
+          provider === 'cal'
+            ? 'min-width:320px; min-height:600px; width:100%;'
+            : 'min-width:320px; height:760px; width:100%; overflow:hidden;'
+        }
+      ></div>
+    </div>
+  </section>
+
   {/* ============================================================
        GRO Framework — scroll-scrubbed "handwritten" revenue formula.
        The stage (1080×520 design units) sits in a box on the right;
@@ -678,32 +704,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       else document.addEventListener("DOMContentLoaded", init);
     })();
   </script>
-
-  <!-- Booking embed — Calendly's inline widget themed yellow + dark to
-       match the inverted footer. Hidden by default; revealed when the
-       hero CTA is clicked (see the inline script at the bottom of this
-       page). The hero CTA also still carries an `href` + target="_blank"
-       so the page degrades to "open Calendly in a new tab" if JS fails.
-       Placed ABOVE the explainer video so the booked-demo flow reads first. -->
-  <section id="booking-embed" hidden class="bg-primary pt-xl pb-md md:pt-2xl px-margin-mobile md:px-margin-desktop">
-    <div class="max-w-page mx-auto">
-      <p class="text-zinc-900 text-body-lg leading-relaxed mb-lg text-center">
-        Select the most convenient date and time for our call.
-      </p>
-      {/* Mount shared by both providers. Cal.com's embed.js auto-resizes
-          the iframe to its content, so it just needs a starting
-          min-height; Calendly's iframe requires an explicit fixed
-          height + overflow:hidden so trailing whitespace gets clipped. */}
-      <div
-        id="booking-mount"
-        style={
-          provider === 'cal'
-            ? 'min-width:320px; min-height:600px; width:100%;'
-            : 'min-width:320px; height:760px; width:100%; overflow:hidden;'
-        }
-      ></div>
-    </div>
-  </section>
 
   {/* Video — Cloudflare Stream embed. Hidden via showExplainerVideo (set
       false per request); still gated on PUBLIC_CF_STREAM_URL otherwise. */}
