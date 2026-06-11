@@ -388,11 +388,22 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       var wrap = section.querySelector('[data-rf-wrap]');
       var stage = section.querySelector('[data-rf-stage]');
 
-      // Uniformly scale the 1080×520 stage to the box width.
+      // Uniformly scale the 1080×520 stage to the box width. On mobile,
+      // crop to the drawn composition's bounding box instead of the full
+      // design canvas — otherwise the canvas margins leave the box mostly
+      // empty and the formula unreadably small.
+      var CONTENT = { x: 96, y: 30, w: 724, h: 462 };
       function fit() {
-        var s = wrap.clientWidth / 1080;
-        stage.style.transform = 'scale(' + s + ')';
-        wrap.style.height = Math.round(520 * s) + 'px';
+        var w = wrap.clientWidth;
+        if (window.matchMedia('(max-width: 767px)').matches) {
+          var s = w / CONTENT.w;
+          stage.style.transform = 'translate(' + (-CONTENT.x * s) + 'px,' + (-CONTENT.y * s) + 'px) scale(' + s + ')';
+          wrap.style.height = Math.round(CONTENT.h * s) + 'px';
+        } else {
+          var s2 = w / 1080;
+          stage.style.transform = 'scale(' + s2 + ')';
+          wrap.style.height = Math.round(520 * s2) + 'px';
+        }
       }
       window.addEventListener('resize', fit);
       fit();
