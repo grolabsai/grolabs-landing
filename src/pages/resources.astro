@@ -42,7 +42,7 @@ const locale = 'en' as const;
           </p>
         ) : (
           groups.map(({ category, items }) => (
-            <div class="mb-2xl">
+            <div class="mb-lg">
               <div class="resource-grid">
                 {items.map((item) => (
                   <article class="resource-card">
@@ -67,26 +67,24 @@ const locale = 'en' as const;
                     )}
                     <div class="resource-card-body">
                       <h4 class="resource-card-title">{localizedTitle(item, locale)}</h4>
-                      {item.author && (
-                        <p class="resource-card-author">{item.author}</p>
-                      )}
-                      <div class="resource-card-meta">
+                      <p class="resource-card-sub">
+                        {item.author && <span>{item.author}</span>}
                         {item.year && <span>{item.year}</span>}
                         {item.rating != null && (
                           <span class="resource-card-rating">★ {Number(item.rating).toFixed(1)}</span>
                         )}
-                      </div>
-                      {item.external_url && (
-                        <a
-                          href={item.external_url}
-                          target="_blank"
-                          rel="noopener noreferrer sponsored"
-                          class="resource-card-link"
-                        >
-                          {ctaForCategory(category.slug, locale)} →
-                        </a>
-                      )}
+                      </p>
                     </div>
+                    {item.external_url && (
+                      <a
+                        href={item.external_url}
+                        target="_blank"
+                        rel="noopener noreferrer sponsored"
+                        class="resource-card-link"
+                      >
+                        <span class="resource-card-link-text">{ctaForCategory(category.slug, locale)}</span> →
+                      </a>
+                    )}
                   </article>
                 ))}
               </div>
@@ -99,50 +97,41 @@ const locale = 'en' as const;
 </BaseLayout>
 
 <style is:global>
+  /* Compact list — every resource is one row (small cover thumbnail +
+     title/author + CTA), read like a Spotify track list rather than a
+     wall of large book covers. */
   .resource-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 16px;
-  }
-  @media (min-width: 640px) {
-    .resource-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 900px) {
-    .resource-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 1200px) {
-    .resource-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
+    display: flex;
+    flex-direction: column;
   }
 
   .resource-card {
-    background: #131316;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    overflow: hidden;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 0;
     display: flex;
-    flex-direction: column;
-    transition: border-color 200ms ease, transform 200ms ease;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 8px;
+    transition: background 180ms ease;
   }
   .resource-card:hover {
-    border-color: rgba(250, 225, 148, 0.25);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.035);
   }
 
   .resource-card-image-link {
     display: block;
     line-height: 0;
+    flex: 0 0 auto;
   }
   .resource-card-image {
-    width: 100%;
-    aspect-ratio: 2 / 3;
+    width: 44px;
+    height: 60px;
     object-fit: cover;
     background: #0e0e11;
+    border-radius: 5px;
     display: block;
   }
   .resource-card-image--placeholder {
@@ -150,16 +139,16 @@ const locale = 'en' as const;
     align-items: center;
     justify-content: center;
     color: rgba(250, 225, 148, 0.35);
-    font-size: 48px;
+    font-size: 22px;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
   }
 
   .resource-card-body {
-    padding: 16px;
+    flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    flex: 1;
+    gap: 3px;
   }
   .resource-card-title {
     color: #EDEAE0;
@@ -167,37 +156,55 @@ const locale = 'en' as const;
     font-weight: 600;
     line-height: 1.3;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .resource-card-author {
-    color: rgba(237, 234, 224, 0.6);
-    font-size: 13px;
-    margin: 0;
-  }
-  .resource-card-meta {
+  .resource-card-sub {
     display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 11px;
-    color: rgba(237, 234, 224, 0.45);
-    letter-spacing: 0.05em;
-    margin-top: 4px;
+    align-items: center;
+    min-width: 0;
+    margin: 0;
+    font-size: 12.5px;
+    color: rgba(237, 234, 224, 0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .resource-card-sub > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+  }
+  .resource-card-sub > span:first-child {
+    flex-shrink: 1;          /* the author truncates first */
+  }
+  .resource-card-sub > span:not(:first-child)::before {
+    content: '·';
+    margin: 0 7px;
+    color: rgba(237, 234, 224, 0.3);
   }
   .resource-card-rating {
     color: rgba(250, 225, 148, 0.7);
   }
   .resource-card-link {
-    margin-top: auto;
-    padding-top: 12px;
+    flex: 0 0 auto;
     color: #fae194;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
+    white-space: nowrap;
     transition: color 180ms;
   }
   .resource-card-link:hover {
     color: #ffffff;
+  }
+  /* Narrow phones: drop the CTA words, keep just the arrow. */
+  @media (max-width: 479px) {
+    .resource-card-link-text {
+      display: none;
+    }
   }
 </style>
