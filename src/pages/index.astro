@@ -218,20 +218,31 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
           <div class="rf-grid">
             <div class="rf-copy">
-              <p>
-                The <span class="rf-cap">GRO</span> Framework allows entrepreneurs and executives to focus on
-                <span class="rf-cap">G</span>rowing the business&mdash;not spending
-                hours watching dashboards, reviewing metrics, and trying to figure
-                out why revenue isn't matching expectations.
-              </p>
-              <p>
-                You focus on strategy, products, customers, and expansion.
-              </p>
-              <p>
-                We <span class="rf-cap">R</span>ecover lost revenue and
-                <span class="rf-cap">O</span>ptimize the product discovery and
-                conversion engine.
-              </p>
+              {/* Full copy (desktop / tablet) */}
+              <div class="rf-copy-full">
+                <p>
+                  The <span class="rf-cap">GRO</span> Framework allows entrepreneurs and executives to focus on
+                  <span class="rf-cap">G</span>rowing the business&mdash;not spending
+                  hours watching dashboards, reviewing metrics, and trying to figure
+                  out why revenue isn't matching expectations.
+                </p>
+                <p>
+                  You focus on strategy, products, customers, and expansion.
+                </p>
+                <p>
+                  We <span class="rf-cap">R</span>ecover lost revenue and
+                  <span class="rf-cap">O</span>ptimize the product discovery and
+                  conversion engine.
+                </p>
+              </div>
+              {/* Short copy (mobile) — same G/R/O story, half the words */}
+              <div class="rf-copy-short">
+                <p>
+                  You focus on <span class="rf-cap">G</span>rowing the business.
+                  We <span class="rf-cap">R</span>ecover lost revenue and
+                  <span class="rf-cap">O</span>ptimize product discovery and conversion.
+                </p>
+              </div>
             </div>
 
             <div class="rf-box">
@@ -290,6 +301,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .rf-track { position: relative; height: 240vh; }
+    @media (max-width: 767px) { .rf-track { height: 190vh; } }   /* shorter thumb-scrub */
     /* Generous padding on the pinned content (plus extra space after the
        track) so the framework never reads as mixed into the neighboring
        sections. */
@@ -320,6 +332,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       margin: 0 0 22px;
     }
     .rf-copy p:last-child { margin-bottom: 0; }
+    /* Mobile swaps in the short copy and tightens the type. */
+    .rf-copy-short { display: none; }
+    @media (max-width: 767px) {
+      .rf-copy-full { display: none; }
+      .rf-copy-short { display: block; }
+      .rf-copy p { font-size: 16.5px; line-height: 1.55; }
+      .rf-box { padding: 16px 10px; }
+      .rf-grid { gap: 24px; }
+    }
     .rf-cap {
       font-family: "Permanent Marker", cursive;
       color: #fae194; font-size: 1.35em; line-height: 1;
@@ -984,6 +1005,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     @media (max-width: 1100px) {
       .hero-v2-grid { grid-template-columns: 1fr; gap: 56px; }
     }
+    @media (max-width: 767px) {
+      .hero-v2-grid { gap: 28px; }
+    }
 
     .hero-v2-headline {
       margin: 0 0 14px;
@@ -997,6 +1021,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       line-height: 1;
       letter-spacing: 0.005em;
       white-space: nowrap;
+    }
+    /* Mobile: size the headline off the viewport so the longest line
+       ("Recover lost revenue") never touches the edges. */
+    @media (max-width: 767px) {
+      .hero-v2-line { font-size: clamp(28px, 8vw, 38px); }
     }
     .hero-v2-amp {
       font-size: 0.75em;
@@ -1273,6 +1302,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .hero-v2-stat-text { font-family: "Hanken Grotesk", sans-serif; color: #ffffff; font-size: 20px; line-height: 1.4; margin: 0; }
     .hero-v2-stat-sales { font-family: "Permanent Marker", cursive; font-size: clamp(38px, 4vw, 56px); line-height: 0.9; margin: 0; }
     .hero-v2-stat-accent { color: #fae194; }
+    /* Mobile: compact the stat box — smaller numbers/text, tighter
+       padding, so it doesn't dominate the screen. */
+    @media (max-width: 767px) {
+      .hero-v2-stat-box { padding: 20px 18px; gap: 14px; }
+      .hero-v2-stat-row { gap: 12px; }
+      .hero-v2-stat-99, .hero-v2-stat-sales { font-size: clamp(24px, 8vw, 34px); }
+      .hero-v2-stat-99 { min-width: 2.2em; }
+      .hero-v2-stat-text { font-size: 15px; line-height: 1.35; }
+    }
     .hero-v2-stage-col .hero-v2-audit { max-width: none; margin-left: 0; }
 
     /* Icons inside the URL + email inputs (lighter-gray shade). */
@@ -2119,11 +2157,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
         Entrepreneurs' Priority
       </span>
-      <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-md">
+      <h2 class="font-marker uppercase text-black text-3xl md:text-5xl mb-md">
         Grow a company without distractions
       </h2>
-      <p class="text-black/60 text-body-lg leading-relaxed mb-lg md:mb-[48px]">
-        We monitor thousands of indicators, metrics, and dashboards so you can focus on growing the business.<br />
+      <p class="text-black/60 text-body-md md:text-body-lg leading-relaxed mb-lg md:mb-[48px]">
+        We monitor thousands of indicators, metrics, and dashboards so you can focus on growing the business.<br class="hidden md:block" />
         You'll receive business insights on a need-to-know basis.
       </p>
 
@@ -2155,7 +2193,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       background: transparent;   /* transparent → the yellow band shows through */
       color-scheme: light;
     }
-    @media (max-width: 1023px) { .td-frame { height: 1500px; } }
+    /* Mobile shows only two dashboard blocks (+ the email ending), so the
+       fallback height is much shorter; JS resizes to the exact content. */
+    @media (max-width: 1023px) { .td-frame { height: 760px; } }
     .td-replay-row { display: flex; justify-content: flex-end; margin-top: 12px; }
     .td-replay-btn {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

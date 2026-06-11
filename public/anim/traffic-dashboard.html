@@ -217,18 +217,22 @@
   }
   .gro-td .gro-email.show { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
 
-  /* Narrow embeds (stacked mobile layout): the side-by-side hand-off
-     doesn't fit — center the phone near the top and put the email
-     below it, capped to the viewport width. */
+  /* Narrow embeds (mobile): the full dashboard is information overload on
+     a phone — tell the story with just TWO blocks (purchase funnel +
+     daily-traffic alert), and end on the EMAIL alone; the phone overlay
+     is dropped entirely (the JS skips the phone hand-off when hidden). */
   @media (max-width: 679px) {
-    .gro-td .gro-phone { left: calc(50% - 109px); top: 40px; height: 460px; transform: translateX(-26px) scale(.97); }
-    .gro-td .gro-phone.show { transform: translateX(0) scale(1); }
+    .gro-td .sec-label { display: none; }
+    .gro-td .tile { display: none; }
+    .gro-td .funnel-tile, .gro-td .alert-tile { display: flex; grid-column: span 12 !important; }
+    .gro-td .gro-phone { display: none; }
     .gro-td .gro-email {
-      right: auto; left: 50%; top: 530px; height: 540px;
+      right: auto; left: 50%; top: 50%;
+      height: min(540px, calc(100% - 24px));
       width: min(404px, calc(100vw - 24px));
-      transform: translateX(calc(-50% + 26px)) scale(.97);
+      transform: translateY(-50%) translateX(calc(-50% + 26px)) scale(.97);
     }
-    .gro-td .gro-email.show { transform: translateX(-50%) scale(1); }
+    .gro-td .gro-email.show { transform: translateY(-50%) translateX(-50%) scale(1); }
   }
   .gro-td .email-card { flex: 1; display: flex; flex-direction: column; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.42), 0 0 0 1px rgba(0,0,0,0.06); color: #1a1b1f; }
   .gro-td .email-head { display: flex; align-items: center; gap: 11px; padding: 12px 16px; border-bottom: 1px solid #ededed; }
@@ -339,7 +343,7 @@
       <span class="meta">3 funnels · goal tracking on</span>
     </div>
 
-    <div class="tile" data-col style="grid-column: span 6;">
+    <div class="tile funnel-tile" data-col style="grid-column: span 6;">
       <div class="tile-head"><span class="tile-label">Purchase funnel</span><span class="tile-sub">overall CVR 3.8%</span></div>
       <div class="funnel-step">
         <div class="fs-top"><span class="fs-name">Sessions</span><span class="fs-val">38,902</span></div>
@@ -555,6 +559,12 @@
     setTimeout(()=>{
       var phone=ROOT.querySelector("#gro-phone"), slot=ROOT.querySelector("#gro-phone-slot");
       dash.classList.remove("dimmed"); dash.classList.add("faded");
+      // Mobile (two-block) layout hides the phone entirely — the email
+      // alone carries the ending, and the alert stays in its tile.
+      if(!phone.offsetParent){
+        var emOnly=ROOT.querySelector("#gro-email"); if(emOnly) emOnly.classList.add("show");
+        return;
+      }
       phone.classList.add("show");
       // the weekly-insights email slides in on the right a beat later
       setTimeout(function(){ var em=ROOT.querySelector("#gro-email"); if(em) em.classList.add("show"); }, 450);
@@ -602,7 +612,8 @@
   function play(){
     timers.forEach(clearTimeout); timers=[];
     reset();
-    const units=[...ROOT.querySelectorAll(".tile")];
+    // skip tiles hidden by the mobile (two-block) layout
+    const units=[...ROOT.querySelectorAll(".tile")].filter(u=>u.offsetParent!==null);
     let t=500;
     units.forEach(u=>{const isAlert=u.id==="gro-alert-tile";if(isAlert)t+=450;const at=t;timers.push(setTimeout(()=>isAlert?revealAlert(u):revealTile(u),at));if(!isAlert)t+=gapFor(u);});
   }
