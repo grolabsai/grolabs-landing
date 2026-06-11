@@ -163,13 +163,16 @@
 
   /* Phone + email share the same top/bottom so their edges line up. */
   .gro-td .gro-phone {
-    position: absolute; top: 28px; bottom: 28px; left: 22px;
-    transform: translateX(-26px) scale(.97);
+    /* Vertically centered with a capped height so the phone keeps a
+       believable aspect even when the embed is full-width (tall). */
+    position: absolute; top: 50%; left: 22px;
+    height: min(560px, calc(100% - 56px));
+    transform: translateY(-50%) translateX(-26px) scale(.97);
     width: 218px; opacity: 0; pointer-events: none; z-index: 6;
     display: flex;
     transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
   }
-  .gro-td .gro-phone.show { opacity: 1; transform: translateX(0) scale(1); }
+  .gro-td .gro-phone.show { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
   .gro-td .phone-frame {
     flex: 1; display: flex; flex-direction: column;
     background: linear-gradient(160deg, #20222a, #121319);
@@ -200,13 +203,30 @@
   /* ── Weekly insights email (desktop), overlaid on the RIGHT of the faded
         dashboard — the "we synthesise & recommend, you decide" message. ── */
   .gro-td .gro-email {
-    position: absolute; top: 28px; bottom: 28px; right: 16px;
-    transform: translateX(26px) scale(.97);
+    /* Same vertical centering + height cap as the phone so their top and
+       bottom edges stay aligned at any embed size. */
+    position: absolute; top: 50%; right: 16px;
+    height: min(560px, calc(100% - 56px));
+    transform: translateY(-50%) translateX(26px) scale(.97);
     width: 404px; opacity: 0; pointer-events: none; z-index: 5;
     display: flex;
     transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
   }
-  .gro-td .gro-email.show { opacity: 1; transform: translateX(0) scale(1); }
+  .gro-td .gro-email.show { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
+
+  /* Narrow embeds (stacked mobile layout): the side-by-side hand-off
+     doesn't fit — center the phone near the top and put the email
+     below it, capped to the viewport width. */
+  @media (max-width: 679px) {
+    .gro-td .gro-phone { left: calc(50% - 109px); top: 40px; height: 460px; transform: translateX(-26px) scale(.97); }
+    .gro-td .gro-phone.show { transform: translateX(0) scale(1); }
+    .gro-td .gro-email {
+      right: auto; left: 50%; top: 530px; height: 540px;
+      width: min(404px, calc(100vw - 24px));
+      transform: translateX(calc(-50% + 26px)) scale(.97);
+    }
+    .gro-td .gro-email.show { transform: translateX(-50%) scale(1); }
+  }
   .gro-td .email-card { flex: 1; display: flex; flex-direction: column; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.42), 0 0 0 1px rgba(0,0,0,0.06); color: #1a1b1f; }
   .gro-td .email-head { display: flex; align-items: center; gap: 11px; padding: 12px 16px; border-bottom: 1px solid #ededed; }
   .gro-td .email-avatar { width: 34px; height: 34px; border-radius: 50%; background: #fae194; color: #1a1b1f; font-weight: 800; font-size: 15px; display: grid; place-items: center; flex-shrink: 0; }
@@ -588,6 +608,8 @@
   window.GROTrafficDashboard = { play, reset };
   let played=false;
   function start(){ if(played) return; played=true; play(); }
+  // Host page's Replay button → restart from the beginning.
+  window.addEventListener("message", (e)=>{ if(e.data && e.data.type==="td-replay"){ played=true; play(); } });
   if("IntersectionObserver" in window){
     const io=new IntersectionObserver((es)=>{es.forEach(e=>{ if(e.isIntersecting){ start(); io.disconnect(); } });},{threshold:0.35});
     io.observe(dash);

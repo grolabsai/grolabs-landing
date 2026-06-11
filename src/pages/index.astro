@@ -151,6 +151,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             </a>
             <span class="hero-v2-cta-note">Free 15-minute call</span>
           </div>
+          <a href="mailto:growth@grolabs.ai" class="hero-v2-btn hero-v2-btn--ghost">Contact</a>
         </div>
       </div>
 
@@ -2093,62 +2094,36 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
-  <!-- Entrepreneurs' Priority / Grow a company. Two-column layout
-       where the LEFT column carries the entire section header +
-       narrative; the RIGHT column hosts the phone-notification SVG
-       starting at the same top edge so the phone visually aligns with
-       the eyebrow. Dark section closing the v2 alternation. -->
+  <!-- Entrepreneurs' Priority / Grow a company. Section header + lede,
+       then the animated traffic-monitoring dashboard at FULL section
+       width (iframe, transparent so the yellow band shows through;
+       auto-plays once on scroll), with a Replay control on the lower
+       right below it. -->
   <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
     <div class="max-w-page mx-auto">
-      <!-- Eyebrow + title on the yellow surface. -->
+      <!-- Eyebrow + title + lede on the yellow surface. -->
       <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
         Entrepreneurs' Priority
       </span>
-      <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-lg md:mb-[48px]">
+      <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-md">
         Grow a company without distractions
       </h2>
+      <p class="text-black/60 text-body-lg leading-relaxed mb-lg md:mb-[48px] max-w-[760px]">
+        We monitor thousands of indicators, metrics, and dashboards so you can
+        focus on growing the business.<br />
+        You'll receive business insights on a need-to-know basis.
+      </p>
 
-      <!-- 40/60 split. LEFT (40%): the dark quote/punchline card with the
-           supporting narrative moved underneath it. RIGHT (60%): the animated
-           traffic-monitoring dashboard (iframe, transparent so the yellow band
-           shows through; auto-plays once on scroll). -->
-      <div class="grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-lg lg:gap-2xl items-start lg:items-stretch">
-        <div class="lg:flex lg:flex-col lg:justify-between">
-          <div class="rounded-xl p-lg md:p-xl text-body-md leading-relaxed" style="background:#1c1d24; color:rgba(237,234,224,0.7);">
-            <blockquote class="border-l border-primary/30 pl-md mb-xl">
-              <p class="text-white text-body-lg italic leading-snug mb-sm">
-                &ldquo;Most entrepreneurs fail because they're working
-                <span class="text-primary font-medium not-italic">in their business</span>
-                rather than
-                <span class="text-primary font-medium not-italic">on their business</span>.&rdquo;
-              </p>
-              <footer class="text-body-sm text-zinc-500 not-italic">
-                — Michael Gerber, <cite class="not-italic">The E-Myth Revisited</cite>
-              </footer>
-            </blockquote>
-
-            <p>
-              <span class="text-primary font-medium">No news = good news.</span>
-              <span class="text-white">If something requires your attention, we'll let you know.</span>
-            </p>
-          </div>
-
-          <p class="text-black/45 text-body-md leading-relaxed mt-lg">
-            Monitoring funnels. Hunting leaks. Reading GA4 at midnight. Every
-            hour you spend in the dashboard is an hour you're not spending on
-            the company — on the strategy, the team, the next product, the
-            partnerships only you can build.
-          </p>
-        </div>
-
-        <div class="td-frame-wrap">
-          <iframe
-            class="td-frame"
-            src={`${base}/anim/traffic-dashboard.html`}
-            title="Traffic monitoring dashboard — live animation"
-            loading="lazy"
-            scrolling="no"
-          ></iframe>
+      <div class="td-frame-wrap">
+        <iframe
+          class="td-frame"
+          src={`${base}/anim/traffic-dashboard.html`}
+          title="Traffic monitoring dashboard — live animation"
+          loading="lazy"
+          scrolling="no"
+        ></iframe>
+        <div class="td-replay-row">
+          <button type="button" class="td-replay-btn" data-td-replay aria-label="Replay animation">↻ Replay</button>
         </div>
       </div>
     </div>
@@ -2165,10 +2140,24 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       color-scheme: light;
     }
     @media (max-width: 1023px) { .td-frame { height: 1500px; } }
+    .td-replay-row { display: flex; justify-content: flex-end; margin-top: 12px; }
+    .td-replay-btn {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(0,0,0,0.5);
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.25);
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+    }
+    .td-replay-btn:hover { color: rgba(0,0,0,0.8); border-color: rgba(0,0,0,0.5); }
   </style>
 
   <script is:inline>
-    // Size the traffic-dashboard iframe to its reported content height.
+    // Size the traffic-dashboard iframe to its reported content height,
+    // and wire the Replay control.
     (function () {
       var frame = document.querySelector('.td-frame');
       if (!frame) return;
@@ -2177,6 +2166,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         if (d && d.type === 'td-height' && typeof d.height === 'number') {
           frame.style.height = Math.max(320, d.height) + 'px';
         }
+      });
+      var replay = document.querySelector('[data-td-replay]');
+      if (replay) replay.addEventListener('click', function () {
+        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'td-replay' }, '*');
       });
     })();
   </script>
