@@ -164,9 +164,11 @@
   /* Phone + email share the same top/bottom so their edges line up. */
   .gro-td .gro-phone {
     /* Vertically centered with a capped height so the phone keeps a
-       believable aspect even when the embed is full-width (tall). */
-    position: absolute; top: 50%; left: 22px;
-    height: min(560px, calc(100% - 56px));
+       believable aspect even when the embed is full-width (tall).
+       Horizontally, phone + email form one CENTERED pair
+       (218 + 58 gap + 404 = 680 wide) instead of hugging the edges. */
+    position: absolute; top: 50%; left: calc(50% - 340px);
+    height: min(600px, calc(100% - 56px));
     transform: translateY(-50%) translateX(-26px) scale(.97);
     width: 218px; opacity: 0; pointer-events: none; z-index: 6;
     display: flex;
@@ -204,9 +206,10 @@
         dashboard — the "we synthesise & recommend, you decide" message. ── */
   .gro-td .gro-email {
     /* Same vertical centering + height cap as the phone so their top and
-       bottom edges stay aligned at any embed size. */
-    position: absolute; top: 50%; right: 16px;
-    height: min(560px, calc(100% - 56px));
+       bottom edges stay aligned at any embed size; right half of the
+       centered pair. */
+    position: absolute; top: 50%; right: calc(50% - 340px);
+    height: min(600px, calc(100% - 56px));
     transform: translateY(-50%) translateX(26px) scale(.97);
     width: 404px; opacity: 0; pointer-events: none; z-index: 5;
     display: flex;

@@ -128,7 +128,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        the audit prompt + URL/email input on the right. (The original
        stat-card hero was removed; this is now the only hero.)
        ============================================================ -->
-  <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-2xl pb-2xl md:pt-3xl md:pb-3xl overflow-hidden" data-hero-audit>
+  <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-xl pb-xl md:pt-3xl md:pb-3xl overflow-hidden" data-hero-audit>
     <div id="particles-container"></div>
 
     <div class="hero-v2-grid max-w-page mx-auto relative z-10 reveal active">
@@ -263,12 +263,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       background: #0c0c0f;
       font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .rf-track { position: relative; height: 280vh; }
+    .rf-track { position: relative; height: 240vh; }
+    /* Pin the content to the top of the viewport with the same padding
+       the other sections use — no 100vh centering, so the section
+       doesn't read as empty space above/below the content. */
     .rf-pin {
-      position: sticky; top: 0; min-height: 100vh;
-      display: flex; align-items: center;
-      padding: 48px 24px;
+      position: sticky; top: 0;
+      padding: 72px 24px;
     }
+    @media (max-width: 767px) { .rf-pin { padding: 40px 16px; } }
     .rf-inner { width: 100%; }
     .rf-head { margin: 0 0 36px; }
     .rf-eyebrow {
@@ -956,7 +959,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .rre-frame { height: 940px; }
     }
     @media (max-width: 859px) {
-      .rre-section { padding: 48px 16px; }
+      .rre-section { padding: 40px 16px; }
       .rre-head { margin-bottom: 28px; }
     }
 
@@ -2099,7 +2102,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        width (iframe, transparent so the yellow band shows through;
        auto-plays once on scroll), with a Replay control on the lower
        right below it. -->
-  <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
+  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
     <div class="max-w-page mx-auto">
       <!-- Eyebrow + title + lede on the yellow surface. -->
       <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
@@ -2130,7 +2133,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   </section>
 
   <style is:global>
-    .td-frame-wrap { width: 100%; }
+    /* 3/4 of the section width, centered; full width once the layout
+       stacks on smaller screens. */
+    .td-frame-wrap { width: 75%; margin: 0 auto; }
+    @media (max-width: 1023px) { .td-frame-wrap { width: 100%; } }
     .td-frame {
       width: 100%;
       height: 820px;            /* initial; resized to content via postMessage */
