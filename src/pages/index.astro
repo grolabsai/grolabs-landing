@@ -757,12 +757,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
         <div class="rre-title-row">
           <h2 class="rre-title">Revenue Recovery Engine</h2>
-          <button type="button" class="rre-replay" data-rre-replay aria-label="Replay animation">↻ Replay</button>
         </div>
         <p class="rre-lede">
-          Every search is a signal. We learn from all of them, catch the queries
-          quietly leaking revenue, and fix them — in the search engine or your
-          product catalog. Then we verify the fix and measure the revenue recovered.
+          Conversion isn't guesswork. That's why we run <span class="rre-lede-brand">labs</span>.<br />
+          Behind every conversion improvement is a disciplined process of measuring, diagnosing, optimizing, and validating.
         </p>
       </header>
       <div class="rre-frame-wrap">
@@ -774,6 +772,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           loading="lazy"
           scrolling="no"
         ></iframe>
+        <div class="rre-replay-row">
+          <button type="button" class="rre-replay" data-rre-replay aria-label="Replay animation">↻ Replay</button>
+        </div>
       </div>
     </div>
   </section>
@@ -981,6 +982,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       transition: background .2s, transform .15s;
     }
     .rre-replay:hover { background: rgba(250, 225, 148, 0.1); transform: translateY(-1px); }
+    /* Replay sits below the animation, lower right — same placement as
+       the yellow section's control. */
+    .rre-replay-row { display: flex; justify-content: flex-end; margin-top: 12px; }
+    /* "labs" reads as the GroLabs brand: caps + the marker face. */
+    .rre-lede-brand {
+      font-family: "Permanent Marker", cursive;
+      text-transform: uppercase;
+      color: #EDEAE0;
+      font-size: 0.95em;
+      letter-spacing: 0.02em;
+    }
     .rre-lede {
       font-family: "Hanken Grotesk", sans-serif;
       font-size: 18px;
