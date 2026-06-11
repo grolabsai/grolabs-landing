@@ -284,7 +284,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
     }
     .rf-track { position: relative; height: 240vh; }
-    @media (max-width: 767px) { .rf-track { height: 190vh; } }   /* shorter thumb-scrub */
+    @media (max-width: 767px) { .rf-track { height: 170vh; } }   /* shorter thumb-scrub */
     /* Generous padding on the pinned content (plus extra space after the
        track) so the framework never reads as mixed into the neighboring
        sections. */
@@ -474,9 +474,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
       // Phase 2 — scrubbed by progress through the pinned track (true scrub:
       // reverse scrolling un-draws).
+      var pinEl = section.querySelector('.rf-pin');
       function update() {
         var r = track.getBoundingClientRect();
-        var total = track.offsetHeight - window.innerHeight;
+        // Mobile: the content is shorter than the viewport, so the pin
+        // holds for (viewport - content) px after a viewport-based scrub
+        // finishes — dead scroll over an empty gap. Time the scrub against
+        // the pin's actual travel instead, finishing ~100px before release
+        // so the completed drawing holds only briefly before moving on.
+        var total = window.matchMedia('(max-width: 767px)').matches
+          ? track.offsetHeight - pinEl.offsetHeight - 100
+          : track.offsetHeight - window.innerHeight;
         if (total <= 0) return;
         var t = clamp(-r.top / total, 0, 1);
 
