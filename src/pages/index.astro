@@ -1003,9 +1003,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       white-space: nowrap;
     }
     /* Mobile: size the headline off the viewport so the longest line
-       ("Recover lost revenue") never touches the edges. */
+       ("Recover lost revenue") never touches the edges, and center the
+       whole copy block (headline, tagline, CTAs). */
     @media (max-width: 767px) {
       .hero-v2-line { font-size: clamp(28px, 8vw, 38px); }
+      .hero-v2-copy { text-align: center; }
+      .hero-v2-headline { align-items: center; }
+      .hero-v2-ctas { justify-content: center; }
+      .hero-v2-cta-stack { align-items: center; }
+      .hero-v2-btn--ghost { align-self: center; }
     }
     .hero-v2-amp {
       font-size: 0.75em;
