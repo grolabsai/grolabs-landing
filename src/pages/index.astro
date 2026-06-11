@@ -2131,7 +2131,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        width (iframe, transparent so the yellow band shows through;
        auto-plays once on scroll), with a Replay control on the lower
        right below it. -->
-  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
+  {/* No `reveal` here: this section is tall (~1100px) and the reveal
+      observer needs 15% visible + a 1.2s fade — on mobile that reads as a
+      huge dead gap after the RRE section. The dashboard iframe has its
+      own entrance animation anyway. */}
+  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden">
     <div class="max-w-page mx-auto">
       <!-- Eyebrow + title + lede on the yellow surface. -->
       <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
