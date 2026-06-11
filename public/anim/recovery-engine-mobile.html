@@ -252,10 +252,16 @@
   if(window.ResizeObserver){ new ResizeObserver(postHeight).observe($('.m-wrap')); }
   addEventListener('load', postHeight); addEventListener('resize', postHeight);
 
+  // Start is driven by the PARENT page (it observes the iframe in the real
+  // viewport and posts rre-play). An IO inside an iframe measures against
+  // the iframe's own viewport on iOS, so self-starting fired on load.
+  new IntersectionObserver(es=>{ visible = es[0].isIntersecting; }, {threshold:.1}).observe($('.m-wrap'));
   let started=false;
-  function maybeStart(){ if(!started && visible){ started=true; play(); } }
-  new IntersectionObserver(es=>{ visible = es[0].isIntersecting; maybeStart(); }, {threshold:.1}).observe($('.m-wrap'));
-  addEventListener('message', e=>{ if(e && e.data && e.data.type==='rre-replay') play(); });
+  addEventListener('message', e=>{
+    const d=e && e.data; if(!d) return;
+    if(d.type==='rre-play' && !started){ started=true; visible=true; play(); }
+    if(d.type==='rre-replay') play();
+  });
 })();
 </script>
 </body>

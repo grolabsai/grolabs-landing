@@ -620,14 +620,19 @@
   if(window.ResizeObserver){ new ResizeObserver(postHeight).observe(document.querySelector('.wrap')); }
   addEventListener('load', postHeight); addEventListener('resize', postHeight);
 
-  // Autoplay ONCE when the section scrolls into view (no loop); it ends greyed
-  // out with only the recovered-revenue block in colour. The host page's Replay
-  // button posts 'rre-replay' to restart from the beginning.
+  // Plays ONCE when the PARENT page sees the iframe in the real viewport
+  // and posts 'rre-play' (an IO inside an iframe measures against the
+  // iframe's own viewport on iOS, so self-starting fired on page load).
+  // Ends greyed out with only the recovered-revenue block in colour; the
+  // host page's Replay button posts 'rre-replay' to restart.
   let visible=false, started=false;
-  function maybeStart(){ if(!started && visible){ started=true; play(); } }
-  new IntersectionObserver((es)=>{ visible = es[0].isIntersecting; maybeStart(); }, {threshold:.12})
+  new IntersectionObserver((es)=>{ visible = es[0].isIntersecting; }, {threshold:.12})
     .observe(document.querySelector('.stage'));
-  addEventListener('message', (e)=>{ if(e && e.data && e.data.type==='rre-replay') play(); });
+  addEventListener('message', (e)=>{
+    const d=e && e.data; if(!d) return;
+    if(d.type==='rre-play' && !started){ started=true; visible=true; play(); }
+    if(d.type==='rre-replay') play();
+  });
 })();
 </script>
 </body>

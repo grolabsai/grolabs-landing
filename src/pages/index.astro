@@ -804,6 +804,31 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           if (h > cur) frame.style.height = h + 'px';
         }
       });
+      // Play when the iframe scrolls into the REAL viewport. The animation
+      // can't reliably self-start: an IntersectionObserver inside an iframe
+      // measures against the iframe's own viewport on iOS, which made it
+      // play on page load instead of on sight.
+      var playSent = false;
+      function sendPlay() {
+        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'rre-play' }, '*');
+      }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting && !playSent) { playSent = true; sendPlay(); io.disconnect(); }
+          });
+        }, { threshold: 0.15 });
+        io.observe(frame);
+      } else {
+        playSent = true;
+        frame.addEventListener('load', sendPlay);
+      }
+      // If the iframe (re)loads after the trigger fired — lazy load finishing
+      // late, or the desktop/mobile src swap — start the fresh document too.
+      frame.addEventListener('load', function () {
+        if (playSent) setTimeout(sendPlay, 60);
+      });
+
       // Replay button → tell the animation iframe to restart from the beginning.
       var replay = document.querySelector('[data-rre-replay]');
       if (replay) replay.addEventListener('click', function () {
