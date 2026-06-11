@@ -217,18 +217,19 @@
   }
   .gro-td .gro-email.show { opacity: 1; transform: translateY(-50%) translateX(0) scale(1); }
 
-  /* Narrow embeds (mobile): the full dashboard is information overload on
-     a phone — tell the story with just TWO blocks (purchase funnel +
-     daily-traffic alert), and end on the EMAIL alone; the phone overlay
-     is dropped entirely (the JS skips the phone hand-off when hidden). */
+  /* Narrow embeds (mobile): we're throwing a concept, not the whole
+     product — tell the story with ONE block (the daily-traffic alert
+     tile), then end on the EMAIL alone; the phone overlay is dropped
+     entirely (the JS skips the phone hand-off when hidden). */
   @media (max-width: 679px) {
+    .gro-td { min-height: 480px; }   /* floor so the email always fits */
     .gro-td .sec-label { display: none; }
     .gro-td .tile { display: none; }
-    .gro-td .funnel-tile, .gro-td .alert-tile { display: flex; grid-column: span 12 !important; }
+    .gro-td .alert-tile { display: flex; grid-column: span 12 !important; }
     .gro-td .gro-phone { display: none; }
     .gro-td .gro-email {
       right: auto; left: 50%; top: 50%;
-      height: min(540px, calc(100% - 24px));
+      height: auto; max-height: calc(100% - 16px);   /* size to content */
       width: min(404px, calc(100vw - 24px));
       transform: translateY(-50%) translateX(calc(-50% + 26px)) scale(.97);
     }

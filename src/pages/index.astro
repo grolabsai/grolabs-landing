@@ -218,31 +218,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
           <div class="rf-grid">
             <div class="rf-copy">
-              {/* Full copy (desktop / tablet) */}
-              <div class="rf-copy-full">
-                <p>
-                  The <span class="rf-cap">GRO</span> Framework allows entrepreneurs and executives to focus on
-                  <span class="rf-cap">G</span>rowing the business&mdash;not spending
-                  hours watching dashboards, reviewing metrics, and trying to figure
-                  out why revenue isn't matching expectations.
-                </p>
-                <p>
-                  You focus on strategy, products, customers, and expansion.
-                </p>
-                <p>
-                  We <span class="rf-cap">R</span>ecover lost revenue and
-                  <span class="rf-cap">O</span>ptimize the product discovery and
-                  conversion engine.
-                </p>
-              </div>
-              {/* Short copy (mobile) — same G/R/O story, half the words */}
-              <div class="rf-copy-short">
-                <p>
-                  You focus on <span class="rf-cap">G</span>rowing the business.
-                  We <span class="rf-cap">R</span>ecover lost revenue and
-                  <span class="rf-cap">O</span>ptimize product discovery and conversion.
-                </p>
-              </div>
+              {/* One concept sentence — same on every viewport. */}
+              <p>
+                The <span class="rf-cap">GRO</span> Framework frees you to
+                <span class="rf-cap">G</span>row the business while we
+                <span class="rf-cap">R</span>ecover lost revenue and
+                <span class="rf-cap">O</span>ptimize the product discovery
+                and conversion engine.
+              </p>
             </div>
 
             <div class="rf-box">
@@ -332,11 +315,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       margin: 0 0 22px;
     }
     .rf-copy p:last-child { margin-bottom: 0; }
-    /* Mobile swaps in the short copy and tightens the type. */
-    .rf-copy-short { display: none; }
+    /* Mobile tightens the type and the box. */
     @media (max-width: 767px) {
-      .rf-copy-full { display: none; }
-      .rf-copy-short { display: block; }
       .rf-copy p { font-size: 16.5px; line-height: 1.55; }
       .rf-box { padding: 16px 10px; }
       .rf-grid { gap: 24px; }
@@ -2193,9 +2173,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       background: transparent;   /* transparent → the yellow band shows through */
       color-scheme: light;
     }
-    /* Mobile shows only two dashboard blocks (+ the email ending), so the
+    /* Mobile shows one dashboard block (+ the email ending), so the
        fallback height is much shorter; JS resizes to the exact content. */
-    @media (max-width: 1023px) { .td-frame { height: 760px; } }
+    @media (max-width: 1023px) { .td-frame { height: 500px; } }
     .td-replay-row { display: flex; justify-content: flex-end; margin-top: 12px; }
     .td-replay-btn {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
