@@ -175,6 +175,7 @@ const canonicalUrl = `${siteUrl}${path}`;
          the logo. Header height grows on mobile to fit two rows
          (h-auto py-3) and <main> compensates with pt-[120px] md:pt-20. -->
     <header
+      data-site-header
       class="fixed top-0 left-0 w-full backdrop-blur-md h-auto py-3 md:h-20 md:py-0 flex items-center px-margin-mobile md:px-margin-desktop border-b border-zinc-800 z-50 bg-canvas/80"
     >
       <div class="max-w-page mx-auto w-full flex flex-wrap items-center gap-md md:grid md:grid-cols-[1fr_auto_1fr]">
@@ -279,6 +280,35 @@ const canonicalUrl = `${siteUrl}${path}`;
     <script>
       import '../scripts/main.ts';
     </script>
+
+    <script is:inline>
+      // Mobile: hide the fixed header while scrolling down, bring it back
+      // the moment the user scrolls up. Desktop keeps it always visible.
+      (function () {
+        var header = document.querySelector('[data-site-header]');
+        if (!header) return;
+        var mq = window.matchMedia('(max-width: 767px)');
+        var lastY = window.scrollY;
+        window.addEventListener('scroll', function () {
+          var y = window.scrollY;
+          if (!mq.matches) { header.classList.remove('header-hidden'); lastY = y; return; }
+          var dy = y - lastY;
+          if (Math.abs(dy) < 6) return;            // ignore jitter
+          if (dy > 0 && y > 90) header.classList.add('header-hidden');
+          else if (dy < 0) header.classList.remove('header-hidden');
+          lastY = y;
+        }, { passive: true });
+        if (mq.addEventListener) mq.addEventListener('change', function () {
+          if (!mq.matches) header.classList.remove('header-hidden');
+        });
+      })();
+    </script>
+
+    <style is:global>
+      /* Mobile auto-hiding header (see inline script above). */
+      [data-site-header] { transition: transform 0.28s ease; }
+      [data-site-header].header-hidden { transform: translateY(-100%); }
+    </style>
 
     <style is:global>
       /* ─────────── Primary CTA — reusable, hero-style ───────────

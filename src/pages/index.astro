@@ -760,7 +760,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         </div>
         <p class="rre-lede">
           Conversion isn't guesswork. That's why we run <span class="rre-lede-brand">labs</span>.<br />
-          Behind every conversion improvement is a disciplined process of measuring, diagnosing, optimizing, and validating.
+          Behind every conversion improvement is a disciplined process of
+          <b class="rre-lede-step">measuring</b>, <b class="rre-lede-step">diagnosing</b>,
+          <b class="rre-lede-step">optimizing</b>, and <b class="rre-lede-step">validating</b>.
         </p>
       </header>
       <div class="rre-frame-wrap">
@@ -993,6 +995,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-size: 0.95em;
       letter-spacing: 0.02em;
     }
+    /* The four process steps pop out of the muted lede: white + bold. */
+    .rre-lede-step { color: #ffffff; font-weight: 700; }
     .rre-lede {
       font-family: "Hanken Grotesk", sans-serif;
       font-size: 18px;
