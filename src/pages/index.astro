@@ -976,9 +976,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       color-scheme: dark;
     }
     /* Below 1000px the iframe loads the simplified single-column mobile
-       animation; give it a closer initial height (JS resizes to exact). */
+       animation (3 fixes, short table); JS resizes to the exact height. */
     @media (max-width: 1000px) {
-      .rre-frame { height: 940px; }
+      .rre-frame { height: 760px; }
     }
     @media (max-width: 859px) {
       .rre-section { padding: 40px 16px; }

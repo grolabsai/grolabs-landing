@@ -60,9 +60,9 @@
   .m-legend{display:flex; gap:14px; margin:10px 0 4px;}
   .m-legend span{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:9px; letter-spacing:.08em; text-transform:uppercase; color:rgba(237,234,224,.55);}
   .m-sw{width:9px;height:9px;border-radius:3px;} .m-sw.search{background:var(--gold);} .m-sw.catalog{background:var(--blue);}
-  /* reserve room for all 8 rows up front so the iframe height is stable from
+  /* reserve room for all 3 rows up front so the iframe height is stable from
      the first frame (rows fill into the reserved space; no row-by-row growth). */
-  .m-table{display:flex; flex-direction:column; min-height:296px;}
+  .m-table{display:flex; flex-direction:column; min-height:114px;}
   .m-row{display:grid; grid-template-columns:3px 1fr auto auto; gap:9px; align-items:center; padding:7px 2px; border-bottom:1px solid rgba(255,255,255,.06); overflow:hidden;}
   .m-row:last-child{border-bottom:0;}
   .m-row .bar{width:3px; height:22px; border-radius:2px;}
@@ -151,15 +151,13 @@
   const money = n => '$'+Math.round(n).toLocaleString();
 
   const WORDS=['running shoes','linen shirt','yoga mat','cast iron pan','desk lamp','wool socks','rain jacket','ceramic mug','sun hat','denim jacket','cotton tee'];
+  /* Mobile runs exactly THREE fixes — one of each fix type (synonym,
+     catalog attribute, re-rank) — so the Recovery Monitor table stays
+     short. The desktop animation keeps the full 8-event run. */
   const EVENTS=[
     {item:'trainers', type:'search', act:'Create synonym', detail:'trainers → running shoes', tag:'Search engine', row:{type:'search', nm:'trainers → running shoes', sl:64, mo:6080}},
-    {item:'keep coffee hot', type:'search', act:'Semantic match', detail:'→ insulated travel mug', tag:'Search engine', row:{type:'search', nm:'keep coffee hot → travel mug', sl:90, mo:2520}},
-    {item:'winter boots', type:'search', act:'Re-rank results', detail:'boost in-stock + best-sellers', tag:'Search engine', row:{type:'search', nm:'winter boots · re-ranked', sl:33, mo:4785}},
-    {item:'trail shoes', type:'search', act:'Create synonym', detail:'trail shoes → hiking shoes', tag:'Search engine', row:{type:'search', nm:'trail shoes → hiking shoes', sl:41, mo:4920}},
     {item:'size 11 wide', type:'catalog', act:'Add attribute', detail:'width = Wide · 38 SKUs', tag:'Data enrichment', row:{type:'catalog', nm:'size 11 wide · width=Wide', sl:52, mo:4940}},
-    {item:'merino', type:'catalog', act:'Add attribute', detail:'material = Merino wool', tag:'Data enrichment', row:{type:'catalog', nm:'merino · material=Merino', sl:58, mo:4930}},
-    {item:'office chair', type:'search', act:'Re-rank results', detail:'boost in-stock + best-sellers', tag:'Search engine', row:{type:'search', nm:'office chair · re-ranked', sl:26, mo:6240}},
-    {item:'vegan leather', type:'catalog', act:'Add attribute', detail:'material = Vegan leather', tag:'Data enrichment', row:{type:'catalog', nm:'vegan leather · material added', sl:38, mo:4370}},
+    {item:'winter boots', type:'search', act:'Re-rank results', detail:'boost in-stock + best-sellers', tag:'Search engine', row:{type:'search', nm:'winter boots · re-ranked', sl:33, mo:4785}},
   ];
   const COL={ search:{bg:'rgba(250,225,148,.16)',fg:'#fae194',bd:'rgba(250,225,148,.6)'},
               catalog:{bg:'rgba(158,197,255,.16)',fg:'#9ec5ff',bd:'rgba(158,197,255,.6)'},
