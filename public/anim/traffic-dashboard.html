@@ -61,6 +61,7 @@
     border: 1px solid rgba(255,255,255,0.07);
     border-radius: 16px;
     padding: 14px;
+    position: relative;           /* containing block for phone/email overlays */
   }
 
   .gro-td .tile {
@@ -161,30 +162,63 @@
         on the LEFT and takes focus, and the alert flies up into the phone. ── */
   .gro-td .dash.faded { opacity: 0.12; filter: saturate(0.4); transition: opacity .8s ease, filter .8s ease; pointer-events: none; }
 
-  /* Phone + email share the same top/bottom so their edges line up. */
+  /* Phone + email: absolutely positioned inside .dash so they zoom with it. */
   .gro-td .gro-phone {
-    position: absolute; top: 28px; bottom: 28px; left: 22px;
-    transform: translateX(-26px) scale(.97);
-    width: 218px; opacity: 0; pointer-events: none; z-index: 6;
+    position: absolute; top: 28px; left: 270px;
+    width: 218px; height: 500px;
+    transform: translateX(-22px) scale(.97);
+    opacity: 0; pointer-events: none; z-index: 6;
     display: flex;
     transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
   }
   .gro-td .gro-phone.show { opacity: 1; transform: translateX(0) scale(1); }
+
+  /* Phone outer frame with side buttons */
   .gro-td .phone-frame {
     flex: 1; display: flex; flex-direction: column;
-    background: linear-gradient(160deg, #20222a, #121319);
-    border: 1px solid rgba(255,255,255,0.12); border-radius: 36px; padding: 9px;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    background: linear-gradient(160deg, #22242e, #121319);
+    border: 1px solid rgba(255,255,255,0.13); border-radius: 34px; padding: 8px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.09);
+    position: relative;
   }
+  /* Left side: silent toggle + two volume buttons */
+  .gro-td .phone-btn-l {
+    position: absolute; left: -3px; top: 68px;
+    display: flex; flex-direction: column; gap: 7px;
+  }
+  .gro-td .phone-btn-l .pb { width: 3px; border-radius: 2px 0 0 2px; background: linear-gradient(180deg,#2e303a,#1a1c24); box-shadow: -1px 0 0 rgba(255,255,255,0.06); }
+  .gro-td .phone-btn-l .pb:first-child { height: 22px; margin-bottom: 5px; }
+  .gro-td .phone-btn-l .pb:not(:first-child) { height: 32px; }
+  /* Right side: power button */
+  .gro-td .phone-btn-r {
+    position: absolute; right: -3px; top: 90px;
+  }
+  .gro-td .phone-btn-r .pb { width: 3px; height: 50px; border-radius: 0 2px 2px 0; background: linear-gradient(180deg,#2e303a,#1a1c24); box-shadow: 1px 0 0 rgba(255,255,255,0.06); }
+
   .gro-td .phone-screen {
     position: relative; flex: 1;
-    background: radial-gradient(130% 90% at 50% 0%, #1a1d24, #0a0b0e 72%);
-    border-radius: 28px; overflow: hidden; padding: 30px 13px 14px;
+    background: radial-gradient(130% 90% at 50% 0%, #1b1e27, #09090d 72%);
+    border-radius: 27px; overflow: hidden; padding: 28px 12px 14px;
   }
-  .gro-td .phone-notch { position: absolute; top: 9px; left: 50%; transform: translateX(-50%); width: 84px; height: 19px; background:#000; border-radius: 0 0 13px 13px; }
-  .gro-td .phone-time { text-align:center; font-family: var(--font); font-weight: 600; font-size: 34px; color:#fff; line-height: 1; margin-top: 14px; }
-  .gro-td .phone-date { text-align:center; font-family: var(--font); font-size: 11.5px; color: rgba(255,255,255,0.5); margin-top: 4px; }
-  .gro-td .phone-slot { margin-top: 26px; }
+  /* Dynamic island pill */
+  .gro-td .phone-notch {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 72px; height: 20px; background: #000; border-radius: 10px;
+  }
+  .gro-td .phone-time { text-align:center; font-family: var(--font); font-weight: 600; font-size: 34px; color:#fff; line-height: 1; margin-top: 12px; }
+  .gro-td .phone-date { text-align:center; font-family: var(--font); font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; letter-spacing: 0.02em; }
+  .gro-td .phone-slot { margin-top: 24px; }
+
+  /* ── Weekly insights email — right of phone, same top edge ── */
+  .gro-td .gro-email {
+    position: absolute; top: 28px; right: 270px;
+    width: 404px; height: 500px;
+    transform: translateX(22px) scale(.97);
+    opacity: 0; pointer-events: none; z-index: 5;
+    display: flex;
+    transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
+  }
+  .gro-td .gro-email.show { opacity: 1; transform: translateX(0) scale(1); }
 
   .gro-td .gro-phone .alert-card.in-phone {
     position: static; transform: none; top: auto; left: auto;
@@ -197,16 +231,6 @@
   .gro-td .gro-phone .alert-card.in-phone .ac-title { font-size: 12.5px; }
   .gro-td .gro-phone .alert-card.in-phone .ac-msg { font-size: 11px; }
 
-  /* ── Weekly insights email (desktop), overlaid on the RIGHT of the faded
-        dashboard — the "we synthesise & recommend, you decide" message. ── */
-  .gro-td .gro-email {
-    position: absolute; top: 28px; bottom: 28px; right: 16px;
-    transform: translateX(26px) scale(.97);
-    width: 404px; opacity: 0; pointer-events: none; z-index: 5;
-    display: flex;
-    transition: opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1);
-  }
-  .gro-td .gro-email.show { opacity: 1; transform: translateX(0) scale(1); }
   .gro-td .email-card { flex: 1; display: flex; flex-direction: column; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.42), 0 0 0 1px rgba(0,0,0,0.06); color: #1a1b1f; }
   .gro-td .email-head { display: flex; align-items: center; gap: 11px; padding: 12px 16px; border-bottom: 1px solid #ededed; }
   .gro-td .email-avatar { width: 34px; height: 34px; border-radius: 50%; background: #fae194; color: #1a1b1f; font-weight: 800; font-size: 15px; display: grid; place-items: center; flex-shrink: 0; }
@@ -411,47 +435,54 @@
       </div>
     </div>
 
-  </div>
 
-  <!-- Phone overlay (left) — the alert flies up into it at the end -->
-  <div class="gro-phone" id="gro-phone" aria-hidden="true">
-    <div class="phone-frame">
-      <div class="phone-screen">
-        <div class="phone-notch"></div>
-        <div class="phone-time">9:41</div>
-        <div class="phone-date">GroLabs · Live monitor</div>
-        <div class="phone-slot" id="gro-phone-slot"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Weekly insights email (desktop) — overlays the right of the faded dashboard -->
-  <div class="gro-email" id="gro-email" aria-hidden="true">
-    <div class="email-card">
-      <div class="email-head">
-        <div class="email-avatar">G</div>
-        <div class="email-meta">
-          <div class="email-from">GroLabs Weekly <span>· insights@grolabs.ai</span></div>
-          <div class="email-subject">This week: kill the password wall (+$4.1k/mo)</div>
+    <!-- Phone overlay — inside .dash so it zooms with the dashboard -->
+    <div class="gro-phone" id="gro-phone" aria-hidden="true">
+      <div class="phone-frame">
+        <div class="phone-btn-l">
+          <div class="pb"></div>
+          <div class="pb"></div>
+          <div class="pb"></div>
         </div>
-        <div class="email-date">Mon 9:00</div>
-      </div>
-      <div class="email-body">
-        <div class="email-insight-title">You're losing first orders at sign-up</div>
-        <svg class="email-graph" viewBox="0 0 320 78" preserveAspectRatio="none">
-          <defs><linearGradient id="egGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e06a6a" stop-opacity=".26"/><stop offset="1" stop-color="#e06a6a" stop-opacity="0"/></linearGradient></defs>
-          <line class="eg-grid" x1="0" y1="26" x2="320" y2="26"/>
-          <line class="eg-grid" x1="0" y1="52" x2="320" y2="52"/>
-          <path d="M4,18 L66,22 L128,28 L190,38 L252,50 L316,58 L316,78 L4,78 Z" fill="url(#egGrad)"/>
-          <path d="M4,18 L66,22 L128,28 L190,38 L252,50 L316,58" fill="none" stroke="#e06a6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-        </svg>
-        <p class="email-interp">Sign-up completion fell to <b>41%</b> (−6pt over 6 weeks). Most shoppers bail at <b>"create a password."</b> That's about <b>$4.1k/mo</b> in first orders never placed.</p>
-        <p class="email-rec"><b>Our recommendation:</b> let shoppers register with single sign-on (Google&nbsp;/&nbsp;Apple) instead of creating a password — one tap, nothing to remember. Projected recovery: <b>+$4.1k/mo</b>.</p>
-        <a class="email-cta" href="#">Review the full plan →</a>
-        <div class="email-footer">Everything else is trending fine — we only email when it's worth your time.</div>
+        <div class="phone-btn-r"><div class="pb"></div></div>
+        <div class="phone-screen">
+          <div class="phone-notch"></div>
+          <div class="phone-time">9:41</div>
+          <div class="phone-date">GroLabs · Live monitor</div>
+          <div class="phone-slot" id="gro-phone-slot"></div>
+        </div>
       </div>
     </div>
-  </div>
+
+    <!-- Weekly insights email — inside .dash so it zooms with the dashboard -->
+    <div class="gro-email" id="gro-email" aria-hidden="true">
+      <div class="email-card">
+        <div class="email-head">
+          <div class="email-avatar">G</div>
+          <div class="email-meta">
+            <div class="email-from">GroLabs Weekly <span>· insights@grolabs.ai</span></div>
+            <div class="email-subject">This week: kill the password wall (+$4.1k/mo)</div>
+          </div>
+          <div class="email-date">Mon 9:00</div>
+        </div>
+        <div class="email-body">
+          <div class="email-insight-title">You're losing first orders at sign-up</div>
+          <svg class="email-graph" viewBox="0 0 320 78" preserveAspectRatio="none">
+            <defs><linearGradient id="egGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e06a6a" stop-opacity=".26"/><stop offset="1" stop-color="#e06a6a" stop-opacity="0"/></linearGradient></defs>
+            <line class="eg-grid" x1="0" y1="26" x2="320" y2="26"/>
+            <line class="eg-grid" x1="0" y1="52" x2="320" y2="52"/>
+            <path d="M4,18 L66,22 L128,28 L190,38 L252,50 L316,58 L316,78 L4,78 Z" fill="url(#egGrad)"/>
+            <path d="M4,18 L66,22 L128,28 L190,38 L252,50 L316,58" fill="none" stroke="#e06a6a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <p class="email-interp">Sign-up completion fell to <b>41%</b> (−6pt over 6 weeks). Most shoppers bail at <b>"create a password."</b> That's about <b>$4.1k/mo</b> in first orders never placed.</p>
+          <p class="email-rec"><b>Our recommendation:</b> let shoppers register with single sign-on (Google&nbsp;/&nbsp;Apple) instead of creating a password — one tap, nothing to remember. Projected recovery: <b>+$4.1k/mo</b>.</p>
+          <a class="email-cta" href="#">Review the full plan →</a>
+          <div class="email-footer">Everything else is trending fine — we only email when it's worth your time.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.dash -->
 </section>
 
 <script>
@@ -584,16 +615,15 @@
     units.forEach(u=>{const isAlert=u.id==="gro-alert-tile";if(isAlert)t+=450;const at=t;timers.push(setTimeout(()=>isAlert?revealAlert(u):revealTile(u),at));if(!isAlert)t+=gapFor(u);});
   }
 
-  // Expose controls + auto-play when scrolled into view (once)
+  // Expose controls; play is triggered by the parent page via postMessage.
   window.GROTrafficDashboard = { play, reset };
-  let played=false;
-  function start(){ if(played) return; played=true; play(); }
-  if("IntersectionObserver" in window){
-    const io=new IntersectionObserver((es)=>{es.forEach(e=>{ if(e.isIntersecting){ start(); io.disconnect(); } });},{threshold:0.35});
-    io.observe(dash);
-  } else {
-    requestAnimationFrame(()=>requestAnimationFrame(start));
-  }
+  let played = false;
+  window.addEventListener('message', function(e) {
+    var d = e.data;
+    if (!d) return;
+    if (d.type === 'td-play'   && !played) { played = true; play(); }
+    if (d.type === 'td-replay')            { played = false; play(); }
+  });
 })();
 </script>
 <script>

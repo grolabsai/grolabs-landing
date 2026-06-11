@@ -505,7 +505,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        blocks auto-play when the section scrolls into view and re-run on
        submit with the entered URL. Mock-driven (backend out of scope).
        ============================================================ */}
-  <section class="audit-carousel px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl overflow-hidden" data-audit-carousel>
+  <!-- Diagnostic scan hidden — results not reliable yet. Remove `hidden` to restore. -->
+  <section class="audit-carousel px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl overflow-hidden hidden" data-audit-carousel>
     <div class="max-w-page mx-auto">
       <header class="audit-carousel-head">
         <span class="audit-carousel-eyebrow">Quick assessment</span>
@@ -1832,20 +1833,24 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           </p>
         </div>
 
-        <div class="td-frame-wrap">
-          <iframe
-            class="td-frame"
-            src={`${base}/anim/traffic-dashboard.html`}
-            title="Traffic monitoring dashboard — live animation"
-            loading="lazy"
-            scrolling="no"
-          ></iframe>
+        <div class="td-frame-outer">
+          <div class="td-frame-wrap">
+            <iframe
+              class="td-frame"
+              src={`${base}/anim/traffic-dashboard.html`}
+              title="Traffic monitoring dashboard — live animation"
+              loading="lazy"
+              scrolling="no"
+            ></iframe>
+          </div>
+          <button type="button" class="td-replay-btn" data-td-replay aria-label="Replay animation">↻ Replay</button>
         </div>
       </div>
     </div>
   </section>
 
   <style is:global>
+    .td-frame-outer { position: relative; width: 100%; }
     .td-frame-wrap { width: 100%; }
     .td-frame {
       width: 100%;
@@ -1856,18 +1861,58 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       color-scheme: light;
     }
     @media (max-width: 1023px) { .td-frame { height: 1500px; } }
+    .td-replay-btn {
+      position: absolute;
+      bottom: -36px; right: 0;
+      font-family: ui-monospace, monospace;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(0,0,0,0.45);
+      background: transparent;
+      border: 1px solid rgba(0,0,0,0.22);
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+    }
+    .td-replay-btn:hover { color: rgba(0,0,0,0.75); border-color: rgba(0,0,0,0.45); }
   </style>
 
   <script is:inline>
-    // Size the traffic-dashboard iframe to its reported content height.
+    // Size iframe, scroll-trigger the animation, and wire the replay button.
     (function () {
       var frame = document.querySelector('.td-frame');
       if (!frame) return;
+
+      // Height sync from iframe
       window.addEventListener('message', function (e) {
         var d = e.data;
         if (d && d.type === 'td-height' && typeof d.height === 'number') {
           frame.style.height = Math.max(320, d.height) + 'px';
         }
+      });
+
+      // Scroll-triggered play (once)
+      var played = false;
+      function triggerPlay() {
+        if (played) return;
+        played = true;
+        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'td-play' }, '*');
+      }
+      var wrap = frame.closest('.td-frame-outer');
+      if (wrap && 'IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries) {
+          entries.forEach(function(e) { if (e.isIntersecting) { triggerPlay(); io.disconnect(); } });
+        }, { threshold: 0.3 });
+        io.observe(wrap);
+      } else {
+        frame.addEventListener('load', triggerPlay);
+      }
+
+      // Replay button
+      var btn = document.querySelector('[data-td-replay]');
+      if (btn) btn.addEventListener('click', function() {
+        played = false;
+        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'td-replay' }, '*');
       });
     })();
   </script>
