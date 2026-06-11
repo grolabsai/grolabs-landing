@@ -1005,6 +1005,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       margin: 0;
       max-width: 640px;
     }
+    /* Desktop: lift the width caps so the process sentence runs on one
+       line instead of wrapping. Mobile keeps the 640px cap (it wraps,
+       with the manual break after "guesswork."). */
+    @media (min-width: 860px) {
+      .rre-head { max-width: none; }
+      .rre-lede { max-width: none; }
+    }
     .rre-frame-wrap { width: 100%; max-width: 1400px; margin: 0 auto; }
     .rre-frame {
       width: 100%;
