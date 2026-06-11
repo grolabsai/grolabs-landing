@@ -158,15 +158,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         <div class="hero-v2-stat-box">
           <div class="hero-v2-stat-row">
             <span class="hero-v2-stat-99">99%</span>
-            <p class="hero-v2-stat-text">of visitors never become customers in many online stores.</p>
+            <p class="hero-v2-stat-text">of visitors never become customers<br />in many online stores.</p>
           </div>
           <div class="hero-v2-stat-row">
             <span class="hero-v2-stat-99">1%</span>
-            <p class="hero-v2-stat-text">conversion uplift would result in</p>
+            <p class="hero-v2-stat-text">conversion uplift<br />would result in</p>
           </div>
           <div class="hero-v2-stat-row">
             <span class="hero-v2-stat-99 hero-v2-stat-accent">2x</span>
-            <p class="hero-v2-stat-text hero-v2-stat-accent">sales!</p>
+            <p class="hero-v2-stat-sales hero-v2-stat-accent">sales!</p>
           </div>
         </div>
       </div>
@@ -964,13 +964,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .hero-v2-stat-99 {
       font-family: "Permanent Marker", cursive;
       color: #ffffff;
-      font-size: clamp(48px, 5.5vw, 76px);
+      font-size: clamp(38px, 4vw, 56px);
       line-height: 0.9;
       flex-shrink: 0;
       min-width: 2.4em;               /* shared column so the three numbers align */
       text-align: right;
     }
     .hero-v2-stat-text { font-family: "Hanken Grotesk", sans-serif; color: #ffffff; font-size: 20px; line-height: 1.4; margin: 0; }
+    .hero-v2-stat-sales { font-family: "Permanent Marker", cursive; font-size: clamp(38px, 4vw, 56px); line-height: 0.9; margin: 0; }
     .hero-v2-stat-accent { color: #fae194; }
     .hero-v2-stage-col .hero-v2-audit { max-width: none; margin-left: 0; }
 
