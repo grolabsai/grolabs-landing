@@ -138,9 +138,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <span class="hero-v2-line"><span class="hero-v2-amp">&amp;</span> grow your business</span>
         </h1>
         <p class="hero-v2-tagline">Without paying for more traffic</p>
-        <p class="hero-v2-lede">
-          Current Revenue + <span class="hero-v2-lede-accent">Revenue leaks</span> = Potential Revenue
-        </p>
         <div class="hero-v2-ctas" data-hero-ctas>
           <div class="hero-v2-cta-stack">
             <a
@@ -158,11 +155,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       </div>
 
       <div class="hero-v2-stage-col">
-        <div class="hero-v2-stat-row">
-          <span class="hero-v2-stat-99">99%</span>
-          <p class="hero-v2-stat-text">of visitors never become customers in many online stores.</p>
+        <div class="hero-v2-stat-box">
+          <div class="hero-v2-stat-row">
+            <span class="hero-v2-stat-99">99%</span>
+            <p class="hero-v2-stat-text">of visitors never become customers in many online stores.</p>
+          </div>
+          <div class="hero-v2-stat-row">
+            <span class="hero-v2-stat-99">1%</span>
+            <p class="hero-v2-stat-text">conversion uplift would result in</p>
+          </div>
+          <div class="hero-v2-stat-row">
+            <span class="hero-v2-stat-99 hero-v2-stat-accent">2x</span>
+            <p class="hero-v2-stat-text hero-v2-stat-accent">sales!</p>
+          </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -505,8 +511,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        blocks auto-play when the section scrolls into view and re-run on
        submit with the entered URL. Mock-driven (backend out of scope).
        ============================================================ */}
-  <!-- Diagnostic scan hidden — results not reliable yet. Remove `hidden` to restore. -->
-  <section class="audit-carousel px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl overflow-hidden hidden" data-audit-carousel>
+  <section class="audit-carousel px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl overflow-hidden" data-audit-carousel>
     <div class="max-w-page mx-auto">
       <header class="audit-carousel-head">
         <span class="audit-carousel-eyebrow">Quick assessment</span>
@@ -947,9 +952,26 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     [data-hero-audit] .hero-v2-copy { display: flex; flex-direction: column; }
     [data-hero-audit] .hero-v2-lede { margin-top: auto; }
     .hero-v2-stage-col { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 560px; margin-left: auto; }
+    .hero-v2-stat-box {
+      background: #1c1d24;            /* lighter-shade block, same as the quote card */
+      border-radius: 16px;
+      padding: 32px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
     .hero-v2-stat-row { display: flex; gap: 18px; align-items: center; }
-    .hero-v2-stat-99 { font-family: "Permanent Marker", cursive; color: #fae194; font-size: clamp(68px, 8vw, 104px); line-height: 0.9; flex-shrink: 0; }
-    .hero-v2-stat-text { font-family: "Hanken Grotesk", sans-serif; color: #EDEAE0; font-size: 20px; line-height: 1.4; margin: 0; }
+    .hero-v2-stat-99 {
+      font-family: "Permanent Marker", cursive;
+      color: #ffffff;
+      font-size: clamp(48px, 5.5vw, 76px);
+      line-height: 0.9;
+      flex-shrink: 0;
+      min-width: 2.4em;               /* shared column so the three numbers align */
+      text-align: right;
+    }
+    .hero-v2-stat-text { font-family: "Hanken Grotesk", sans-serif; color: #ffffff; font-size: 20px; line-height: 1.4; margin: 0; }
+    .hero-v2-stat-accent { color: #fae194; }
     .hero-v2-stage-col .hero-v2-audit { max-width: none; margin-left: 0; }
 
     /* Icons inside the URL + email inputs (lighter-gray shade). */
@@ -1833,24 +1855,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           </p>
         </div>
 
-        <div class="td-frame-outer">
-          <div class="td-frame-wrap">
-            <iframe
-              class="td-frame"
-              src={`${base}/anim/traffic-dashboard.html`}
-              title="Traffic monitoring dashboard — live animation"
-              loading="lazy"
-              scrolling="no"
-            ></iframe>
-          </div>
-          <button type="button" class="td-replay-btn" data-td-replay aria-label="Replay animation">↻ Replay</button>
+        <div class="td-frame-wrap">
+          <iframe
+            class="td-frame"
+            src={`${base}/anim/traffic-dashboard.html`}
+            title="Traffic monitoring dashboard — live animation"
+            loading="lazy"
+            scrolling="no"
+          ></iframe>
         </div>
       </div>
     </div>
   </section>
 
   <style is:global>
-    .td-frame-outer { position: relative; width: 100%; }
     .td-frame-wrap { width: 100%; }
     .td-frame {
       width: 100%;
@@ -1861,58 +1879,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       color-scheme: light;
     }
     @media (max-width: 1023px) { .td-frame { height: 1500px; } }
-    .td-replay-btn {
-      position: absolute;
-      bottom: -36px; right: 0;
-      font-family: ui-monospace, monospace;
-      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(0,0,0,0.45);
-      background: transparent;
-      border: 1px solid rgba(0,0,0,0.22);
-      border-radius: 6px;
-      padding: 5px 10px;
-      cursor: pointer;
-      transition: color .15s, border-color .15s;
-    }
-    .td-replay-btn:hover { color: rgba(0,0,0,0.75); border-color: rgba(0,0,0,0.45); }
   </style>
 
   <script is:inline>
-    // Size iframe, scroll-trigger the animation, and wire the replay button.
+    // Size the traffic-dashboard iframe to its reported content height.
     (function () {
       var frame = document.querySelector('.td-frame');
       if (!frame) return;
-
-      // Height sync from iframe
       window.addEventListener('message', function (e) {
         var d = e.data;
         if (d && d.type === 'td-height' && typeof d.height === 'number') {
           frame.style.height = Math.max(320, d.height) + 'px';
         }
-      });
-
-      // Scroll-triggered play (once)
-      var played = false;
-      function triggerPlay() {
-        if (played) return;
-        played = true;
-        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'td-play' }, '*');
-      }
-      var wrap = frame.closest('.td-frame-outer');
-      if (wrap && 'IntersectionObserver' in window) {
-        var io = new IntersectionObserver(function(entries) {
-          entries.forEach(function(e) { if (e.isIntersecting) { triggerPlay(); io.disconnect(); } });
-        }, { threshold: 0.3 });
-        io.observe(wrap);
-      } else {
-        frame.addEventListener('load', triggerPlay);
-      }
-
-      // Replay button
-      var btn = document.querySelector('[data-td-replay]');
-      if (btn) btn.addEventListener('click', function() {
-        played = false;
-        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'td-replay' }, '*');
       });
     })();
   </script>
