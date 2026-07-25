@@ -893,14 +893,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     {/* below lg the head sits above the track; at lg+ it lives inside
         the pinned stage's left column (.cps-side) */}
     <div class="cps-head-wrap cps-head-sm">
-      <div class="cps-eyebrow">Alchemus — AI catalog optimization agent</div>
+      <div class="cps-eyebrow">Alchemus — AI catalog Enrichment agent</div>
       <h2 class="cps-h2">Product Catalog</h2>
       <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
     </div>
     <div class="cps-track">
       <div class="cps-stage">
         <div class="cps-cols">
-        <div class="cps-eyebrow cps-side-eb">Alchemus — AI catalog optimization agent</div>
+        <div class="cps-eyebrow cps-side-eb">Alchemus — AI catalog Enrichment agent</div>
         <div class="cps-side">
           <h2 class="cps-h2">Product Catalog</h2>
           <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
@@ -2546,6 +2546,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
                 <div class="tp-tx">Yesterday's visits fell 5.3% below your daily threshold.</div>
               </div>
             </div>
+            <div class="tp-home"></div>
           </div>
           <svg class="tdm-link" id="tdmLink" aria-hidden="true"><path id="tdmLinkP"/><path id="tdmLinkH"/></svg>
         </div>
@@ -2584,13 +2585,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       display: flex; flex-direction: column; align-items: center;
     }
     .tdm-fin-stage .tdm-card { position: relative; z-index: 1; }
+    /* the phone sits IN FLOW directly under the pinned graph (small
+       fixed gap) and renders as a complete handset: tall phone
+       proportions with a home indicator at the bottom */
     .tdm-phone {
-      position: absolute; left: 50%; bottom: 0;
-      width: 212px; margin-left: 40px;
-      background: #0f1014; border: 1.5px solid rgba(255,255,255,.16); border-radius: 26px;
-      padding: 14px 13px 18px; box-shadow: 0 24px 60px -18px rgba(0,0,0,.5);
+      position: relative;
+      width: 200px; min-height: 380px; margin-top: 20px;
+      display: flex; flex-direction: column;
+      background: #0f1014; border: 1.5px solid rgba(255,255,255,.16); border-radius: 30px;
+      padding: 14px 13px 14px; box-shadow: 0 24px 60px -18px rgba(0,0,0,.5);
       opacity: 0; pointer-events: none;
     }
+    .tp-home { margin-top: auto; width: 72px; height: 4px; border-radius: 99px; background: rgba(255,255,255,.25); align-self: center; }
     .tp-notch { width: 64px; height: 16px; background: #000; border-radius: 10px; margin: 0 auto 12px; }
     .tp-time { font-size: 30px; font-weight: 600; text-align: center; color: #fff; line-height: 1; }
     .tp-sub { font-size: 12.5px; text-align: center; color: rgba(237,234,224,.5); margin: 5px 0 14px; }
@@ -2603,8 +2609,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .tdm-link path { fill: none; stroke: #dc2626; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
     @media (max-width: 680px) {
       .tdm-flow { gap: 28px; }
+      /* all graph blocks the same width on mobile */
+      .tdm-card, .tdm-card.tdm-wide { max-width: none; width: 100%; }
       .tdm-card { padding: 12px 13px 10px; }
-      .tdm-phone { width: 172px; margin-left: 0; transform: translateX(-50%); border-radius: 22px; }
+      .tdm-phone { width: 172px; min-height: 330px; margin-top: 16px; border-radius: 24px; }
       .tp-time { font-size: 24px; }
     }
 
@@ -2956,10 +2964,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           linkH.setAttribute('d', 'M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l-6 -11 M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l6 -11');
           linkH.style.opacity = ak > 0.95 ? '1' : '0';
         } else { linkP.style.opacity = '0'; linkH.style.opacity = '0'; }
-        // then the phone
+        // then the phone (in flow below the graph; it only fades/rises)
         phone.style.opacity = pk.toFixed(3);
-        var baseT = getComputedStyle(phone).getPropertyValue('--tp-x') || '';
-        phone.style.transform = (matchMedia('(max-width:680px)').matches ? 'translateX(-50%) ' : '') + 'translateY(' + ((1 - pk) * 16).toFixed(1) + 'px)';
+        phone.style.transform = 'translateY(' + ((1 - pk) * 16).toFixed(1) + 'px)';
       }
       addEventListener('scroll', render, { passive: true });
       addEventListener('resize', render);
