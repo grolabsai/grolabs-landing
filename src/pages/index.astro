@@ -723,84 +723,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   )}
 
   {/* ============================================================
-       Revenue Recovery Engine — animated section.
-       The animation is a self-contained DOM/JS document served from
-       /anim/recovery-engine.html and embedded in an iframe (fully
-       isolated styles/scripts). It autoplays on scroll, runs the full
-       leak→fix→recover pipeline for 8 leaks, holds 10s on the closing
-       graph, then loops. The iframe reports its content height via
-       postMessage; the inline script below sizes it to fit. The page
-       supplies the heading + copy.
-       ============================================================ */}
-  <section class="rre-section reveal" data-screen-label="Revenue Recovery Engine">
-    <div class="max-w-page mx-auto w-full">
-      <header class="rre-head">
-        <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
-        <div class="rre-title-row">
-          <h2 class="rre-title">Revenue Recovery Engine</h2>
-          <button type="button" class="rre-replay" data-rre-replay aria-label="Replay animation">↻ Replay</button>
-        </div>
-        <p class="rre-lede">
-          Every search is a signal. We learn from all of them, catch the queries
-          quietly leaking revenue, and fix them — in the search engine or your
-          product catalog. Then we verify the fix and measure the revenue recovered.
-        </p>
-      </header>
-      <div class="rre-frame-wrap">
-        <iframe
-          class="rre-frame"
-          data-src-desktop={`${base}/anim/recovery-engine.html`}
-          data-src-mobile={`${base}/anim/recovery-engine-mobile.html`}
-          title="Revenue Recovery Engine — live animation"
-          loading="lazy"
-          scrolling="no"
-        ></iframe>
-      </div>
-    </div>
-  </section>
-
-  <script is:inline>
-    // Load the desktop or the simplified mobile animation per viewport, and
-    // size the iframe to whichever one reports its height.
-    (function () {
-      var frame = document.querySelector('.rre-frame');
-      if (!frame) return;
-      var mq = window.matchMedia('(max-width: 1000px)');
-      var current = null;
-      function pick() {
-        var want = mq.matches ? frame.dataset.srcMobile : frame.dataset.srcDesktop;
-        if (want !== current) { current = want; frame.style.height = ''; frame.src = want; }
-      }
-      pick();
-      if (mq.addEventListener) mq.addEventListener('change', pick);
-      else if (mq.addListener) mq.addListener(pick);
-      window.addEventListener('message', function (e) {
-        var d = e.data;
-        if (d && d.type === 'rre-height' && typeof d.height === 'number') {
-          // grow-only: settle to the tallest state once, then stay put so the
-          // page below doesn't reflow as the table empties/refills each loop.
-          var h = Math.max(320, d.height);
-          var cur = parseInt(frame.style.height, 10) || 0;
-          if (h > cur) frame.style.height = h + 'px';
-        }
-      });
-      // Replay button → tell the animation iframe to restart from the beginning.
-      var replay = document.querySelector('[data-rre-replay]');
-      if (replay) replay.addEventListener('click', function () {
-        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'rre-replay' }, '*');
-      });
-    })();
-  </script>
-
-  {/* ============================================================
-       Revenue Recovery Engine — SCROLL-DRIVEN copy of the section
-       above. Same pipeline, but compacted to 4 events and executed by
-       scroll instead of autoplaying: the stage pins below the header
-       while a tall track provides the scroll distance, and the page
-       posts the progress value into the iframe ({type:'rre-p', p});
-       inside, every visual is a pure function of p, so scrolling up
-       rewinds the run. Animation: /anim/recovery-engine-scroll.html
-       (single compact column, sized for a phone viewport).
+       Revenue Recovery Engine — scroll-driven. The stage pins below
+       the header while a tall track provides the scroll distance, and
+       the page posts the progress value into the iframe
+       ({type:'rre-p', p}); inside, every visual is a pure function of
+       p, so scrolling up rewinds the run. Three no-result searches
+       (typo / synonym / semantic), storefront and engine zones.
+       Animation: /anim/recovery-engine-scroll.html (single compact
+       column, sized for a phone viewport).
        ============================================================ */}
   <section class="rres" data-rre-scroll data-screen-label="Revenue Recovery Engine (scroll)">
     <div class="max-w-page mx-auto w-full">

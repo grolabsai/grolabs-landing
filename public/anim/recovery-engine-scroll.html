@@ -32,7 +32,9 @@
     font-family:var(--sans); color:var(--bone); padding:8px; overflow:hidden;
     height:100svh; display:grid; place-items:center;
   }
-  .m-wrap{max-width:460px; width:100%; margin:0 auto; display:flex; flex-direction:column; gap:8px; position:relative;}
+  /* left padding = a reserved gutter where the yellow guide line runs, so
+     it sits BESIDE the blocks instead of crossing over them */
+  .m-wrap{max-width:488px; width:100%; margin:0 auto; padding-left:28px; display:flex; flex-direction:column; gap:8px; position:relative;}
   #guide{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:60; opacity:0;}
   #guide path{fill:none; stroke:#f5c518; stroke-width:4.5; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
   #guidePath{filter:drop-shadow(0 2px 6px rgba(245,197,24,.3));}
@@ -207,8 +209,8 @@
        total up the left side to the search box; erased tail-first when the
        next search starts typing -->
   <svg id="guide" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-    <path id="guidePath" d="M 79 96.5 C 55 103.5,16 101,6.5 89 C 0.5 80.5,1.5 42,4 16.5 C 4.6 11,7.5 8.4,12.5 9.1" />
-    <path id="guideHead" d="M 12.5 9.1 L 9.2 11.8 M 12.5 9.1 L 9.3 6.7" />
+    <path id="guidePath" d="M 79 96.5 C 55 103.5,13 101,4.6 89 C 1 80.5,1.2 42,2.6 16.5 C 2.9 11,5.2 8.4,10 9.1" />
+    <path id="guideHead" d="M 10 9.1 L 7 11.7 M 10 9.1 L 7.1 6.8" />
   </svg>
 </div>
 <div id="mFlyer"></div>
@@ -308,7 +310,8 @@
     [['#revSys',sysRev],['#revRec',recRev]].forEach(([sel,v])=>{
       const el=$(sel);
       el.style.opacity=v.toFixed(3);
-      el.style.transform=v<1?'translateY('+((1-v)*10).toFixed(1)+'px)':'';
+      // enter from ABOVE (slide down): the reveal follows the eye path
+      el.style.transform=v<1?'translateY('+(-(1-v)*10).toFixed(1)+'px)':'';
       el.style.visibility=v<=0?'hidden':'';
     });
 
@@ -337,8 +340,10 @@
     btn.style.filter=press>0?'brightness('+(1+press*0.9).toFixed(2)+')':'';
     btn.style.boxShadow=press>0?'0 0 0 '+(press*5).toFixed(1)+'px rgba(27,28,34,.14)':'';
 
-    /* 3 · the reaction: red no-results strip */
-    const resOn=started&&lt>=PH.res;
+    /* 3 · the reaction: red no-results strip. It clears the moment the
+       leak chip finishes carrying it down to the Revenue-leak card, so
+       the storefront is clean for the next run */
+    const resOn=started&&lt>=PH.res&&lt<PH.fly1[1];
     $('#shopRes').classList.toggle('bad',resOn);
     $('#resTxt').textContent=resOn?'No results for "'+ev.item+'"':'';
 
