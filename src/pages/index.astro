@@ -793,6 +793,300 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   </script>
 
   {/* ============================================================
+       Catalog Parser — Alchemus. Scroll-driven section: an Excel feed
+       is scanned row by row (yellow beam, tokens turn into coloured
+       pills), each row drops into its product base card, and a full
+       SKU table builds underneath. Engine is public/catalog-parser.js
+       (ship as-is, do not edit); every visual is a pure function of
+       scroll progress, so scrolling up rewinds the parse. Markup,
+       class names and DOM nesting inside .cps-inner must not change —
+       the engine queries and measures that structure.
+       ============================================================ */}
+  <section class="cps" id="cps" data-screen-label="Catalog Parser">
+    <div class="cps-head-wrap">
+      <div class="cps-eyebrow">Alchemus — AI catalog optimization agent</div>
+      <h2 class="cps-h2">Product Catalog</h2>
+      <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
+    </div>
+    <div class="cps-track">
+      <div class="cps-stage">
+        <div class="cps-inner">
+
+          <div class="cps-sheet">
+            <div class="cps-sheet-bar"><span class="cps-sheet-x">X</span><span class="cps-sheet-f">product_feed.xlsx</span><span class="cps-sheet-tab">Sheet1</span><span class="cps-sheet-n">7 rows</span></div>
+            <div class="cps-sheet-head"><span class="cps-gut">#</span><span style="flex:1">A</span><span class="cps-scol">B</span><span class="cps-pcol">C</span></div>
+            <div class="cps-sheet-r1"><span class="cps-gut">1</span><span style="flex:1">product_title</span><span class="cps-scol">sku</span><span class="cps-pcol">price</span></div>
+            <ul class="cps-rows"></ul>
+            <div class="cps-trail"></div><div class="cps-head"></div>
+            <div class="cps-sheet-done">all rows processed</div>
+          </div>
+
+          <div class="cps-cards"></div>
+
+          <div class="cps-table">
+            <table>
+              <thead><tr><th>SKU</th><th class="v">Color</th><th class="v">Size</th><th class="a">Style</th><th class="a">Closure</th><th class="a">Type</th><th class="r">Price</th></tr></thead>
+              <tbody class="cps-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="cps-legend"><span><i style="background:#fff"></i>Product base</span><span><i style="background:#9ec5ff"></i>Attribute</span><span><i style="background:#fae194"></i>Variant axis</span></div>
+
+        </div>
+        <div class="cps-hint"><b></b><span>Scroll to run the parser</span></div>
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    :root{--cps-bg:#0c0c0f;--cps-line:rgba(255,255,255,.09);--cps-txt:#e8e8ee;--cps-dim:#8b8d98;--cps-accent:#fae194;--cps-blue:#9ec5ff;--cps-green:#34d399;--cps-ink:#24252b}
+
+    .cps{background:radial-gradient(130% 130% at 26% 18%,#15161d 0%,#0c0c0f 58%,#07070a 100%);font-family:"Hanken Grotesk",-apple-system,sans-serif}
+    .cps-track{height:700vh;position:relative}
+    .cps-stage{position:sticky;top:0;height:100svh;min-height:560px;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;padding:14px 16px 40px;overflow:hidden}
+    .cps-inner{width:100%;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+
+    /* ── section header (landing-page type) ── */
+    .cps-head-wrap{max-width:900px;margin:0 auto;padding:88px 16px 0}
+    .cps-eyebrow{display:flex;align-items:center;gap:10px;font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--cps-accent);margin-bottom:20px}
+    .cps-h2{font-family:"Permanent Marker","Hanken Grotesk",cursive;font-size:clamp(34px,4vw,54px);font-weight:400;letter-spacing:.005em;color:#fff;line-height:1.06;margin:0;text-wrap:balance}
+    .cps-sub{font-size:18px;line-height:1.55;color:rgba(237,234,224,.62);max-width:620px;margin:18px 0 0;text-wrap:pretty}
+    .cps-sub em{font-style:normal;color:var(--cps-accent);font-weight:500}
+    @media (max-width:760px){.cps-head-wrap{padding:64px 14px 0}.cps-sub{font-size:16px}.cps-eyebrow{font-size:11px;letter-spacing:.18em}}
+
+    /* ── spreadsheet ── */
+    .cps-sheet{background:#fff;border-radius:7px;box-shadow:0 24px 60px -24px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.12);position:relative}
+    .cps-sheet-bar{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#f4f4f2;border-bottom:1px solid #dcdcd8;border-radius:7px 7px 0 0}
+    .cps-sheet-x{width:15px;height:15px;border-radius:3px;background:#1b7a4b;color:#fff;font:700 9.5px/15px "Hanken Grotesk",sans-serif;text-align:center;flex:none}
+    .cps-sheet-f{font-size:11.5px;font-weight:600;color:#3a3b40}
+    .cps-sheet-tab{font-size:10px;color:#8a8a90;border:1px solid #dcdcd8;border-radius:3px;padding:1px 6px;background:#fff}
+    .cps-sheet-n{margin-left:auto;font:500 10.5px/1 ui-monospace,Menlo,monospace;color:#8a8a90;font-variant-numeric:tabular-nums}
+    .cps-sheet-head,.cps-sheet-r1{display:flex;border-bottom:1px solid #dcdcd8}
+    .cps-sheet-head{background:#f7f7f5;font:600 9.5px/1 "Hanken Grotesk",sans-serif;color:#9a9aa0;letter-spacing:.06em}
+    .cps-sheet-head span,.cps-sheet-r1 span{padding:5px 9px}
+    .cps-gut{width:30px;flex:none;text-align:center;border-right:1px solid #dcdcd8;padding-left:0!important;padding-right:0!important}
+    .cps-scol{width:86px;flex:none;border-left:1px solid #e6e6e2}
+    .cps-pcol{width:72px;flex:none;border-left:1px solid #e6e6e2;text-align:right}
+    .cps-sheet-r1{font-size:11.5px;color:#5c5d63;font-weight:600;border-bottom:1px solid #e6e6e2}
+    .cps-sheet-r1 .cps-gut{color:#a9a9ae;font:500 10px/1.6 ui-monospace,Menlo,monospace}
+    .cps-sheet-done{height:0;overflow:hidden;text-align:center;font:500 11px/30px ui-monospace,Menlo,monospace;color:#a9a9ae;opacity:0}
+    .cps-rows{list-style:none;margin:0;padding:0;position:relative}
+    .cps-r{position:relative;will-change:height}
+    .cps-r-in{--lift:0;--sel:0;position:relative;display:flex;align-items:stretch;border-bottom:1px solid color-mix(in oklab,#e6e6e2 calc((1 - var(--lift))*100%),rgba(250,225,148,.5));background:#fff;border-radius:calc(var(--lift)*8px);box-shadow:inset 0 0 0 calc(var(--sel)*1.5px) rgba(250,196,20,calc(var(--sel)*.9)),0 0 0 calc(var(--lift)*1px) rgba(250,225,148,calc(var(--lift)*.55)),0 calc(var(--lift)*18px) calc(var(--lift)*34px) calc(var(--lift)*-14px) rgba(0,0,0,calc(var(--lift)*.55));will-change:transform,opacity}
+    .cps-r-i{width:30px;flex:none;display:flex;align-items:center;justify-content:center;font:500 10px/1 ui-monospace,Menlo,monospace;color:#a9a9ae;border-right:1px solid #e6e6e2}
+    .cps-r-c{flex:1;padding:6px 8px;font:400 13px/1.75 ui-monospace,Menlo,monospace;white-space:pre-wrap;color:var(--cps-ink)}
+    .cps-r-s{width:86px;flex:none;border-left:1px solid #e6e6e2;display:flex;align-items:center;padding:0 9px;font:500 11.5px/1 ui-monospace,Menlo,monospace;letter-spacing:.02em;color:#4b4c52}
+    .cps-r-p{width:72px;flex:none;border-left:1px solid #e6e6e2;display:flex;align-items:center;justify-content:flex-end;padding:0 9px;font:500 12px/1 ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;color:#4b4c52}
+    .cps-tok{--on:0;border-radius:99px;padding:2px 6px;color:color-mix(in oklab,var(--c-on) calc(var(--on)*100%),var(--cps-ink));background:color-mix(in oklab,var(--bg-on) calc(var(--on)*100%),transparent);box-shadow:0 0 0 1px color-mix(in oklab,var(--br-on) calc(var(--on)*100%),transparent)}
+    .cps-tok-attr{--c-on:#1c4f8c;--bg-on:#dbe9fb;--br-on:#a9c8ef}
+    .cps-tok-type{--c-on:#1b1c22;--bg-on:#e8e8ea;--br-on:#c9c9ce;font-weight:calc(400 + var(--on)*200)}
+    .cps-tok-var{--c-on:#7a5300;--bg-on:#fdf0c8;--br-on:#f0cd6a;font-weight:calc(400 + var(--on)*100)}
+    .cps-sep{outline:1px dashed rgba(214,90,90,.55);outline-offset:1px;border-radius:2px}
+    .cps-flag{position:absolute;right:170px;top:50%;transform:translateY(-50%);font-size:10px;color:#c0392b;background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.28);border-radius:99px;padding:2px 7px;white-space:nowrap;opacity:0}
+    /* scan head */
+    .cps-head,.cps-trail{position:absolute;left:0;top:0;pointer-events:none;opacity:0;z-index:6}
+    .cps-head{width:4px;border-radius:2px;background:linear-gradient(180deg,#ffe9a3,#f5b700);box-shadow:0 0 18px 6px rgba(245,183,0,.75),0 0 40px 12px rgba(245,183,0,.35),0 0 2px 1px #fff}
+    .cps-trail{background:linear-gradient(90deg,rgba(245,183,0,0),rgba(245,183,0,.22));border-bottom:2px solid rgba(245,183,0,.7)}
+    .cps-bubble{position:absolute;left:50%;top:-30px;transform:translate(-50%,0) scale(var(--s,1));opacity:0;font:600 21px/1 "Hanken Grotesk",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#fff;padding:11px 24px;border-radius:99px;white-space:nowrap;z-index:8;box-shadow:0 14px 34px -10px rgba(0,0,0,.6)}
+    .cps-bubble.nb{background:#0f9d58}
+    .cps-bubble.pv{background:#c98a12}
+
+    /* ── output ── */
+    .cps-cards{display:grid;gap:9px;margin-top:58px}
+    .cps-c{--rev:0;opacity:var(--rev);transform:translateY(calc((1 - var(--rev))*14px));border:1px solid var(--cps-line);border-radius:12px;background:linear-gradient(#1b1c23,#161720);padding:11px 13px;display:flex;flex-direction:column;gap:8px}
+    .cps-c-h{display:flex;align-items:center;gap:8px}
+    .cps-c-dot{width:6px;height:6px;border-radius:99px;background:var(--cps-green);flex:none;box-shadow:0 0 0 3px rgba(52,211,153,.13)}
+    .cps-c-name{font-size:14px;font-weight:600;color:#fff;line-height:1.25}
+    .cps-c-body{overflow:hidden;display:flex;flex-direction:column;gap:8px}
+    .cps-c-attrs{display:flex;flex-wrap:wrap;gap:5px}
+    .cps-chip{--on:0;opacity:calc(.15 + var(--on)*.85);transform:scale(calc(.94 + var(--on)*.06));display:inline-flex;gap:5px;align-items:baseline;font-size:11px;padding:3px 8px;border-radius:6px;border:1px solid rgba(158,197,255,.22);background:rgba(158,197,255,.07)}
+    .cps-chip i{font-style:normal;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#6f8ab5}
+    .cps-chip b{font-weight:500;color:var(--cps-blue)}
+    .cps-c-axes{display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(255,255,255,.06);padding-top:8px}
+    .cps-ax{display:flex;align-items:center;gap:9px}
+    .cps-ax-k{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#8a7f5c;width:44px;flex:none}
+    .cps-ax-v{display:flex;flex-wrap:wrap;gap:5px}
+    .cps-pill{--on:0;opacity:calc(.16 + var(--on)*.84);font:500 11px/1 ui-monospace,Menlo,monospace;padding:4px 8px;border-radius:99px;border:1px solid rgba(250,225,148,calc(.14 + var(--on)*.24));background:rgba(250,225,148,calc(var(--on)*.1));color:color-mix(in oklab,var(--cps-accent) calc(30% + var(--on)*70%),#63656f);transition:opacity .25s}
+    .cps-c-f{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:500 10.5px/1 ui-monospace,Menlo,monospace;color:#6d6f7a;font-variant-numeric:tabular-nums}
+    .cps-gap{color:#f0a3a3;border:1px dashed rgba(240,163,163,.35);border-radius:99px;padding:3px 7px}
+    .cps-full{color:var(--cps-green);border:1px solid rgba(52,211,153,.3);border-radius:99px;padding:3px 7px}
+
+    /* ── SKU table ── */
+    .cps-table{--on:0;opacity:var(--on);transform:translateY(calc((1 - var(--on))*10px));border:1px solid var(--cps-line);border-radius:12px;background:linear-gradient(#191a21,#141520);overflow:hidden}
+    .cps-table table{width:100%;border-collapse:collapse;font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+    .cps-table th{font:600 8.5px/1 "Hanken Grotesk",sans-serif;letter-spacing:.12em;text-transform:uppercase;text-align:left;padding:8px 7px;color:#7e808b;border-bottom:1px solid rgba(255,255,255,.09);white-space:nowrap}
+    .cps-table th.v{color:#a8974f}.cps-table th.a{color:#6f8ab5}.cps-table th.r{text-align:right}
+    .cps-table td{font-size:10.5px;padding:6px 7px;border-bottom:1px solid rgba(255,255,255,.045);color:#c9cad4;white-space:nowrap}
+    .cps-table tr:last-child td{border-bottom:0}
+    .c-sku{color:#fff;font-weight:500;letter-spacing:.02em}
+    .c-var{color:var(--cps-accent)}
+    .c-at{color:var(--cps-blue)}
+    .c-pr{color:var(--cps-green);text-align:right;font-weight:500}
+    .cps-tg td{background:rgba(255,255,255,.03);font:600 9.5px/1 "Hanken Grotesk",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#9a9ba6;padding:6px 7px}
+    .cps-tg-dot{display:inline-block;width:5px;height:5px;border-radius:99px;background:var(--cps-green);margin-right:7px;vertical-align:1px}
+
+    /* ── legend · bottom ── */
+    .cps-legend{--on:0;opacity:var(--on);display:flex;flex-wrap:wrap;justify-content:center;gap:14px;font-size:10.5px;letter-spacing:.05em;color:var(--cps-dim);padding-top:2px}
+    .cps-legend i{width:7px;height:7px;border-radius:2px;display:inline-block;margin-right:5px;vertical-align:1px}
+
+    /* ── hint ── */
+    .cps-hint{--on:1;opacity:var(--on);position:absolute;left:0;right:0;bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11.5px;letter-spacing:.05em;color:#7e808b}
+    .cps-hint b{width:14px;height:14px;border-radius:99px;border:1px solid rgba(250,225,148,.4);display:grid;place-items:center;animation:cps-bob 1.6s ease-in-out infinite}
+    .cps-hint b:after{content:"";width:4px;height:4px;border-right:1px solid var(--cps-accent);border-bottom:1px solid var(--cps-accent);transform:rotate(45deg) translate(-1px,-1px)}
+    @keyframes cps-bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(2px)}}
+
+    @media (min-width:761px){
+      .cps-stage{gap:16px;padding:20px 32px 44px}
+      .cps-r-c{font-size:14px;padding:8px 11px}
+      .cps-cards{grid-template-columns:1fr 1fr;gap:12px}
+      .cps-c-name{font-size:15px}
+      .cps-table td{font-size:11.5px;padding:7px 10px}
+      .cps-table th{font-size:9px;padding:9px 10px}
+      .cps-cards{margin-top:68px}
+    }
+    @media (max-width:760px){
+      .cps-stage{padding:12px 14px 36px}
+      .cps-c{padding:10px 11px;gap:7px}
+      .cps-chip{padding:2px 7px;font-size:10.5px}
+      .cps-r-c{font-size:12px;line-height:1.9}
+      .cps-cards{margin-top:52px}
+      .cps-r-p,.cps-pcol{width:56px}
+      .cps-r-s,.cps-scol{width:74px}
+      .cps-r-s{font-size:10.5px;padding:0 6px}
+      .cps-bubble{font-size:15px;padding:9px 18px;top:-24px}
+      .cps-table td,.cps-table th{padding:5px 5px}
+      .cps-table td{font-size:9.5px}
+    }
+    @media (prefers-reduced-motion:reduce){.cps-hint b{animation:none}}
+
+    /* ── site override: pin the stage below the fixed site header.
+       --cps-top is set from the header's measured height by the config
+       script; shrinking the stage (rather than padding it) keeps the
+       engine's clientHeight-based auto-fit correct. ── */
+    .cps-stage{top:var(--cps-top,0px);height:calc(100svh - var(--cps-top,0px))}
+  </style>
+
+  <script is:inline>
+    // Keep the pinned Catalog Parser stage below the fixed site header:
+    // mirror the header's measured height into --cps-top, and poke the
+    // engine (it re-measures on window resize) when that height changes.
+    (function () {
+      var header = document.querySelector('header');
+      var last = -1;
+      function setTop() {
+        var h = header ? Math.round(header.getBoundingClientRect().height) : 0;
+        if (h === last) return;
+        last = h;
+        document.documentElement.style.setProperty('--cps-top', h + 'px');
+        window.dispatchEvent(new Event('resize'));
+      }
+      if (header && 'ResizeObserver' in window) new ResizeObserver(setTop).observe(header);
+      setTop();
+    })();
+
+    // Catalog Parser data — must be defined before catalog-parser.js runs.
+    window.CATALOG_CONFIG = {
+      rootId: "cps",
+      badge: { base: "New product base", variant: "Product variant" },
+      status: {
+        idle: "Awaiting feed",
+        scan: "Scanning row {n} — classifying every token",
+        create: "No matching base → new product base created",
+        match: "Base matched → adding variant",
+        done: "2 product bases · 2 variant axes · 7 SKUs",
+      },
+      bases: [
+        { id: "A", name: "Long sleeve Elegant Button Down Shirt",
+          attrs: [["Type","Shirt"],["Style","Elegant"],["Closure","Button down"],["Sleeve","Long sleeve"]],
+          axes: [{ name:"Color", values:["Blue","Black"] },{ name:"Size", values:["Small","Medium"] }] },
+        { id: "B", name: "Short sleeve Casual Button Down Shirt",
+          attrs: [["Type","Shirt"],["Style","Casual"],["Closure","Button down"],["Sleeve","Short sleeve"]],
+          axes: [{ name:"Color", values:["Blue","Black"] },{ name:"Size", values:["Small","Medium"] }] },
+      ],
+      rows: [
+        { base:"B", sku:"SSC-BLU-S", price:54, flag:"double space normalized", vals:[["Color","Blue"],["Size","Small"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{sep:"  "},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Small",role:"var"}] },
+        { base:"A", sku:"LSE-BLU-M", price:68, vals:[["Color","Blue"],["Size","Medium"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Medium",role:"var"}] },
+        { base:"B", sku:"SSC-BLK-M", price:58, vals:[["Color","Black"],["Size","Medium"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Medium",role:"var"}] },
+        { base:"A", sku:"LSE-BLU-S", price:68, vals:[["Color","Blue"],["Size","Small"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Small",role:"var"}] },
+        { base:"B", sku:"SSC-BLU-M", price:54, vals:[["Color","Blue"],["Size","Medium"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Medium",role:"var"}] },
+        { base:"A", sku:"LSE-BLK-S", price:72, vals:[["Color","Black"],["Size","Small"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Small",role:"var"}] },
+        { base:"B", sku:"SSC-BLK-S", price:58, vals:[["Color","Black"],["Size","Small"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Small",role:"var"}] },
+      ],
+    };
+  </script>
+  <script is:inline src={`${base}/catalog-parser.js`}></script>
+
+  <!-- Try it out / Attribute Match Visibility. Live Meilisearch demo
+       against the `demo` index — 4 snack bars with a deliberate
+       data-quality gradient (3/3, 2/3, 1/3, 0/3 matches against the
+       gluten-free + sugar-free + dairy-free trio). The 0/3 product is
+       the punchline: it IS all three things, but the merchant never
+       tagged it, so search can't surface it by attribute.
+       Sits on the lighter canvas bg so the search panel inside it can
+       use the floating-card shadow treatment from the hero. -->
+  <section class="relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Try it out
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">
+        Search Demo
+      </h2>
+
+      <!-- Copy-to-clipboard helper. Sits between the title and the
+           two-column grid so the action ("copy these criteria") reads
+           as part of the section intro, and the "↓ paste into the
+           search box" feedback points naturally at the panel below. -->
+      <SearchCopyHelper />
+
+      <!-- Two-column layout: search panel on the left (wider), feature
+           list on the right (narrower). Stacks on mobile. -->
+      <div class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-xl items-start">
+        <SearchDemo />
+
+        <!-- Yellow-icon feature list. Material Symbols stand in for
+             bullet glyphs; text on the right of each icon. The
+             "Attribute match visibility" item carries an extra
+             yellow sub-label ("Reduces returns") spelling out the
+             outcome. -->
+        <ul class="grid grid-cols-2 gap-md lg:grid-cols-1">
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">bolt</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Lightning-fast results
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">check_box</span>
+            <div class="text-body-md leading-relaxed">
+              <div class="text-white">Attribute match visibility</div>
+              <div class="text-primary font-mono text-xs uppercase tracking-[0.18em] mt-1">Reduces returns</div>
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">person</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Personalized results
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">record_voice_over</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Semantic search
+            </div>
+          </li>
+          <li class="flex items-start gap-md">
+            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">spellcheck</span>
+            <div class="text-white text-body-md leading-relaxed">
+              Typo tolerance &amp; synonyms
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ============================================================
        Quick assessment — diagnostic scan. Always visible, placed BELOW
        the Revenue Recovery Engine animation. The URL/email/Start fields
        (moved out of the hero) sit horizontally at the top; the scan
@@ -2028,83 +2322,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   <section class="relative py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-canvas-deeper overflow-hidden reveal hidden">
     <div class="max-w-page mx-auto">
       <DiagnosticWidget locale="en" />
-    </div>
-  </section>
-
-  <!-- Try it out / Attribute Match Visibility. Live Meilisearch demo
-       against the `demo` index — 4 snack bars with a deliberate
-       data-quality gradient (3/3, 2/3, 1/3, 0/3 matches against the
-       gluten-free + sugar-free + dairy-free trio). The 0/3 product is
-       the punchline: it IS all three things, but the merchant never
-       tagged it, so search can't surface it by attribute.
-       Sits on the lighter canvas bg so the search panel inside it can
-       use the floating-card shadow treatment from the hero. -->
-  <!-- Search Demo section hidden for now (per request). Remove `hidden` to restore. -->
-  <section class="hidden relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
-    <div class="max-w-page mx-auto">
-      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
-        Try it out
-      </span>
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">
-        Search Demo
-      </h2>
-
-      <!-- Copy-to-clipboard helper. Sits between the title and the
-           two-column grid so the action ("copy these criteria") reads
-           as part of the section intro, and the "↓ paste into the
-           search box" feedback points naturally at the panel below. -->
-      <SearchCopyHelper />
-
-      <!-- Two-column layout: search panel on the left (wider), feature
-           list on the right (narrower). Stacks on mobile. -->
-      <div class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-xl items-start">
-        <SearchDemo />
-
-        <!-- Yellow-icon feature list. Material Symbols stand in for
-             bullet glyphs; text on the right of each icon. The
-             "Attribute match visibility" item carries an extra
-             yellow sub-label ("Reduces returns") spelling out the
-             outcome. -->
-        <ul class="grid grid-cols-2 gap-md lg:grid-cols-1">
-          <li class="flex items-start gap-md">
-            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">bolt</span>
-            <div class="text-white text-body-md leading-relaxed">
-              Lightning-fast results
-            </div>
-          </li>
-          <li class="flex items-start gap-md">
-            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">check_box</span>
-            <div class="text-body-md leading-relaxed">
-              <div class="text-white">Attribute match visibility</div>
-              <div class="text-primary font-mono text-xs uppercase tracking-[0.18em] mt-1">Reduces returns</div>
-            </div>
-          </li>
-          <li class="flex items-start gap-md">
-            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">person</span>
-            <div class="text-white text-body-md leading-relaxed">
-              Personalized results
-            </div>
-          </li>
-          <li class="flex items-start gap-md">
-            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">record_voice_over</span>
-            <div class="text-white text-body-md leading-relaxed">
-              Semantic search
-            </div>
-          </li>
-          <li class="flex items-start gap-md">
-            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">location_on</span>
-            <div class="text-white text-body-md leading-relaxed">
-              Geo-search
-            </div>
-          </li>
-          <li class="flex items-start gap-md">
-            <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">spellcheck</span>
-            <div class="text-white text-body-md leading-relaxed">
-              Typo tolerance &amp; synonyms
-            </div>
-          </li>
-        </ul>
-      </div>
     </div>
   </section>
 
