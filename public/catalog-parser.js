@@ -141,9 +141,10 @@
   function measure() {
     try { measureInner(); } catch (e) { console.error("cps measure", e); } finally { ready = true; }
   }
-  function measureInner() {
-    ready = false;
-    inner.style.zoom = "1";
+  function measureGeom() {
+    // Row/token geometry in the CURRENT zoom's coordinate space. No sheet
+    // min-height reservation: the sheet shrinks as rows are consumed
+    // (row collapse is continuous, so the motion stays smooth).
     rowRefs.forEach((r) => {
       r.li.style.height = "auto";
       r.box.style.transform = "none"; r.box.style.opacity = "1";
@@ -155,17 +156,27 @@
       });
       r.h = r.li.offsetHeight;
     });
-    sheet.style.minHeight = "0px";
-    const sheetH = sheet.offsetHeight;
     cardRefs.forEach((c) => { c.el.style.display = ""; c.body.style.height = "auto"; c.bodyH = c.body.offsetHeight; });
     tableEl.style.display = "";
-    sheet.style.minHeight = sheetH + "px";
+  }
+  function measureInner() {
+    ready = false;
+    inner.style.zoom = "1";
+    measureGeom();
     ready = true;
     let tallest = 0;
     [0, 0.2, 0.4, 0.6, 0.7, 0.8, 1].forEach((s) => { render(s); tallest = Math.max(tallest, inner.offsetHeight); });
     const avail = stage.clientHeight - 26 - hintEl.offsetHeight;
     fit = Math.max(0.5, Math.min(1, avail / (tallest || 1)));
     inner.style.zoom = fit < 0.999 ? String(fit.toFixed(3)) : "1";
+    if (fit < 0.999) {
+      // Line wrapping can differ at the applied zoom (more width fits), so
+      // re-measure geometry in the final coordinate space — otherwise the
+      // sheet/beam use stale wrapped positions and heights.
+      ready = false;
+      measureGeom();
+      ready = true;
+    }
     render(cur);
   }
 

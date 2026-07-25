@@ -218,20 +218,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
           <div class="rf-grid">
             <div class="rf-copy">
-              <p>
-                The <span class="rf-cap">GRO</span> Framework allows entrepreneurs and executives to focus on
-                <span class="rf-cap">G</span>rowing the business&mdash;not spending
-                hours watching dashboards, reviewing metrics, and trying to figure
-                out why revenue isn't matching expectations.
-              </p>
-              <p>
-                You focus on strategy, products, customers, and expansion.
-              </p>
-              <p>
-                We <span class="rf-cap">R</span>ecover lost revenue and
-                <span class="rf-cap">O</span>ptimize the product discovery and
-                conversion engine.
-              </p>
+              <p>The GRO Framework frees you to</p>
+              {/* G / R / O spelled vertically in a thin left column; the
+                  text wraps only inside the wide right column, never
+                  under the letters. */}
+              <div class="rf-gro">
+                <span class="rf-cap">G</span>
+                <p>row the business while we</p>
+                <span class="rf-cap">R</span>
+                <p>ecover lost revenue and</p>
+                <span class="rf-cap">O</span>
+                <p>ptimize the revenue recovery engine.</p>
+              </div>
             </div>
 
             <div class="rf-box">
@@ -324,6 +322,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Permanent Marker", cursive;
       color: #fae194; font-size: 1.35em; line-height: 1;
     }
+    /* two-column G/RO: thin letter column, wide text column; tight rows
+       so the lines read as one continuous sentence */
+    .rf-gro {
+      display: grid; grid-template-columns: auto 1fr;
+      column-gap: 6px; row-gap: 6px; align-items: baseline;
+    }
+    .rf-gro .rf-cap { font-size: 1.5em; line-height: 1; }
+    .rf-gro p { margin: 0; }
+    .rf-copy > p { margin-bottom: 10px; }
     .rf-box {
       background: #131316;
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -331,6 +338,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       padding: 28px 20px;
       overflow: hidden;
     }
+    @media (max-width: 767px) { .rf-box { padding: 14px 10px; } }
 
     /* Stage: fixed 1080×520 design space, uniformly scaled to the box width */
     .rf-stage-wrap { position: relative; width: 100%; overflow: hidden; }
@@ -387,10 +395,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       var wrap = section.querySelector('[data-rf-wrap]');
       var stage = section.querySelector('[data-rf-stage]');
 
-      // Uniformly scale the 1080×520 stage to the box width.
+      // Uniformly scale the 1080×520 stage to the box width. On mobile,
+      // crop to the design window that actually has content (x 100–830)
+      // so the equation fills the card instead of leaving side margins.
       function fit() {
-        var s = wrap.clientWidth / 1080;
-        stage.style.transform = 'scale(' + s + ')';
+        var mobile = window.matchMedia('(max-width: 767px)').matches;
+        var DW = mobile ? 730 : 1080, OX = mobile ? 100 : 0;
+        var s = wrap.clientWidth / DW;
+        stage.style.transform = 'translateX(' + (-OX * s) + 'px) scale(' + s + ')';
         wrap.style.height = Math.round(520 * s) + 'px';
       }
       window.addEventListener('resize', fit);
@@ -985,6 +997,30 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        script; shrinking the stage (rather than padding it) keeps the
        engine's clientHeight-based auto-fit correct. ── */
     .cps-stage{top:var(--cps-top,0px);height:calc(100svh - var(--cps-top,0px))}
+
+    /* ── site override: the two base cards keep their left/right
+       positions on mobile too (the rows travel sideways into them);
+       internals compact to fit the half width. ── */
+    .cps-cards{grid-template-columns:1fr 1fr;gap:8px}
+    @media (max-width:760px){
+      .cps-c{padding:8px 9px;gap:6px}
+      .cps-c-name{font-size:11px;line-height:1.2}
+      .cps-chip{font-size:9px;padding:2px 5px;gap:3px}
+      .cps-chip i{font-size:7.5px}
+      .cps-pill{font-size:9px;padding:3px 6px}
+      .cps-ax{gap:6px}
+      .cps-ax-k{width:30px;font-size:8.5px}
+      .cps-c-f{font-size:8.5px;gap:5px}
+    }
+
+    /* ── site override: section rhythm — more air above the title and
+       after the track, matching neighboring sections. ── */
+    .cps-head-wrap{padding-top:120px}
+    .cps{padding-bottom:64px}
+    @media (max-width:760px){
+      .cps-head-wrap{padding-top:80px}
+      .cps{padding-bottom:40px}
+    }
   </style>
 
   <script is:inline>
