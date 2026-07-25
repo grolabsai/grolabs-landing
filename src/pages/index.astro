@@ -761,7 +761,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         the pin); at lg+ it lives inside the pinned stage's left column */}
     <div class="max-w-page mx-auto w-full rres-head-sm">
       <header class="rre-head">
-        <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
+        <span class="rre-eyebrow">AI-powered optimization</span>
         <div class="rre-title-row">
           <h2 class="rre-title">Revenue Recovery Engine</h2>
         </div>
@@ -775,7 +775,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     <div class="rres-track">
       <div class="rres-stage">
         <div class="rres-cols">
-          <span class="rre-eyebrow rres-eb">AI-Powered Search Engine &amp; Product Data Enrichment</span>
+          <span class="rre-eyebrow rres-eb">AI-powered optimization</span>
           <header class="rre-head rres-side">
             <div class="rre-title-row">
               <h2 class="rre-title">Revenue Recovery Engine</h2>
@@ -806,7 +806,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       padding: 120px 24px 40px;
       font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
     }
-    .rres-track { height: 330vh; position: relative; }
+    /* doubled: halves how much animation each scroll px advances */
+    .rres-track { height: 660vh; position: relative; }
     .rres-stage {
       position: sticky;
       top: var(--cps-top, 0px);
@@ -1067,14 +1068,16 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        internals compact to fit the half width. ── */
     .cps-cards{grid-template-columns:1fr 1fr;gap:8px}
     @media (max-width:760px){
-      .cps-c{padding:8px 9px;gap:6px}
-      .cps-c-name{font-size:11px;line-height:1.2}
-      .cps-chip{font-size:9px;padding:2px 5px;gap:3px}
-      .cps-chip i{font-size:7.5px}
-      .cps-pill{font-size:9px;padding:3px 6px}
-      .cps-ax{gap:6px}
-      .cps-ax-k{width:30px;font-size:8.5px}
-      .cps-c-f{font-size:8.5px;gap:5px}
+      .cps-c{padding:9px 10px;gap:7px}
+      .cps-c-name{font-size:13px;line-height:1.25}
+      .cps-c-attrs{gap:7px}
+      .cps-chip{font-size:11px;padding:3px 7px;gap:5px}
+      .cps-chip i{font-size:9.5px}
+      .cps-pill{font-size:11px;padding:3px 7px}
+      .cps-ax{gap:8px}
+      .cps-ax-v{gap:7px}
+      .cps-ax-k{width:38px;font-size:10.5px}
+      .cps-c-f{font-size:10.5px;gap:7px}
     }
 
     /* ── site override: two-digit SKUs need only a slim column, which
@@ -2504,38 +2507,105 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         You'll receive business insights on a need-to-know basis.
       </p>
     </div>
-    <div class="tdm-track">
-      <div class="tdm-stage">
-        <iframe
-          class="tdm-frame"
-          src={`${base}/anim/traffic-monitor-scroll.html`}
-          title="Traffic monitoring — scroll-driven animation"
-          loading="lazy"
-          scrolling="no"
-        ></iframe>
+    {/* Three app-exact Signals charts in NORMAL FLOW — each one runs its
+        own draw sequence (card appears → axes/background → line sweeps
+        left→right) as it scrolls through the viewport. The last chart
+        then PINS near the top of the page with clear space below it:
+        the red arrow draws downward out of the breach first, and only
+        then the phone fades in under it. */}
+    <div class="tdm-flow max-w-page mx-auto">
+      <div class="tdm-card" id="tdmC1">
+        <div class="tdm-ct">Week-over-week change — the detector that misses slow drift</div>
+        <svg id="tdmS1" class="tdm-svg" viewBox="0 0 360 190" aria-hidden="true"></svg>
+        <div class="tdm-note">Each bar compares one week to the one before. A slow decline never trips this alarm — six weeks of −1% each stay invisible here.</div>
+      </div>
+      <div class="tdm-card" id="tdmC2">
+        <div class="tdm-ct">Accumulated drift (CUSUM)</div>
+        <svg id="tdmS2" class="tdm-svg" viewBox="0 0 360 190" aria-hidden="true"></svg>
+        <div class="tdm-note">Adds up every small shortfall below the baseline. Sustained drift crosses the decision limit weeks before any single-week alarm would fire.</div>
+      </div>
+      <div class="tdm-fin-track">
+        <div class="tdm-fin-stage">
+          <div class="tdm-card tdm-wide" id="tdmC3">
+            <div class="tdm-ct">Daily sessions vs the rolling week</div>
+            <div class="tdm-legend">
+              <span class="k"><i class="ln mut"></i>daily sessions</span>
+              <span class="k"><i class="ln"></i>7-day rolling average</span>
+            </div>
+            <svg id="tdmS3" class="tdm-svg" viewBox="0 0 720 190" aria-hidden="true"></svg>
+            <div class="tdm-note">Days of the week have their own rhythm, so any two adjacent days differ for reasons that have nothing to do with performance. The rolling line is the honest trend.</div>
+          </div>
+          <div class="tdm-phone" id="tdmPhone">
+            <div class="tp-notch"></div>
+            <div class="tp-time">9:41</div>
+            <div class="tp-sub">GroLabs · Live monitor</div>
+            <div class="tp-card">
+              <div class="tp-ic">!</div>
+              <div>
+                <div class="tp-tt">Traffic dropped <b>5.3%</b></div>
+                <div class="tp-tx">Yesterday's visits fell 5.3% below your daily threshold.</div>
+              </div>
+            </div>
+          </div>
+          <svg class="tdm-link" id="tdmLink" aria-hidden="true"><path id="tdmLinkP"/><path id="tdmLinkH"/></svg>
+        </div>
       </div>
     </div>
   </section>
 
   <style is:global>
-    .tdm-track { height: 240vh; position: relative; }
-    .tdm-stage {
-      position: sticky;
-      top: var(--cps-top, 0px);
-      height: calc(100svh - var(--cps-top, 0px));
-      min-height: 480px;
-      display: flex;
-      justify-content: center;
-      padding: 8px 0 12px;
+    /* ── traffic-monitor story: app-exact dark glass tiles on yellow ── */
+    .tdm-flow { display: flex; flex-direction: column; align-items: center; gap: 48px; }
+    .tdm-card {
+      width: 100%; max-width: 560px;
+      background: linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(255,255,255,.035)), #0d0d10;
+      border: 0; border-radius: 14px; padding: 16px 18px 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07);
+      transition: box-shadow .3s;
     }
-    .tdm-frame {
+    .tdm-card.tdm-wide { max-width: 860px; }
+    .tdm-card.alert { box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px rgba(239,68,68,.4), 0 0 26px rgba(239,68,68,.25); }
+    .tdm-ct { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #edeae0; margin-bottom: 8px; }
+    .tdm-note { font-size: 10.5px; color: rgba(237,234,224,.4); line-height: 1.5; margin-top: 8px; }
+    .tdm-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 10.5px; color: rgba(237,234,224,.6); margin: 2px 0 8px; }
+    .tdm-legend .k { display: inline-flex; align-items: center; gap: 6px; }
+    .tdm-legend .ln { width: 16px; height: 0; border-top: 2px solid #7fb0c9; border-radius: 2px; }
+    .tdm-legend .ln.mut { border-top-width: 1.5px; border-color: rgba(237,234,224,.35); }
+    .tdm-svg { display: block; width: 100%; height: auto; }
+
+    /* finale: the last chart pins near the top; the space below stays
+       clear for the arrow + phone */
+    .tdm-fin-track { height: 230vh; position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .tdm-fin-stage {
+      position: sticky;
+      top: calc(var(--cps-top, 0px) + 14px);
       width: 100%;
-      max-width: 1040px;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: transparent;   /* transparent → the yellow band shows through */
-      color-scheme: dark;
+      height: calc(100svh - var(--cps-top, 0px) - 28px);
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .tdm-fin-stage .tdm-card { position: relative; z-index: 1; }
+    .tdm-phone {
+      position: absolute; left: 50%; bottom: 0;
+      width: 212px; margin-left: 40px;
+      background: #0f1014; border: 1.5px solid rgba(255,255,255,.16); border-radius: 26px;
+      padding: 14px 13px 18px; box-shadow: 0 24px 60px -18px rgba(0,0,0,.5);
+      opacity: 0; pointer-events: none;
+    }
+    .tp-notch { width: 64px; height: 16px; background: #000; border-radius: 10px; margin: 0 auto 12px; }
+    .tp-time { font-size: 30px; font-weight: 600; text-align: center; color: #fff; line-height: 1; }
+    .tp-sub { font-size: 12.5px; text-align: center; color: rgba(237,234,224,.5); margin: 5px 0 14px; }
+    .tp-card { background: #17181d; border: 1.5px solid rgba(239,68,68,.6); border-radius: 13px; padding: 11px; display: flex; gap: 9px; box-shadow: 0 0 22px rgba(239,68,68,.18); }
+    .tp-ic { flex: none; width: 26px; height: 26px; border-radius: 8px; background: #ef4444; color: #fff; font-weight: 800; font-size: 15px; display: grid; place-items: center; }
+    .tp-tt { font-size: 13.5px; font-weight: 700; color: #fff; line-height: 1.25; }
+    .tp-tt b { color: #fca5a5; }
+    .tp-tx { font-size: 12px; line-height: 1.4; color: rgba(237,234,224,.6); margin-top: 3px; }
+    .tdm-link { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; }
+    .tdm-link path { fill: none; stroke: #dc2626; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    @media (max-width: 680px) {
+      .tdm-flow { gap: 28px; }
+      .tdm-card { padding: 12px 13px 10px; }
+      .tdm-phone { width: 172px; margin-left: 0; transform: translateX(-50%); border-radius: 22px; }
+      .tp-time { font-size: 24px; }
     }
 
     /* ── Lifted glass card — "Subtle · no border" (GLASS-CARDS-HANDOFF) ──
@@ -2620,29 +2690,285 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .anim-glass > * { position: relative; z-index: 1; }
       .anim-glass > iframe { height: min(660px, calc(100svh - var(--cps-top, 0px) - 90px)); }
     }
+
+    /* ── glass for the Search Demo panel (component styles may emit after
+       page styles, so pin it with a compound selector) ── */
+    .search-demo.lifted-glass {
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.13) 0%,
+        rgba(255,255,255,0.05) 36%,
+        rgba(255,255,255,0.012) 100%),
+        rgba(28,29,36,0.55);
+      border: 0;
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      box-shadow:
+        0 18px 48px rgba(0,0,0,0.5),
+        inset 0 1px 1px rgba(255,255,255,0.10);
+    }
+    @media (max-width: 768px) {
+      .search-demo.lifted-glass {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: linear-gradient(180deg, #292a30 0%, #1e1f25 36%, #17181c 100%);
+      }
+    }
+
+    /* ── hero mobile: CTAs stay side by side (shrink to fit), tagline
+       centered ── */
+    @media (max-width: 767px) {
+      .hero-v2-tagline { text-align: center; }
+      .hero-v2-ctas { flex-wrap: nowrap; gap: 10px; }
+      .hero-v2-btn { padding: 12px 14px; font-size: 13px; white-space: nowrap; }
+    }
+    @media (max-width: 350px) {
+      .hero-v2-btn { padding: 10px 10px; font-size: 11.5px; }
+    }
+
+    /* ── GRO Framework: eyebrow→title spacing back to the standard
+       (the grid's 40px gap was stacking onto the eyebrow's margin) ── */
+    .rf-grid { row-gap: 0; }
+    @media (max-width: 1023px) {
+      .rf-grid > .rf-box { margin-top: 40px; }
+    }
+
+    /* ── RRE: the in-stage eyebrow must never show on mobile (the
+       .rre-eyebrow display:block rule was out-cascading the hide) ── */
+    .rre-eyebrow.rres-eb { display: none; }
+    @media (min-width: 1024px) {
+      .rre-eyebrow.rres-eb { display: block; }
+    }
+
+    /* ── standard: on mobile, HALF the eyebrow→title spacing across
+       all sections (custom eyebrows + the tailwind mb-4 eyebrows) ── */
+    @media (max-width: 767px) {
+      .rf-eyebrow { margin-bottom: 8px; }
+      .rre-eyebrow { margin-bottom: 8px; }
+      .cps-eyebrow { margin-bottom: 10px; }
+      .font-mono.mb-4.block { margin-bottom: 8px; }
+    }
+
+    /* ── Catalog sheet: no row-number gutter; sku + full price visible
+       on mobile (titles wrap in their now-narrower column) ── */
+    .cps-gut, .cps-r-i { display: none; }
+    @media (max-width: 760px) {
+      .cps-r-s, .cps-scol { width: 34px; }
+      .cps-r-p, .cps-pcol { width: 58px; }
+    }
   </style>
 
   <script is:inline>
-    // Drive the pinned traffic-monitoring story: map the track's scroll
-    // progress to p (0→1) and post it into the animation iframe.
+    // Traffic-monitor story, inline and scroll-driven. Charts replicate
+    // the app.grolabs.ai Signals dashboard drawing vocabulary. Each
+    // chart runs card → axes → line as IT scrolls through the viewport;
+    // the last chart pins, breaches, draws the red arrow DOWN, and only
+    // then reveals the phone. Everything is a pure function of scroll.
     (function () {
       var sec = document.querySelector('[data-tdm]');
       if (!sec) return;
-      var track = sec.querySelector('.tdm-track');
-      var stage = sec.querySelector('.tdm-stage');
-      var frame = sec.querySelector('.tdm-frame');
-      function send() {
-        var r = track.getBoundingClientRect();
-        var span = r.height - stage.offsetHeight;
-        var off = parseFloat(getComputedStyle(stage).top) || 0;
-        var p = span > 0 ? (off - r.top) / span : 0;
-        if (frame.contentWindow)
-          frame.contentWindow.postMessage({ type: 'tdm-p', p: Math.max(0, Math.min(1, p)) }, '*');
+      var $ = function (s) { return sec.querySelector(s); };
+      var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
+      var ease = function (k) { return 1 - Math.pow(1 - k, 3); };
+      var seg = function (t, a, b) { return clamp((t - a) / (b - a), 0, 1); };
+      var NS = 'http://www.w3.org/2000/svg';
+      var el = function (n, at, parent) {
+        var e = document.createElementNS(NS, n);
+        for (var k in at) e.setAttribute(k, at[k]);
+        if (parent) parent.appendChild(e);
+        return e;
+      };
+      var txt = function (at, s, parent) { var t = el('text', at, parent); t.textContent = s; return t; };
+
+      // the app's drawing vocabulary (signal-chart-util)
+      var AX = 'rgba(237,234,224,0.4)', GRID = 'rgba(255,255,255,0.06)',
+          CENTRE = 'rgba(237,234,224,0.45)', BLUE = '#7fb0c9', REDS = '#fca5a5',
+          RED = '#ef4444', GREEN = '#34d399', MUTED = 'rgba(237,234,224,0.35)',
+          T2 = 'rgba(237,234,224,0.6)', PAGE = '#0d0d10', F = 9.5,
+          MONO = 'ui-monospace,Menlo,monospace';
+      var lin = function (d0, d1, r0, r1) { var s = d1 - d0 || 1; return function (v) { return r0 + ((v - d0) / s) * (r1 - r0); }; };
+      function smoothPath(xs, ys) {
+        if (!xs.length) return '';
+        var d = 'M' + xs[0].toFixed(1) + ' ' + ys[0].toFixed(1);
+        for (var i = 0; i < xs.length - 1; i++) {
+          var mx = ((xs[i] + xs[i + 1]) / 2).toFixed(1);
+          d += ' C ' + mx + ' ' + ys[i].toFixed(1) + ' ' + mx + ' ' + ys[i + 1].toFixed(1) + ' ' + xs[i + 1].toFixed(1) + ' ' + ys[i + 1].toFixed(1);
+        }
+        return d;
       }
-      addEventListener('scroll', send, { passive: true });
-      addEventListener('resize', send);
-      frame.addEventListener('load', send);
-      send();
+      var gn = 0;
+      function grad(svg, color, strong) {
+        var id = 'tdmg' + (gn++);
+        var lg = el('linearGradient', { id: id, x1: 0, y1: 0, x2: 0, y2: 1 }, el('defs', {}, svg));
+        if (strong) {
+          el('stop', { offset: '0%', 'stop-color': color, 'stop-opacity': 0.38 }, lg);
+          el('stop', { offset: '55%', 'stop-color': color, 'stop-opacity': 0.14 }, lg);
+          el('stop', { offset: '100%', 'stop-color': color, 'stop-opacity': 0 }, lg);
+        } else {
+          el('stop', { offset: '0%', 'stop-color': color, 'stop-opacity': 0.22 }, lg);
+          el('stop', { offset: '100%', 'stop-color': color, 'stop-opacity': 0 }, lg);
+        }
+        return id;
+      }
+      function clipRect(svg, x, h) {
+        var id = 'tdmc' + (gn++);
+        var r = el('rect', { x: x, y: 0, width: 0, height: h }, el('clipPath', { id: id }, el('defs', {}, svg)));
+        return { id: id, r: r };
+      }
+      // axes/background group per chart: revealed in its own phase
+      function axGroup(svg) { return el('g', { opacity: 0 }, svg); }
+
+      // ── chart 1 · WoW bars ──
+      var s1 = $('#tdmS1'), ax1 = axGroup(s1);
+      var y1 = lin(-8, 8, 168, 12), x1 = lin(0, 11, 44, 344), bw1 = 10;
+      [-8, 0, 8].forEach(function (g) {
+        el('line', { x1: 34, x2: 354, y1: y1(g), y2: y1(g), stroke: g === 0 ? CENTRE : GRID, 'stroke-width': 1 }, ax1);
+        txt({ x: 30, y: y1(g) + 3, 'font-size': F, fill: AX, 'text-anchor': 'end', 'font-family': MONO }, (g > 0 ? '+' : '') + g + '%', ax1);
+      });
+      el('line', { x1: 34, x2: 354, y1: y1(-5), y2: y1(-5), stroke: REDS, 'stroke-width': 1.2 }, ax1);
+      txt({ x: 354, y: y1(-5) + 11, 'font-size': F, fill: REDS, 'text-anchor': 'end', 'font-family': MONO }, 'point alarm −5%', ax1);
+      [[0, 'Apr 20'], [6, 'Jun 1'], [11, 'Jul 13']].forEach(function (t) {
+        txt({ x: x1(t[0]), y: 184, 'font-size': F, fill: AX, 'text-anchor': 'middle', 'font-family': MONO }, t[1], ax1);
+      });
+      var VALS = [0.4, 2.1, -0.8, -1.6, 2.3, -3.4, 1.9, -3.2, 5.6, -1.1, -3.6, 1.8];
+      var bars = VALS.map(function (v, i) {
+        return { v: v, r: el('rect', { x: x1(i) - bw1 / 2, width: bw1, rx: 1.5, fill: i === 11 ? GREEN : MUTED, height: 0.01, y: y1(0) }, s1) };
+      });
+
+      // ── chart 2 · CUSUM (green = staying under the limit) ──
+      var s2 = $('#tdmS2'), ax2 = axGroup(s2);
+      var CUS = [0, 0.1, 0.3, 0.4, 0.7, 1.1, 1.4, 1.9, 2.6, 3.2, 3.9, 4.6], H2 = 6.5;
+      var hi2 = 7.475;
+      var y2 = lin(0, hi2, 168, 14), x2 = lin(0, 11, 44, 344);
+      [0, hi2 / 2, hi2].forEach(function (g) {
+        el('line', { x1: 34, x2: 354, y1: y2(g), y2: y2(g), stroke: g === 0 ? CENTRE : GRID, 'stroke-width': 1 }, ax2);
+      });
+      el('line', { x1: 34, x2: 354, y1: y2(H2), y2: y2(H2), stroke: REDS, 'stroke-width': 1.2 }, ax2);
+      txt({ x: 36, y: y2(H2) - 5, 'font-size': F, fill: REDS, 'font-family': MONO }, 'decision limit', ax2);
+      [[0, 'Apr 20'], [6, 'Jun 1'], [11, 'Jul 13']].forEach(function (t) {
+        txt({ x: x2(t[0]), y: 184, 'font-size': F, fill: AX, 'text-anchor': 'middle', 'font-family': MONO }, t[1], ax2);
+      });
+      var xs2 = CUS.map(function (_, i) { return x2(i); }), ys2 = CUS.map(function (v) { return y2(v); });
+      var line2 = smoothPath(xs2, ys2);
+      var clip2 = clipRect(s2, 34, 190);
+      var g2 = el('g', { 'clip-path': 'url(#' + clip2.id + ')' }, s2);
+      el('path', { d: line2 + ' L' + xs2[11].toFixed(1) + ' ' + y2(0).toFixed(1) + ' L' + xs2[0].toFixed(1) + ' ' + y2(0).toFixed(1) + ' Z', fill: 'url(#' + grad(s2, GREEN, true) + ')' }, g2);
+      el('path', { d: line2, fill: 'none', stroke: GREEN, 'stroke-width': 2.2, 'stroke-linejoin': 'round' }, g2);
+      var dot2 = el('circle', { cx: xs2[11], cy: ys2[11], r: 4, fill: GREEN, stroke: PAGE, 'stroke-width': 1.5, opacity: 0 }, s2);
+
+      // ── chart 3 · daily vs rolling (blue→red as ONE continuous stroke) ──
+      var s3 = $('#tdmS3'), ax3 = axGroup(s3);
+      var N = 56, m3 = { l: 36, r: 64, t: 12, b: 22 };
+      var roll = function (i) { return 137 - 16 * Math.pow(i / (N - 1), 1.15) + 0.8 * Math.sin(i / 4); };
+      var dailyF = function (i) { return roll(i) + 24 * Math.sin(2 * Math.PI * ((i - 2) % 7) / 7) + 3 * Math.sin(i / 2.6); };
+      var dv = [], rv = [];
+      for (var i = 0; i < N; i++) { dv.push(dailyF(i)); rv.push(roll(i)); }
+      var lo3 = Math.min.apply(null, dv), hi3 = Math.max.apply(null, dv), sp3 = hi3 - lo3;
+      var d0 = lo3 - sp3 * 0.1, d1 = hi3 + sp3 * 0.1;
+      var x3 = lin(0, N - 1, m3.l, 720 - m3.r), y3 = lin(d0, d1, 190 - m3.b, m3.t);
+      var TH = 127.8;
+      [d0 + (d1 - d0) * 0.15, (d0 + d1) / 2, d1 - (d1 - d0) * 0.15].map(Math.round).forEach(function (g) {
+        el('line', { x1: m3.l, x2: 720 - m3.r, y1: y3(g), y2: y3(g), stroke: GRID, 'stroke-width': 1 }, ax3);
+        txt({ x: m3.l - 4, y: y3(g) + 3, 'font-size': F, fill: AX, 'text-anchor': 'end', 'font-family': MONO }, String(g), ax3);
+      });
+      el('line', { x1: m3.l, x2: 720 - m3.r, y1: y3(TH), y2: y3(TH), stroke: REDS, 'stroke-width': 1.2, 'stroke-dasharray': '5 4' }, ax3);
+      txt({ x: m3.l + 4, y: y3(TH) - 6, 'font-size': F, fill: REDS, 'font-family': MONO }, 'daily threshold', ax3);
+      [[0, 'May 29'], [18, 'Jun 16'], [37, 'Jul 5'], [55, 'Jul 23']].forEach(function (t) {
+        txt({ x: x3(t[0]), y: 184, 'font-size': F, fill: AX, 'text-anchor': 'middle', 'font-family': MONO }, t[1], ax3);
+      });
+      var xs3 = dv.map(function (_, i) { return x3(i); });
+      var clip3d = clipRect(s3, m3.l, 190);
+      var gd = el('g', { 'clip-path': 'url(#' + clip3d.id + ')' }, s3);
+      el('path', { d: smoothPath(xs3, dv.map(function (v) { return y3(v); })), fill: 'none', stroke: MUTED, 'stroke-width': 1.2, 'stroke-linejoin': 'round' }, gd);
+      var ci = 0; for (i = 0; i < N; i++) { if (rv[i] < TH) { ci = i; break; } }
+      // one clip over BOTH segments: the sweep draws blue, then continues
+      // seamlessly in red past the crossing — a single continuous stroke
+      var clip3b = clipRect(s3, m3.l, 190);
+      var gb = el('g', { 'clip-path': 'url(#' + clip3b.id + ')' }, s3);
+      var rollAllLine = smoothPath(xs3, rv.map(function (v) { return y3(v); }));
+      el('path', { d: rollAllLine + ' L ' + xs3[N - 1].toFixed(1) + ' ' + (190 - m3.b) + ' L ' + xs3[0].toFixed(1) + ' ' + (190 - m3.b) + ' Z', fill: 'url(#' + grad(s3, BLUE, false) + ')' }, gb);
+      el('path', { d: smoothPath(xs3.slice(0, ci + 1), rv.slice(0, ci + 1).map(function (v) { return y3(v); })), fill: 'none', stroke: BLUE, 'stroke-width': 2.4, 'stroke-linejoin': 'round' }, gb);
+      el('path', { d: smoothPath(xs3.slice(ci), rv.slice(ci).map(function (v) { return y3(v); })), fill: 'none', stroke: RED, 'stroke-width': 2.4, 'stroke-linejoin': 'round' }, gb);
+      var dot3 = el('circle', { id: 'tdmDot', cx: xs3[N - 1], cy: y3(rv[N - 1]), r: 3.5, fill: RED, stroke: PAGE, 'stroke-width': 1.5, opacity: 0 }, s3);
+      var end3 = txt({ x: xs3[N - 1] + 8, y: y3(rv[N - 1]) + 3, 'font-size': F, fill: RED, 'font-family': MONO, opacity: 0 }, '121/day', s3);
+      var ann3 = txt({ x: xs3[N - 1] + 8, y: y3(rv[N - 1]) + 16, 'font-size': F, fill: RED, 'font-family': MONO, opacity: 0 }, '−5.3%', s3);
+      var plotW1 = 320, plotW2 = 320, plotW3 = 720 - m3.l - m3.r;
+      var xcFrac = (x3(ci) - m3.l) / plotW3; // where the sweep goes red
+
+      // ── choreography ──
+      var c1 = $('#tdmC1'), c2c = $('#tdmC2'), c3 = $('#tdmC3'),
+          fin = $('.tdm-fin-track'), stage = $('.tdm-fin-stage'),
+          phone = $('#tdmPhone'), linkP = $('#tdmLinkP'), linkH = $('#tdmLinkH');
+      // card appears → axes fade in → line draws, from the card's own
+      // travel through the viewport
+      function cardP(elm) {
+        var r = elm.getBoundingClientRect();
+        return clamp((innerHeight * 0.9 - r.top) / (innerHeight * 0.55), 0, 1);
+      }
+      function applyCard(card, ax, p) {
+        var a = ease(seg(p, 0, 0.22));
+        card.style.opacity = a.toFixed(3);
+        card.style.transform = 'translateY(' + ((1 - a) * 14).toFixed(1) + 'px)';
+        ax.setAttribute('opacity', ease(seg(p, 0.18, 0.4)).toFixed(3));
+        return seg(p, 0.38, 1);
+      }
+      function render() {
+        // chart 1: bars
+        var d1p = applyCard(c1, ax1, cardP(c1));
+        bars.forEach(function (b, i) {
+          var k = ease(seg(d1p, i * 0.075, i * 0.075 + 0.12));
+          var h = Math.abs(y1(b.v) - y1(0)) * k;
+          b.r.setAttribute('height', Math.max(0.01, h).toFixed(1));
+          b.r.setAttribute('y', (b.v > 0 ? y1(0) - h : y1(0)).toFixed(1));
+        });
+        // chart 2: sweep
+        var d2p = applyCard(c2c, ax2, cardP(c2c));
+        clip2.r.setAttribute('width', (plotW2 * ease(d2p)).toFixed(1));
+        dot2.setAttribute('opacity', seg(d2p, 0.96, 1));
+        // finale progress from the pin track
+        var r = fin.getBoundingClientRect();
+        var off = parseFloat(getComputedStyle(stage).top) || 0;
+        var span = r.height - stage.offsetHeight;
+        var pf = span > 0 ? clamp((off - r.top) / span, 0, 1) : 0;
+        // chart 3: card+axes on approach, then the continuous sweep
+        applyCard(c3, ax3, Math.max(cardP(c3), pf > 0 ? 1 : 0));
+        clip3d.r.setAttribute('width', (plotW3 * ease(seg(pf, 0.02, 0.28))).toFixed(1));
+        var sweep = ease(seg(pf, 0.24, 0.55));
+        clip3b.r.setAttribute('width', (plotW3 * sweep + (sweep >= 1 ? 10 : 0)).toFixed(1));
+        var breached = sweep >= 1;
+        dot3.setAttribute('opacity', breached ? 1 : 0);
+        end3.setAttribute('opacity', breached ? 1 : 0);
+        ann3.setAttribute('opacity', breached ? 1 : 0);
+        c3.classList.toggle('alert', breached);
+        // arrow DOWN out of the breach — before the phone
+        var ak = ease(seg(pf, 0.60, 0.74));
+        var pk = ease(seg(pf, 0.76, 0.9));
+        if (ak > 0) {
+          var sr = stage.getBoundingClientRect();
+          var dr = dot3.getBoundingClientRect();
+          var pr = phone.getBoundingClientRect();
+          var x0 = dr.left + dr.width / 2 - sr.left, y0 = dr.bottom - sr.top + 4;
+          var x1a = pr.left + pr.width / 2 - sr.left, y1a = pr.top - sr.top - 10;
+          linkP.setAttribute('d', 'M' + x0.toFixed(1) + ' ' + y0.toFixed(1) +
+            ' C' + x0.toFixed(1) + ' ' + ((y0 + y1a) / 2).toFixed(1) + ' ' + x1a.toFixed(1) + ' ' + ((y0 + y1a) / 2).toFixed(1) + ' ' + x1a.toFixed(1) + ' ' + y1a.toFixed(1));
+          var AL = linkP.getTotalLength();
+          linkP.style.strokeDasharray = (AL * ak).toFixed(1) + ' ' + (AL + 2).toFixed(1);
+          linkP.style.opacity = '1';
+          linkH.setAttribute('d', 'M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l-6 -11 M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l6 -11');
+          linkH.style.opacity = ak > 0.95 ? '1' : '0';
+        } else { linkP.style.opacity = '0'; linkH.style.opacity = '0'; }
+        // then the phone
+        phone.style.opacity = pk.toFixed(3);
+        var baseT = getComputedStyle(phone).getPropertyValue('--tp-x') || '';
+        phone.style.transform = (matchMedia('(max-width:680px)').matches ? 'translateX(-50%) ' : '') + 'translateY(' + ((1 - pk) * 16).toFixed(1) + 'px)';
+      }
+      addEventListener('scroll', render, { passive: true });
+      addEventListener('resize', render);
+      // late re-renders: layout above shifts as lazy iframes size
+      // themselves, so correct the state even without a scroll event
+      addEventListener('load', render);
+      setTimeout(render, 600);
+      setTimeout(render, 2000);
+      render();
     })();
   </script>
 
