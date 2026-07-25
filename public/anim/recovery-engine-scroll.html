@@ -9,10 +9,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet" />
 <style>
-  /* Scroll-driven variant of recovery-engine-mobile.html: every visual is a
-     pure function of a progress value p (0→1) posted by the parent page as
-     {type:'rre-p', p}, so scrolling up rewinds the run exactly. 4 events,
-     compacted vertically so the whole pipeline fits a phone viewport. */
+  /* Scroll-driven Revenue Recovery Engine: every visual is a pure function
+     of a progress value p (0→1) posted by the parent as {type:'rre-p', p},
+     so scrolling up rewinds the run exactly.
+
+     Two clearly separated zones:
+     · .shop — the LIGHT storefront card: what the shopper sees and does
+       (search term types in → search button clicks → red "no results").
+     · the DARK panels — the GroLabs engine reacting automatically
+       (leak captured → proposed fix → recovered revenue).
+     All three emulated searches return no results: a typo, a missing
+     synonym, and a semantic query the catalog has no description for. */
   :root{
     --gold:#fae194; --blue:#9ec5ff; --pass:#34d399;
     --leak:#f0a3a3; --leak-s:#ef4444; --surface:#1a1b22; --bone:#EDEAE0;
@@ -26,22 +33,39 @@
     height:100svh; display:grid; place-items:center;
   }
   .m-wrap{max-width:460px; width:100%; margin:0 auto; display:flex; flex-direction:column; gap:8px;}
+
+  /* zone separators */
+  .z-lab{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:rgba(237,234,224,.5); transition:filter .5s ease, opacity .5s ease;}
+  .z-lab::after{content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(255,255,255,.16),transparent);}
+  .z-lab.sys{color:var(--gold); margin-top:4px;}
+  .z-lab.sys::after{background:linear-gradient(90deg,rgba(250,225,148,.35),transparent);}
+
+  /* ── storefront (shopper's screen — light UI) ── */
+  .shop{background:#f6f6f4; border-radius:12px; box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.14); overflow:hidden; transition:filter .5s ease, opacity .5s ease;}
+  .shop-bar{display:flex; align-items:center; gap:5px; padding:7px 11px; background:#ececeb; border-bottom:1px solid #dddddb;}
+  .shop-dot{width:8px; height:8px; border-radius:99px;}
+  .shop-dot.r{background:#f87171;} .shop-dot.y{background:#fbbf24;} .shop-dot.g{background:#34d399;}
+  .shop-url{margin-left:7px; font-family:var(--mono); font-size:9.5px; color:#8a8a90; background:#fff; border:1px solid #dddddb; border-radius:5px; padding:2px 8px;}
+  .shop-body{padding:12px;}
+  .shop-search{display:flex; gap:7px;}
+  .shop-q{flex:1; display:flex; align-items:center; gap:2px; background:#fff; border:1.5px solid #d6d6d3; border-radius:9px; padding:9px 12px; font-size:14px; color:#1b1c22; min-height:39px; transition:border-color .2s, box-shadow .2s;}
+  .shop-q.live{border-color:#a8a8a4; box-shadow:0 0 0 3px rgba(27,28,34,.05);}
+  .shop-q .ph{color:#a3a3a0;}
+  .shop-caret{display:inline-block; width:1.5px; height:15px; background:#1b1c22; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
+  .shop-btn{flex:none; width:41px; border:0; border-radius:9px; background:#1b1c22; color:#fff; display:grid; place-items:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  /* no-results strip — space reserved from the start so nothing reflows */
+  .shop-res{margin-top:9px; min-height:38px; border-radius:8px; border:1px solid transparent; display:flex; align-items:center; gap:8px; padding:8px 12px; font-size:12.5px; font-weight:600; color:transparent; transition:background .25s, border-color .25s, color .25s;}
+  .shop-res.bad{background:rgba(239,68,68,.09); border-color:rgba(239,68,68,.4); color:#b91c1c;}
+  .shop-res .n0{font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.08em; border:1px solid transparent; border-radius:5px; padding:2px 6px; flex:none;}
+  .shop-res.bad .n0{border-color:rgba(239,68,68,.45); background:#fff;}
+
+  /* ── engine panels (dark) ── */
   .m-panel{background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:11px 12px; box-shadow:0 10px 22px rgba(0,0,0,.5); display:flex; flex-direction:column; transition:filter .5s ease, opacity .5s ease;}
-  /* ended state — grey out everything except the recovered-revenue block */
-  .m-wrap.ended .m-panel:not(.m-recovery){ filter:grayscale(1); opacity:.4; }
+  .m-wrap.ended :is(.m-pipe,.shop,.z-lab){ filter:grayscale(1); opacity:.45; }
   .m-h{font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;}
   .m-h .s{display:block; font-size:9px; letter-spacing:.03em; color:rgba(237,234,224,.4); margin-top:3px; text-transform:none;}
   .green{color:var(--pass);} .gold{color:var(--gold);} .blue{color:var(--blue);} .red{color:var(--leak);} .white{color:var(--bone);}
-
-  /* demand */
-  .m-search{display:flex; align-items:center; gap:8px; background:#0f1015; border:1px solid rgba(255,255,255,.12); border-radius:9px; padding:8px 11px; margin-top:9px;}
-  .m-search .q{font-size:14px; min-height:17px;}
-  .m-caret{display:inline-block; width:1.5px; height:13px; background:var(--pass); animation:blink 1s steps(1) infinite;}
-  @keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
-  .m-scan{position:relative; height:16px; border-radius:6px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); overflow:hidden; display:flex; align-items:center; margin-top:7px;}
-  .m-sweep{position:absolute; top:0; bottom:0; width:64px; left:-64px; background:linear-gradient(90deg,rgba(250,225,148,0),rgba(250,225,148,.5)50%,rgba(250,225,148,0)); animation:mSweep 1.8s linear infinite;}
-  @keyframes mSweep{0%{left:-64px;}100%{left:100%;}}
-  .m-scan span:last-child{position:relative; font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); padding-left:9px;}
 
   /* pipeline (leak → fix) */
   .m-pipe{min-height:88px; transition:border-color .25s;}
@@ -61,7 +85,6 @@
   .m-legend{display:flex; gap:12px; margin:7px 0 2px;}
   .m-legend span{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; color:rgba(237,234,224,.55);}
   .m-sw{width:8px;height:8px;border-radius:2px;} .m-sw.search{background:var(--gold);} .m-sw.catalog{background:var(--blue);}
-  /* all 4 rows exist from the start (reserved slots) so nothing reflows */
   .m-table{display:flex; flex-direction:column;}
   .m-row{display:grid; grid-template-columns:3px 1fr auto auto; gap:8px; align-items:center; padding:6px 2px; border-bottom:1px solid rgba(255,255,255,.06); overflow:hidden;}
   .m-row:last-child{border-bottom:0;}
@@ -98,16 +121,25 @@
 <body>
 <div class="m-wrap" id="mWrap">
 
-  <div class="m-panel">
-    <div class="m-h green">Demand Monitor<span class="s">every search scored — green passes, red leaks</span></div>
-    <div class="m-search" id="mSearch"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(237,234,224,.5)" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="q" id="mQ"></span><span class="m-caret"></span></div>
-    <div class="m-scan"><span class="m-sweep"></span><span>Analyzing…</span></div>
+  <div class="z-lab">Your storefront · the shopper's screen</div>
+  <div class="shop">
+    <div class="shop-bar"><span class="shop-dot r"></span><span class="shop-dot y"></span><span class="shop-dot g"></span><span class="shop-url">yourstore.com</span></div>
+    <div class="shop-body">
+      <div class="shop-search">
+        <div class="shop-q" id="shopQ"><span id="qText" class="ph">Search products…</span><span class="shop-caret" id="qCaret" style="display:none"></span></div>
+        <button class="shop-btn" id="shopBtn" type="button" tabindex="-1" aria-label="Search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+      </div>
+      <div class="shop-res" id="shopRes"><span class="n0" id="resN0">0 RESULTS</span><span id="resTxt"></span></div>
+    </div>
   </div>
 
+  <div class="z-lab sys">GroLabs engine · reacts automatically</div>
   <div class="m-panel m-pipe idle" id="mPipe">
     <div class="m-h red" id="mPipeH">⬤ Revenue leak</div>
     <div class="m-pipe-act" id="mAct"></div>
-    <div class="m-pipe-item" id="mItem">awaiting query</div>
+    <div class="m-pipe-item" id="mItem">awaiting searches</div>
     <div class="m-pipe-tag" id="mTag">idle</div>
   </div>
 
@@ -124,8 +156,8 @@
         <path d="M0,56 L300,56 L300,80 L0,80 Z" fill="url(#mgY)"/>
         <line x1="0" y1="56" x2="300" y2="56" stroke="#fae194" stroke-width="1.5" stroke-opacity=".75"/>
         <g id="mTrace" style="clip-path:inset(0 100% 0 0)">
-          <path d="M0,56 L75,47 L150,38 L225,25 L300,14 L300,56 Z" fill="url(#mgG)"/>
-          <path d="M0,56 L75,47 L150,38 L225,25 L300,14" fill="none" stroke="#34d399" stroke-width="2"/>
+          <path d="M0,56 L100,45 L200,30 L300,14 L300,56 Z" fill="url(#mgG)"/>
+          <path d="M0,56 L100,45 L200,30 L300,14" fill="none" stroke="#34d399" stroke-width="2"/>
         </g>
       </svg>
       <div class="m-glegend"><span class="m-gprev">Previous revenue (flat)</span><span class="m-grec">Recovered revenue</span></div>
@@ -146,25 +178,32 @@
   const money = n => '$'+Math.round(n).toLocaleString();
   const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
   const ease = k => 1-Math.pow(1-k,3);
-  // fraction of [a,b] covered at t, clamped 0..1
   const seg = (t,a,b) => clamp((t-a)/(b-a),0,1);
 
+  /* Three no-result searches: a typo, a missing synonym, and a semantic
+     query the catalog has no description to match. */
   const EVENTS=[
-    {item:'trainers',      type:'search',  act:'Create synonym', detail:'trainers → running shoes',       tag:'Search engine',   row:{type:'search',  nm:'trainers → running shoes',      sl:64, mo:6080}},
-    {item:'winter boots',  type:'search',  act:'Re-rank results', detail:'boost in-stock + best-sellers', tag:'Search engine',   row:{type:'search',  nm:'winter boots · re-ranked',      sl:33, mo:4785}},
-    {item:'size 11 wide',  type:'catalog', act:'Add attribute',  detail:'width = Wide · 38 SKUs',         tag:'Data enrichment', row:{type:'catalog', nm:'size 11 wide · width=Wide',     sl:52, mo:4940}},
-    {item:'vegan leather', type:'catalog', act:'Add attribute',  detail:'material = Vegan leather',       tag:'Data enrichment', row:{type:'catalog', nm:'vegan leather · material added', sl:38, mo:4370}},
+    {item:'snekers', type:'search', act:'Set typo tolerance', detail:'snekers → Sneakers', tag:'Search engine',
+     row:{type:'search', nm:'snekers → sneakers', sl:41, mo:3260}},
+    {item:'trainers', type:'search', act:'Create synonym', detail:'trainers = running shoes', tag:'Search engine',
+     row:{type:'search', nm:'trainers → running shoes', sl:64, mo:6080}},
+    {item:'shoes for standing all day', type:'catalog', act:'Add product description', detail:'Cloudfoam + “all-day support”', tag:'Data enrichment',
+     row:{type:'catalog', nm:'standing all day · description', sl:38, mo:4370}},
   ];
   const COL={ search:{bg:'rgba(250,225,148,.16)',fg:'#fae194',bd:'rgba(250,225,148,.6)'},
               catalog:{bg:'rgba(158,197,255,.16)',fg:'#9ec5ff',bd:'rgba(158,197,255,.6)'},
-              leak:{bg:'rgba(239,68,68,.18)',fg:'#f0a3a3',bd:'rgba(239,68,68,.6)'} };
+              leak:{bg:'rgba(254,242,242,.97)',fg:'#b91c1c',bd:'rgba(239,68,68,.6)'} };
 
-  /* progress map: intro, 4 equal event segments, finale */
+  /* progress map: intro, 3 equal event segments, finale */
   const INTRO=0.03, FINALE=0.92, W=(FINALE-INTRO)/EVENTS.length;
-  /* phases inside one event (local t 0..1) */
-  const PH={ typeEnd:0.16, fly1:[0.18,0.30], leakEnd:0.48, fixEnd:0.62, fly2:[0.62,0.76], roll:[0.76,0.92] };
+  /* phases inside one event (local t 0..1):
+     type → CLICK → no-results → leak flies to engine → leak card →
+     proposed fix → fix flies to its row → totals roll */
+  const PH={ typeEnd:0.13, click:[0.15,0.21], res:0.21,
+             fly1:[0.27,0.38], leakEnd:0.52, fixEnd:0.66,
+             fly2:[0.66,0.78], roll:[0.78,0.94] };
 
-  // build the 4 reserved rows up front
+  // build the reserved recovery rows up front
   const rowEls = EVENTS.map(ev=>{
     const el=document.createElement('div'); el.className='m-row reserved '+ev.row.type;
     el.innerHTML='<span class="bar"></span><span class="nm">'+ev.row.nm+'</span><span class="sl">+0</span><span class="mo">$0</span>';
@@ -182,14 +221,14 @@
 
   function setPipe(state,ev){
     const p=$('#mPipe'), tag=$('#mTag');
-    p.className='m-panel m-pipe'+(state==='idle'?' idle':state==='leak'?' leak':' '+ev.type)+(state==='hit'?' leak hitp':'');
+    p.className='m-panel m-pipe'+(state==='idle'?' idle':state==='leak'?' leak':state==='hit'?' leak hitp':' '+ev.type);
     if(state==='idle'){
       $('#mPipeH').textContent='⬤ Revenue leak'; $('#mPipeH').className='m-h red';
-      $('#mAct').textContent=''; $('#mItem').textContent='awaiting query';
+      $('#mAct').textContent=''; $('#mItem').textContent='awaiting searches';
       tag.className='m-pipe-tag'; tag.textContent='idle';
     } else if(state==='leak'||state==='hit'){
       $('#mPipeH').textContent='⬤ Revenue leak'; $('#mPipeH').className='m-h red';
-      $('#mAct').textContent=''; $('#mItem').textContent='"'+ev.item+'"';
+      $('#mAct').textContent='search returned 0 results'; $('#mItem').textContent='"'+ev.item+'"';
       tag.className='m-pipe-tag show leak'; tag.textContent='Revenue leak';
     } else {
       $('#mPipeH').textContent='⚙ Proposed fix'; $('#mPipeH').className='m-h white';
@@ -215,24 +254,42 @@
     const ev=EVENTS[i];
     const started=P>=INTRO;
 
-    // query text: typed slice; cleared once the fix has flown away
+    /* 1 · storefront: the query types in */
     const chars=Math.round(ev.item.length*seg(lt,0,PH.typeEnd));
-    $('#mQ').textContent=(!started||lt>=PH.fly2[0])?'':ev.item.slice(0,chars);
+    const typing=started&&chars>0;
+    const qT=$('#qText');
+    if(typing){ qT.textContent=ev.item.slice(0,chars); qT.className=''; }
+    else { qT.textContent='Search products…'; qT.className='ph'; }
+    $('#qCaret').style.display=typing&&lt<PH.res?'':'none';
+    $('#shopQ').classList.toggle('live',typing&&lt<PH.click[1]);
 
-    // pipeline card state
+    /* 2 · the search "click" — button press effect */
+    const ck=seg(lt,PH.click[0],PH.click[1]);
+    const press=started&&ck>0&&ck<1?Math.sin(Math.PI*ck):0;
+    const btn=$('#shopBtn');
+    btn.style.transform='scale('+(1-0.16*press).toFixed(3)+')';
+    btn.style.filter=press>0?'brightness('+(1+press*0.9).toFixed(2)+')':'';
+    btn.style.boxShadow=press>0?'0 0 0 '+(press*5).toFixed(1)+'px rgba(27,28,34,.14)':'';
+
+    /* 3 · the reaction: red no-results strip */
+    const resOn=started&&lt>=PH.res;
+    $('#shopRes').classList.toggle('bad',resOn);
+    $('#resTxt').textContent=resOn?'No results for "'+ev.item+'"':'';
+
+    /* engine: pipeline card state */
     if(!started||lt<PH.fly1[1]) setPipe('idle',ev);
-    else if(lt<PH.leakEnd)      setPipe(lt<PH.fly1[1]+0.08?'hit':'leak',ev);
+    else if(lt<PH.leakEnd)      setPipe(lt<PH.fly1[1]+0.06?'hit':'leak',ev);
     else if(lt<PH.fly2[1])      setPipe('fix',ev);
     else                        setPipe('idle',ev);
 
-    // flyer (at most one flight active)
+    /* flyer (at most one flight active) */
     if(started&&lt>=PH.fly1[0]&&lt<PH.fly1[1]){
-      setFlyer(true,center($('#mSearch')),center($('#mPipe')),seg(lt,PH.fly1[0],PH.fly1[1]),COL.leak,'✕ '+ev.item);
+      setFlyer(true,center($('#shopRes')),center($('#mPipe')),seg(lt,PH.fly1[0],PH.fly1[1]),COL.leak,'✕ 0 results · "'+ev.item+'"');
     } else if(started&&lt>=PH.fly2[0]&&lt<PH.fly2[1]){
       setFlyer(true,center($('#mPipe')),center(rowEls[i]),seg(lt,PH.fly2[0],PH.fly2[1]),ev.type==='catalog'?COL.catalog:COL.search,ev.row.nm);
     } else setFlyer(false);
 
-    // rows + totals: earlier events full, active event rolls, later reserved
+    /* rows + totals: earlier events full, active event rolls, later reserved */
     let rev=0,sales=0,leaks=0;
     EVENTS.forEach((e2,j)=>{
       const f=j<i?1:j>i?0:(started?ease(seg(lt,PH.roll[0],PH.roll[1])):0);
@@ -245,7 +302,7 @@
     $('#mRev').innerHTML=money(rev)+'<span class="u"> /mo</span>';
     $('#mSales').textContent=Math.round(sales); $('#mLeaks').textContent=leaks;
 
-    // finale: graph wipes in, recovery panel locks green, rest greys out
+    /* finale: graph wipes in, recovery panel locks green, rest greys out */
     const wipe=ease(seg(P,FINALE,0.985));
     $('#mTrace').style.clipPath='inset(0 '+((1-wipe)*100).toFixed(2)+'% 0 0)';
     $('#mGraph').classList.toggle('on',wipe>0);
