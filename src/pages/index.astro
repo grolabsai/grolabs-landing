@@ -2870,7 +2870,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       // ── chart 3 · daily vs rolling (blue→red as ONE continuous stroke) ──
       var s3 = $('#tdmS3'), ax3 = axGroup(s3);
       var N = 56, m3 = { l: 36, r: 64, t: 12, b: 22 };
-      var roll = function (i) { return 137 - 16 * Math.pow(i / (N - 1), 1.15) + 0.8 * Math.sin(i / 4); };
+      // distinguishable trend: visible ups and downs that stay ABOVE the
+      // threshold, then a steep dive once it breaks (ends ≈121 = −5.3%)
+      var roll = function (i) {
+        var wave = 3.2 * Math.sin(i / 5.5) + 1.2 * Math.sin(i / 2.3);
+        if (i <= 40) return 135.8 + wave;
+        var t = (i - 40) / 15;
+        return 135.8 + wave * (1 - 0.7 * t) - 13.9 * t * t;
+      };
       var dailyF = function (i) { return roll(i) + 24 * Math.sin(2 * Math.PI * ((i - 2) % 7) / 7) + 3 * Math.sin(i / 2.6); };
       var dv = [], rv = [];
       for (var i = 0; i < N; i++) { dv.push(dailyF(i)); rv.push(roll(i)); }
