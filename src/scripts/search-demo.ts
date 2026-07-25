@@ -10,9 +10,9 @@
  * Two searches run on every query:
  *
  *   1. Keyword search — what the user typed. Returns products whose
- *      dietary_tags / name actually match.
+ *      attribute_tags / name actually match.
  *
- *   2. Category sweep — empty query + filter category="Snack Bars".
+ *   2. Category sweep — empty query + filter category="Shirts".
  *      Returns ALL products in the category, including ones keyword
  *      search missed because attributes were never filled in. The diff
  *      between (2) and (1) is the "hidden by data quality" cohort — the
@@ -23,9 +23,9 @@ const MS_HOST = 'https://ms-5a6fa3e472b4-47486.nyc.meilisearch.io';
 const MS_SEARCH_KEY =
   '3d095bf1146002d0978c5f5fe36cc83d9d97da384b3694c91e55e49eb968bfca';
 const INDEX = 'demo';
-const CATEGORY = 'Snack Bars';
+const CATEGORY = 'Shirts';
 
-const TRACKED_TAGS = ['gluten-free', 'sugar-free', 'dairy-free'] as const;
+const TRACKED_TAGS = ['button-down', 'slim fit'] as const;
 
 type Locale = 'en' | 'es';
 const STRINGS = {
@@ -57,7 +57,7 @@ type Product = {
   description: string;
   image_url: string;
   price: number;
-  dietary_tags: string[];
+  attribute_tags: string[];
 };
 
 type SearchResponse = {
@@ -83,7 +83,7 @@ function formatPrice(n: number): string {
 }
 
 function pillsHtml(product: Product, query: string): string {
-  const productTags = new Set(product.dietary_tags);
+  const productTags = new Set(product.attribute_tags);
   const lowerQuery = query.toLowerCase();
   return TRACKED_TAGS.map((tag) => {
     const queried = lowerQuery.includes(tag);

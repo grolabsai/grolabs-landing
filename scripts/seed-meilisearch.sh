@@ -43,17 +43,17 @@ created=$(call -X POST "$MS_HOST/indexes" --data "{\"uid\":\"$INDEX\",\"primaryK
 
 echo "==> searchable attributes"
 uid=$(call -X PUT "$MS_HOST/indexes/$INDEX/settings/searchable-attributes" \
-  --data '["name","brand","category","description","dietary_tags"]' | jq -r .taskUid)
+  --data '["name","brand","category","description","attribute_tags"]' | jq -r .taskUid)
 wait_task "$uid"
 
 echo "==> filterable attributes"
 uid=$(call -X PUT "$MS_HOST/indexes/$INDEX/settings/filterable-attributes" \
-  --data '["dietary_tags","brand","category"]' | jq -r .taskUid)
+  --data '["attribute_tags","brand","category"]' | jq -r .taskUid)
 wait_task "$uid"
 
 echo "==> synonyms"
 uid=$(call -X PUT "$MS_HOST/indexes/$INDEX/settings/synonyms" \
-  --data '{"gluten free":["gluten-free"],"sugar free":["sugar-free"],"dairy free":["dairy-free"],"gluten-free":["gluten free"],"sugar-free":["sugar free"],"dairy-free":["dairy free"]}' \
+  --data '{"button down":["button-down"],"button-down":["button down"],"buttondown":["button-down"],"slim-fit":["slim fit"],"slimfit":["slim fit"]}' \
   | jq -r .taskUid)
 wait_task "$uid"
 
