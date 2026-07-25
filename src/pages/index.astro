@@ -2560,14 +2560,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* desktop: the two detectors share one row, each half the width of
        the rhythm chart below (which spans the full row) */
     @media (min-width: 1024px) {
-      .tdm-flow { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1000px; margin: 0 auto; }
+      .tdm-flow { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1000px; margin: 0 auto; align-items: stretch; }
       /* !important: the base .tdm-card.tdm-wide max-width rule is
          declared later in this block and would win otherwise */
       .tdm-card, .tdm-card.tdm-wide { max-width: none !important; width: 100%; }
+      /* reserve a fixed title zone (tallest sibling title = 3 lines) so
+         every chart starts at the same y regardless of title wrap */
+      .tdm-ct { min-height: 48px; }
       .tdm-fin-track { grid-column: 1 / -1; margin-top: 24px; }
     }
+    /* standard container: blocks align by CONTAINER size, not content —
+       flex column with the caption pinned to the bottom, so differing
+       content leaves internal margin instead of changing the box */
     .tdm-card {
       width: 100%; max-width: 560px;
+      display: flex; flex-direction: column;
       background: linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(255,255,255,.035)), #0d0d10;
       border: 0; border-radius: 14px; padding: 16px 18px 14px;
       box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07);
@@ -2576,7 +2583,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .tdm-card.tdm-wide { max-width: 860px; }
     .tdm-card.alert { box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px rgba(239,68,68,.4), 0 0 26px rgba(239,68,68,.25); }
     .tdm-ct { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #edeae0; margin-bottom: 8px; }
-    .tdm-note { font-size: 10.5px; color: rgba(237,234,224,.4); line-height: 1.5; margin-top: 8px; }
+    .tdm-note { font-size: 10.5px; color: rgba(237,234,224,.4); line-height: 1.5; margin-top: auto; padding-top: 8px; }
     .tdm-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 10.5px; color: rgba(237,234,224,.6); margin: 2px 0 8px; }
     .tdm-legend .k { display: inline-flex; align-items: center; gap: 6px; }
     .tdm-legend .ln { width: 16px; height: 0; border-top: 2px solid #7fb0c9; border-radius: 2px; }
@@ -2929,13 +2936,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       // card appears → axes fade in → line draws, from the card's own
       // travel through the viewport
       function cardP(elm) {
+        // measure against the UNtransformed position (subtract the reveal
+        // offset we applied) so cards sharing a row never desync
         var r = elm.getBoundingClientRect();
-        return clamp((innerHeight * 0.9 - r.top) / (innerHeight * 0.55), 0, 1);
+        var top = r.top - (elm._ty || 0);
+        return clamp((innerHeight * 0.9 - top) / (innerHeight * 0.55), 0, 1);
       }
       function applyCard(card, ax, p) {
         var a = ease(seg(p, 0, 0.22));
+        var ty = (1 - a) * 14;
         card.style.opacity = a.toFixed(3);
-        card.style.transform = 'translateY(' + ((1 - a) * 14).toFixed(1) + 'px)';
+        card.style.transform = 'translateY(' + ty.toFixed(1) + 'px)';
+        card._ty = ty;
         ax.setAttribute('opacity', ease(seg(p, 0.18, 0.4)).toFixed(3));
         return seg(p, 0.38, 1);
       }
