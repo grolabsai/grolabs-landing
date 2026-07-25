@@ -2557,6 +2557,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   <style is:global>
     /* ── traffic-monitor story: app-exact dark glass tiles on yellow ── */
     .tdm-flow { display: flex; flex-direction: column; align-items: center; gap: 48px; }
+    /* desktop: the two detectors share one row, each half the width of
+       the rhythm chart below (which spans the full row) */
+    @media (min-width: 1024px) {
+      .tdm-flow { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1000px; margin: 0 auto; }
+      /* !important: the base .tdm-card.tdm-wide max-width rule is
+         declared later in this block and would win otherwise */
+      .tdm-card, .tdm-card.tdm-wide { max-width: none !important; width: 100%; }
+      .tdm-fin-track { grid-column: 1 / -1; margin-top: 24px; }
+    }
     .tdm-card {
       width: 100%; max-width: 560px;
       background: linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(255,255,255,.035)), #0d0d10;
@@ -2943,15 +2952,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         var d2p = applyCard(c2c, ax2, cardP(c2c));
         clip2.r.setAttribute('width', (plotW2 * ease(d2p)).toFixed(1));
         dot2.setAttribute('opacity', seg(d2p, 0.96, 1));
-        // finale progress from the pin track
+        // finale progress: one continuous variable that starts counting
+        // when the track reaches mid-screen (the lines begin drawing on
+        // approach), runs through the anchor at the top, and continues
+        // through breach → arrow → phone while pinned
         var r = fin.getBoundingClientRect();
         var off = parseFloat(getComputedStyle(stage).top) || 0;
         var span = r.height - stage.offsetHeight;
-        var pf = span > 0 ? clamp((off - r.top) / span, 0, 1) : 0;
+        var startY = innerHeight * 0.55;
+        var total = (startY - off) + span;
+        var pf = total > 0 ? clamp((startY - r.top) / total, 0, 1) : 0;
         // chart 3: card+axes on approach, then the continuous sweep
         applyCard(c3, ax3, Math.max(cardP(c3), pf > 0 ? 1 : 0));
-        clip3d.r.setAttribute('width', (plotW3 * ease(seg(pf, 0.02, 0.28))).toFixed(1));
-        var sweep = ease(seg(pf, 0.24, 0.55));
+        clip3d.r.setAttribute('width', (plotW3 * ease(seg(pf, 0.02, 0.20))).toFixed(1));
+        var sweep = ease(seg(pf, 0.16, 0.50));
         clip3b.r.setAttribute('width', (plotW3 * sweep + (sweep >= 1 ? 10 : 0)).toFixed(1));
         var breached = sweep >= 1;
         dot3.setAttribute('opacity', breached ? 1 : 0);
@@ -2959,8 +2973,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         ann3.setAttribute('opacity', breached ? 1 : 0);
         c3.classList.toggle('alert', breached);
         // arrow DOWN out of the breach — before the phone
-        var ak = ease(seg(pf, 0.60, 0.74));
-        var pk = ease(seg(pf, 0.76, 0.9));
+        var ak = ease(seg(pf, 0.56, 0.72));
+        var pk = ease(seg(pf, 0.74, 0.9));
         if (ak > 0) {
           var sr = stage.getBoundingClientRect();
           var dr = dot3.getBoundingClientRect();

@@ -7,23 +7,16 @@
  * browser and cannot read other indexes, mutate data, or mint other
  * keys.
  *
- * Two searches run on every query:
- *
- *   1. Keyword search — what the user typed. Returns products whose
- *      attribute_tags / name actually match.
- *
- *   2. Category sweep — empty query + filter category="Shirts".
- *      Returns ALL products in the category, including ones keyword
- *      search missed because attributes were never filled in. The diff
- *      between (2) and (1) is the "hidden by data quality" cohort — the
- *      GroLabs sales pitch made concrete.
+ * One legitimate keyword search per query — the results are exactly
+ * what Meilisearch returns, no staging. (The former "hidden by missing
+ * attributes" category-sweep cohort was removed pending a better way
+ * to present it.)
  */
 
 const MS_HOST = 'https://ms-f663ae03da2b-47486.sfo.meilisearch.io';
 const MS_SEARCH_KEY =
   '32b3319599c8618fc31d8167d9e368d0d1127fc800f02fd72fa2d35c092f26a3';
 const INDEX = 'demo';
-const CATEGORY = 'Shirts';
 
 const TRACKED_TAGS = ['button-down', 'slim fit'] as const;
 
@@ -119,16 +112,11 @@ function emptyStateHtml(message: string): string {
   return `<div class="search-demo-empty">${message}</div>`;
 }
 
-function statusHtml(visibleCount: number, hiddenCount: number, ms: number, t: typeof STRINGS['en']): string {
-  const total = visibleCount + hiddenCount;
-  const hiddenNote =
-    hiddenCount > 0
-      ? ` · <span class="search-demo-status-hidden">${hiddenCount} ${t.hiddenByAttrs}</span>`
-      : '';
+function statusHtml(total: number, ms: number, t: typeof STRINGS['en']): string {
   const word = total === 1 ? t.resultsSingular : t.resultsPlural;
   return `
     <div class="search-demo-status">
-      ${total} ${word} ${t.in} ${ms}ms${hiddenNote}
+      ${total} ${word} ${t.in} ${ms}ms
     </div>
   `;
 }
@@ -146,25 +134,18 @@ async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement, t: typ
   const started = performance.now();
   try {
 
-    const [keywordRes, categoryRes] = await Promise.all([
-      meiliSearch({ q: query, limit: 20 }),
-      meiliSearch({ q: '', filter: `category = "${CATEGORY}"`, limit: 20 }),
-    ]);
-    const keywordIds = new Set(keywordRes.hits.map((p) => p.id));
-    const hiddenHits = categoryRes.hits.filter((p) => !keywordIds.has(p.id));
+    const keywordRes = await meiliSearch({ q: query, limit: 20 });
     const elapsed = Math.max(
       keywordRes.processingTimeMs ?? 0,
-      categoryRes.processingTimeMs ?? 0,
       Math.round(performance.now() - started),
     );
 
     const parts: string[] = [];
-    if (keywordRes.hits.length === 0 && hiddenHits.length === 0) {
+    if (keywordRes.hits.length === 0) {
       parts.push(emptyStateHtml(t.noMatch));
     } else {
       for (const p of keywordRes.hits) parts.push(rowHtml(p, query, false, t));
-      for (const p of hiddenHits) parts.push(rowHtml(p, query, true, t));
-      parts.push(statusHtml(keywordRes.hits.length, hiddenHits.length, elapsed, t));
+      parts.push(statusHtml(keywordRes.hits.length, elapsed, t));
     }
     resultsEl.innerHTML = parts.join('');
   } catch (err) {
