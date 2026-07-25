@@ -191,7 +191,7 @@ const canonicalUrl = `${siteUrl}${path}`;
         </div>
         {/* Nav: w-full forces it to wrap to row 2 on mobile;
             md restores inline centered placement. */}
-        <nav class="order-3 w-full justify-center md:order-2 md:w-auto md:justify-self-center md:self-end flex items-center md:items-end gap-lg pt-1 md:pt-0">
+        <nav data-site-nav class="order-3 w-full justify-center md:order-2 md:w-auto md:justify-self-center md:self-end flex items-center md:items-end gap-lg pt-1 md:pt-0">
           <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none" href={home}>
             {t.nav.home}
           </a>
@@ -204,6 +204,39 @@ const canonicalUrl = `${siteUrl}${path}`;
         </nav>
       </div>
     </header>
+
+    <style is:global>
+      /* Nav row hides while scrolling down, returns on scroll up. On
+         mobile it collapses (header gets shorter — the pinned sections
+         watch the header height and adapt); on desktop it just fades. */
+      nav[data-site-nav] {
+        transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.25s ease, padding 0.25s ease;
+      }
+      header.nav-hidden nav[data-site-nav] {
+        opacity: 0; transform: translateY(-6px); pointer-events: none;
+      }
+      @media (max-width: 767px) {
+        nav[data-site-nav] { max-height: 40px; overflow: hidden; }
+        header.nav-hidden nav[data-site-nav] { max-height: 0; padding-top: 0; margin-top: -12px; }
+      }
+    </style>
+    <script is:inline>
+      // Direction-aware nav visibility: accumulate scroll delta so small
+      // jitter doesn't flip it; always visible near the top of the page.
+      (function () {
+        var header = document.querySelector('header');
+        if (!header) return;
+        var last = window.scrollY, acc = 0;
+        window.addEventListener('scroll', function () {
+          var y = window.scrollY, d = y - last;
+          last = y;
+          if (y < 10) { header.classList.remove('nav-hidden'); acc = 0; return; }
+          acc = (d > 0) === (acc > 0) ? acc + d : d;
+          if (acc > 24) header.classList.add('nav-hidden');
+          else if (acc < -24) header.classList.remove('nav-hidden');
+        }, { passive: true });
+      })();
+    </script>
 
     <main class="relative z-10 pt-[120px] md:pt-20 min-h-screen bg-transparent">
       <slot />
