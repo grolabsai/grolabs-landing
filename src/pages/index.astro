@@ -2723,11 +2723,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
 
     /* ── hero mobile: CTAs stay side by side (shrink to fit), tagline
-       centered ── */
+       centered, and the big stat numbers top-align with their text ── */
     @media (max-width: 767px) {
       .hero-v2-tagline { text-align: center; }
       .hero-v2-ctas { flex-wrap: nowrap; gap: 10px; }
       .hero-v2-btn { padding: 12px 14px; font-size: 13px; white-space: nowrap; }
+      .hero-v2-stat-row { align-items: flex-start; }
+      /* marker glyphs carry ~0.1em of leading; nudge so the 99% cap
+         height sits level with the first text line's cap height */
+      .hero-v2-stat-99 { margin-top: 0.08em; }
     }
     @media (max-width: 350px) {
       .hero-v2-btn { padding: 10px 10px; font-size: 11.5px; }

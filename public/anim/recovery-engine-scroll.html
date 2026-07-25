@@ -64,10 +64,12 @@
   @keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
   .shop-btn{flex:none; width:41px; border:0; border-radius:9px; background:#1b1c22; color:#fff; display:grid; place-items:center; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.25);}
   /* no-results strip — space reserved from the start so nothing reflows */
-  .shop-res{margin-top:9px; min-height:38px; border-radius:8px; border:1px solid transparent; display:flex; align-items:center; gap:8px; padding:8px 12px; font-size:14.5px; font-weight:600; color:transparent; transition:background .25s, border-color .25s, color .25s;}
+  /* one short centered line ("No results") at the search box's font
+     size, with an ! icon — the box height stays constant */
+  .shop-res{margin-top:9px; min-height:42px; border-radius:8px; border:1px solid transparent; display:flex; align-items:center; justify-content:center; gap:9px; padding:8px 12px; font-size:16px; font-weight:600; color:transparent; transition:background .25s, border-color .25s, color .25s;}
   .shop-res.bad{background:rgba(239,68,68,.09); border-color:rgba(239,68,68,.4); color:#b91c1c;}
-  .shop-res .n0{font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.08em; border:1px solid transparent; border-radius:5px; padding:2px 6px; flex:none;}
-  .shop-res.bad .n0{border-color:rgba(239,68,68,.45); background:#fff;}
+  .shop-res .ic{width:20px; height:20px; border-radius:99px; background:transparent; color:transparent; font-weight:800; font-size:13px; line-height:1; display:grid; place-items:center; flex:none;}
+  .shop-res.bad .ic{background:#dc2626; color:#fff;}
 
   /* ── engine panels (dark) ── */
   .m-panel{background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:11px 12px; box-shadow:0 10px 22px rgba(0,0,0,.5); display:flex; flex-direction:column; transition:filter .5s ease, opacity .5s ease;}
@@ -124,6 +126,8 @@
   .m-spark{flex:1 1 auto; min-width:0; align-self:stretch; display:flex; align-items:flex-end;}
   .m-spark svg{display:block; width:100%; max-width:150px; height:44px;}
   .m-spark path{fill:none; stroke:var(--pass); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  /* light gray XY axis behind the green line */
+  .m-spark .sax{stroke:rgba(255,255,255,.28); stroke-width:1.5;}
   .m-total-txt{flex:0 0 auto; text-align:right;}
   .m-total-lab{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--pass);}
   .m-total-val{font-family:"Permanent Marker",cursive; font-size:29px; line-height:1; color:var(--pass); margin:5px 0 3px;}
@@ -148,7 +152,7 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
         </button>
       </div>
-      <div class="shop-res" id="shopRes"><span class="n0" id="resN0">0 RESULTS</span><span id="resTxt"></span></div>
+      <div class="shop-res" id="shopRes"><span class="ic">!</span><span id="resTxt"></span></div>
     </div>
   </div>
 
@@ -180,6 +184,7 @@
            the number grows (one bump per fix) -->
       <div class="m-spark">
         <svg viewBox="0 0 120 44" preserveAspectRatio="none" aria-hidden="true">
+          <path class="sax" d="M2 2 L2 42 L118 42" />
           <path id="mSpark" style="stroke-dasharray:0 400" d="M2 42 C8 42 12 41 16 40 C26 37 32 34 36 32 L44 31 C54 28 62 23 70 20 L80 18 C90 15 100 11 108 8 L116 6" />
         </svg>
       </div>
@@ -352,7 +357,7 @@
        the storefront is clean for the next run */
     const resOn=started&&lt>=PH.res&&lt<PH.fly1[1];
     $('#shopRes').classList.toggle('bad',resOn);
-    $('#resTxt').textContent=resOn?'No results for "'+ev.item+'"':'';
+    $('#resTxt').textContent=resOn?'No results':'';
 
     /* engine: pipeline card state */
     if(!started||lt<PH.fly1[1]) setPipe('idle',ev);

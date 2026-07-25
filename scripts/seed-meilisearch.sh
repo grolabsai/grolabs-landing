@@ -10,7 +10,7 @@
 #   MEILISEARCH_MASTER_KEY=<key> ./scripts/seed-meilisearch.sh
 set -euo pipefail
 
-MS_HOST="${MEILISEARCH_HOST:-https://ms-5a6fa3e472b4-47486.nyc.meilisearch.io}"
+MS_HOST="${MEILISEARCH_HOST:-https://ms-f663ae03da2b-47486.sfo.meilisearch.io}"
 : "${MEILISEARCH_MASTER_KEY:?set MEILISEARCH_MASTER_KEY before running}"
 
 INDEX=demo

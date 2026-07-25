@@ -19,9 +19,9 @@
  *      GroLabs sales pitch made concrete.
  */
 
-const MS_HOST = 'https://ms-5a6fa3e472b4-47486.nyc.meilisearch.io';
+const MS_HOST = 'https://ms-f663ae03da2b-47486.sfo.meilisearch.io';
 const MS_SEARCH_KEY =
-  '3d095bf1146002d0978c5f5fe36cc83d9d97da384b3694c91e55e49eb968bfca';
+  '32b3319599c8618fc31d8167d9e368d0d1127fc800f02fd72fa2d35c092f26a3';
 const INDEX = 'demo';
 const CATEGORY = 'Shirts';
 
