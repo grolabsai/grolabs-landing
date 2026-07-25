@@ -120,17 +120,11 @@
   .m-row.reserved .bar{opacity:.25;} .m-row.reserved .nm,.m-row.reserved .sl,.m-row.reserved .mo{opacity:0;}
   .m-row .nm,.m-row .sl,.m-row .mo{transition:opacity .25s;}
 
-  /* graph — space reserved from the start; the trace wipes in with scroll */
-  .m-graph{margin:9px 0 2px; opacity:.35; transition:opacity .3s;}
-  .m-graph.on{opacity:1;}
-  .m-graph svg{display:block; width:100%; height:54px;}
-  .m-glegend{display:flex; gap:12px; margin-top:5px; font-family:var(--mono); font-size:8px; letter-spacing:.05em; text-transform:uppercase;}
-  .m-glegend span{display:inline-flex; align-items:center; gap:5px;}
-  .m-glegend span::before{content:""; width:8px; height:8px; border-radius:2px;}
-  .m-gprev{color:rgba(250,225,148,.8);} .m-gprev::before{background:var(--gold);}
-  .m-grec{color:rgba(52,211,153,.9);} .m-grec::before{background:var(--pass);}
-
-  .m-total{border-top:1px solid rgba(255,255,255,.1); margin-top:8px; padding-top:9px; text-align:right;}
+  .m-total{border-top:1px solid rgba(255,255,255,.1); margin-top:8px; padding-top:9px; display:flex; align-items:flex-end; gap:14px;}
+  .m-spark{flex:1 1 auto; min-width:0; align-self:stretch; display:flex; align-items:flex-end;}
+  .m-spark svg{display:block; width:100%; max-width:150px; height:44px;}
+  .m-spark path{fill:none; stroke:var(--pass); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  .m-total-txt{flex:0 0 auto; text-align:right;}
   .m-total-lab{font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--pass);}
   .m-total-val{font-family:"Permanent Marker",cursive; font-size:29px; line-height:1; color:var(--pass); margin:5px 0 3px;}
   .m-total-val .u{font-size:.42em; opacity:.65;}
@@ -181,25 +175,19 @@
     <div class="m-h green">Recovery Monitor<span class="s">recovered revenue per fix</span></div>
     <div class="m-legend"><span><i class="m-sw search"></i> Search fix</span><span><i class="m-sw catalog"></i> Catalog fix</span></div>
     <div class="m-table" id="mTable"></div>
-    <div class="m-graph" id="mGraph">
-      <svg viewBox="0 0 300 80" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="mgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".5"/><stop offset="1" stop-color="#34d399" stop-opacity=".04"/></linearGradient>
-          <linearGradient id="mgY" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fae194" stop-opacity=".22"/><stop offset="1" stop-color="#fae194" stop-opacity=".03"/></linearGradient>
-        </defs>
-        <path d="M0,56 L300,56 L300,80 L0,80 Z" fill="url(#mgY)"/>
-        <line x1="0" y1="56" x2="300" y2="56" stroke="#fae194" stroke-width="1.5" stroke-opacity=".75"/>
-        <g id="mTrace" style="clip-path:inset(0 100% 0 0)">
-          <path d="M0,56 L100,45 L200,30 L300,14 L300,56 Z" fill="url(#mgG)"/>
-          <path d="M0,56 L100,45 L200,30 L300,14" fill="none" stroke="#34d399" stroke-width="2"/>
-        </g>
-      </svg>
-      <div class="m-glegend"><span class="m-gprev">Previous revenue (flat)</span><span class="m-grec">Recovered revenue</span></div>
-    </div>
     <div class="m-total">
-      <div class="m-total-lab">Revenue recovered</div>
-      <div class="m-total-val" id="mRev">$0<span class="u"> /mo</span></div>
-      <div class="m-total-sub"><span id="mLeaks">0</span> <span id="mLeaksLab">leaks</span> fixed · <b>+<span id="mSales">0</span> sales</b></div>
+      <!-- sparkline draws left→right, bottom→top, advancing only while
+           the number grows (one bump per fix) -->
+      <div class="m-spark">
+        <svg viewBox="0 0 120 44" preserveAspectRatio="none" aria-hidden="true">
+          <path id="mSpark" style="stroke-dasharray:0 400" d="M2 42 C8 42 12 41 16 40 C26 37 32 34 36 32 L44 31 C54 28 62 23 70 20 L80 18 C90 15 100 11 108 8 L116 6" />
+        </svg>
+      </div>
+      <div class="m-total-txt">
+        <div class="m-total-lab">Revenue recovered</div>
+        <div class="m-total-val" id="mRev">$0<span class="u"> /mo</span></div>
+        <div class="m-total-sub"><span id="mLeaks">0</span> <span id="mLeaksLab">leaks</span> fixed · <b>+<span id="mSales">0</span> sales</b></div>
+      </div>
     </div>
   </div>
   </div>
@@ -252,8 +240,10 @@
     $('#mTable').appendChild(el); return el;
   });
 
-  let GLEN=250;
+  let GLEN=250, SLEN=140;
   try{ GLEN=document.getElementById('guidePath').getTotalLength(); }catch(e){}
+  try{ SLEN=document.getElementById('mSpark').getTotalLength(); }catch(e){}
+  const TOTREV=EVENTS.reduce((a,e)=>a+e.row.mo,0);
 
   let zoom=1;
   function fit(){
@@ -373,6 +363,11 @@
     $('#mSales').textContent=Math.round(sales); $('#mLeaks').textContent=leaks;
     $('#mLeaksLab').textContent=leaks===1?'leak':'leaks';
 
+    /* sparkline beside the number: drawn length follows the recovered
+       total, so it only advances while the number is growing */
+    const sf=SLEN*(TOTREV?rev/TOTREV:0);
+    $('#mSpark').style.strokeDasharray=sf.toFixed(2)+' '+(SLEN+2).toFixed(2);
+
     /* guide line: drawn from the fresh payout up to the search box during
        the blink window, then fades out as soon as the draw finishes.
        Both transitions. */
@@ -390,10 +385,7 @@
       $('#guideHead').style.opacity=seg(gDraw,0.9,1).toFixed(3);
     } else $('#guide').style.opacity='0';
 
-    /* finale: graph wipes in, recovery panel locks green, rest greys out */
-    const wipe=ease(seg(P,FINALE,0.985));
-    $('#mTrace').style.clipPath='inset(0 '+((1-wipe)*100).toFixed(2)+'% 0 0)';
-    $('#mGraph').classList.toggle('on',wipe>0);
+    /* finale: recovery panel locks green, rest greys out */
     $('#mRecovery').classList.toggle('done',P>0.97);
     $('#mWrap').classList.toggle('ended',P>0.985);
   }

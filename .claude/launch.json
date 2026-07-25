@@ -4,9 +4,11 @@
     {
       "name": "astro",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 4321,
-      "cwd": "/Users/sasu/code/grolabs-landing"
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 4321
     }
   ]
 }
