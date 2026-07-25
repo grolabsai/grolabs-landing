@@ -22,7 +22,9 @@
   const seg = (v, a, b) => cl((v - a) / (b - a));
 
   /* ── Timing · bottom row first ──────────────────────────────── */
-  const START = 0.045, END = 0.70, LEN = (END - START) / N;
+  /* START near 0: the bottom row starts scanning on the first scroll
+     tick after the stage pins (no dead scroll at the top). */
+  const START = 0.006, END = 0.70, LEN = (END - START) / N;
   const slotOf = (i) => N - 1 - i;
   const rowQ = (p, i) => cl((p - (START + slotOf(i) * LEN)) / LEN);
   const TBL = [0.72, 0.865], LEG = [0.875, 0.93];
@@ -274,7 +276,10 @@
     if (manual != null) return manual;
     const r = track.getBoundingClientRect();
     const span = r.height - stage.offsetHeight;
-    return span <= 0 ? 0 : cl(-r.top / span);
+    // The stage may stick below a fixed site header (top > 0); progress
+    // must start the moment it pins, not when the track passes y=0.
+    const off = parseFloat(getComputedStyle(stage).top) || 0;
+    return span <= 0 ? 0 : cl((off - r.top) / span);
   }
   function sync() {
     cur = progress();
