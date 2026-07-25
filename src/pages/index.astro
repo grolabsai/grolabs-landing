@@ -156,7 +156,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       </div>
 
       <div class="hero-v2-stage-col">
-        <div class="hero-v2-stat-box">
+        <div class="hero-v2-stat-box lifted-glass">
           <div class="hero-v2-stat-row">
             <span class="hero-v2-stat-99">99%</span>
             <p class="hero-v2-stat-text">of visitors never become customers<br />in many online stores.</p>
@@ -232,7 +232,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
               </div>
             </div>
 
-            <div class="rf-box">
+            <div class="rf-box lifted-glass">
               <div class="rf-stage-wrap" data-rf-wrap>
                 <div class="rf-stage" data-rf-stage>
                   <svg class="rf-marks" viewBox="0 0 1080 520" preserveAspectRatio="none" aria-hidden="true">
@@ -774,13 +774,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
               product catalog. Scroll to run the engine.
             </p>
           </header>
-          <iframe
-            class="rres-frame"
-            src={`${base}/anim/recovery-engine-scroll.html`}
-            title="Revenue Recovery Engine — scroll-driven animation"
-            loading="lazy"
-            scrolling="no"
-          ></iframe>
+          <div class="anim-glass">
+            <iframe
+              class="rres-frame"
+              src={`${base}/anim/recovery-engine-scroll.html`}
+              title="Revenue Recovery Engine — scroll-driven animation"
+              loading="lazy"
+              scrolling="no"
+            ></iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -885,6 +887,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <h2 class="cps-h2">Product Catalog</h2>
           <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
         </div>
+        <div class="anim-glass">
         <div class="cps-inner">
 
           <div class="cps-sheet">
@@ -907,6 +910,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
           <div class="cps-legend"><span><i style="background:#fff"></i>Product base</span><span><i style="background:#9ec5ff"></i>Attribute</span><span><i style="background:#fae194"></i>Variant axis</span></div>
 
+        </div>
         </div>
         </div>
         <div class="cps-hint"><b></b><span>Scroll to run the parser</span></div>
@@ -1136,11 +1140,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   <script is:inline src={`${base}/catalog-parser.js`}></script>
 
   <!-- Try it out / Attribute Match Visibility. Live Meilisearch demo
-       against the `demo` index — 4 snack bars with a deliberate
-       data-quality gradient (3/3, 2/3, 1/3, 0/3 matches against the
-       gluten-free + sugar-free + dairy-free trio). The 0/3 product is
-       the punchline: it IS all three things, but the merchant never
-       tagged it, so search can't surface it by attribute.
+       against the `demo` index — 4 shirts with a deliberate
+       data-quality gradient against the "button-down, slim fit" query:
+       two 2/2 matches, one button-down in a REGULAR fit (returned with
+       a gray 'slim fit' pill — that gray pill is the attribute-match
+       visibility demo), and one hidden punchline: it IS a slim-fit
+       button-down but the merchant never filled any attributes, so
+       only the category sweep reveals it.
        Sits on the lighter canvas bg so the search panel inside it can
        use the floating-card shadow treatment from the hero. -->
   <section class="relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
@@ -1177,9 +1183,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           </li>
           <li class="flex items-start gap-md">
             <span class="material-symbols-outlined text-primary text-2xl flex-shrink-0 leading-none mt-1" aria-hidden="true">check_box</span>
-            <div class="text-body-md leading-relaxed">
-              <div class="text-white">Attribute match visibility</div>
-              <div class="text-primary font-mono text-xs uppercase tracking-[0.18em] mt-1">Reduces returns</div>
+            <div class="text-white text-body-md leading-relaxed">
+              Attribute match visibility
             </div>
           </li>
           <li class="flex items-start gap-md">
@@ -2453,11 +2458,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   </section>
 
   <!-- Entrepreneurs' Priority / Grow a company. Section header + lede,
-       then the animated traffic-monitoring dashboard at FULL section
-       width (iframe, transparent so the yellow band shows through;
-       auto-plays once on scroll), with a Replay control on the lower
-       right below it. -->
-  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal">
+       then the SCROLL-DRIVEN monitoring story (iframe, transparent so
+       the yellow band shows through): three charts draw quickly with
+       scroll — pink thresholds, green last elements where healthy —
+       then the bottom chart breaches its threshold (red), the other
+       charts fade, the breaching chart moves left and the phone slides
+       in from the right with an arrow from the breach to the
+       notification it triggered. -->
+  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal" data-tdm>
     <div class="max-w-page mx-auto">
       <!-- Eyebrow + title + lede on the yellow surface. -->
       <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
@@ -2470,67 +2478,140 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         We monitor thousands of indicators, metrics, and dashboards so you can focus on growing the business.<br />
         You'll receive business insights on a need-to-know basis.
       </p>
-
-      <div class="td-frame-wrap">
+    </div>
+    <div class="tdm-track">
+      <div class="tdm-stage">
         <iframe
-          class="td-frame"
-          src={`${base}/anim/traffic-dashboard.html`}
-          title="Traffic monitoring dashboard — live animation"
+          class="tdm-frame"
+          src={`${base}/anim/traffic-monitor-scroll.html`}
+          title="Traffic monitoring — scroll-driven animation"
           loading="lazy"
           scrolling="no"
         ></iframe>
-        <div class="td-replay-row">
-          <button type="button" class="td-replay-btn" data-td-replay aria-label="Replay animation">↻ Replay</button>
-        </div>
       </div>
     </div>
   </section>
 
   <style is:global>
-    /* 3/4 of the section width, centered; full width once the layout
-       stacks on smaller screens. */
-    .td-frame-wrap { width: 75%; margin: 0 auto; }
-    @media (max-width: 1023px) { .td-frame-wrap { width: 100%; } }
-    .td-frame {
+    .tdm-track { height: 240vh; position: relative; }
+    .tdm-stage {
+      position: sticky;
+      top: var(--cps-top, 0px);
+      height: calc(100svh - var(--cps-top, 0px));
+      min-height: 480px;
+      display: flex;
+      justify-content: center;
+      padding: 8px 0 12px;
+    }
+    .tdm-frame {
       width: 100%;
-      height: 820px;            /* initial; resized to content via postMessage */
+      max-width: 1040px;
+      height: 100%;
       border: 0;
       display: block;
       background: transparent;   /* transparent → the yellow band shows through */
-      color-scheme: light;
+      color-scheme: dark;
     }
-    @media (max-width: 1023px) { .td-frame { height: 1500px; } }
-    .td-replay-row { display: flex; justify-content: flex-end; margin-top: 12px; }
-    .td-replay-btn {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(0,0,0,0.5);
-      background: transparent;
-      border: 1px solid rgba(0,0,0,0.25);
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: color .15s, border-color .15s;
+
+    /* ── Lifted glass card — "Subtle · no border" (GLASS-CARDS-HANDOFF) ──
+       Refractive translucent fill + saturating blur + inner top highlight
+       + soft drop shadow. NO border, NO rim-light stroke. */
+    .lifted-glass {
+      background: linear-gradient(160deg,
+        rgba(255,255,255,0.05) 0%,
+        rgba(255,255,255,0.02) 60%,
+        rgba(255,255,255,0.035) 100%),
+        rgba(24,25,31,0.92);
+      backdrop-filter: blur(10px) saturate(135%);
+      -webkit-backdrop-filter: blur(10px) saturate(135%);
+      border: 0;
+      border-radius: 16px;
+      position: relative;
+      isolation: isolate;
+      box-shadow:
+        0 12px 32px rgba(0,0,0,0.44),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      transition:
+        transform .35s cubic-bezier(.2,0,.2,1),
+        box-shadow .35s ease;
     }
-    .td-replay-btn:hover { color: rgba(0,0,0,0.8); border-color: rgba(0,0,0,0.5); }
+    .lifted-glass:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        0 18px 42px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.13);
+    }
+    .lifted-glass > * { position: relative; z-index: 1; }
+    /* Mobile fallback — blur is the expensive part on phones. */
+    @media (max-width: 768px) {
+      .lifted-glass {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: #191a20;
+        box-shadow:
+          0 8px 22px rgba(0,0,0,0.40),
+          inset 0 1px 0 rgba(255,255,255,0.06);
+      }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      .lifted-glass {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: #191a20;
+      }
+    }
+
+    /* ── Desktop-only glass slab BEHIND the Catalog Parser and RRE
+       animations. Below lg it contributes no box at all. ── */
+    .anim-glass { display: contents; }
+    @media (min-width: 1024px) {
+      .anim-glass {
+        display: block;
+        background: linear-gradient(160deg,
+          rgba(255,255,255,0.05) 0%,
+          rgba(255,255,255,0.02) 60%,
+          rgba(255,255,255,0.035) 100%),
+          rgba(24,25,31,0.92);
+        backdrop-filter: blur(10px) saturate(135%);
+        -webkit-backdrop-filter: blur(10px) saturate(135%);
+        border-radius: 16px;
+        position: relative;
+        isolation: isolate;
+        box-shadow:
+          0 12px 32px rgba(0,0,0,0.44),
+          inset 0 1px 0 rgba(255,255,255,0.08);
+        padding: 14px;
+        height: 100%;
+        min-height: 0;
+      }
+      .anim-glass > * { position: relative; z-index: 1; }
+      .anim-glass > iframe { height: 100%; }
+      /* top-align the animation slabs with the section titles */
+      .rres-side, .cps-side { align-self: start !important; padding-top: 6px; }
+    }
   </style>
 
   <script is:inline>
-    // Size the traffic-dashboard iframe to its reported content height,
-    // and wire the Replay control.
+    // Drive the pinned traffic-monitoring story: map the track's scroll
+    // progress to p (0→1) and post it into the animation iframe.
     (function () {
-      var frame = document.querySelector('.td-frame');
-      if (!frame) return;
-      window.addEventListener('message', function (e) {
-        var d = e.data;
-        if (d && d.type === 'td-height' && typeof d.height === 'number') {
-          frame.style.height = Math.max(320, d.height) + 'px';
-        }
-      });
-      var replay = document.querySelector('[data-td-replay]');
-      if (replay) replay.addEventListener('click', function () {
-        if (frame.contentWindow) frame.contentWindow.postMessage({ type: 'td-replay' }, '*');
-      });
+      var sec = document.querySelector('[data-tdm]');
+      if (!sec) return;
+      var track = sec.querySelector('.tdm-track');
+      var stage = sec.querySelector('.tdm-stage');
+      var frame = sec.querySelector('.tdm-frame');
+      function send() {
+        var r = track.getBoundingClientRect();
+        var span = r.height - stage.offsetHeight;
+        var off = parseFloat(getComputedStyle(stage).top) || 0;
+        var p = span > 0 ? (off - r.top) / span : 0;
+        if (frame.contentWindow)
+          frame.contentWindow.postMessage({ type: 'tdm-p', p: Math.max(0, Math.min(1, p)) }, '*');
+      }
+      addEventListener('scroll', send, { passive: true });
+      addEventListener('resize', send);
+      frame.addEventListener('load', send);
+      send();
     })();
   </script>
 

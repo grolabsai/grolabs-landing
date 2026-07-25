@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>Traffic monitoring — scroll-driven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* Scroll-driven traffic monitoring: every visual is a pure function of
+     a progress value p (0→1) posted by the parent as {type:'tdm-p', p}.
+     Three dark chart cards on the transparent (yellow) band:
+       1 · week-over-week bars   — pink alarm line, last bar GREEN (healthy)
+       2 · accumulated drift     — pink decision limit, end dot GREEN (healthy)
+       3 · daily vs rolling week — the rolling line deliberately crosses the
+           pink threshold and turns RED, then the other charts fade, chart 3
+           moves left and the phone slides in from the right with an arrow
+           from the breach to the notification it triggered. */
+  :root{
+    --card:#131316; --line:rgba(255,255,255,.09); --bone:#EDEAE0;
+    --dim:rgba(237,234,224,.55); --pink:#f9a8d4; --green:#34d399;
+    --red:#ef4444; --blue:#9ec5ff; --grey:#7c7d85;
+    --mono:ui-monospace,Menlo,monospace; --sans:"Hanken Grotesk",-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{background:transparent; font-family:var(--sans); color:var(--bone); padding:8px; overflow:hidden; height:100svh; display:grid; place-items:center;}
+  .w{position:relative; width:100%; max-width:1000px; margin:0 auto;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; transform-origin:left center;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px 10px; box-shadow:0 18px 40px -18px rgba(0,0,0,.55); transition:border-color .3s, box-shadow .3s;}
+  .card.wide{grid-column:1/-1;}
+  .card.alert{border-color:rgba(239,68,68,.65); box-shadow:0 18px 40px -18px rgba(0,0,0,.55),0 0 0 1px rgba(239,68,68,.35),0 0 26px rgba(239,68,68,.22);}
+  .ct{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#9a9ba6; margin-bottom:6px;}
+  .cc{font-size:10.5px; line-height:1.45; color:var(--dim); margin-top:6px;}
+  .cl{display:flex; gap:12px; margin:2px 0 4px; font-family:var(--mono); font-size:8.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--dim);}
+  .cl i{display:inline-block; width:10px; height:2.5px; border-radius:2px; vertical-align:2px; margin-right:5px;}
+  svg{display:block; width:100%; height:auto;}
+  @media (max-width:680px){ .grid{grid-template-columns:1fr; gap:9px;} .card{padding:10px 11px 8px;} }
+
+  /* phone — slides in from the right during the hand-off */
+  .phone{position:absolute; right:0; top:50%; width:212px; background:#0f1014; border:1.5px solid rgba(255,255,255,.16); border-radius:26px; padding:14px 13px 18px; box-shadow:0 24px 60px -18px rgba(0,0,0,.65); opacity:0; pointer-events:none;}
+  .ph-notch{width:64px; height:16px; background:#000; border-radius:10px; margin:0 auto 14px;}
+  .ph-time{font-size:34px; font-weight:600; text-align:center; color:#fff; line-height:1;}
+  .ph-sub{font-size:10.5px; text-align:center; color:rgba(237,234,224,.5); margin:6px 0 16px;}
+  .ph-card{background:#17181d; border:1.5px solid rgba(239,68,68,.6); border-radius:13px; padding:11px; display:flex; gap:9px; box-shadow:0 0 22px rgba(239,68,68,.18);}
+  .ph-ic{flex:none; width:26px; height:26px; border-radius:8px; background:var(--red); color:#fff; font-weight:800; font-size:15px; display:grid; place-items:center;}
+  .ph-tt{font-size:11.5px; font-weight:700; color:#fff; line-height:1.25;}
+  .ph-tt b{color:#f0a3a3;}
+  .ph-tx{font-size:10px; line-height:1.4; color:rgba(237,234,224,.6); margin-top:3px;}
+  @media (max-width:680px){ .phone{width:172px; border-radius:22px; padding:11px 10px 14px;} .ph-time{font-size:26px;} }
+
+  /* arrow overlay: breach → notification */
+  #alink{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:40;}
+  #alink path{fill:none; stroke:#dc2626; stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+</style>
+</head>
+<body>
+<div class="w" id="wrap">
+  <div class="grid" id="grid">
+    <div class="card" id="c1">
+      <div class="ct">Week-over-week change</div>
+      <svg id="s1" viewBox="0 0 320 148" aria-hidden="true"></svg>
+      <div class="cc">Each bar compares one week to the one before. A slow decline never trips this alarm.</div>
+    </div>
+    <div class="card" id="c2">
+      <div class="ct">Accumulated drift (CUSUM)</div>
+      <svg id="s2" viewBox="0 0 320 148" aria-hidden="true"></svg>
+      <div class="cc">Every small shortfall adds up — sustained drift shows weeks before any single-week alarm.</div>
+    </div>
+    <div class="card wide" id="c3">
+      <div class="ct">Daily sessions vs the rolling week</div>
+      <div class="cl"><span><i style="background:var(--grey)"></i>daily sessions</span><span><i style="background:var(--blue)"></i>7-day rolling average</span></div>
+      <svg id="s3" viewBox="0 0 640 190" aria-hidden="true"></svg>
+      <div class="cc">Days have their own rhythm — the rolling line is the honest trend.</div>
+    </div>
+  </div>
+
+  <div class="phone" id="phone">
+    <div class="ph-notch"></div>
+    <div class="ph-time">9:41</div>
+    <div class="ph-sub">GroLabs · Live monitor</div>
+    <div class="ph-card">
+      <div class="ph-ic">!</div>
+      <div>
+        <div class="ph-tt">Traffic dropped <b>5.3%</b></div>
+        <div class="ph-tx">Yesterday's visits fell 5.3% below your daily threshold.</div>
+      </div>
+    </div>
+  </div>
+
+  <svg id="alink" aria-hidden="true"><path id="alinkP"/><path id="alinkH"/></svg>
+</div>
+
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+  const ease=k=>1-Math.pow(1-k,3);
+  const seg=(t,a,b)=>clamp((t-a)/(b-a),0,1);
+  const NS='http://www.w3.org/2000/svg';
+  const el=(n,at)=>{const e=document.createElementNS(NS,n);for(const k in at)e.setAttribute(k,at[k]);return e;};
+
+  /* timeline */
+  const PH={ in:[0,0.05], c1:[0.05,0.26], c2:[0.27,0.47],
+             c3g:[0.49,0.61], c3b:[0.59,0.75], c3r:[0.73,0.79],
+             slide:[0.82,0.93], arrow:[0.93,0.99] };
+
+  /* ── chart 1 · WoW bars. last bar is above the alarm → GREEN ── */
+  const s1=$('#s1');
+  const B={y0:66, px:7.2, alarm:-5};
+  const VALS=[0.6,2.1,-0.8,-1.6,2.3,-3.4,1.9,-3.2,5.6,-1.1,-3.6,1.8];
+  s1.appendChild(el('line',{x1:16,y1:B.y0,x2:308,y2:B.y0,stroke:'rgba(255,255,255,.25)','stroke-width':1}));
+  const alarmY=B.y0-B.alarm*B.px;
+  s1.appendChild(el('line',{id:'a1',x1:16,y1:alarmY,x2:308,y2:alarmY,stroke:'var(--pink)','stroke-width':2,opacity:0}));
+  const a1t=el('text',{x:308,y:alarmY+16,fill:'var(--pink)','text-anchor':'end','font-size':11,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
+  a1t.textContent='point alarm −5%'; a1t.id='a1t'; s1.appendChild(a1t);
+  const bars=VALS.map((v,i)=>{
+    const r=el('rect',{x:20+i*24,width:15,rx:2,fill:i===VALS.length-1?'var(--green)':'var(--grey)'});
+    s1.appendChild(r); return {r,v};
+  });
+
+  /* ── chart 2 · CUSUM. stays below the limit → end dot GREEN ── */
+  const s2=$('#s2');
+  const limY=52;
+  s2.appendChild(el('line',{x1:16,y1:132,x2:308,y2:132,stroke:'rgba(255,255,255,.25)','stroke-width':1}));
+  s2.appendChild(el('line',{id:'a2',x1:16,y1:limY,x2:308,y2:limY,stroke:'var(--pink)','stroke-width':2,opacity:0}));
+  const a2t=el('text',{x:18,y:limY-7,fill:'var(--pink)','font-size':11,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
+  a2t.textContent='decision limit'; a2t.id='a2t'; s2.appendChild(a2t);
+  const cus=el('path',{d:'M20 128 C60 128 80 127 104 124 C136 120 150 113 174 106 C198 99 214 94 238 86 C262 78 280 72 296 68',stroke:'var(--blue)','stroke-width':2.5,fill:'none','stroke-linecap':'round'});
+  s2.appendChild(cus);
+  const dot2=el('circle',{cx:296,cy:68,r:4.5,fill:'var(--green)',opacity:0}); dot2.id='dot2'; s2.appendChild(dot2);
+  const L2=cus.getTotalLength();
+
+  /* ── chart 3 · daily vs rolling. crosses the threshold → RED ── */
+  const s3=$('#s3');
+  const TH=118;
+  const RPTS=[[30,72],[110,76],[190,80],[262,85],[330,90],[396,96],[458,103],[506,112],[536,120],[572,127],[610,133]];
+  const rollY=x=>{ for(let i=1;i<RPTS.length;i++){ if(x<=RPTS[i][0]){ const [x0,y0]=RPTS[i-1],[x1,y1]=RPTS[i]; return y0+(y1-y0)*(x-x0)/(x1-x0);} } return RPTS[RPTS.length-1][1]; };
+  s3.appendChild(el('line',{x1:20,y1:168,x2:620,y2:168,stroke:'rgba(255,255,255,.25)','stroke-width':1}));
+  s3.appendChild(el('line',{id:'a3',x1:20,y1:TH,x2:620,y2:TH,stroke:'var(--pink)','stroke-width':2,'stroke-dasharray':'6 5',opacity:0}));
+  const a3t=el('text',{x:22,y:TH-7,fill:'var(--pink)','font-size':11,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
+  a3t.textContent='daily threshold'; a3t.id='a3t'; s3.appendChild(a3t);
+  let dd='M30 '+(rollY(30)+30).toFixed(1);
+  for(let x=36;x<=610;x+=6) dd+=' L'+x+' '+(rollY(x)+30*Math.sin((x-30)/16)).toFixed(1);
+  const daily=el('path',{d:dd,stroke:'rgba(255,255,255,.28)','stroke-width':1.5,fill:'none'});
+  s3.appendChild(daily);
+  const L3d=daily.getTotalLength();
+  const rollD='M'+RPTS.map(p=>p[0]+' '+p[1]).join(' L');
+  const roll=el('path',{d:rollD,stroke:'var(--blue)','stroke-width':3,fill:'none','stroke-linecap':'round'});
+  s3.appendChild(roll);
+  const L3r=roll.getTotalLength();
+  // crossing of the rolling line with TH is between (506,112) and (536,120)
+  const XC=506+(536-506)*(TH-112)/(120-112);
+  const redD='M'+XC.toFixed(1)+' '+TH+' L536 120 L572 127 L610 133';
+  const red=el('path',{d:redD,stroke:'var(--red)','stroke-width':3.2,fill:'none','stroke-linecap':'round'});
+  s3.appendChild(red);
+  const L3x=red.getTotalLength();
+  const dot3=el('circle',{cx:610,cy:133,r:5,fill:'var(--red)',opacity:0}); dot3.id='c3dot'; s3.appendChild(dot3);
+  const ann=el('text',{x:606,y:152,fill:'var(--red)','text-anchor':'end','font-size':12,'font-weight':600,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
+  ann.textContent='121/day · −5.3% below threshold'; ann.id='c3ann'; s3.appendChild(ann);
+
+  const dash=(p,len,k)=>{ p.style.strokeDasharray=(len*k).toFixed(1)+' '+(len+2).toFixed(1); };
+
+  let zoom=1, mobile=false;
+  function fit(){
+    document.body.style.zoom='1';
+    mobile=matchMedia('(max-width:680px)').matches;
+    const need=$('#wrap').offsetHeight+16;
+    zoom=Math.max(0.5,Math.min(1,innerHeight/need));
+    document.body.style.zoom=zoom<0.999?String(zoom.toFixed(3)):'1';
+  }
+  const rect=e=>{const r=e.getBoundingClientRect();return {l:r.left/zoom,t:r.top/zoom,r:r.right/zoom,b:r.bottom/zoom,w:r.width/zoom,h:r.height/zoom};};
+
+  function render(P){
+    P=clamp(P,0,1);
+
+    /* cards stagger in */
+    ['#c1','#c2','#c3'].forEach((s,i)=>{
+      const k=ease(seg(P,PH.in[0]+i*0.012,PH.in[1]+i*0.012));
+      const c=$(s); c.style.opacity=k.toFixed(3);
+      c.style.transform='translateY('+((1-k)*-8).toFixed(1)+'px)';
+    });
+
+    /* chart 1: pink alarm line, then bars grow left→right */
+    const t1=seg(P,PH.c1[0],PH.c1[1]);
+    const aw=ease(seg(t1,0,0.14));
+    $('#a1').style.opacity=aw; $('#a1t').style.opacity=aw;
+    $('#a1').setAttribute('x2',(16+292*aw).toFixed(1));
+    bars.forEach((b,i)=>{
+      const k=ease(seg(t1,0.10+i*0.072,0.10+i*0.072+0.09));
+      const h=Math.abs(b.v)*B.px*k;
+      b.r.setAttribute('height',Math.max(0.01,h).toFixed(1));
+      b.r.setAttribute('y',(b.v>0?B.y0-h:B.y0).toFixed(1));
+    });
+
+    /* chart 2: pink limit, CUSUM draws, green dot when it lands */
+    const t2=seg(P,PH.c2[0],PH.c2[1]);
+    const aw2=ease(seg(t2,0,0.14));
+    $('#a2').style.opacity=aw2; $('#a2t').style.opacity=aw2;
+    $('#a2').setAttribute('x2',(16+292*aw2).toFixed(1));
+    dash(cus,L2,ease(seg(t2,0.10,0.95)));
+    $('#dot2').style.opacity=seg(t2,0.95,1);
+
+    /* chart 3: threshold + grey daily, blue rolling, red breach */
+    const g3=seg(P,PH.c3g[0],PH.c3g[1]);
+    const aw3=ease(seg(g3,0,0.2));
+    $('#a3').style.opacity=aw3; $('#a3t').style.opacity=aw3;
+    dash(daily,L3d,ease(seg(g3,0.15,1)));
+    dash(roll,L3r,ease(seg(P,PH.c3b[0],PH.c3b[1])));
+    const rk=seg(P,PH.c3r[0],PH.c3r[1]);
+    dash(red,L3x,ease(rk));
+    const breached=P>=PH.c3r[1];
+    $('#c3dot').style.opacity=breached?1:0;
+    $('#c3ann').style.opacity=breached?1:0;
+    $('#c3').classList.toggle('alert',breached);
+
+    /* hand-off: charts 1+2 fade, chart 3 moves left, phone slides in */
+    const sk=ease(seg(P,PH.slide[0],PH.slide[1]));
+    $('#c1').style.opacity=Math.min(+$('#c1').style.opacity,1-sk).toFixed(3);
+    $('#c2').style.opacity=Math.min(+$('#c2').style.opacity,1-sk).toFixed(3);
+    const wrap=$('#wrap'), c3=$('#c3'), phone=$('#phone');
+    const s3s=mobile?0.62:0.66;
+    // move chart 3 up toward the vertical middle and shrink to the left
+    const dy=(wrap.offsetHeight/2)-(c3.offsetTop+c3.offsetHeight/2);
+    c3.style.transformOrigin='left center';
+    c3.style.transform='translateY('+(dy*sk).toFixed(1)+'px) scale('+(1-(1-s3s)*sk).toFixed(3)+')';
+    const pw=phone.offsetWidth;
+    phone.style.opacity=sk.toFixed(3);
+    phone.style.transform='translateY(-50%) translateX('+((1-sk)*(pw+60)).toFixed(1)+'px)';
+
+    /* arrow: breach dot → the phone notification it triggered */
+    const ak=ease(seg(P,PH.arrow[0],PH.arrow[1]));
+    const ap=$('#alinkP'), ah=$('#alinkH');
+    if(ak>0&&sk>0.98){
+      const w=rect(wrap), d=rect($('#c3dot')), n=rect(phone.querySelector('.ph-card'));
+      const x0=d.l-w.l+6, y0=d.t-w.t, x1=n.l-w.l-8, y1=n.t-w.t+n.h/2;
+      const mx=(x0+x1)/2;
+      ap.setAttribute('d','M'+x0.toFixed(1)+' '+y0.toFixed(1)+' C'+mx.toFixed(1)+' '+(y0-40).toFixed(1)+' '+mx.toFixed(1)+' '+y1.toFixed(1)+' '+x1.toFixed(1)+' '+y1.toFixed(1));
+      const AL=ap.getTotalLength();
+      ap.style.strokeDasharray=(AL*ak).toFixed(1)+' '+(AL+2).toFixed(1);
+      ap.style.opacity='1';
+      // arrowhead once the tip arrives (arrives moving rightward)
+      ah.setAttribute('d','M'+x1+' '+y1+' l-11 -6 M'+x1+' '+y1+' l-11 6');
+      ah.style.opacity=ak>0.95?'1':'0';
+    } else { ap.style.opacity='0'; ah.style.opacity='0'; }
+  }
+
+  let last=0;
+  addEventListener('message',e=>{
+    if(e&&e.data&&e.data.type==='tdm-p'&&typeof e.data.p==='number'){ last=e.data.p; render(last); }
+  });
+  addEventListener('resize',()=>{ fit(); render(last); });
+  addEventListener('load',()=>{ fit(); render(0); });
+})();
+</script>
+</body>
+</html>
