@@ -745,7 +745,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        column, sized for a phone viewport).
        ============================================================ */}
   <section class="rres" data-rre-scroll data-screen-label="Revenue Recovery Engine (scroll)">
-    <div class="max-w-page mx-auto w-full">
+    {/* below lg the copy sits above the track (and scrolls away before
+        the pin); at lg+ it lives inside the pinned stage's left column */}
+    <div class="max-w-page mx-auto w-full rres-head-sm">
       <header class="rre-head">
         <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
         <div class="rre-title-row">
@@ -757,8 +759,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           product catalog. Scroll to run the engine.
         </p>
       </header>
-      <div class="rres-track">
-        <div class="rres-stage">
+    </div>
+    <div class="rres-track">
+      <div class="rres-stage">
+        <div class="rres-cols">
+          <header class="rre-head rres-side">
+            <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
+            <div class="rre-title-row">
+              <h2 class="rre-title">Revenue Recovery Engine</h2>
+            </div>
+            <p class="rre-lede">
+              Every search is a signal. We learn from all of them, catch the queries
+              quietly leaking revenue, and fix them — in the search engine or your
+              product catalog. Scroll to run the engine.
+            </p>
+          </header>
           <iframe
             class="rres-frame"
             src={`${base}/anim/recovery-engine-scroll.html`}
@@ -795,6 +810,25 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       display: block;
       background: transparent;
       color-scheme: dark;
+    }
+    /* single column below lg (copy above the track), two columns inside
+       the pinned stage at lg+: text left, animation right */
+    .rres-cols {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .rres-side { display: none; }
+    @media (min-width: 1024px) {
+      .rres-head-sm { display: none; }
+      .rres-cols {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+        gap: 64px;
+        /* section already pads 24px; +24 here = the 48px page margin */
+        max-width: 1440px; margin: 0 auto; padding: 0 24px;
+      }
+      .rres-side { display: block; align-self: center; margin: 0; }
+      .rres-frame { max-width: none; }
     }
     @media (max-width: 859px) {
       .rres { padding: 40px 16px 24px; }
@@ -836,13 +870,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        the engine queries and measures that structure.
        ============================================================ */}
   <section class="cps" id="cps" data-screen-label="Catalog Parser">
-    <div class="cps-head-wrap">
+    {/* below lg the head sits above the track; at lg+ it lives inside
+        the pinned stage's left column (.cps-side) */}
+    <div class="cps-head-wrap cps-head-sm">
       <div class="cps-eyebrow">Alchemus — AI catalog optimization agent</div>
       <h2 class="cps-h2">Product Catalog</h2>
       <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
     </div>
     <div class="cps-track">
       <div class="cps-stage">
+        <div class="cps-cols">
+        <div class="cps-side">
+          <div class="cps-eyebrow">Alchemus — AI catalog optimization agent</div>
+          <h2 class="cps-h2">Product Catalog</h2>
+          <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
+        </div>
         <div class="cps-inner">
 
           <div class="cps-sheet">
@@ -865,6 +907,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
           <div class="cps-legend"><span><i style="background:#fff"></i>Product base</span><span><i style="background:#9ec5ff"></i>Attribute</span><span><i style="background:#fae194"></i>Variant axis</span></div>
 
+        </div>
         </div>
         <div class="cps-hint"><b></b><span>Scroll to run the parser</span></div>
       </div>
@@ -1013,6 +1056,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .cps-c-f{font-size:8.5px;gap:5px}
     }
 
+    /* ── site override: two-digit SKUs need only a slim column, which
+       frees width for the product titles (they may wrap). ── */
+    .cps-r-s,.cps-scol{width:48px}
+    @media (max-width:760px){.cps-r-s,.cps-scol{width:36px}}
+
     /* ── site override: section rhythm — more air above the title and
        after the track, matching neighboring sections. ── */
     .cps-head-wrap{padding-top:120px}
@@ -1020,6 +1068,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     @media (max-width:760px){
       .cps-head-wrap{padding-top:80px}
       .cps{padding-bottom:40px}
+    }
+
+    /* ── site override: two-column desktop layout — copy left, parse
+       right — inside the pinned stage; aligned to the page container
+       (max 1440px / 48px margins) like the neighboring sections. The
+       mobile head (.cps-head-sm) aligns at the 16px mobile margin. ── */
+    .cps-cols{width:100%;flex:1;min-height:0;display:flex;flex-direction:column}
+    .cps-side{display:none}
+    .cps-head-wrap{max-width:1440px;padding-left:16px;padding-right:16px}
+    @media (min-width:1024px){
+      .cps-head-sm{display:none}
+      .cps-cols{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:64px;align-items:stretch;max-width:1440px;margin:0 auto;padding:0 16px;}
+      .cps-side{display:block;align-self:center}
+      .cps-inner{margin:0;max-width:none;min-width:0}
     }
   </style>
 
@@ -1061,13 +1123,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           axes: [{ name:"Color", values:["Blue","Black"] },{ name:"Size", values:["Small","Medium"] }] },
       ],
       rows: [
-        { base:"B", sku:"SSC-BLU-S", price:54, flag:"double space normalized", vals:[["Color","Blue"],["Size","Small"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{sep:"  "},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Small",role:"var"}] },
-        { base:"A", sku:"LSE-BLU-M", price:68, vals:[["Color","Blue"],["Size","Medium"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Medium",role:"var"}] },
-        { base:"B", sku:"SSC-BLK-M", price:58, vals:[["Color","Black"],["Size","Medium"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Medium",role:"var"}] },
-        { base:"A", sku:"LSE-BLU-S", price:68, vals:[["Color","Blue"],["Size","Small"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Small",role:"var"}] },
-        { base:"B", sku:"SSC-BLU-M", price:54, vals:[["Color","Blue"],["Size","Medium"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Medium",role:"var"}] },
-        { base:"A", sku:"LSE-BLK-S", price:72, vals:[["Color","Black"],["Size","Small"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Small",role:"var"}] },
-        { base:"B", sku:"SSC-BLK-S", price:58, vals:[["Color","Black"],["Size","Small"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Small",role:"var"}] },
+        { base:"B", sku:"01", price:54, flag:"double space normalized", vals:[["Color","Blue"],["Size","Small"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{sep:"  "},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Small",role:"var"}] },
+        { base:"A", sku:"02", price:68, vals:[["Color","Blue"],["Size","Medium"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Medium",role:"var"}] },
+        { base:"B", sku:"03", price:58, vals:[["Color","Black"],["Size","Medium"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Medium",role:"var"}] },
+        { base:"A", sku:"04", price:68, vals:[["Color","Blue"],["Size","Small"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Small",role:"var"}] },
+        { base:"B", sku:"05", price:54, vals:[["Color","Blue"],["Size","Medium"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Blue",role:"var"},{t:"Medium",role:"var"}] },
+        { base:"A", sku:"06", price:72, vals:[["Color","Black"],["Size","Small"]], tokens:[{t:"Long sleeve",role:"attr"},{t:"Elegant",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Small",role:"var"}] },
+        { base:"B", sku:"07", price:58, vals:[["Color","Black"],["Size","Small"]], tokens:[{t:"Short sleeve",role:"attr"},{t:"casual",role:"attr"},{t:"button down",role:"attr"},{t:"shirt",role:"type"},{t:"Black",role:"var"},{t:"Small",role:"var"}] },
       ],
     };
   </script>
@@ -1333,7 +1395,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       width: 100%;
     }
     @media (max-width: 1100px) {
-      .hero-v2-grid { grid-template-columns: 1fr; gap: 56px; }
+      /* minmax(0,1fr), not 1fr: plain 1fr means minmax(auto,1fr), and the
+         nowrap headline's min-content width would inflate the column past
+         the viewport, clipping the title/CTAs/stat box on the right. */
+      .hero-v2-grid { grid-template-columns: minmax(0, 1fr); gap: 56px; }
     }
 
     .hero-v2-headline {
@@ -1353,6 +1418,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-size: 0.75em;
       margin-right: 0.08em;
       position: relative; top: -0.02em;
+    }
+    /* must come AFTER the base .hero-v2-line rule to win the cascade:
+       scale the nowrap headline to the viewport so it never clips */
+    @media (max-width: 767px) {
+      .hero-v2-line { font-size: clamp(24px, 8.4vw, 38px); }
     }
 
     .hero-v2-tagline {

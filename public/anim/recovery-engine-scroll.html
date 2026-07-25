@@ -245,12 +245,30 @@
   try{ SLEN=document.getElementById('mSpark').getTotalLength(); }catch(e){}
   const TOTREV=EVENTS.reduce((a,e)=>a+e.row.mo,0);
 
+  /* The pipeline card must NOT resize with its content (that would push
+     the Recovery Monitor up and down): measure the tallest leak/fix
+     state across every event and lock the card to that height. */
+  function lockPipeHeight(){
+    const pipe=$('#mPipe');
+    pipe.style.minHeight='';
+    let max=0;
+    EVENTS.forEach(ev=>{
+      setPipe('leak',ev); max=Math.max(max,pipe.offsetHeight);
+      setPipe('fix',ev);  max=Math.max(max,pipe.offsetHeight);
+    });
+    setPipe('idle',EVENTS[0]);
+    pipe.style.minHeight=max+'px';
+  }
+
   let zoom=1;
   function fit(){
     document.body.style.zoom='1';
+    lockPipeHeight();
     const need=$('#mWrap').offsetHeight+16;
     zoom=Math.max(0.55,Math.min(1,innerHeight/need));
     document.body.style.zoom=zoom<0.999?String(zoom.toFixed(3)):'1';
+    // wrapping differs at the applied zoom — re-lock in the final space
+    if(zoom<0.999) lockPipeHeight();
   }
   function center(el){ const r=el.getBoundingClientRect(); return {x:(r.left+r.width/2)/zoom, y:(r.top+r.height/2)/zoom}; }
 
