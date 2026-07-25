@@ -9,35 +9,48 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-  /* Scroll-driven traffic monitoring: every visual is a pure function of
-     a progress value p (0→1) posted by the parent as {type:'tdm-p', p}.
-     Three dark chart cards on the transparent (yellow) band:
-       1 · week-over-week bars   — pink alarm line, last bar GREEN (healthy)
-       2 · accumulated drift     — pink decision limit, end dot GREEN (healthy)
-       3 · daily vs rolling week — the rolling line deliberately crosses the
-           pink threshold and turns RED, then the other charts fade, chart 3
-           moves left and the phone slides in from the right with an arrow
-           from the breach to the notification it triggered. */
+  /* Scroll-driven traffic monitoring. Every visual is a pure function of a
+     progress value p (0→1) posted by the parent as {type:'tdm-p', p}.
+
+     The charts are faithful replicas of the app.grolabs.ai Signals
+     dashboard (signal-charts-client.tsx + signal-chart-util.tsx): same
+     geometry, palette, midpoint-cubic smoothing, gradient area fades,
+     axis/caption typography and copy. Deviations, per direction:
+     thresholds in the app's LIGHT red (--danger #fca5a5) instead of solid
+     red; healthy endings in green; the rolling-week chart deliberately
+     trends down and breaches its threshold to trigger the phone alert. */
   :root{
-    --card:#131316; --line:rgba(255,255,255,.09); --bone:#EDEAE0;
-    --dim:rgba(237,234,224,.55); --pink:#f0a3a3; --green:#34d399;
-    --red:#ef4444; --blue:#9ec5ff; --grey:#7c7d85;
-    --mono:ui-monospace,Menlo,monospace; --sans:"Hanken Grotesk",-apple-system,sans-serif;
+    --blue:#7fb0c9; --green:#34d399; --red:#ef4444; --red-soft:#fca5a5;
+    --text:#edeae0; --strong:#fff;
+    --t2:rgba(237,234,224,.6); --t3:rgba(237,234,224,.4);
+    --muted:rgba(237,234,224,.35);
+    --page-bg:#0d0d10;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,monospace;
+    --sans:"Hanken Grotesk",-apple-system,sans-serif;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;}
-  body{background:transparent; font-family:var(--sans); color:var(--bone); padding:8px; overflow:hidden; height:100svh; display:grid; place-items:center;}
+  body{background:transparent; font-family:var(--sans); color:var(--text); padding:8px; overflow:hidden; height:100svh; display:grid; place-items:center;}
   .w{position:relative; width:100%; max-width:1000px; margin:0 auto;}
   .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; transform-origin:left center;}
-  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px 10px; box-shadow:0 18px 40px -18px rgba(0,0,0,.55); transition:border-color .3s, box-shadow .3s;}
+  /* the app's dark glass tile (insights.css --tile) composited over an
+     opaque dark base so it stays dashboard-dark on the yellow band */
+  .card{
+    background:linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.02) 60%,rgba(255,255,255,.035)), var(--page-bg);
+    border:0; border-radius:14px; padding:14px 16px 12px;
+    box-shadow:0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07);
+    transition:box-shadow .3s;
+  }
   .card.wide{grid-column:1/-1;}
-  .card.alert{border-color:rgba(239,68,68,.65); box-shadow:0 18px 40px -18px rgba(0,0,0,.55),0 0 0 1px rgba(239,68,68,.35),0 0 26px rgba(239,68,68,.22);}
-  .ct{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:#9a9ba6; margin-bottom:6px;}
-  .cc{font-size:10.5px; line-height:1.45; color:var(--dim); margin-top:6px;}
-  .cl{display:flex; gap:12px; margin:2px 0 4px; font-family:var(--mono); font-size:8.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--dim);}
-  .cl i{display:inline-block; width:10px; height:2.5px; border-radius:2px; vertical-align:2px; margin-right:5px;}
-  svg{display:block; width:100%; height:auto;}
-  @media (max-width:680px){ .grid{grid-template-columns:1fr; gap:9px;} .card{padding:10px 11px 8px;} }
+  .card.alert{box-shadow:0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px rgba(239,68,68,.4), 0 0 26px rgba(239,68,68,.2);}
+  .ct{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text); margin-bottom:8px;}
+  .sig-note{font-size:10.5px; color:var(--t3); line-height:1.5; margin-top:8px; }
+  .sig-legend{display:flex; flex-wrap:wrap; gap:14px; font-size:10.5px; color:var(--t2); margin:2px 0 8px;}
+  .sig-legend .k{display:inline-flex; align-items:center; gap:6px;}
+  .sig-legend .ln{width:16px; height:0; border-top:2px solid var(--blue); border-radius:2px;}
+  .sig-legend .ln.mut{border-top-width:1.5px; border-color:var(--muted);}
+  svg.sigchart{display:block; width:100%; height:auto;}
+  @media (max-width:680px){ .grid{grid-template-columns:1fr; gap:9px;} .card{padding:11px 12px 9px;} }
 
   /* phone — slides in from the right during the hand-off */
   .phone{position:absolute; right:0; top:50%; width:212px; background:#0f1014; border:1.5px solid rgba(255,255,255,.16); border-radius:26px; padding:14px 13px 18px; box-shadow:0 24px 60px -18px rgba(0,0,0,.65); opacity:0; pointer-events:none;}
@@ -47,7 +60,7 @@
   .ph-card{background:#17181d; border:1.5px solid rgba(239,68,68,.6); border-radius:13px; padding:11px; display:flex; gap:9px; box-shadow:0 0 22px rgba(239,68,68,.18);}
   .ph-ic{flex:none; width:26px; height:26px; border-radius:8px; background:var(--red); color:#fff; font-weight:800; font-size:15px; display:grid; place-items:center;}
   .ph-tt{font-size:11.5px; font-weight:700; color:#fff; line-height:1.25;}
-  .ph-tt b{color:#f0a3a3;}
+  .ph-tt b{color:var(--red-soft);}
   .ph-tx{font-size:10px; line-height:1.4; color:rgba(237,234,224,.6); margin-top:3px;}
   @media (max-width:680px){ .phone{width:172px; border-radius:22px; padding:11px 10px 14px;} .ph-time{font-size:26px;} }
 
@@ -60,20 +73,23 @@
 <div class="w" id="wrap">
   <div class="grid" id="grid">
     <div class="card" id="c1">
-      <div class="ct">Week-over-week change</div>
-      <svg id="s1" viewBox="0 0 320 148" aria-hidden="true"></svg>
-      <div class="cc">Each bar compares one week to the one before. A slow decline never trips this alarm.</div>
+      <div class="ct">Week-over-week change — the detector that misses slow drift</div>
+      <svg id="s1" class="sigchart" viewBox="0 0 360 190" aria-hidden="true"></svg>
+      <div class="sig-note">Each bar compares one week to the one before. A slow decline never trips this alarm — six weeks of −1% each stay invisible here.</div>
     </div>
     <div class="card" id="c2">
       <div class="ct">Accumulated drift (CUSUM)</div>
-      <svg id="s2" viewBox="0 0 320 148" aria-hidden="true"></svg>
-      <div class="cc">Every small shortfall adds up — sustained drift shows weeks before any single-week alarm.</div>
+      <svg id="s2" class="sigchart" viewBox="0 0 360 190" aria-hidden="true"></svg>
+      <div class="sig-note">Adds up every small shortfall below the baseline. Sustained drift crosses the decision limit weeks before any single-week alarm would fire.</div>
     </div>
     <div class="card wide" id="c3">
       <div class="ct">Daily sessions vs the rolling week</div>
-      <div class="cl"><span><i style="background:var(--grey)"></i>daily sessions</span><span><i style="background:var(--blue)"></i>7-day rolling average</span></div>
-      <svg id="s3" viewBox="0 0 640 190" aria-hidden="true"></svg>
-      <div class="cc">Days have their own rhythm — the rolling line is the honest trend.</div>
+      <div class="sig-legend">
+        <span class="k"><i class="ln mut"></i>daily sessions</span>
+        <span class="k"><i class="ln"></i>7-day rolling average</span>
+      </div>
+      <svg id="s3" class="sigchart" viewBox="0 0 720 190" aria-hidden="true"></svg>
+      <div class="sig-note">Days of the week have their own rhythm, so any two adjacent days differ for reasons that have nothing to do with performance. The rolling line is the honest trend.</div>
     </div>
   </div>
 
@@ -100,78 +116,139 @@
   const ease=k=>1-Math.pow(1-k,3);
   const seg=(t,a,b)=>clamp((t-a)/(b-a),0,1);
   const NS='http://www.w3.org/2000/svg';
-  const el=(n,at)=>{const e=document.createElementNS(NS,n);for(const k in at)e.setAttribute(k,at[k]);return e;};
+  const el=(n,at,parent)=>{const e=document.createElementNS(NS,n);for(const k in at)e.setAttribute(k,at[k]);if(parent)parent.appendChild(e);return e;};
+  const txt=(at,s,parent)=>{const t=el('text',at,parent);t.textContent=s;return t;};
+
+  /* ── the app's drawing vocabulary (signal-chart-util) ── */
+  const AX='rgba(237,234,224,0.4)', GRID='rgba(255,255,255,0.06)',
+        CENTRE='rgba(237,234,224,0.45)', BLUE='#7fb0c9', REDS='#fca5a5',
+        RED='#ef4444', GREEN='#34d399', MUTED='rgba(237,234,224,0.35)',
+        T2='rgba(237,234,224,0.6)', PAGE='#0d0d10', F=9.5, MONO='ui-monospace,Menlo,monospace';
+  const lin=(d0,d1,r0,r1)=>{const s=d1-d0||1;return v=>r0+((v-d0)/s)*(r1-r0);};
+  function smoothPath(xs,ys){
+    if(!xs.length)return'';
+    let d='M'+xs[0].toFixed(1)+' '+ys[0].toFixed(1);
+    for(let i=0;i<xs.length-1;i++){
+      const mx=((xs[i]+xs[i+1])/2).toFixed(1);
+      d+=' C '+mx+' '+ys[i].toFixed(1)+' '+mx+' '+ys[i+1].toFixed(1)+' '+xs[i+1].toFixed(1)+' '+ys[i+1].toFixed(1);
+    }
+    return d;
+  }
+  let gradN=0;
+  function grad(svg,color,strong){
+    const id='g'+(gradN++);
+    const defs=el('defs',{},svg);
+    const lg=el('linearGradient',{id,x1:0,y1:0,x2:0,y2:1},defs);
+    if(strong){
+      el('stop',{offset:'0%','stop-color':color,'stop-opacity':.38},lg);
+      el('stop',{offset:'55%','stop-color':color,'stop-opacity':.14},lg);
+      el('stop',{offset:'100%','stop-color':color,'stop-opacity':0},lg);
+    } else {
+      el('stop',{offset:'0%','stop-color':color,'stop-opacity':.22},lg);
+      el('stop',{offset:'100%','stop-color':color,'stop-opacity':0},lg);
+    }
+    return id;
+  }
+  function clipRect(svg,x,h){
+    const id='c'+(gradN++);
+    const cp=el('clipPath',{id},el('defs',{},svg));
+    const r=el('rect',{x,y:0,width:0,height:h},cp);
+    return {id,r,x0:x};
+  }
 
   /* timeline */
   const PH={ in:[0,0.05], c1:[0.05,0.26], c2:[0.27,0.47],
              c3g:[0.49,0.61], c3b:[0.59,0.75], c3r:[0.73,0.79],
              slide:[0.82,0.93], arrow:[0.93,0.99] };
 
-  /* ── chart 1 · WoW bars. last bar is above the alarm → GREEN ── */
+  /* ── chart 1 · WoW bars (WowBars replica). Last bar above the alarm → GREEN ── */
   const s1=$('#s1');
-  const B={y0:66, px:7.2, alarm:-5};
-  const VALS=[0.6,2.1,-0.8,-1.6,2.3,-3.4,1.9,-3.2,5.6,-1.1,-3.6,1.8];
-  s1.appendChild(el('line',{x1:16,y1:B.y0,x2:308,y2:B.y0,stroke:'rgba(255,255,255,.25)','stroke-width':1}));
-  const alarmY=B.y0-B.alarm*B.px;
-  s1.appendChild(el('line',{id:'a1',x1:16,y1:alarmY,x2:308,y2:alarmY,stroke:'var(--pink)','stroke-width':2,opacity:0}));
-  const a1t=el('text',{x:308,y:alarmY+16,fill:'var(--pink)','text-anchor':'end','font-size':11,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
-  a1t.textContent='point alarm −5%'; a1t.id='a1t'; s1.appendChild(a1t);
-  const bars=VALS.map((v,i)=>{
-    const r=el('rect',{x:20+i*24,width:15,rx:2,fill:i===VALS.length-1?'var(--green)':'var(--grey)'});
-    s1.appendChild(r); return {r,v};
-  });
+  {const W=360,H=190,m={l:34,r:6,t:12,b:22},mag=8;
+   var y1=lin(-mag,mag,H-m.b,m.t), x1=lin(0,11,m.l+10,W-m.r-10), bw1=10;
+   [-mag,0,mag].forEach(g=>{
+     el('line',{x1:m.l,x2:W-m.r,y1:y1(g),y2:y1(g),stroke:g===0?CENTRE:GRID,'stroke-width':1},s1);
+     txt({x:m.l-4,y:y1(g)+3,'font-size':F,fill:AX,'text-anchor':'end','font-family':MONO},(g>0?'+':'')+Math.round(g)+'%',s1);
+   });
+   el('line',{id:'a1',x1:m.l,x2:W-m.r,y1:y1(-5),y2:y1(-5),stroke:REDS,'stroke-width':1.2,opacity:0},s1);
+   txt({id:'a1t',x:W-m.r,y:y1(-5)+11,'font-size':F,fill:REDS,'text-anchor':'end','font-family':MONO},'point alarm −5%',s1);
+   $('#a1t').setAttribute('opacity',0);
+   var VALS=[0.4,2.1,-0.8,-1.6,2.3,-3.4,1.9,-3.2,5.6,-1.1,-3.6,1.8];
+   var bars=VALS.map((v,i)=>({v,r:el('rect',{x:x1(i)-bw1/2,width:bw1,rx:1.5,fill:i===11?GREEN:MUTED},s1)}));
+   [[0,'Apr 20'],[6,'Jun 1'],[11,'Jul 13']].forEach(([i,s])=>txt({x:x1(i),y:H-6,'font-size':F,fill:AX,'text-anchor':'middle','font-family':MONO},s,s1));
+   var B1={y:y1};}
 
-  /* ── chart 2 · CUSUM. stays below the limit → end dot GREEN ── */
+  /* ── chart 2 · CUSUM (CusumChart replica), GREEN = staying under the limit ── */
   const s2=$('#s2');
-  const limY=52;
-  s2.appendChild(el('line',{x1:16,y1:132,x2:308,y2:132,stroke:'rgba(255,255,255,.25)','stroke-width':1}));
-  s2.appendChild(el('line',{id:'a2',x1:16,y1:limY,x2:308,y2:limY,stroke:'var(--pink)','stroke-width':2,opacity:0}));
-  const a2t=el('text',{x:18,y:limY-7,fill:'var(--pink)','font-size':11,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
-  a2t.textContent='decision limit'; a2t.id='a2t'; s2.appendChild(a2t);
-  const cus=el('path',{d:'M20 128 C60 128 80 127 104 124 C136 120 150 113 174 106 C198 99 214 94 238 86 C262 78 280 72 296 68',stroke:'var(--blue)','stroke-width':2.5,fill:'none','stroke-linecap':'round'});
-  s2.appendChild(cus);
-  const dot2=el('circle',{cx:296,cy:68,r:4.5,fill:'var(--green)',opacity:0}); dot2.id='dot2'; s2.appendChild(dot2);
-  const L2=cus.getTotalLength();
+  {const W=360,H=190,m={l:34,r:6,t:14,b:22};
+   const CUS=[0,0.1,0.3,0.4,0.7,1.1,1.4,1.9,2.6,3.2,3.9,4.6], h=6.5;
+   const hi=Math.max(...CUS,h)*1.15;
+   const y=lin(0,hi,H-m.b,m.t), x=lin(0,11,m.l+10,W-m.r-10);
+   [0,hi/2,hi].forEach(g=>el('line',{x1:m.l,x2:W-m.r,y1:y(g),y2:y(g),stroke:g===0?CENTRE:GRID,'stroke-width':1},s2));
+   el('line',{id:'a2',x1:m.l,x2:W-m.r,y1:y(h),y2:y(h),stroke:REDS,'stroke-width':1.2,opacity:0},s2);
+   txt({id:'a2t',x:m.l+2,y:y(h)-5,'font-size':F,fill:REDS,'font-family':MONO},'decision limit',s2);
+   $('#a2t').setAttribute('opacity',0);
+   const xs=CUS.map((_,i)=>x(i)), ys=CUS.map(v=>y(v));
+   const line=smoothPath(xs,ys);
+   const gid=grad(s2,GREEN,true);
+   var clip2=clipRect(s2,m.l,H);
+   const g2=el('g',{'clip-path':'url(#'+clip2.id+')'},s2);
+   el('path',{d:line+' L'+xs[11].toFixed(1)+' '+y(0).toFixed(1)+' L'+xs[0].toFixed(1)+' '+y(0).toFixed(1)+' Z',fill:'url(#'+gid+')'},g2);
+   el('path',{d:line,fill:'none',stroke:GREEN,'stroke-width':2.2,'stroke-linejoin':'round'},g2);
+   el('circle',{id:'dot2',cx:xs[11],cy:ys[11],r:4,fill:GREEN,stroke:PAGE,'stroke-width':1.5,opacity:0},s2);
+   [[0,'Apr 20'],[6,'Jun 1'],[11,'Jul 13']].forEach(([i,s])=>txt({x:x(i),y:H-6,'font-size':F,fill:AX,'text-anchor':'middle','font-family':MONO},s,s2));
+   var C2={plotW:W-m.r-m.l};}
 
-  /* ── chart 3 · daily vs rolling. crosses the threshold → RED ── */
+  /* ── chart 3 · daily vs rolling week (DailyRollingChart replica) —
+        clear downward trend, waves + gradient shadow, deliberate breach ── */
   const s3=$('#s3');
-  const TH=118;
-  const RPTS=[[30,72],[110,76],[190,80],[262,85],[330,90],[396,96],[458,103],[506,112],[536,120],[572,127],[610,133]];
-  const rollY=x=>{ for(let i=1;i<RPTS.length;i++){ if(x<=RPTS[i][0]){ const [x0,y0]=RPTS[i-1],[x1,y1]=RPTS[i]; return y0+(y1-y0)*(x-x0)/(x1-x0);} } return RPTS[RPTS.length-1][1]; };
-  s3.appendChild(el('line',{x1:20,y1:168,x2:620,y2:168,stroke:'rgba(255,255,255,.25)','stroke-width':1}));
-  s3.appendChild(el('line',{id:'a3',x1:20,y1:TH,x2:620,y2:TH,stroke:'var(--pink)','stroke-width':2,'stroke-dasharray':'6 5',opacity:0}));
-  const a3t=el('text',{x:22,y:TH-7,fill:'var(--pink)','font-size':11,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
-  a3t.textContent='daily threshold'; a3t.id='a3t'; s3.appendChild(a3t);
-  let dd='M30 '+(rollY(30)+30).toFixed(1);
-  for(let x=36;x<=610;x+=6) dd+=' L'+x+' '+(rollY(x)+30*Math.sin((x-30)/16)).toFixed(1);
-  const daily=el('path',{d:dd,stroke:'rgba(255,255,255,.28)','stroke-width':1.5,fill:'none'});
-  s3.appendChild(daily);
-  const L3d=daily.getTotalLength();
-  const rollD='M'+RPTS.map(p=>p[0]+' '+p[1]).join(' L');
-  const roll=el('path',{d:rollD,stroke:'var(--blue)','stroke-width':3,fill:'none','stroke-linecap':'round'});
-  s3.appendChild(roll);
-  const L3r=roll.getTotalLength();
-  // crossing of the rolling line with TH is between (506,112) and (536,120)
-  const XC=506+(536-506)*(TH-112)/(120-112);
-  const redD='M'+XC.toFixed(1)+' '+TH+' L536 120 L572 127 L610 133';
-  const red=el('path',{d:redD,stroke:'var(--red)','stroke-width':3.2,fill:'none','stroke-linecap':'round'});
-  s3.appendChild(red);
-  const L3x=red.getTotalLength();
-  const dot3=el('circle',{cx:610,cy:133,r:5,fill:'var(--red)',opacity:0}); dot3.id='c3dot'; s3.appendChild(dot3);
-  const ann=el('text',{x:606,y:152,fill:'var(--red)','text-anchor':'end','font-size':12,'font-weight':600,'font-family':'ui-monospace,Menlo,monospace',opacity:0});
-  ann.textContent='121/day · −5.3% below threshold'; ann.id='c3ann'; s3.appendChild(ann);
+  {const W=720,H=190,m={l:36,r:64,t:12,b:22},N=56;
+   const roll=i=>137-16*Math.pow(i/(N-1),1.15)+0.8*Math.sin(i/4);
+   const daily=i=>roll(i)+24*Math.sin(2*Math.PI*((i-2)%7)/7)+3*Math.sin(i/2.6);
+   const dv=[],rv=[];
+   for(let i=0;i<N;i++){dv.push(daily(i));rv.push(roll(i));}
+   const lo=Math.min(...dv),hiV=Math.max(...dv),span=hiV-lo;
+   const d0=lo-span*0.1,d1=hiV+span*0.1;
+   const x=lin(0,N-1,m.l,W-m.r), y=lin(d0,d1,H-m.b,m.t);
+   const TH=127.8;
+   [d0+(d1-d0)*0.15,(d0+d1)/2,d1-(d1-d0)*0.15].map(Math.round).forEach(g=>{
+     el('line',{x1:m.l,x2:W-m.r,y1:y(g),y2:y(g),stroke:GRID,'stroke-width':1},s3);
+     txt({x:m.l-4,y:y(g)+3,'font-size':F,fill:AX,'text-anchor':'end','font-family':MONO},String(g),s3);
+   });
+   el('line',{id:'a3',x1:m.l,x2:W-m.r,y1:y(TH),y2:y(TH),stroke:REDS,'stroke-width':1.2,'stroke-dasharray':'5 4',opacity:0},s3);
+   txt({id:'a3t',x:m.l+4,y:y(TH)-6,'font-size':F,fill:REDS,'font-family':MONO},'daily threshold',s3);
+   $('#a3t').setAttribute('opacity',0);
+   const xs=dv.map((_,i)=>x(i));
+   const dailyLine=smoothPath(xs,dv.map(v=>y(v)));
+   var clip3d=clipRect(s3,m.l,H);
+   const gd=el('g',{'clip-path':'url(#'+clip3d.id+')'},s3);
+   el('path',{d:dailyLine,fill:'none',stroke:MUTED,'stroke-width':1.2,'stroke-linejoin':'round'},gd);
+   const rollLine=smoothPath(xs,rv.map(v=>y(v)));
+   const gid3=grad(s3,BLUE,false);
+   var clip3b=clipRect(s3,m.l,H);
+   const gb=el('g',{'clip-path':'url(#'+clip3b.id+')'},s3);
+   el('path',{d:rollLine+' L '+xs[N-1].toFixed(1)+' '+(H-m.b)+' L '+xs[0].toFixed(1)+' '+(H-m.b)+' Z',fill:'url(#'+gid3+')'},gb);
+   el('path',{d:rollLine,fill:'none',stroke:BLUE,'stroke-width':2.4,'stroke-linejoin':'round'},gb);
+   // red overlay: the rolling tail once it falls through the threshold
+   let ci=0; for(let i=0;i<N;i++){ if(rv[i]<TH){ ci=i; break; } }
+   var clip3r=clipRect(s3,x(ci),H);
+   const gr=el('g',{'clip-path':'url(#'+clip3r.id+')'},s3);
+   el('path',{d:smoothPath(xs.slice(ci),rv.slice(ci).map(v=>y(v))),fill:'none',stroke:RED,'stroke-width':2.6,'stroke-linejoin':'round'},gr);
+   el('circle',{id:'c3dot',cx:xs[N-1],cy:y(rv[N-1]),r:3.5,fill:BLUE,stroke:PAGE,'stroke-width':1.5,opacity:0},s3);
+   txt({id:'c3end',x:xs[N-1]+8,y:y(rv[N-1])+3,'font-size':F,fill:T2,'font-family':MONO},'121/day',s3);
+   $('#c3end').setAttribute('opacity',0);
+   txt({id:'c3ann',x:xs[N-1]+8,y:y(rv[N-1])+16,'font-size':F,fill:RED,'font-family':MONO},'−5.3% below threshold',s3);
+   $('#c3ann').setAttribute('opacity',0);
+   [[0,'May 29'],[18,'Jun 16'],[37,'Jul 5'],[55,'Jul 23']].forEach(([i,s])=>txt({x:x(i),y:H-6,'font-size':F,fill:AX,'text-anchor':'middle','font-family':MONO},s,s3));
+   var C3={plotW:W-m.r-m.l,xc:x(ci),xEnd:x(N-1)};}
 
-  const dash=(p,len,k)=>{ p.style.strokeDasharray=(len*k).toFixed(1)+' '+(len+2).toFixed(1); };
-
-  let zoom=1, mobile=false;
+  let zoom=1;
   function fit(){
     document.body.style.zoom='1';
-    mobile=matchMedia('(max-width:680px)').matches;
     const need=$('#wrap').offsetHeight+16;
     zoom=Math.max(0.5,Math.min(1,innerHeight/need));
     document.body.style.zoom=zoom<0.999?String(zoom.toFixed(3)):'1';
   }
-  const rect=e=>{const r=e.getBoundingClientRect();return {l:r.left/zoom,t:r.top/zoom,r:r.right/zoom,b:r.bottom/zoom,w:r.width/zoom,h:r.height/zoom};};
+  const rect=e=>{const r=e.getBoundingClientRect();return {l:r.left/zoom,t:r.top/zoom,w:r.width/zoom,h:r.h};};
 
   function render(P){
     P=clamp(P,0,1);
@@ -183,37 +260,37 @@
       c.style.transform='translateY('+((1-k)*-8).toFixed(1)+'px)';
     });
 
-    /* chart 1: pink alarm line, then bars grow left→right */
+    /* chart 1: alarm line sweeps in, bars grow left→right */
     const t1=seg(P,PH.c1[0],PH.c1[1]);
     const aw=ease(seg(t1,0,0.14));
-    $('#a1').style.opacity=aw; $('#a1t').style.opacity=aw;
-    $('#a1').setAttribute('x2',(16+292*aw).toFixed(1));
+    $('#a1').setAttribute('opacity',aw); $('#a1t').setAttribute('opacity',aw);
     bars.forEach((b,i)=>{
-      const k=ease(seg(t1,0.10+i*0.072,0.10+i*0.072+0.09));
-      const h=Math.abs(b.v)*B.px*k;
+      const k=ease(seg(t1,0.10+i*0.072,0.19+i*0.072));
+      const h=Math.abs(B1.y(b.v)-B1.y(0))*k;
       b.r.setAttribute('height',Math.max(0.01,h).toFixed(1));
-      b.r.setAttribute('y',(b.v>0?B.y0-h:B.y0).toFixed(1));
+      b.r.setAttribute('y',(b.v>0?B1.y(0)-h:B1.y(0)).toFixed(1));
     });
 
-    /* chart 2: pink limit, CUSUM draws, green dot when it lands */
+    /* chart 2: limit in, green drift line + area reveal, end dot */
     const t2=seg(P,PH.c2[0],PH.c2[1]);
     const aw2=ease(seg(t2,0,0.14));
-    $('#a2').style.opacity=aw2; $('#a2t').style.opacity=aw2;
-    $('#a2').setAttribute('x2',(16+292*aw2).toFixed(1));
-    dash(cus,L2,ease(seg(t2,0.10,0.95)));
-    $('#dot2').style.opacity=seg(t2,0.95,1);
+    $('#a2').setAttribute('opacity',aw2); $('#a2t').setAttribute('opacity',aw2);
+    clip2.r.setAttribute('width',(C2.plotW*ease(seg(t2,0.10,0.95))).toFixed(1));
+    $('#dot2').setAttribute('opacity',seg(t2,0.93,1));
 
-    /* chart 3: threshold + grey daily, blue rolling, red breach */
+    /* chart 3: threshold + grey daily, blue rolling + shadow, red breach */
     const g3=seg(P,PH.c3g[0],PH.c3g[1]);
     const aw3=ease(seg(g3,0,0.2));
-    $('#a3').style.opacity=aw3; $('#a3t').style.opacity=aw3;
-    dash(daily,L3d,ease(seg(g3,0.15,1)));
-    dash(roll,L3r,ease(seg(P,PH.c3b[0],PH.c3b[1])));
-    const rk=seg(P,PH.c3r[0],PH.c3r[1]);
-    dash(red,L3x,ease(rk));
-    const breached=P>=PH.c3r[1];
-    $('#c3dot').style.opacity=breached?1:0;
-    $('#c3ann').style.opacity=breached?1:0;
+    $('#a3').setAttribute('opacity',aw3); $('#a3t').setAttribute('opacity',aw3);
+    clip3d.r.setAttribute('width',(C3.plotW*ease(seg(g3,0.15,1))).toFixed(1));
+    clip3b.r.setAttribute('width',(C3.plotW*ease(seg(P,PH.c3b[0],PH.c3b[1]))).toFixed(1));
+    clip3r.r.setAttribute('width',((C3.xEnd-C3.xc+8)*ease(seg(P,PH.c3r[0],PH.c3r[1]))).toFixed(1));
+    const blueDone=P>=PH.c3b[1], breached=P>=PH.c3r[1];
+    $('#c3dot').setAttribute('opacity',blueDone?1:0);
+    $('#c3dot').setAttribute('fill',breached?RED:BLUE);
+    $('#c3end').setAttribute('opacity',blueDone?1:0);
+    $('#c3end').setAttribute('fill',breached?RED:T2);
+    $('#c3ann').setAttribute('opacity',breached?1:0);
     $('#c3').classList.toggle('alert',breached);
 
     /* hand-off: charts 1+2 fade, chart 3 moves left, phone slides in */
@@ -221,8 +298,8 @@
     $('#c1').style.opacity=Math.min(+$('#c1').style.opacity,1-sk).toFixed(3);
     $('#c2').style.opacity=Math.min(+$('#c2').style.opacity,1-sk).toFixed(3);
     const wrap=$('#wrap'), c3=$('#c3'), phone=$('#phone');
-    const s3s=mobile?0.62:0.66;
-    // move chart 3 up toward the vertical middle and shrink to the left
+    const mob=matchMedia('(max-width:680px)').matches;
+    const s3s=mob?0.62:0.66;
     const dy=(wrap.offsetHeight/2)-(c3.offsetTop+c3.offsetHeight/2);
     c3.style.transformOrigin='left center';
     c3.style.transform='translateY('+(dy*sk).toFixed(1)+'px) scale('+(1-(1-s3s)*sk).toFixed(3)+')';
@@ -234,14 +311,16 @@
     const ak=ease(seg(P,PH.arrow[0],PH.arrow[1]));
     const ap=$('#alinkP'), ah=$('#alinkH');
     if(ak>0&&sk>0.98){
-      const w=rect(wrap), d=rect($('#c3dot')), n=rect(phone.querySelector('.ph-card'));
-      const x0=d.l-w.l+6, y0=d.t-w.t, x1=n.l-w.l-8, y1=n.t-w.t+n.h/2;
+      const w=$('#wrap').getBoundingClientRect();
+      const d=$('#c3dot').getBoundingClientRect();
+      const n=phone.querySelector('.ph-card').getBoundingClientRect();
+      const x0=(d.left+d.width/2)/zoom-w.left/zoom+6, y0=(d.top+d.height/2)/zoom-w.top/zoom;
+      const x1=n.left/zoom-w.left/zoom-8, y1=(n.top+n.height/2)/zoom-w.top/zoom;
       const mx=(x0+x1)/2;
       ap.setAttribute('d','M'+x0.toFixed(1)+' '+y0.toFixed(1)+' C'+mx.toFixed(1)+' '+(y0-40).toFixed(1)+' '+mx.toFixed(1)+' '+y1.toFixed(1)+' '+x1.toFixed(1)+' '+y1.toFixed(1));
       const AL=ap.getTotalLength();
       ap.style.strokeDasharray=(AL*ak).toFixed(1)+' '+(AL+2).toFixed(1);
       ap.style.opacity='1';
-      // arrowhead once the tip arrives (arrives moving rightward)
       ah.setAttribute('d','M'+x1+' '+y1+' l-11 -6 M'+x1+' '+y1+' l-11 6');
       ah.style.opacity=ak>0.95?'1':'0';
     } else { ap.style.opacity='0'; ah.style.opacity='0'; }
