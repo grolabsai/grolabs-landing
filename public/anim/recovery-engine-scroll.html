@@ -46,8 +46,6 @@
   /* zone separators */
   .z-lab{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:rgba(237,234,224,.5); transition:filter .5s ease, opacity .5s ease;}
   .z-lab::after{content:""; flex:1; height:1px; background:linear-gradient(90deg,rgba(255,255,255,.16),transparent);}
-  .z-lab.sys{color:var(--gold); margin-top:4px;}
-  .z-lab.sys::after{background:linear-gradient(90deg,rgba(250,225,148,.35),transparent);}
 
   /* ── storefront (shopper's screen — light UI) ── */
   .shop{background:#f6f6f4; border-radius:12px; box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.14); overflow:hidden; transition:filter .5s ease, opacity .5s ease;}
@@ -159,7 +157,6 @@
   </div>
 
   <div class="rev" id="revSys">
-  <div class="z-lab sys">GroLabs engine · reacts automatically</div>
   <div class="m-panel m-pipe idle" id="mPipe">
     <div class="m-pipe-col leak" id="pLeak">
       <div class="m-h red">⬤ Revenue leak</div>
@@ -374,21 +371,20 @@
     $('#mSales').textContent=Math.round(sales); $('#mLeaks').textContent=leaks;
 
     /* guide line: drawn from the fresh payout up to the search box during
-       the blink window, held, then erased tail-first (pulled toward the
-       search box) as the next search starts typing. Both transitions. */
-    let gDraw=0,gTail=0,gOn=false;
+       the blink window, then fades out as soon as the draw finishes.
+       Both transitions. */
+    let gDraw=0,gFade=0,gOn=false;
     for(let k=0;k<EVENTS.length-1;k++){
       const dr=ease(seg(P,INTRO+W1*(k+0.92),INTRO+W1*(k+1)));
-      const er=ease(seg(P,INTRO+W1*(k+1.02),INTRO+W1*(k+1.12)));
-      if(dr>0&&er<1){ gDraw=dr; gTail=er; gOn=true; break; }
+      const fd=ease(seg(P,INTRO+W1*(k+1.03),INTRO+W1*(k+1.12)));
+      if(dr>0&&fd<1){ gDraw=dr; gFade=fd; gOn=true; break; }
     }
     const gp=$('#guidePath');
     if(gOn){
-      const headL=GLEN*gDraw, tailL=GLEN*gTail;
-      gp.style.strokeDasharray=Math.max(0,headL-tailL).toFixed(2)+' '+(GLEN*2).toFixed(2);
-      gp.style.strokeDashoffset=(-tailL).toFixed(2);
-      $('#guide').style.opacity='1';
-      $('#guideHead').style.opacity=Math.min(seg(gDraw,0.9,1),1-seg(gTail,0.6,0.9)).toFixed(3);
+      gp.style.strokeDasharray=(GLEN*gDraw).toFixed(2)+' '+(GLEN*2).toFixed(2);
+      gp.style.strokeDashoffset='0';
+      $('#guide').style.opacity=(1-gFade).toFixed(3);
+      $('#guideHead').style.opacity=seg(gDraw,0.9,1).toFixed(3);
     } else $('#guide').style.opacity='0';
 
     /* finale: graph wipes in, recovery panel locks green, rest greys out */
