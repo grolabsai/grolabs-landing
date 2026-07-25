@@ -211,12 +211,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     <div class="rf-track" data-rf-track>
       <div class="rf-pin">
         <div class="rf-inner max-w-page mx-auto">
-          <header class="rf-head">
-            <span class="rf-eyebrow">How?</span>
-            <h2 class="rf-title">GRO Framework</h2>
-          </header>
-
           <div class="rf-grid">
+            <span class="rf-eyebrow">How?</span>
+            <div class="rf-copycol">
+            <h2 class="rf-title">GRO Framework</h2>
             <div class="rf-copy">
               <p>The GRO Framework frees you to:</p>
               {/* G / R / O spelled vertically in a thin left column; the
@@ -230,6 +228,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
                 <span class="rf-cap">O</span>
                 <p>ptimize the revenue recovery engine.</p>
               </div>
+            </div>
             </div>
 
             <div class="rf-box lifted-glass">
@@ -312,7 +311,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .rf-grid {
       display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center;
     }
-    @media (min-width: 1024px) { .rf-grid { grid-template-columns: 2fr 3fr; gap: 56px; } }
+    @media (min-width: 1024px) {
+      /* two rows: eyebrow alone on top; title+copy left and the glass
+         box right SHARE row 2, so the box top == the title top */
+      .rf-grid {
+        grid-template-columns: 2fr 3fr;
+        grid-template-rows: auto 1fr;
+        column-gap: 56px; row-gap: 0;
+        align-items: start;
+      }
+      .rf-grid > .rf-eyebrow { grid-column: 1; grid-row: 1; }
+      .rf-copycol { grid-column: 1; grid-row: 2; }
+      .rf-grid > .rf-box { grid-column: 2; grid-row: 2; align-self: start; }
+    }
+    .rf-copycol .rf-title { margin-bottom: 24px; }
     .rf-copy p {
       font-size: 19px; line-height: 1.65; color: rgba(237, 234, 224, 0.7);
       margin: 0 0 22px;
@@ -763,8 +775,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     <div class="rres-track">
       <div class="rres-stage">
         <div class="rres-cols">
+          <span class="rre-eyebrow rres-eb">AI-Powered Search Engine &amp; Product Data Enrichment</span>
           <header class="rre-head rres-side">
-            <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
             <div class="rre-title-row">
               <h2 class="rre-title">Revenue Recovery Engine</h2>
             </div>
@@ -820,16 +832,21 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       display: flex; flex-direction: column; align-items: center;
     }
     .rres-side { display: none; }
+    .rres-eb { display: none; }
     @media (min-width: 1024px) {
       .rres-head-sm { display: none; }
       .rres-cols {
         display: grid;
         grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-        gap: 64px;
+        grid-template-rows: auto 1fr;
+        column-gap: 64px; row-gap: 0;
+        align-items: start;
         /* section already pads 24px; +24 here = the 48px page margin */
         max-width: 1440px; margin: 0 auto; padding: 0 24px;
       }
-      .rres-side { display: block; align-self: center; margin: 0; }
+      .rres-eb { display: block; grid-column: 1; grid-row: 1; }
+      .rres-side { display: block; margin: 0; grid-column: 1; grid-row: 2; align-self: start; }
+      .rres-cols > .anim-glass { grid-column: 2; grid-row: 2; }
       .rres-frame { max-width: none; }
     }
     @media (max-width: 859px) {
@@ -882,8 +899,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     <div class="cps-track">
       <div class="cps-stage">
         <div class="cps-cols">
+        <div class="cps-eyebrow cps-side-eb">Alchemus — AI catalog optimization agent</div>
         <div class="cps-side">
-          <div class="cps-eyebrow">Alchemus — AI catalog optimization agent</div>
           <h2 class="cps-h2">Product Catalog</h2>
           <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
         </div>
@@ -1079,12 +1096,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        (max 1440px / 48px margins) like the neighboring sections. The
        mobile head (.cps-head-sm) aligns at the 16px mobile margin. ── */
     .cps-cols{width:100%;flex:1;min-height:0;display:flex;flex-direction:column}
-    .cps-side{display:none}
+    .cps-side,.cps-side-eb{display:none}
     .cps-head-wrap{max-width:1440px;padding-left:16px;padding-right:16px}
     @media (min-width:1024px){
       .cps-head-sm{display:none}
-      .cps-cols{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:64px;align-items:stretch;max-width:1440px;margin:0 auto;padding:0 16px;}
-      .cps-side{display:block;align-self:center}
+      .cps-cols{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);grid-template-rows:auto 1fr;column-gap:64px;row-gap:0;align-items:start;max-width:1440px;margin:0 auto;padding:0 16px;}
+      .cps-side-eb{display:block;grid-column:1;grid-row:1}
+      .cps-side{display:block;grid-column:1;grid-row:2;align-self:start}
+      .cps-cols>.anim-glass{grid-column:2;grid-row:2}
       .cps-inner{margin:0;max-width:none;min-width:0}
     }
   </style>
@@ -1428,6 +1447,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        scale the nowrap headline to the viewport so it never clips */
     @media (max-width: 767px) {
       .hero-v2-line { font-size: clamp(24px, 8.4vw, 38px); }
+    }
+    /* two-column hero: size the nowrap headline to its HALF-width column
+       so it never runs under the (translucent) stat card */
+    @media (min-width: 1101px) {
+      .hero-v2-line { font-size: clamp(34px, 3.5vw, 56px); }
     }
 
     .hero-v2-tagline {
@@ -2465,7 +2489,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        charts fade, the breaching chart moves left and the phone slides
        in from the right with an arrow from the breach to the
        notification it triggered. -->
-  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary overflow-hidden reveal" data-tdm>
+  {/* NOTE: no overflow-hidden here — it would break the sticky pin */}
+  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary reveal" data-tdm>
     <div class="max-w-page mx-auto">
       <!-- Eyebrow + title + lede on the yellow surface. -->
       <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
@@ -2516,30 +2541,35 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* ── Lifted glass card — "Subtle · no border" (GLASS-CARDS-HANDOFF) ──
        Refractive translucent fill + saturating blur + inner top highlight
        + soft drop shadow. NO border, NO rim-light stroke. */
+    /* "Glass · no border" — the stronger variant from the handoff §4:
+       55%-opaque fill + heavy saturating blur, so the refraction is
+       actually visible on the dark page. */
     .lifted-glass {
-      background: linear-gradient(160deg,
-        rgba(255,255,255,0.05) 0%,
-        rgba(255,255,255,0.02) 60%,
-        rgba(255,255,255,0.035) 100%),
-        rgba(24,25,31,0.92);
-      backdrop-filter: blur(10px) saturate(135%);
-      -webkit-backdrop-filter: blur(10px) saturate(135%);
+      /* vertical sheen: clearly lighter at the top, falling off to dark */
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.13) 0%,
+        rgba(255,255,255,0.05) 36%,
+        rgba(255,255,255,0.012) 100%),
+        rgba(28,29,36,0.55);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
       border: 0;
-      border-radius: 16px;
+      border-radius: 18px;
       position: relative;
       isolation: isolate;
       box-shadow:
-        0 12px 32px rgba(0,0,0,0.44),
-        inset 0 1px 0 rgba(255,255,255,0.08);
+        0 18px 48px rgba(0,0,0,0.5),
+        inset 0 1px 1px rgba(255,255,255,0.10);
       transition:
         transform .35s cubic-bezier(.2,0,.2,1),
         box-shadow .35s ease;
     }
     .lifted-glass:hover {
-      transform: translateY(-3px);
+      transform: translateY(-4px);
       box-shadow:
-        0 18px 42px rgba(0,0,0,0.5),
-        inset 0 1px 0 rgba(255,255,255,0.13);
+        0 26px 60px rgba(0,0,0,0.56),
+        inset 0 1px 1px rgba(255,255,255,0.16),
+        0 0 28px rgba(250,225,148,0.12);   /* faint brand-yellow bloom */
     }
     .lifted-glass > * { position: relative; z-index: 1; }
     /* Mobile fallback — blur is the expensive part on phones. */
@@ -2547,7 +2577,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .lifted-glass {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
-        background: #191a20;
+        /* same top-to-bottom sheen, as a cheap opaque gradient */
+        background: linear-gradient(180deg, #292a30 0%, #1e1f25 36%, #17181c 100%);
         box-shadow:
           0 8px 22px rgba(0,0,0,0.40),
           inset 0 1px 0 rgba(255,255,255,0.06);
@@ -2567,27 +2598,27 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     @media (min-width: 1024px) {
       .anim-glass {
         display: block;
-        background: linear-gradient(160deg,
-          rgba(255,255,255,0.05) 0%,
-          rgba(255,255,255,0.02) 60%,
-          rgba(255,255,255,0.035) 100%),
-          rgba(24,25,31,0.92);
-        backdrop-filter: blur(10px) saturate(135%);
-        -webkit-backdrop-filter: blur(10px) saturate(135%);
-        border-radius: 16px;
+        background: linear-gradient(180deg,
+          rgba(255,255,255,0.13) 0%,
+          rgba(255,255,255,0.05) 36%,
+          rgba(255,255,255,0.012) 100%),
+          rgba(28,29,36,0.55);
+        backdrop-filter: blur(18px) saturate(180%);
+        -webkit-backdrop-filter: blur(18px) saturate(180%);
+        border-radius: 18px;
         position: relative;
         isolation: isolate;
         box-shadow:
-          0 12px 32px rgba(0,0,0,0.44),
-          inset 0 1px 0 rgba(255,255,255,0.08);
+          0 18px 48px rgba(0,0,0,0.5),
+          inset 0 1px 1px rgba(255,255,255,0.10);
         padding: 14px;
-        height: 100%;
+        /* hug the content — never taller than the animation needs */
+        align-self: start;
+        width: 100%;
         min-height: 0;
       }
       .anim-glass > * { position: relative; z-index: 1; }
-      .anim-glass > iframe { height: 100%; }
-      /* top-align the animation slabs with the section titles */
-      .rres-side, .cps-side { align-self: start !important; padding-top: 6px; }
+      .anim-glass > iframe { height: min(660px, calc(100svh - var(--cps-top, 0px) - 90px)); }
     }
   </style>
 
