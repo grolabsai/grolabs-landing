@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>Revenue Recovery Engine — scroll-driven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet" />
+<style>
+  /* Scroll-driven variant of recovery-engine-mobile.html: every visual is a
+     pure function of a progress value p (0→1) posted by the parent page as
+     {type:'rre-p', p}, so scrolling up rewinds the run exactly. 4 events,
+     compacted vertically so the whole pipeline fits a phone viewport. */
+  :root{
+    --gold:#fae194; --blue:#9ec5ff; --pass:#34d399;
+    --leak:#f0a3a3; --leak-s:#ef4444; --surface:#1a1b22; --bone:#EDEAE0;
+    --mono:ui-monospace,Menlo,monospace; --sans:"Hanken Grotesk",-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:transparent;
+    font-family:var(--sans); color:var(--bone); padding:8px; overflow:hidden;
+    height:100svh; display:grid; place-items:center;
+  }
+  .m-wrap{max-width:460px; width:100%; margin:0 auto; display:flex; flex-direction:column; gap:8px;}
+  .m-panel{background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:11px 12px; box-shadow:0 10px 22px rgba(0,0,0,.5); display:flex; flex-direction:column; transition:filter .5s ease, opacity .5s ease;}
+  /* ended state — grey out everything except the recovered-revenue block */
+  .m-wrap.ended .m-panel:not(.m-recovery){ filter:grayscale(1); opacity:.4; }
+  .m-h{font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;}
+  .m-h .s{display:block; font-size:9px; letter-spacing:.03em; color:rgba(237,234,224,.4); margin-top:3px; text-transform:none;}
+  .green{color:var(--pass);} .gold{color:var(--gold);} .blue{color:var(--blue);} .red{color:var(--leak);} .white{color:var(--bone);}
+
+  /* demand */
+  .m-search{display:flex; align-items:center; gap:8px; background:#0f1015; border:1px solid rgba(255,255,255,.12); border-radius:9px; padding:8px 11px; margin-top:9px;}
+  .m-search .q{font-size:14px; min-height:17px;}
+  .m-caret{display:inline-block; width:1.5px; height:13px; background:var(--pass); animation:blink 1s steps(1) infinite;}
+  @keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
+  .m-scan{position:relative; height:16px; border-radius:6px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); overflow:hidden; display:flex; align-items:center; margin-top:7px;}
+  .m-sweep{position:absolute; top:0; bottom:0; width:64px; left:-64px; background:linear-gradient(90deg,rgba(250,225,148,0),rgba(250,225,148,.5)50%,rgba(250,225,148,0)); animation:mSweep 1.8s linear infinite;}
+  @keyframes mSweep{0%{left:-64px;}100%{left:100%;}}
+  .m-scan span:last-child{position:relative; font-family:var(--mono); font-size:8.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); padding-left:9px;}
+
+  /* pipeline (leak → fix) */
+  .m-pipe{min-height:88px; transition:border-color .25s;}
+  .m-pipe.leak{border-color:var(--leak-s);}
+  .m-pipe.search{border-color:var(--gold);} .m-pipe.catalog{border-color:var(--blue);}
+  .m-pipe.idle{opacity:.5;}
+  .m-pipe.hitp{box-shadow:0 10px 22px rgba(0,0,0,.5),0 0 0 1px rgba(239,68,68,.55),0 0 24px rgba(239,68,68,.28);}
+  .m-pipe-item{font-size:15px; font-weight:600; margin:7px 0 6px; min-height:19px;}
+  .m-pipe-act{font-family:var(--mono); font-size:8.5px; letter-spacing:.12em; text-transform:uppercase; color:rgba(237,234,224,.5); margin-bottom:2px; min-height:10px;}
+  .m-pipe-tag{display:inline-flex; align-self:flex-start; font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:6px; border:1px solid; opacity:0; transition:opacity .25s;}
+  .m-pipe-tag.show{opacity:1;}
+  .m-pipe-tag.leak{color:var(--leak); border-color:rgba(239,68,68,.5); background:rgba(239,68,68,.08);}
+  .m-pipe-tag.search{color:var(--gold); border-color:rgba(250,225,148,.5); background:rgba(250,225,148,.1);}
+  .m-pipe-tag.catalog{color:var(--blue); border-color:rgba(158,197,255,.5); background:rgba(158,197,255,.1);}
+
+  /* recovery */
+  .m-legend{display:flex; gap:12px; margin:7px 0 2px;}
+  .m-legend span{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; color:rgba(237,234,224,.55);}
+  .m-sw{width:8px;height:8px;border-radius:2px;} .m-sw.search{background:var(--gold);} .m-sw.catalog{background:var(--blue);}
+  /* all 4 rows exist from the start (reserved slots) so nothing reflows */
+  .m-table{display:flex; flex-direction:column;}
+  .m-row{display:grid; grid-template-columns:3px 1fr auto auto; gap:8px; align-items:center; padding:6px 2px; border-bottom:1px solid rgba(255,255,255,.06); overflow:hidden;}
+  .m-row:last-child{border-bottom:0;}
+  .m-row .bar{width:3px; height:20px; border-radius:2px;}
+  .m-row.search .bar{background:var(--gold);} .m-row.catalog .bar{background:var(--blue);}
+  .m-row .nm{min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11.5px; font-weight:600;}
+  .m-row .sl{font-family:var(--mono); font-size:9.5px; color:var(--pass); text-align:right;}
+  .m-row .mo{font-family:var(--mono); font-size:11.5px; font-weight:600; text-align:right; min-width:52px;}
+  .m-row.reserved{outline:1px dashed rgba(255,255,255,.12); outline-offset:-2px; border-radius:6px;}
+  .m-row.reserved .bar{opacity:.25;} .m-row.reserved .nm,.m-row.reserved .sl,.m-row.reserved .mo{opacity:0;}
+  .m-row .nm,.m-row .sl,.m-row .mo{transition:opacity .25s;}
+
+  /* graph — space reserved from the start; the trace wipes in with scroll */
+  .m-graph{margin:9px 0 2px; opacity:.35; transition:opacity .3s;}
+  .m-graph.on{opacity:1;}
+  .m-graph svg{display:block; width:100%; height:54px;}
+  .m-glegend{display:flex; gap:12px; margin-top:5px; font-family:var(--mono); font-size:8px; letter-spacing:.05em; text-transform:uppercase;}
+  .m-glegend span{display:inline-flex; align-items:center; gap:5px;}
+  .m-glegend span::before{content:""; width:8px; height:8px; border-radius:2px;}
+  .m-gprev{color:rgba(250,225,148,.8);} .m-gprev::before{background:var(--gold);}
+  .m-grec{color:rgba(52,211,153,.9);} .m-grec::before{background:var(--pass);}
+
+  .m-total{border-top:1px solid rgba(255,255,255,.1); margin-top:8px; padding-top:9px; text-align:right;}
+  .m-total-lab{font-family:var(--mono); font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--pass);}
+  .m-total-val{font-family:"Permanent Marker",cursive; font-size:29px; line-height:1; color:var(--pass); margin:5px 0 3px;}
+  .m-total-val .u{font-size:.42em; opacity:.65;}
+  .m-total-sub{font-family:var(--mono); font-size:9.5px; color:rgba(237,234,224,.55);}
+  .m-total-sub b{color:var(--pass);}
+  .m-recovery.done{border-color:rgba(52,211,153,.45); box-shadow:0 10px 22px rgba(0,0,0,.5),0 0 0 1px rgba(52,211,153,.22),0 0 30px rgba(52,211,153,.12);}
+
+  #mFlyer{position:fixed; left:0; top:0; z-index:90; pointer-events:none; opacity:0; font-family:var(--mono); font-size:10px; font-weight:600; padding:5px 9px; border-radius:7px; border:1px solid; white-space:nowrap; box-shadow:0 6px 18px rgba(0,0,0,.5); transform-origin:center;}
+</style>
+</head>
+<body>
+<div class="m-wrap" id="mWrap">
+
+  <div class="m-panel">
+    <div class="m-h green">Demand Monitor<span class="s">every search scored — green passes, red leaks</span></div>
+    <div class="m-search" id="mSearch"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(237,234,224,.5)" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="q" id="mQ"></span><span class="m-caret"></span></div>
+    <div class="m-scan"><span class="m-sweep"></span><span>Analyzing…</span></div>
+  </div>
+
+  <div class="m-panel m-pipe idle" id="mPipe">
+    <div class="m-h red" id="mPipeH">⬤ Revenue leak</div>
+    <div class="m-pipe-act" id="mAct"></div>
+    <div class="m-pipe-item" id="mItem">awaiting query</div>
+    <div class="m-pipe-tag" id="mTag">idle</div>
+  </div>
+
+  <div class="m-panel m-recovery" id="mRecovery">
+    <div class="m-h green">Recovery Monitor<span class="s">recovered revenue per fix</span></div>
+    <div class="m-legend"><span><i class="m-sw search"></i> Search fix</span><span><i class="m-sw catalog"></i> Catalog fix</span></div>
+    <div class="m-table" id="mTable"></div>
+    <div class="m-graph" id="mGraph">
+      <svg viewBox="0 0 300 80" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="mgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34d399" stop-opacity=".5"/><stop offset="1" stop-color="#34d399" stop-opacity=".04"/></linearGradient>
+          <linearGradient id="mgY" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fae194" stop-opacity=".22"/><stop offset="1" stop-color="#fae194" stop-opacity=".03"/></linearGradient>
+        </defs>
+        <path d="M0,56 L300,56 L300,80 L0,80 Z" fill="url(#mgY)"/>
+        <line x1="0" y1="56" x2="300" y2="56" stroke="#fae194" stroke-width="1.5" stroke-opacity=".75"/>
+        <g id="mTrace" style="clip-path:inset(0 100% 0 0)">
+          <path d="M0,56 L75,47 L150,38 L225,25 L300,14 L300,56 Z" fill="url(#mgG)"/>
+          <path d="M0,56 L75,47 L150,38 L225,25 L300,14" fill="none" stroke="#34d399" stroke-width="2"/>
+        </g>
+      </svg>
+      <div class="m-glegend"><span class="m-gprev">Previous revenue (flat)</span><span class="m-grec">Recovered revenue</span></div>
+    </div>
+    <div class="m-total">
+      <div class="m-total-lab">Revenue recovered</div>
+      <div class="m-total-val" id="mRev">$0<span class="u"> /mo</span></div>
+      <div class="m-total-sub"><span id="mLeaks">0</span> leaks fixed · <b>+<span id="mSales">0</span> sales</b></div>
+    </div>
+  </div>
+
+</div>
+<div id="mFlyer"></div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const money = n => '$'+Math.round(n).toLocaleString();
+  const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
+  const ease = k => 1-Math.pow(1-k,3);
+  // fraction of [a,b] covered at t, clamped 0..1
+  const seg = (t,a,b) => clamp((t-a)/(b-a),0,1);
+
+  const EVENTS=[
+    {item:'trainers',      type:'search',  act:'Create synonym', detail:'trainers → running shoes',       tag:'Search engine',   row:{type:'search',  nm:'trainers → running shoes',      sl:64, mo:6080}},
+    {item:'winter boots',  type:'search',  act:'Re-rank results', detail:'boost in-stock + best-sellers', tag:'Search engine',   row:{type:'search',  nm:'winter boots · re-ranked',      sl:33, mo:4785}},
+    {item:'size 11 wide',  type:'catalog', act:'Add attribute',  detail:'width = Wide · 38 SKUs',         tag:'Data enrichment', row:{type:'catalog', nm:'size 11 wide · width=Wide',     sl:52, mo:4940}},
+    {item:'vegan leather', type:'catalog', act:'Add attribute',  detail:'material = Vegan leather',       tag:'Data enrichment', row:{type:'catalog', nm:'vegan leather · material added', sl:38, mo:4370}},
+  ];
+  const COL={ search:{bg:'rgba(250,225,148,.16)',fg:'#fae194',bd:'rgba(250,225,148,.6)'},
+              catalog:{bg:'rgba(158,197,255,.16)',fg:'#9ec5ff',bd:'rgba(158,197,255,.6)'},
+              leak:{bg:'rgba(239,68,68,.18)',fg:'#f0a3a3',bd:'rgba(239,68,68,.6)'} };
+
+  /* progress map: intro, 4 equal event segments, finale */
+  const INTRO=0.03, FINALE=0.92, W=(FINALE-INTRO)/EVENTS.length;
+  /* phases inside one event (local t 0..1) */
+  const PH={ typeEnd:0.16, fly1:[0.18,0.30], leakEnd:0.48, fixEnd:0.62, fly2:[0.62,0.76], roll:[0.76,0.92] };
+
+  // build the 4 reserved rows up front
+  const rowEls = EVENTS.map(ev=>{
+    const el=document.createElement('div'); el.className='m-row reserved '+ev.row.type;
+    el.innerHTML='<span class="bar"></span><span class="nm">'+ev.row.nm+'</span><span class="sl">+0</span><span class="mo">$0</span>';
+    $('#mTable').appendChild(el); return el;
+  });
+
+  let zoom=1;
+  function fit(){
+    document.body.style.zoom='1';
+    const need=$('#mWrap').offsetHeight+16;
+    zoom=Math.max(0.55,Math.min(1,innerHeight/need));
+    document.body.style.zoom=zoom<0.999?String(zoom.toFixed(3)):'1';
+  }
+  function center(el){ const r=el.getBoundingClientRect(); return {x:(r.left+r.width/2)/zoom, y:(r.top+r.height/2)/zoom}; }
+
+  function setPipe(state,ev){
+    const p=$('#mPipe'), tag=$('#mTag');
+    p.className='m-panel m-pipe'+(state==='idle'?' idle':state==='leak'?' leak':' '+ev.type)+(state==='hit'?' leak hitp':'');
+    if(state==='idle'){
+      $('#mPipeH').textContent='⬤ Revenue leak'; $('#mPipeH').className='m-h red';
+      $('#mAct').textContent=''; $('#mItem').textContent='awaiting query';
+      tag.className='m-pipe-tag'; tag.textContent='idle';
+    } else if(state==='leak'||state==='hit'){
+      $('#mPipeH').textContent='⬤ Revenue leak'; $('#mPipeH').className='m-h red';
+      $('#mAct').textContent=''; $('#mItem').textContent='"'+ev.item+'"';
+      tag.className='m-pipe-tag show leak'; tag.textContent='Revenue leak';
+    } else {
+      $('#mPipeH').textContent='⚙ Proposed fix'; $('#mPipeH').className='m-h white';
+      $('#mAct').textContent=ev.act; $('#mItem').textContent=ev.detail;
+      tag.className='m-pipe-tag show '+ev.type; tag.textContent='→ '+ev.tag;
+    }
+  }
+
+  function setFlyer(on,from,to,k,color,text){
+    const f=$('#mFlyer');
+    if(!on){ f.style.opacity='0'; return; }
+    const e=ease(k), x=from.x+(to.x-from.x)*e, y=from.y+(to.y-from.y)*e;
+    f.textContent=text; f.style.background=color.bg; f.style.color=color.fg; f.style.borderColor=color.bd;
+    f.style.transform='translate('+x+'px,'+y+'px) translate(-50%,-50%) scale('+(0.85+0.15*e)+')';
+    f.style.opacity=String(k<0.08?k/0.08:k>0.92?(1-k)/0.08:1);
+  }
+
+  function render(P){
+    P=clamp(P,0,1);
+    const t=clamp((P-INTRO)/(FINALE-INTRO),0,1)*EVENTS.length;
+    const i=Math.min(EVENTS.length-1,Math.floor(t));  // active event
+    const lt=P<INTRO?0:clamp(t-i,0,1);                // local t in the event
+    const ev=EVENTS[i];
+    const started=P>=INTRO;
+
+    // query text: typed slice; cleared once the fix has flown away
+    const chars=Math.round(ev.item.length*seg(lt,0,PH.typeEnd));
+    $('#mQ').textContent=(!started||lt>=PH.fly2[0])?'':ev.item.slice(0,chars);
+
+    // pipeline card state
+    if(!started||lt<PH.fly1[1]) setPipe('idle',ev);
+    else if(lt<PH.leakEnd)      setPipe(lt<PH.fly1[1]+0.08?'hit':'leak',ev);
+    else if(lt<PH.fly2[1])      setPipe('fix',ev);
+    else                        setPipe('idle',ev);
+
+    // flyer (at most one flight active)
+    if(started&&lt>=PH.fly1[0]&&lt<PH.fly1[1]){
+      setFlyer(true,center($('#mSearch')),center($('#mPipe')),seg(lt,PH.fly1[0],PH.fly1[1]),COL.leak,'✕ '+ev.item);
+    } else if(started&&lt>=PH.fly2[0]&&lt<PH.fly2[1]){
+      setFlyer(true,center($('#mPipe')),center(rowEls[i]),seg(lt,PH.fly2[0],PH.fly2[1]),ev.type==='catalog'?COL.catalog:COL.search,ev.row.nm);
+    } else setFlyer(false);
+
+    // rows + totals: earlier events full, active event rolls, later reserved
+    let rev=0,sales=0,leaks=0;
+    EVENTS.forEach((e2,j)=>{
+      const f=j<i?1:j>i?0:(started?ease(seg(lt,PH.roll[0],PH.roll[1])):0);
+      const revealed=j<i||(j===i&&started&&lt>=PH.fly2[1]);
+      rowEls[j].classList.toggle('reserved',!revealed);
+      rowEls[j].querySelector('.sl').textContent='+'+Math.round(e2.row.sl*f);
+      rowEls[j].querySelector('.mo').textContent=money(e2.row.mo*f);
+      rev+=e2.row.mo*f; sales+=e2.row.sl*f; if(revealed)leaks++;
+    });
+    $('#mRev').innerHTML=money(rev)+'<span class="u"> /mo</span>';
+    $('#mSales').textContent=Math.round(sales); $('#mLeaks').textContent=leaks;
+
+    // finale: graph wipes in, recovery panel locks green, rest greys out
+    const wipe=ease(seg(P,FINALE,0.985));
+    $('#mTrace').style.clipPath='inset(0 '+((1-wipe)*100).toFixed(2)+'% 0 0)';
+    $('#mGraph').classList.toggle('on',wipe>0);
+    $('#mRecovery').classList.toggle('done',P>0.97);
+    $('#mWrap').classList.toggle('ended',P>0.985);
+  }
+
+  let last=0;
+  addEventListener('message',e=>{
+    if(e&&e.data&&e.data.type==='rre-p'&&typeof e.data.p==='number'){ last=e.data.p; render(last); }
+  });
+  addEventListener('resize',()=>{ fit(); render(last); });
+  addEventListener('load',()=>{ fit(); render(0); });
+})();
+</script>
+</body>
+</html>

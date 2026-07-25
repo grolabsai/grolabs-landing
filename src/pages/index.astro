@@ -793,6 +793,97 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   </script>
 
   {/* ============================================================
+       Revenue Recovery Engine — SCROLL-DRIVEN copy of the section
+       above. Same pipeline, but compacted to 4 events and executed by
+       scroll instead of autoplaying: the stage pins below the header
+       while a tall track provides the scroll distance, and the page
+       posts the progress value into the iframe ({type:'rre-p', p});
+       inside, every visual is a pure function of p, so scrolling up
+       rewinds the run. Animation: /anim/recovery-engine-scroll.html
+       (single compact column, sized for a phone viewport).
+       ============================================================ */}
+  <section class="rres" data-rre-scroll data-screen-label="Revenue Recovery Engine (scroll)">
+    <div class="max-w-page mx-auto w-full">
+      <header class="rre-head">
+        <span class="rre-eyebrow">AI-Powered Search Engine &amp; Product Data Enrichment</span>
+        <div class="rre-title-row">
+          <h2 class="rre-title">Revenue Recovery Engine</h2>
+        </div>
+        <p class="rre-lede">
+          Every search is a signal. We learn from all of them, catch the queries
+          quietly leaking revenue, and fix them — in the search engine or your
+          product catalog. Scroll to run the engine.
+        </p>
+      </header>
+      <div class="rres-track">
+        <div class="rres-stage">
+          <iframe
+            class="rres-frame"
+            src={`${base}/anim/recovery-engine-scroll.html`}
+            title="Revenue Recovery Engine — scroll-driven animation"
+            loading="lazy"
+            scrolling="no"
+          ></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    .rres {
+      background: radial-gradient(130% 130% at 26% 18%, #15161d 0%, #0c0c0f 58%, #07070a 100%);
+      padding: 120px 24px 40px;
+      font-family: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .rres-track { height: 420vh; position: relative; }
+    .rres-stage {
+      position: sticky;
+      top: var(--cps-top, 0px);
+      height: calc(100svh - var(--cps-top, 0px));
+      min-height: 480px;
+      display: flex;
+      justify-content: center;
+      padding: 8px 0 12px;
+    }
+    .rres-frame {
+      width: 100%;
+      max-width: 560px;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: transparent;
+      color-scheme: dark;
+    }
+    @media (max-width: 859px) {
+      .rres { padding: 40px 16px 24px; }
+    }
+  </style>
+
+  <script is:inline>
+    // Drive the scroll-pinned Revenue Recovery Engine: map the track's
+    // scroll progress to p (0→1) and post it into the animation iframe.
+    (function () {
+      var sec = document.querySelector('[data-rre-scroll]');
+      if (!sec) return;
+      var track = sec.querySelector('.rres-track');
+      var stage = sec.querySelector('.rres-stage');
+      var frame = sec.querySelector('.rres-frame');
+      function send() {
+        var r = track.getBoundingClientRect();
+        var span = r.height - stage.offsetHeight;
+        var off = parseFloat(getComputedStyle(stage).top) || 0;
+        var p = span > 0 ? (off - r.top) / span : 0;
+        if (frame.contentWindow)
+          frame.contentWindow.postMessage({ type: 'rre-p', p: Math.max(0, Math.min(1, p)) }, '*');
+      }
+      addEventListener('scroll', send, { passive: true });
+      addEventListener('resize', send);
+      frame.addEventListener('load', send);
+      send();
+    })();
+  </script>
+
+  {/* ============================================================
        Catalog Parser — Alchemus. Scroll-driven section: an Excel feed
        is scanned row by row (yellow beam, tokens turn into coloured
        pills), each row drops into its product base card, and a full
