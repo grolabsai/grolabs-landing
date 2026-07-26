@@ -38,9 +38,10 @@
   /* vertical stage labels down the left gutter, one per block */
   .v-lab{position:absolute; left:24px; writing-mode:vertical-rl; text-orientation:upright; font-family:var(--mono); font-size:11px; letter-spacing:.05em; line-height:1; text-transform:uppercase; color:rgba(237,234,224,.5); transition:opacity .4s ease, filter .5s ease;}
   #guide{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:60; opacity:0;}
-  #guide path{fill:none; stroke:#f5c518; stroke-width:4.5; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
-  #guidePath{filter:drop-shadow(0 2px 6px rgba(245,197,24,.3));}
-  #guideHead{opacity:0;}
+  /* subtle dotted guide — same language as the dashed threshold lines */
+  #guide path{fill:none; stroke:rgba(245,197,24,.55); stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  #guidePath{stroke-width:2; stroke-dasharray:2.5 6;}
+  #guideHead{stroke-width:2.5; stroke:rgba(245,197,24,.8); opacity:0;}
   /* progressive-reveal groups: space is always reserved (no reflow); the
      blocks fade in only when the story first needs them */
   .rev{display:flex; flex-direction:column; gap:8px;}
@@ -129,6 +130,7 @@
   .m-spark path{fill:none; stroke:var(--pass); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
   /* light gray XY axis behind the green line */
   .m-spark .sax{stroke:rgba(255,255,255,.28); stroke-width:1.5;}
+  .m-spark .sgrid path{stroke:rgba(255,255,255,.08); stroke-width:1;}
   .m-total-txt{flex:0 0 auto; text-align:right;}
   .m-total-lab{font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--pass);}
   .m-total-val{font-family:"Permanent Marker",cursive; font-size:29px; line-height:1; color:var(--pass); margin:5px 0 3px;}
@@ -178,6 +180,7 @@
            the number grows (one bump per fix) -->
       <div class="m-spark">
         <svg viewBox="0 0 120 44" preserveAspectRatio="none" aria-hidden="true">
+          <g class="sgrid"><path d="M2 12 H118 M2 22 H118 M2 32 H118" /><path d="M31 40 V44 M60 40 V44 M89 40 V44" /></g>
           <path class="sax" d="M2 2 L2 42 L118 42" />
           <path id="mSpark" style="stroke-dasharray:0 400" d="M2 42 C8 42 12 41 16 40 C26 37 32 34 36 32 L44 31 C54 28 62 23 70 20 L80 18 C90 15 100 11 108 8 L116 6" />
         </svg>
@@ -193,14 +196,17 @@
   <span class="v-lab" id="vl0">Search</span>
   <span class="v-lab" id="vl1">Diagnose</span>
   <span class="v-lab" id="vl2">Fix</span>
-  <span class="v-lab" id="vl3">Recovery Monitor</span>
+  <span class="v-lab" id="vl3">Monitor</span>
 
   <!-- hand-drawn guide line: after each payout it sweeps from the updated
        total up the left side to the search box; erased tail-first when the
        next search starts typing -->
   <svg id="guide" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-    <path id="guidePath" d="M 79 96.5 C 55 103.5,14 101,6.4 89 C 3.6 80.5,3.8 42,5.4 16.5 C 5.7 11,7.4 8.4,11.4 9.1" />
-    <path id="guideHead" d="M 11.4 9.1 L 8.4 11.7 M 11.4 9.1 L 8.5 6.8" />
+    <defs><clipPath id="gclip"><rect id="gclipR" x="-6" y="100" width="112" height="0" /></clipPath></defs>
+    <g clip-path="url(#gclip)">
+      <path id="guidePath" d="M 78 97 C 54 103.5,14 101,6.4 89 C 3.6 80.5,3.8 42,5.4 16.5 C 5.7 11,7.4 8.4,11.4 8.6" />
+    </g>
+    <path id="guideHead" d="M 11.4 8.6 L 8.4 11.2 M 11.4 8.6 L 8.5 6.3" />
   </svg>
 </div>
 <div id="mFlyer"></div>
@@ -346,6 +352,16 @@
     const qT=$('#qText');
     if(typing){ qT.textContent=ev.item.slice(0,chars); qT.className=''; }
     else { qT.textContent='Search products…'; qT.className='ph'; }
+    // yellow while the search is being performed (on the light UI a
+    // darker gold keeps it readable)
+    qT.style.color=(typing&&lt<PH.res)?'#c98a12':'';
+
+    /* vertical labels take their block's active color */
+    const DIMC='rgba(237,234,224,.5)';
+    $('#vl0').style.color=(started&&lt<PH.fly1[0]&&chars>0)?'#fae194':DIMC;
+    $('#vl1').style.color=(started&&lt>=PH.fly1[1]&&lt<PH.leakEnd)?'#f0a3a3':DIMC;
+    $('#vl2').style.color=(started&&lt>=PH.leakEnd&&lt<PH.fly2[1])?(ev.type==='catalog'?'#9ec5ff':'#fae194'):DIMC;
+    $('#vl3').style.color=((started&&lt>=PH.fly2[1]&&lt<=PH.roll[1])||P>0.97)?'#34d399':DIMC;
     $('#qCaret').style.display=typing&&lt<PH.res?'':'none';
     const qBox=$('#shopQ');
     qBox.classList.toggle('live',typing&&lt<PH.click[1]);
@@ -411,10 +427,12 @@
       const fd=ease(seg(P,INTRO+W1*(k+1.03),INTRO+W1*(k+1.12)));
       if(dr>0&&fd<1){ gDraw=dr; gFade=fd; gOn=true; break; }
     }
-    const gp=$('#guidePath');
     if(gOn){
-      gp.style.strokeDasharray=(GLEN*gDraw).toFixed(2)+' '+(GLEN*2).toFixed(2);
-      gp.style.strokeDashoffset='0';
+      // reveal the dotted path bottom→top with a clip so dashes stay intact
+      const yTop=4, yr=100-gDraw*(100-yTop);
+      const cr=$('#gclipR');
+      cr.setAttribute('y', yr.toFixed(2));
+      cr.setAttribute('height', (100-yr+3).toFixed(2));
       $('#guide').style.opacity=(1-gFade).toFixed(3);
       $('#guideHead').style.opacity=seg(gDraw,0.9,1).toFixed(3);
     } else $('#guide').style.opacity='0';
