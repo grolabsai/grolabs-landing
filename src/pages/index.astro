@@ -891,7 +891,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     :root{--cps-bg:#0c0c0f;--cps-line:rgba(255,255,255,.09);--cps-txt:#e8e8ee;--cps-dim:#8b8d98;--cps-accent:#fae194;--cps-blue:#9ec5ff;--cps-green:#34d399;--cps-ink:#24252b}
 
     .cps{background:radial-gradient(130% 130% at 26% 18%,#15161d 0%,#0c0c0f 58%,#07070a 100%);font-family:"Hanken Grotesk",-apple-system,sans-serif}
-    .cps-track{height:700vh;position:relative}
+    .cps-track{height:560vh;position:relative}
     .cps-stage{position:sticky;top:0;height:100svh;min-height:560px;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;padding:14px 16px 40px;overflow:hidden}
     .cps-inner{width:100%;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 
@@ -1218,7 +1218,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        only the category sweep reveals it.
        Sits on the lighter canvas bg so the search panel inside it can
        use the floating-card shadow treatment from the hero. -->
-  <section class="relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+  <section class="sd-section relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
     <div class="max-w-page mx-auto sd-grid">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block sd-eb">
         Try it out
@@ -2701,7 +2701,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
     /* finale: the last chart pins near the top; the space below stays
        clear for the arrow + phone */
-    .tdm-fin-track { height: 260vh; position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .tdm-fin-track { height: 300vh; position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
     .tdm-fin-stage {
       position: sticky;
       /* top is set by JS: the block pins so the LAST chart sits at the
@@ -2905,6 +2905,23 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .rre-eyebrow { margin-bottom: 8px; }
       .cps-eyebrow { margin-bottom: 10px; }
       .font-mono.mb-4.block { margin-bottom: 8px; }
+    }
+
+    /* ── section rhythm STANDARD (from the GRO→RRE reference): ~120px
+       from a section's start to its first element, ~100px from its last
+       element to the section's end; halved on mobile ── */
+    @media (min-width: 768px) {
+      section[data-tdm] { padding-top: 120px; padding-bottom: 100px; }
+      section.sd-section { padding-top: 120px; padding-bottom: 100px; }
+      .rres { padding-bottom: 100px; }
+      .cps { padding-bottom: 100px; }
+    }
+    @media (max-width: 767px) {
+      section[data-tdm] { padding-top: 60px; padding-bottom: 50px; }
+      section.sd-section { padding-top: 60px; padding-bottom: 50px; }
+      .rres { padding-top: 60px; padding-bottom: 50px; }
+      .cps { padding-bottom: 50px; }
+      .cps-head-wrap { padding-top: 60px; }
     }
 
     /* ── Catalog sheet: no row-number gutter; sku + full price visible

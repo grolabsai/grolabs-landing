@@ -25,10 +25,10 @@
   const seg = (v, a, b) => cl((v - a) / (b - a));
 
   /* ── Timing · bottom row first ──────────────────────────────── */
-  /* END well before 1: the finished layout stays PINNED for the last
-     ~22% of the track, so the next section rises from the bottom over
-     a still catalog before the page scrolls on together. */
-  const START = 0.006, END = 0.78, LEN = (END - START) / N;
+  /* END at 0.86: the remaining track ≈ one viewport of scroll, which
+     is exactly the window where the next section rises over the still,
+     pinned catalog — the rise starts the moment the parse finishes. */
+  const START = 0.006, END = 0.86, LEN = (END - START) / N;
   const slotOf = (i) => N - 1 - i;
   const rowQ = (p, i) => cl((p - (START + slotOf(i) * LEN)) / LEN);
 
