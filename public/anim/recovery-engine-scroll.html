@@ -275,6 +275,10 @@
       setPipe('fix',ev);  mL=Math.max(mL,pl.offsetHeight); mF=Math.max(mF,pf.offsetHeight);
     });
     setPipe('idle',EVENTS[0]);
+    // the DIAGNOSE block is never shorter than its vertical label —
+    // otherwise the FIX label (pinned to the next block's top) overlaps
+    const lab1=$('#vl1');
+    if(lab1) mL=Math.max(mL, lab1.offsetHeight+6);
     pl.style.minHeight=mL+'px'; pf.style.minHeight=mF+'px';
     // vertical stage labels: pin each to its block's top edge
     [['#vl0','.shop'],['#vl1','#pLeak'],['#vl2','#pFix'],['#vl3','#mRecovery']].forEach(function(pair){

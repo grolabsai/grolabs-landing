@@ -186,11 +186,19 @@
 
       // travel PRECISELY to this row's landing spot: base-creating rows
       // fly LEFT into the base card they create; variant rows fly RIGHT
-      // into their exact slot
+      // into their exact slot. transform-origin is the row's TOP-LEFT and
+      // the final scale is target-width / row-width, so at travel=1 the
+      // row covers exactly the rect it's being inserted into — same
+      // left edge, same width — instead of a right-shifted oversize.
       const tgt = ROWS[i].isNew ? inWrap(baseOf[ROWS[i].base].el) : inWrap(varRefs[i].el);
-      const dx = (wrap.offsetLeft + tgt.x) - (sheet.offsetLeft + 8);
-      const dy = (wrap.offsetTop + tgt.y) - (sheet.offsetTop + rowsEl.offsetTop + r.li.offsetTop);
-      r.box.style.transform = "translate(" + (dx * travel).toFixed(1) + "px," + (dy * travel).toFixed(1) + "px) scale(" + (1 - 0.45 * travel).toFixed(3) + ")";
+      const rw = r.box.offsetWidth || 1;
+      const s1 = tgt.w / rw;
+      const sc = 1 + (s1 - 1) * travel;
+      const dx = (wrap.offsetLeft + tgt.x) - (sheet.offsetLeft + rowsEl.offsetLeft + r.li.offsetLeft + r.box.offsetLeft);
+      const dy = (wrap.offsetTop + tgt.y) - (sheet.offsetTop + rowsEl.offsetTop + r.li.offsetTop)
+               + ((tgt.h - r.h * s1) / 2) * travel;   // settle centered in the slot's height
+      r.box.style.transformOrigin = "0 0";
+      r.box.style.transform = "translate(" + (dx * travel).toFixed(1) + "px," + (dy * travel).toFixed(1) + "px) scale(" + sc.toFixed(4) + ")";
       r.box.style.opacity = (1 - fade).toFixed(3);
       r.li.style.height = collapse <= 0.001 ? "auto" : (r.h * (1 - collapse)).toFixed(1) + "px";
       r.li.style.zIndex = travel > 0 ? "5" : "1";
