@@ -2928,12 +2928,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        on mobile (titles wrap in their now-narrower column) ── */
     .cps-gut, .cps-r-i { display: none; }
     /* the flexible title cell must be allowed to SHRINK (flex min-width
-       defaults to auto → long tokens pushed sku/price out of the sheet) */
+       defaults to auto → long tokens pushed sku/price out of the sheet),
+       and the sku/price columns are HARD-sized so nothing can squeeze
+       or overlap them */
     .cps-r-c { min-width: 0; overflow-wrap: anywhere; }
-    .cps-r-s, .cps-r-p { flex-shrink: 0; }
+    .cps-r-s, .cps-scol { flex: 0 0 48px; width: 48px; min-width: 48px; overflow: hidden; }
+    .cps-r-p, .cps-pcol { flex: 0 0 56px; width: 56px; min-width: 56px; overflow: hidden; }
     @media (max-width: 760px) {
-      .cps-r-s, .cps-scol { width: 40px; }
-      .cps-r-p, .cps-pcol { width: 62px; }
+      .cps-r-s, .cps-scol { flex: 0 0 36px; width: 36px; min-width: 36px; }
+      .cps-r-p, .cps-pcol { flex: 0 0 46px; width: 46px; min-width: 46px; }
     }
   </style>
 

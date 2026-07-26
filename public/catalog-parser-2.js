@@ -46,7 +46,7 @@
     box.innerHTML = '<span class="cps-r-i"></span><span class="cps-r-c"></span><span class="cps-r-s"></span><span class="cps-r-p"></span>';
     box.querySelector(".cps-r-i").textContent = String(i + 2);
     box.querySelector(".cps-r-s").textContent = r.sku;
-    box.querySelector(".cps-r-p").textContent = r.price.toFixed(2);
+    box.querySelector(".cps-r-p").textContent = String(Math.round(r.price));
     const cell = box.querySelector(".cps-r-c");
     const toks = [];
     r.tokens.forEach((t) => {
@@ -112,7 +112,7 @@
       pills[0].textContent = r.vals[0][1];
       pills[1].textContent = r.vals[1][1];
       v.querySelector(".cb-v-sku").textContent = r.sku;
-      v.querySelector(".cb-v-price").textContent = "$" + r.price.toFixed(2);
+      v.querySelector(".cb-v-price").textContent = "$" + Math.round(r.price);
       gv.appendChild(v);
       const path = document.createElementNS(NS, "path");
       links.appendChild(path);

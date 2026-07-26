@@ -286,12 +286,14 @@
     document.body.style.zoom='1';
     lockPipeHeight();
     const need=$('#mWrap').offsetHeight+16;
+    // report the FULL (zoom-independent) height; the parent sizes the
+    // frame to it (capped to the viewport), so zoom stays 1 and the
+    // animation uses the full width whenever the viewport allows
+    try{ parent.postMessage({type:'rre-h', h: need+18}, '*'); }catch(e){}
     zoom=Math.max(0.55,Math.min(1,innerHeight/need));
     document.body.style.zoom=zoom<0.999?String(zoom.toFixed(3)):'1';
     // wrapping differs at the applied zoom — re-lock in the final space
     if(zoom<0.999) lockPipeHeight();
-    // let the parent hug the glass slab to the actual content height
-    try{ parent.postMessage({type:'rre-h', h: Math.ceil($('#mWrap').getBoundingClientRect().height)+18}, '*'); }catch(e){}
   }
   function center(el){ const r=el.getBoundingClientRect(); return {x:(r.left+r.width/2)/zoom, y:(r.top+r.height/2)/zoom}; }
 
@@ -346,10 +348,15 @@
       el.style.transform=v<1?'translateY('+(-(1-v)*10).toFixed(1)+'px)':'';
       el.style.visibility=v<=0?'hidden':'';
     });
-    // the vertical stage labels appear with their blocks
+    // the vertical stage labels appear with their blocks and track
+    // their block tops every frame (late layout can move blocks)
     $('#vl1').style.opacity=sysRev.toFixed(3);
     $('#vl2').style.opacity=sysRev.toFixed(3);
     $('#vl3').style.opacity=recRev.toFixed(3);
+    [['#vl0','.shop'],['#vl1','#pLeak'],['#vl2','#pFix'],['#vl3','#mRecovery']].forEach(function(pair){
+      const lab=$(pair[0]), el=$(pair[1]);
+      if(lab&&el) lab.style.top=el.offsetTop+'px';
+    });
 
     /* 1 · storefront: the query types in */
     const chars=Math.round(ev.item.length*seg(lt,0,PH.typeEnd));
@@ -450,6 +457,7 @@
   });
   addEventListener('resize',()=>{ fit(); render(last); });
   addEventListener('load',()=>{ fit(); render(0); });
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ fit(); render(last); });
 })();
 </script>
 </body>
