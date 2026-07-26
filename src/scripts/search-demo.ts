@@ -84,15 +84,17 @@ let nextMatched = new Set<string>();
 function pillsHtml(product: Product, query: string): string {
   const productTags = new Set(product.attribute_tags);
   const lowerQuery = query.toLowerCase();
-  return TRACKED_TAGS.map((tag) => {
-    const queried = lowerQuery.includes(tag);
-    const matched = queried && productTags.has(tag);
+  // A pill only EXISTS once its term is fully typed in the query — no
+  // pre-announcing terms the search doesn't know about yet. Then it's
+  // green when the product carries the attribute, red when it doesn't.
+  return TRACKED_TAGS.filter((tag) => lowerQuery.includes(tag)).map((tag) => {
+    const matched = productTags.has(tag);
     const key = `${product.id}:${tag}`;
     if (matched) nextMatched.add(key);
     const pop = matched && !prevMatched.has(key) ? ' search-demo-pill--pop' : '';
     const cls = matched
       ? `search-demo-pill search-demo-pill--match${pop}`
-      : 'search-demo-pill search-demo-pill--miss';
+      : 'search-demo-pill search-demo-pill--fail';
     return `<span class="${cls}">${tag}</span>`;
   }).join('');
 }
