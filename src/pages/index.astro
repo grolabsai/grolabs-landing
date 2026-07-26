@@ -1383,7 +1383,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       // [TYPE_START, TYPE_END], then a quiet GAP_AFTER beat before the
       // yellow section is allowed to enter the viewport — typing and the
       // yellow rise never compete for the eye.
-      var TYPE_START = 80, TYPE_END = 660, GAP_AFTER = 220;
+      // typing runs over ~1160px of scroll — deliberately slow, so the
+      // search-as-you-type effect on the results is digestible
+      var TYPE_START = 80, TYPE_END = 1240, GAP_AFTER = 220;
       var lastN = -1;
       function offTop() { return parseFloat(getComputedStyle(stage).top) || 0; }
       function size() {
@@ -2733,8 +2735,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
               <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">
                 Entrepreneurs' Priority
               </span>
-              <h2 class="font-marker uppercase text-black text-4xl md:text-5xl mb-md">
-                Grow a company without distractions
+              <h2 class="font-marker uppercase text-black mb-md tdm-side-title">
+                Grow a company<br />without distractions
               </h2>
               <p class="text-black/60 text-body-lg leading-relaxed">
                 We monitor thousands of indicators, metrics, and dashboards so you can focus on growing the business.<br />
@@ -2793,9 +2795,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         align-items: start;
         width: 100%;
       }
-      .tdm-side { display: flex; flex-direction: column; align-items: flex-start; }
+      /* h-0/min-h-full: the side column ADOPTS the dashboard's height
+         instead of defining the row's — so the phone's bottom (margin
+         auto) lands exactly on the dashboard's bottom edge */
+      .tdm-side { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; height: 0; min-height: 100%; }
       .tdm-side-copy { display: block; }
-      .tdm-side .tdm-phone { margin-top: 44px; align-self: center; }
+      /* two-row title: sized so "without distractions" holds one line */
+      .tdm-side-title { font-size: clamp(26px, 2.45vw, 38px); line-height: 1.12; }
+      /* the phone FLEXES to fill the space left under the copy, so its
+         bottom always sits exactly on the dashboard's bottom edge
+         (capped at full handset size, shrinks when the column is tight) */
+      .tdm-side .tdm-phone { margin-top: 28px; align-self: center; width: 170px; height: auto; min-height: 240px; max-height: 330px; flex: 1 1 auto; }
       .tdm-2up { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
       /* !important: the base .tdm-card.tdm-wide max-width rule is
          declared later in this block and would win otherwise */
@@ -3262,16 +3272,29 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         return seg(p, 0.38, 1);
       }
       function render() {
+        // on the desktop split the two detectors share one row and their
+        // data plots run IN SEQUENCE — the left one completes, then the
+        // right one begins. (Stacked layouts sequence naturally by
+        // scroll position, so they keep their own drivers.)
+        var seq = window.matchMedia('(min-width: 1024px)').matches;
+        var pp1 = cardP(c1);
         // chart 1: bars
-        var d1p = applyCard(c1, ax1, cardP(c1));
+        applyCard(c1, ax1, pp1);
+        var d1p = seq ? seg(pp1, 0.38, 0.68) : seg(pp1, 0.38, 1);
         bars.forEach(function (b, i) {
           var k = ease(seg(d1p, i * 0.075, i * 0.075 + 0.12));
           var h = Math.abs(y1(b.v) - y1(0)) * k;
           b.r.setAttribute('height', Math.max(0.01, h).toFixed(1));
           b.r.setAttribute('y', (b.v > 0 ? y1(0) - h : y1(0)).toFixed(1));
         });
-        // chart 2: sweep
-        var d2p = applyCard(c2c, ax2, cardP(c2c));
+        // chart 2: sweep — starts only once the bars have finished
+        var d2p;
+        if (seq) {
+          applyCard(c2c, ax2, pp1);
+          d2p = seg(pp1, 0.68, 0.99);
+        } else {
+          d2p = applyCard(c2c, ax2, cardP(c2c));
+        }
         clip2.r.setAttribute('width', (plotW2 * ease(d2p)).toFixed(1));
         dot2.setAttribute('opacity', seg(d2p, 0.96, 1));
         // finale progress: one continuous variable that starts counting
@@ -3340,7 +3363,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           var AL = linkP.getTotalLength();
           linkP.style.strokeDasharray = (AL * ak).toFixed(1) + ' ' + (AL + 2).toFixed(1);
           linkP.style.opacity = '1';
-          linkH.style.opacity = ak > 0.95 ? '1' : '0';
+          // pen behavior: the head appears only once the line is FULLY drawn
+          linkH.style.opacity = ak >= 0.999 ? '1' : '0';
         } else { linkP.style.opacity = '0'; linkH.style.opacity = '0'; }
         alertEl.style.opacity = alk.toFixed(3);
         // the alert enters as the arrow's continuation: from the LEFT on

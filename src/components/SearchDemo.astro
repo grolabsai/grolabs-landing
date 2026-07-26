@@ -229,6 +229,20 @@ const STRINGS = {
     background: rgba(16, 185, 129, 0.12);
     border-color: rgba(16, 185, 129, 0.35);
   }
+  /* the moment a pill TURNS green (added only on the gray→green
+     transition, so already-green pills stay still): double grow/shrink
+     flash that makes the state change unmissable */
+  .search-demo-pill--pop { animation: sd-pill-pop 0.9s cubic-bezier(.3,0,.3,1); }
+  @keyframes sd-pill-pop {
+    0%, 100% { transform: scale(1); }
+    18% { transform: scale(1.35); }
+    38% { transform: scale(1); }
+    58% { transform: scale(1.35); }
+    78% { transform: scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .search-demo-pill--pop { animation: none; }
+  }
   .search-demo-pill--miss {
     color: rgba(237, 234, 224, 0.4);
     background: rgba(255, 255, 255, 0.03);

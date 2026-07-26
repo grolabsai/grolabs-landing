@@ -75,14 +75,23 @@ function formatPrice(n: number): string {
   return `$${n.toFixed(2)}`;
 }
 
+// Matched (product, tag) pairs from the PREVIOUS render — a pill only
+// gets the grow/shrink pop the moment it transitions gray → green, not
+// on every re-render while it stays green.
+let prevMatched = new Set<string>();
+let nextMatched = new Set<string>();
+
 function pillsHtml(product: Product, query: string): string {
   const productTags = new Set(product.attribute_tags);
   const lowerQuery = query.toLowerCase();
   return TRACKED_TAGS.map((tag) => {
     const queried = lowerQuery.includes(tag);
     const matched = queried && productTags.has(tag);
+    const key = `${product.id}:${tag}`;
+    if (matched) nextMatched.add(key);
+    const pop = matched && !prevMatched.has(key) ? ' search-demo-pill--pop' : '';
     const cls = matched
-      ? 'search-demo-pill search-demo-pill--match'
+      ? `search-demo-pill search-demo-pill--match${pop}`
       : 'search-demo-pill search-demo-pill--miss';
     return `<span class="${cls}">${tag}</span>`;
   }).join('');
@@ -128,6 +137,7 @@ async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement, t: typ
     // clearing innerHTML lets the :empty CSS rule collapse the results
     // area to zero height so the panel reads as "ready, not running".
     resultsEl.innerHTML = '';
+    prevMatched = new Set();
     return;
   }
   resultsEl.setAttribute('aria-busy', 'true');
@@ -148,6 +158,8 @@ async function runSearch(input: HTMLInputElement, resultsEl: HTMLElement, t: typ
       parts.push(statusHtml(keywordRes.hits.length, elapsed, t));
     }
     resultsEl.innerHTML = parts.join('');
+    prevMatched = nextMatched;
+    nextMatched = new Set();
   } catch (err) {
     resultsEl.innerHTML = emptyStateHtml(t.unavailable);
     console.error('[search-demo] meili call failed', err);

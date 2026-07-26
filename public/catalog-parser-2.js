@@ -25,11 +25,24 @@
   const seg = (v, a, b) => cl((v - a) / (b - a));
 
   /* ── Timing · bottom row first ──────────────────────────────── */
-  /* END at 0.97: the rise window (the last ~140px of the sticky range,
-     where the next section climbs over the still, pinned catalog) opens
-     at ≈0.97 of the range — so the parse finishes exactly as the rise
-     begins, with no dead scroll in between. */
-  const START = 0.006, END = 0.97, LEN = (END - START) / N;
+  /* END is DYNAMIC: the point where the next section starts rising is
+     pure geometry (viewport height vs track/stage/padding), so the
+     parse-end is computed from that geometry — the last row always
+     lands BEFORE the rise window opens, on any screen. tuneEnd() keeps
+     these in sync on measure and resize. */
+  const START = 0.006;
+  let END = 0.97, LEN = (END - START) / N;
+  function tuneEnd() {
+    const trackH = track.offsetHeight, stageH = stage.offsetHeight;
+    const off = parseFloat(getComputedStyle(stage).top) || 0;
+    const sec = track.closest(".cps");
+    const pb = sec ? parseFloat(getComputedStyle(sec).paddingBottom) || 0 : 0;
+    const span = trackH - stageH;
+    if (span <= 0) return;
+    const pRise = (off + pb + trackH - innerHeight) / span;
+    END = Math.min(0.97, Math.max(0.5, pRise - 0.015));
+    LEN = (END - START) / N;
+  }
   const slotOf = (i) => N - 1 - i;
   const rowQ = (p, i) => cl((p - (START + slotOf(i) * LEN)) / LEN);
 
@@ -153,6 +166,7 @@
     fit = Math.max(0.5, Math.min(1, avail / (tallest || 1)));
     inner.style.zoom = fit < 0.999 ? String(fit.toFixed(3)) : "1";
     if (fit < 0.999) { ready = false; measureGeom(); ready = true; }
+    tuneEnd();
     render(cur);
   }
 
