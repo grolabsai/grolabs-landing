@@ -811,8 +811,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .rres-stage {
       position: sticky;
       top: var(--cps-top, 0px);
-      height: calc(100svh - var(--cps-top, 0px));
-      min-height: 480px;
+      /* CONTENT height, not 100svh: a full-viewport sticky leaves no
+         room for the next section to rise below it during the dwell */
+      height: auto;
       display: flex;
       justify-content: center;
       padding: 8px 0 12px;
@@ -1011,7 +1012,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        --cps-top is set from the header's measured height by the config
        script; shrinking the stage (rather than padding it) keeps the
        engine's clientHeight-based auto-fit correct. ── */
-    .cps-stage{top:var(--cps-top,0px);height:calc(100svh - var(--cps-top,0px))}
+    /* 140px shorter than the viewport: the strip below the pinned
+       stage is where the next section rises during the end-of-track
+       dwell (the GRO→RRE hand-off pattern) */
+    .cps-stage{top:var(--cps-top,0px);height:calc(100svh - var(--cps-top,0px) - 140px)}
 
     /* ── site override: the two base cards keep their left/right
        positions on mobile too (the rows travel sideways into them);
@@ -2845,6 +2849,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         -webkit-backdrop-filter: none;
         background: linear-gradient(180deg, #292a30 0%, #1e1f25 36%, #17181c 100%);
       }
+    }
+
+    /* ── single-column hero: the CTA row completes the block's
+       rectangle — Book flush left, Contact's right edge on the column's
+       right edge, the leftover width distributed between both buttons
+       while the gap stays fixed ── */
+    @media (max-width: 1100px) {
+      .hero-v2-ctas { width: 100%; flex-wrap: nowrap; }
+      .hero-v2-cta-stack { flex: 1 1 auto; min-width: 0; }
+      .hero-v2-cta-stack .hero-v2-btn { width: 100%; justify-content: center; }
+      .hero-v2-btn--ghost { flex: 1 1 auto; justify-content: center; }
     }
 
     /* ── hero mobile: CTAs stay side by side (shrink to fit), tagline
