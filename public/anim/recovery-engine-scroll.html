@@ -332,9 +332,9 @@
   }
 
   function render(P){
-    // finish at 85% of the track — the final 15% is a pinned dwell so
-    // the next section scrolls into view over a still animation
-    P=clamp(P/0.85,0,1);
+    // the PARENT rescales p so the sequence completes exactly at the
+    // hand-off point (next section entering) — no local dwell mapping
+    P=clamp(P,0,1);
     const t=clamp((P-INTRO)/(FINALE-INTRO),0,1)*EVENTS.length;
     const i=Math.min(EVENTS.length-1,Math.floor(t));  // active event
     const lt=P<INTRO?0:clamp(t-i,0,1);                // local t in the event
@@ -375,7 +375,9 @@
     $('#vl0').style.color=(started&&lt<PH.fly1[0]&&chars>0)?'#fae194':DIMC;
     $('#vl1').style.color=(started&&lt>=PH.fly1[1]&&lt<PH.leakEnd)?'#f0a3a3':DIMC;
     $('#vl2').style.color=(started&&lt>=PH.leakEnd&&lt<PH.fly2[1])?(ev.type==='catalog'?'#9ec5ff':'#fae194'):DIMC;
-    const monOn=(started&&lt>=PH.fly2[1]&&lt<=PH.roll[1])||P>0.97;
+    // once the LAST payout has rolled in, the monitor stays green — no
+    // dark-then-green flicker after the total reaches its final value
+    const monOn=(started&&lt>=PH.fly2[1]&&(i<EVENTS.length-1?lt<=PH.roll[1]:true))||P>0.89;
     $('#vl3').style.color=monOn?'#34d399':DIMC;
     $('#mRecovery').classList.toggle('on',monOn);
     $('#qCaret').style.display=typing&&lt<PH.res?'':'none';
@@ -454,7 +456,7 @@
     } else $('#guide').style.opacity='0';
 
     /* finale: recovery panel locks green, rest greys out */
-    $('#mWrap').classList.toggle('ended',P>0.985);
+    $('#mWrap').classList.toggle('ended',P>0.90);
   }
 
   let last=0;
