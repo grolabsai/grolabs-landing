@@ -1,20 +1,23 @@
 /* ══════════════════════════════════════════════════════════════════════
-   Catalog parser — scroll-driven.
-   Spreadsheet (unordered rows, bottom-up) → scan head sweeps each title
-   colouring tokens → row drops toward its base card → SKU table.
-   Every visual is a pure function of scroll progress p (scroll up rewinds).
-   Reads window.CATALOG_CONFIG.
+   Catalog parser v2 — scroll-driven EXPERIMENT (base → variants map).
+   Same spreadsheet scan as catalog-parser.js, but the output area is a
+   two-column relationship view: base cards stacked on the LEFT, one
+   mini variant card per parsed row on the RIGHT (color · size · sku ·
+   price), each connected to its base with an arrowed link as it lands.
+   Every visual is a pure function of scroll progress p.
+   Reads window.CATALOG_CONFIG2.
    ══════════════════════════════════════════════════════════════════════ */
 (function () {
-  const CFG = window.CATALOG_CONFIG;
-  const root = document.getElementById(CFG.rootId || "cps");
+  const CFG = window.CATALOG_CONFIG2;
+  const root = document.getElementById(CFG.rootId || "cps2");
+  if (!root) return;
   const q1 = (s) => root.querySelector(s);
   const track = q1(".cps-track"), stage = q1(".cps-stage"), inner = q1(".cps-inner");
   const sheet = q1(".cps-sheet"), rowsEl = q1(".cps-rows"), head = q1(".cps-head"), trail = q1(".cps-trail");
-  const cardsEl = q1(".cps-cards"), tableEl = q1(".cps-table"), tbody = q1(".cps-tbody");
+  const wrap = q1(".cb-wrap"), basesEl = q1(".cb-bases"), varsEl = q1(".cb-vars"), links = q1(".cb-links");
   const hintEl = q1(".cps-hint"), sheetCount = q1(".cps-sheet-n"), sheetDone = q1(".cps-sheet-done");
-  const legendEl = q1(".cps-legend");
   const ROWS = CFG.rows, N = ROWS.length;
+  const NS = "http://www.w3.org/2000/svg";
 
   const cl = (v, a, b) => Math.max(a === undefined ? 0 : a, Math.min(b === undefined ? 1 : b, v));
   const es = (t) => t * t * (3 - 2 * t);
@@ -22,20 +25,16 @@
   const seg = (v, a, b) => cl((v - a) / (b - a));
 
   /* ── Timing · bottom row first ──────────────────────────────── */
-  /* START near 0: the bottom row starts scanning on the first scroll
-     tick after the stage pins (no dead scroll at the top). */
-  const START = 0.006, END = 0.70, LEN = (END - START) / N;
+  const START = 0.006, END = 0.86, LEN = (END - START) / N;
   const slotOf = (i) => N - 1 - i;
   const rowQ = (p, i) => cl((p - (START + slotOf(i) * LEN)) / LEN);
-  const TBL = [0.72, 0.865], LEG = [0.875, 0.93];
 
-  /* ── Which rows create a base vs extend one (bottom-up) ─────── */
   const seen = {};
   [...ROWS].map((r, i) => i).sort((a, b) => slotOf(a) - slotOf(b)).forEach((i) => {
     ROWS[i].isNew = !seen[ROWS[i].base]; seen[ROWS[i].base] = 1;
   });
 
-  /* ── Spreadsheet rows ───────────────────────────────────────── */
+  /* ── Spreadsheet rows (same construction as v1) ─────────────── */
   const rowRefs = ROWS.map((r, i) => {
     const li = document.createElement("li");
     li.className = "cps-r";
@@ -66,85 +65,59 @@
     return { li, box, toks, bub, flag: box.querySelector(".cps-flag"), h: 0 };
   });
 
-  /* ── Cards, ordered by discovery ────────────────────────────── */
+  /* ── Base cards (LEFT column), ordered by discovery ─────────── */
   const BASES = CFG.bases.slice().sort((a, b) => {
     const f = (id) => Math.min.apply(null, ROWS.map((r, i) => (r.base === id ? slotOf(i) : 99)));
     return f(a.id) - f(b.id);
   });
-  const cardRefs = BASES.map((b, bi) => {
+  const baseRefs = BASES.map((b) => {
     const c = document.createElement("div");
-    c.className = "cps-c";
-    c.innerHTML = '<div class="cps-c-h"><span class="cps-c-dot"></span><span class="cps-c-name"></span></div>'
-      + '<div class="cps-c-body"><div class="cps-c-attrs"></div><div class="cps-c-axes"></div></div><div class="cps-c-f"></div>';
-    c.querySelector(".cps-c-name").textContent = b.name;
-    const at = c.querySelector(".cps-c-attrs");
-    const chips = b.attrs.map(([k, v]) => {
+    c.className = "cb-base";
+    c.innerHTML = '<div class="cb-b-h"><span class="cps-c-dot"></span><span class="cb-b-name"></span></div>'
+      + '<div class="cb-b-chips"></div><div class="cb-b-f"></div>';
+    c.querySelector(".cb-b-name").textContent = b.name;
+    const at = c.querySelector(".cb-b-chips");
+    b.attrs.forEach(([k, v]) => {
       const ch = document.createElement("span");
       ch.className = "cps-chip";
       ch.innerHTML = "<i></i><b></b>";
       ch.querySelector("i").textContent = k;
       ch.querySelector("b").textContent = v;
+      ch.style.setProperty("--on", "1");
       at.appendChild(ch);
-      return ch;
     });
-    const ax = c.querySelector(".cps-c-axes");
-    const axRefs = b.axes.map((a) => {
-      const row = document.createElement("div");
-      row.className = "cps-ax";
-      row.innerHTML = '<span class="cps-ax-k"></span><span class="cps-ax-v"></span>';
-      row.querySelector(".cps-ax-k").textContent = a.name;
-      const vwrap = row.querySelector(".cps-ax-v");
-      const pills = a.values.map((v) => {
-        const p = document.createElement("span");
-        p.className = "cps-pill";
-        p.textContent = v;
-        vwrap.appendChild(p);
-        return p;
-      });
-      ax.appendChild(row);
-      return { row, pills, axis: a };
-    });
-    cardsEl.appendChild(c);
+    basesEl.appendChild(c);
     const mine = ROWS.map((r, i) => (r.base === b.id ? i : -1)).filter((i) => i >= 0);
-    return { el: c, body: c.querySelector(".cps-c-body"), chips, axRefs, foot: c.querySelector(".cps-c-f"),
-      base: b, side: bi === 0 ? -1 : 1, mine, bodyH: 0,
+    return { el: c, foot: c.querySelector(".cb-b-f"), base: b, mine,
       first: mine.reduce((a, i) => (slotOf(i) < slotOf(a) ? i : a), mine[0]) };
   });
-  const sideOf = {}; cardRefs.forEach((c) => { sideOf[c.base.id] = c.side; });
+  const baseOf = {}; baseRefs.forEach((b) => { baseOf[b.base.id] = b; });
 
-  /* ── SKU table ──────────────────────────────────────────────── */
-  const trRefs = [];
-  BASES.forEach((b) => {
-    const gr = document.createElement("tr");
-    gr.className = "cps-tg";
-    gr.innerHTML = '<td colspan="6"><span class="cps-tg-dot"></span><span></span></td>';
-    gr.querySelector("td span:last-child").textContent = b.name;
-    tbody.appendChild(gr);
-    trRefs.push(gr);
-    ROWS.map((r, i) => ({ r, i })).filter((o) => o.r.base === b.id)
-      .sort((a, c) => (a.r.vals[0][1] + a.r.vals[1][1]).localeCompare(c.r.vals[0][1] + c.r.vals[1][1]))
-      .forEach((o) => {
-        const tr = document.createElement("tr");
-        const cells = [
-          ["sku", o.r.sku], ["var", o.r.vals[0][1]], ["var", o.r.vals[1][1]],
-          ["at", b.attrs[0][1]], ["at", b.attrs[1][1]],
-          ["pr", "$" + o.r.price.toFixed(2)],
-        ];
-        cells.forEach(([k, v]) => { const td = document.createElement("td"); td.className = "c-" + k; td.textContent = v; tr.appendChild(td); });
-        tbody.appendChild(tr);
-        trRefs.push(tr);
-      });
+  /* ── Variant mini-cards (RIGHT column, one per row, parse order) ── */
+  const varRefs = new Array(N);
+  [...ROWS].map((r, i) => i).sort((a, b) => slotOf(a) - slotOf(b)).forEach((i) => {
+    const r = ROWS[i];
+    const v = document.createElement("div");
+    v.className = "cb-var";
+    v.innerHTML = '<span class="cps-pill cb-v-pill"></span><span class="cps-pill cb-v-pill"></span>'
+      + '<span class="cb-v-sku"></span><span class="cb-v-price"></span>';
+    const pills = v.querySelectorAll(".cb-v-pill");
+    pills[0].textContent = r.vals[0][1];
+    pills[1].textContent = r.vals[1][1];
+    v.querySelector(".cb-v-sku").textContent = r.sku;
+    v.querySelector(".cb-v-price").textContent = "$" + r.price.toFixed(2);
+    varsEl.appendChild(v);
+    const path = document.createElementNS(NS, "path");
+    links.appendChild(path);
+    varRefs[i] = { el: v, pills, path };
   });
 
   /* ── Measure + auto-fit ─────────────────────────────────────── */
   let cur = 0, fit = 1, ready = false;
   function measure() {
-    try { measureInner(); } catch (e) { console.error("cps measure", e); } finally { ready = true; }
+    try { measureInner(); } catch (e) { console.error("cps2 measure", e); } finally { ready = true; }
   }
   function measureGeom() {
-    // Row/token geometry in the CURRENT zoom's coordinate space. No sheet
-    // min-height reservation: the sheet shrinks as rows are consumed
-    // (row collapse is continuous, so the motion stays smooth).
     rowRefs.forEach((r) => {
       r.li.style.height = "auto";
       r.box.style.transform = "none"; r.box.style.opacity = "1";
@@ -156,8 +129,6 @@
       });
       r.h = r.li.offsetHeight;
     });
-    cardRefs.forEach((c) => { c.el.style.display = ""; c.body.style.height = "auto"; c.bodyH = c.body.offsetHeight; });
-    tableEl.style.display = "";
   }
   function measureInner() {
     ready = false;
@@ -165,20 +136,16 @@
     measureGeom();
     ready = true;
     let tallest = 0;
-    [0, 0.2, 0.4, 0.6, 0.7, 0.8, 1].forEach((s) => { render(s); tallest = Math.max(tallest, inner.offsetHeight); });
+    [0, 0.3, 0.6, 0.9, 1].forEach((s) => { render(s); tallest = Math.max(tallest, inner.offsetHeight); });
     const avail = stage.clientHeight - 26 - hintEl.offsetHeight;
     fit = Math.max(0.5, Math.min(1, avail / (tallest || 1)));
     inner.style.zoom = fit < 0.999 ? String(fit.toFixed(3)) : "1";
-    if (fit < 0.999) {
-      // Line wrapping can differ at the applied zoom (more width fits), so
-      // re-measure geometry in the final coordinate space — otherwise the
-      // sheet/beam use stale wrapped positions and heights.
-      ready = false;
-      measureGeom();
-      ready = true;
-    }
+    if (fit < 0.999) { ready = false; measureGeom(); ready = true; }
     render(cur);
   }
+
+  /* offsets of an element within the .cb-wrap (its positioned ancestor) */
+  const inWrap = (el) => ({ x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight });
 
   /* ── Render ─────────────────────────────────────────────────── */
   function render(p) {
@@ -205,15 +172,18 @@
       r.bub.style.opacity = bv.toFixed(3);
       r.bub.style.setProperty("--s", (0.8 + 0.2 * es(seg(q, 0.52, 0.66))).toFixed(3));
 
-      const dx = (sideOf[ROWS[i].base] || 0) * inner.clientWidth * 0.19;
-      const dy = (cardsEl.offsetTop + 16) - (sheet.offsetTop + rowsEl.offsetTop + r.li.offsetTop);
-      r.box.style.transform = "translate(" + (dx * travel).toFixed(1) + "px," + (dy * travel).toFixed(1) + "px) scale(" + (1 - 0.2 * travel).toFixed(3) + ")";
+      // travel toward THIS row's variant slot on the right
+      const v = varRefs[i];
+      const slot = inWrap(v.el);
+      const dx = (wrap.offsetLeft + slot.x) - (sheet.offsetLeft + 8);
+      const dy = (wrap.offsetTop + slot.y) - (sheet.offsetTop + rowsEl.offsetTop + r.li.offsetTop);
+      r.box.style.transform = "translate(" + (dx * travel).toFixed(1) + "px," + (dy * travel).toFixed(1) + "px) scale(" + (1 - 0.45 * travel).toFixed(3) + ")";
       r.box.style.opacity = (1 - fade).toFixed(3);
       r.li.style.height = collapse <= 0.001 ? "auto" : (r.h * (1 - collapse)).toFixed(1) + "px";
       r.li.style.zIndex = travel > 0 ? "5" : "1";
     });
 
-    /* scan head + trail */
+    /* scan head + trail (identical to v1) */
     if (active >= 0 && activeQ > 0.05 && activeQ < 0.56) {
       const r = rowRefs[active], nt = r.toks.length;
       const s = cl(seg(activeQ, 0.07, 0.52) * nt, 0, nt);
@@ -224,77 +194,61 @@
       head.style.transform = "translate(" + x.toFixed(1) + "px," + top.toFixed(1) + "px)";
       head.style.height = t.h + "px";
       trail.style.opacity = head.style.opacity;
-      trail.style.transform = "translate(" + r.toks[0].x + "px," + top.toFixed(1) + "px)";      trail.style.width = Math.max(0, x - r.toks[0].x).toFixed(1) + "px";
+      trail.style.transform = "translate(" + r.toks[0].x + "px," + top.toFixed(1) + "px)";
+      trail.style.width = Math.max(0, x - r.toks[0].x).toFixed(1) + "px";
       trail.style.height = t.h + "px";
     } else { head.style.opacity = "0"; trail.style.opacity = "0"; }
 
-    /* sheet */
     sheetCount.textContent = (N - parsed) + (N - parsed === 1 ? " row" : " rows");
     const dn = es(seg(p, END - LEN * 0.4, END));
     sheetDone.style.opacity = dn.toFixed(3);
     sheetDone.style.height = (dn * 30).toFixed(1) + "px";
 
-    /* cards */
-    let bases = 0, skus = 0;
-    cardRefs.forEach((cr) => {
-      const rev = es(seg(rowQ(p, cr.first), 0.72, 0.98));
-      cr.el.style.setProperty("--rev", rev.toFixed(3));
-      if (rev > 0.02) bases++;
-      cr.body.style.height = "auto";
-      cr.chips.forEach((ch, k) => ch.style.setProperty("--on", es(cl((rev - 0.10 - k * 0.11) / 0.34)).toFixed(3)));
-      const got = {};
+    /* base cards reveal with their first row */
+    baseRefs.forEach((b) => {
+      const rev = es(seg(rowQ(p, b.first), 0.72, 0.98));
+      b.el.style.setProperty("--rev", rev.toFixed(3));
       let n = 0;
-      cr.mine.forEach((i) => { if (rowQ(p, i) >= 0.80) { n++; ROWS[i].vals.forEach(([a, v]) => { (got[a] = got[a] || {})[v] = 1; }); } });
-      skus += n;
-      let poss = 1, axesShown = 0;
-      cr.axRefs.forEach((ar) => {
-        let c = 0;
-        ar.pills.forEach((pl) => {
-          const on = got[ar.axis.name] && got[ar.axis.name][pl.textContent] ? 1 : 0;
-          pl.style.setProperty("--on", String(on));
-          if (on) c++;
-        });
-        poss *= Math.max(1, c);
-        if (c) axesShown++;
-        ar.row.style.opacity = (rev * (c ? 1 : 0.28)).toFixed(3);
-      });
-      const gaps = Math.max(0, poss - n);
-      cr.foot.innerHTML = "";
-      const a = document.createElement("span");
-      a.textContent = n + (n === 1 ? " variant · " : " variants · ") + axesShown + (axesShown === 1 ? " axis" : " axes");
-      cr.foot.appendChild(a);
-      if (rev > 0.9 && cr.mine.every((i) => rowQ(p, i) >= 1)) {
-        const g = document.createElement("span");
-        g.className = gaps > 0 ? "cps-gap" : "cps-full";
-        g.textContent = gaps > 0 ? gaps + (gaps === 1 ? " gap in matrix" : " gaps in matrix") : "complete matrix";
-        cr.foot.appendChild(g);
-      }
+      b.mine.forEach((i) => { if (rowQ(p, i) >= 0.80) n++; });
+      b.foot.textContent = n + (n === 1 ? " variant" : " variants");
     });
 
-    /* SKU table */
-    const tv = seg(p, TBL[0], TBL[1]);
-    tableEl.style.setProperty("--on", es(tv).toFixed(3));
-    trRefs.forEach((tr, k) => tr.style.opacity = es(cl((tv - k * 0.075) / 0.25)).toFixed(3));
+    /* variant cards fill + arrowed links back to their base */
+    rowRefs.forEach((_, i) => {
+      const q = rowQ(p, i);
+      const v = varRefs[i];
+      const on = es(seg(q, 0.78, 0.95));
+      v.el.style.setProperty("--vo", on.toFixed(3));
+      v.el.classList.toggle("onv", q >= 0.80);
+      const b = baseOf[ROWS[i].base];
+      const bb = inWrap(b.el), ss = inWrap(v.el);
+      const x0 = bb.x + bb.w, y0 = bb.y + bb.h / 2;
+      const x1 = ss.x - 6, y1 = ss.y + ss.h / 2;
+      const mx = (x0 + x1) / 2;
+      v.path.setAttribute("d",
+        "M" + x0 + " " + y0 + " C" + mx + " " + y0 + " " + mx + " " + y1 + " " + x1 + " " + y1 +
+        " M" + x1 + " " + y1 + " l-6 -4 M" + x1 + " " + y1 + " l-6 4");
+      const L = v.path.getTotalLength();
+      const k = es(seg(q, 0.82, 0.99));
+      v.path.style.strokeDasharray = (L * k).toFixed(1) + " " + (L + 2).toFixed(1);
+      v.path.style.opacity = k > 0 ? "1" : "0";
+    });
 
-    legendEl.style.setProperty("--on", es(seg(p, LEG[0], LEG[1])).toFixed(3));
     hintEl.style.setProperty("--on", (1 - es(seg(p, 0.01, 0.06))).toFixed(3));
   }
 
-  /* ── Scroll driver (event-driven; no rAF loop — rAF is throttled
-     in background/offscreen frames, which would stall the render) ── */
+  /* ── Scroll driver (same as v1: sticky-offset aware) ────────── */
   let manual = null, sched = false, lastW = 0, rt = 0;
   function progress() {
     if (manual != null) return manual;
     const r = track.getBoundingClientRect();
     const span = r.height - stage.offsetHeight;
-    // The stage may stick below a fixed site header (top > 0); progress
-    // must start the moment it pins, not when the track passes y=0.
     const off = parseFloat(getComputedStyle(stage).top) || 0;
     return span <= 0 ? 0 : cl((off - r.top) / span);
   }
   function sync() {
     cur = progress();
-    try { render(cur); } catch (e) { console.error("cps render", e); }
+    try { render(cur); } catch (e) { console.error("cps2 render", e); }
   }
   function schedule() {
     if (sched) return;
@@ -310,7 +264,7 @@
     schedule();
   });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); sync(); });
-  root.__setP = (p) => { manual = p; sync(); };          // debug / embed hook
+  root.__setP = (p) => { manual = p; sync(); };
   lastW = inner.clientWidth;
   measure();
   sync();

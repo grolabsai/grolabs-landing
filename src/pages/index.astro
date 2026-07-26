@@ -921,7 +921,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
           <div class="cps-table">
             <table>
-              <thead><tr><th>SKU</th><th class="v">Color</th><th class="v">Size</th><th class="a">Style</th><th class="a">Closure</th><th class="a">Type</th><th class="r">Price</th></tr></thead>
+              <thead><tr><th>SKU</th><th class="v">Color</th><th class="v">Size</th><th class="a">Closure</th><th class="a">Sleeve</th><th class="r">Price</th></tr></thead>
               <tbody class="cps-tbody"></tbody>
             </table>
           </div>
@@ -1142,10 +1142,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       },
       bases: [
         { id: "A", name: "Long sleeve Elegant Button Down Shirt",
-          attrs: [["Type","Shirt"],["Style","Elegant"],["Closure","Button down"],["Sleeve","Long sleeve"]],
+          attrs: [["Closure","Button down"],["Sleeve","Long sleeve"]],
           axes: [{ name:"Color", values:["Blue","Black"] },{ name:"Size", values:["Small","Medium"] }] },
         { id: "B", name: "Short sleeve Casual Button Down Shirt",
-          attrs: [["Type","Shirt"],["Style","Casual"],["Closure","Button down"],["Sleeve","Short sleeve"]],
+          attrs: [["Closure","Button down"],["Sleeve","Short sleeve"]],
           axes: [{ name:"Color", values:["Blue","Black"] },{ name:"Size", values:["Small","Medium"] }] },
       ],
       rows: [
@@ -1160,6 +1160,78 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     };
   </script>
   <script is:inline src={`${base}/catalog-parser.js`}></script>
+
+  {/* ============================================================
+       Catalog Parser V2 — EXPERIMENT (base → variants map). Same
+       spreadsheet scan; the output is a relationship view: base cards
+       on the left, one mini variant card per row on the right
+       (color · size · sku · price), each landing with an arrowed link
+       to its base. Engine: /catalog-parser-2.js.
+       ============================================================ */}
+  <section class="cps" id="cps2" data-screen-label="Catalog Parser v2">
+    <div class="cps-head-wrap">
+      <div class="cps-eyebrow">Alchemus — AI catalog Enrichment agent · v2 experiment</div>
+      <h2 class="cps-h2">Product Catalog — base &amp; variants</h2>
+      <p class="cps-sub"><em>Alchemus</em> maps every feed row to a product base and its variants — one base, many variants, connected.</p>
+    </div>
+    <div class="cps-track">
+      <div class="cps-stage">
+        <div class="cps-inner">
+
+          <div class="cps-sheet">
+            <div class="cps-sheet-bar"><span class="cps-sheet-x">X</span><span class="cps-sheet-f">product_feed.xlsx</span><span class="cps-sheet-tab">Sheet1</span><span class="cps-sheet-n">7 rows</span></div>
+            <div class="cps-sheet-head"><span class="cps-gut">#</span><span style="flex:1">A</span><span class="cps-scol">B</span><span class="cps-pcol">C</span></div>
+            <div class="cps-sheet-r1"><span class="cps-gut">1</span><span style="flex:1">product_title</span><span class="cps-scol">sku</span><span class="cps-pcol">price</span></div>
+            <ul class="cps-rows"></ul>
+            <div class="cps-trail"></div><div class="cps-head"></div>
+            <div class="cps-sheet-done">all rows processed</div>
+          </div>
+
+          <div class="cb-wrap">
+            <div class="cb-col cb-bases"></div>
+            <div class="cb-col cb-vars"></div>
+            <svg class="cb-links" aria-hidden="true"></svg>
+          </div>
+
+        </div>
+        <div class="cps-hint"><b></b><span>Scroll to run the parser</span></div>
+      </div>
+    </div>
+  </section>
+
+  <style is:global>
+    /* v2 base→variants relationship view */
+    #cps2 .cps-inner{position:relative}
+    .cb-wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-top:44px}
+    .cb-col{display:flex;flex-direction:column;gap:10px}
+    .cb-bases{justify-content:center;gap:26px}
+    .cb-base{--rev:0;opacity:var(--rev);transform:translateY(calc((1 - var(--rev))*10px));border:1px solid rgba(255,255,255,.09);border-radius:12px;background:linear-gradient(#1b1c23,#161720);padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+    .cb-b-h{display:flex;align-items:center;gap:8px}
+    .cb-b-name{font-size:13px;font-weight:600;color:#fff;line-height:1.25}
+    .cb-b-chips{display:flex;flex-wrap:wrap;gap:6px}
+    .cb-b-f{font:500 10px/1 ui-monospace,Menlo,monospace;color:#6d6f7a}
+    .cb-var{--vo:0;display:flex;align-items:center;gap:7px;border:1px dashed rgba(255,255,255,.14);border-radius:9px;padding:6px 9px;min-height:34px;transition:border-color .25s,background .25s}
+    .cb-var.onv{border-style:solid;border-color:rgba(250,225,148,.35);background:rgba(250,225,148,.04)}
+    .cb-var>*{opacity:var(--vo)}
+    .cb-var .cb-v-pill{--on:1}
+    .cb-v-sku{font:600 11px/1 ui-monospace,Menlo,monospace;color:#fff;margin-left:auto}
+    .cb-v-price{font:500 11px/1 ui-monospace,Menlo,monospace;color:var(--cps-green)}
+    .cb-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+    .cb-links path{fill:none;stroke:rgba(250,225,148,.6);stroke-width:1.5;stroke-linecap:round}
+    @media (max-width:760px){
+      .cb-wrap{gap:20px;margin-top:32px}
+      .cb-base{padding:8px 9px}
+      .cb-b-name{font-size:11.5px}
+      .cb-var{padding:5px 7px;min-height:30px;gap:5px}
+      .cb-v-sku,.cb-v-price{font-size:10px}
+    }
+  </style>
+
+  <script is:inline>
+    // Catalog Parser V2 data — must be defined before catalog-parser-2.js.
+    window.CATALOG_CONFIG2 = Object.assign({}, window.CATALOG_CONFIG, { rootId: "cps2" });
+  </script>
+  <script is:inline src={`${base}/catalog-parser-2.js`}></script>
 
   <!-- Try it out / Attribute Match Visibility. Live Meilisearch demo
        against the `demo` index — 4 shirts with a deliberate
@@ -2779,9 +2851,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* ── Catalog sheet: no row-number gutter; sku + full price visible
        on mobile (titles wrap in their now-narrower column) ── */
     .cps-gut, .cps-r-i { display: none; }
+    /* the flexible title cell must be allowed to SHRINK (flex min-width
+       defaults to auto → long tokens pushed sku/price out of the sheet) */
+    .cps-r-c { min-width: 0; overflow-wrap: anywhere; }
+    .cps-r-s, .cps-r-p { flex-shrink: 0; }
     @media (max-width: 760px) {
-      .cps-r-s, .cps-scol { width: 34px; }
-      .cps-r-p, .cps-pcol { width: 58px; }
+      .cps-r-s, .cps-scol { width: 40px; }
+      .cps-r-p, .cps-pcol { width: 62px; }
     }
   </style>
 
