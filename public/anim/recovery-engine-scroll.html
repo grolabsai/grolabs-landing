@@ -80,7 +80,10 @@
 
   /* pipeline — leak stays on the LEFT, the proposed fix appears beside
      it on the RIGHT (it does not replace the leak) */
-  .m-pipe{min-height:96px; display:grid; grid-template-columns:1fr 14px 1fr; gap:6px; align-items:stretch; padding:9px;}
+  .m-pipe{min-height:96px; display:flex; flex-direction:column; gap:7px; padding:10px 11px;}
+  .m-lab{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:rgba(237,234,224,.5);}
+  .m-lab::after{content:""; flex:1; height:1px; background:rgba(255,255,255,.12);}
+  .m-prob{font-size:12px; line-height:1.45; color:rgba(237,234,224,.6); min-height:17px; margin-bottom:3px;}
   .m-pipe.idle{opacity:.5;}
   .m-pipe-col{border:1px solid rgba(255,255,255,.10); border-radius:9px; padding:8px 9px; display:flex; flex-direction:column; transition:border-color .25s, background .25s;}
   .m-pipe-col .m-h{font-size:11.5px;}
@@ -94,9 +97,6 @@
   .m-pipe-col.fix.on>*{opacity:1;}
   .m-pipe-col.fix.on.search{border-color:rgba(250,225,148,.55); background:rgba(250,225,148,.05);}
   .m-pipe-col.fix.on.catalog{border-color:rgba(158,197,255,.55); background:rgba(158,197,255,.05);}
-  .m-pipe-arrow{display:grid; place-items:center; font-size:13px; color:rgba(237,234,224,.35); opacity:0; transition:opacity .25s;}
-  .m-pipe-arrow.on{opacity:1;}
-  .m-pipe-arrow.on.search{color:var(--gold);} .m-pipe-arrow.on.catalog{color:var(--blue);}
   .m-pipe-item{font-size:14.5px; font-weight:600; margin:5px 0 5px; min-height:17px; overflow-wrap:anywhere;}
   .m-pipe-act{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:rgba(237,234,224,.5); margin-bottom:2px; min-height:10px;}
   .m-pipe-tag{margin-top:auto;}
@@ -111,15 +111,15 @@
   .m-legend span{display:inline-flex; align-items:center; gap:5px; font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:rgba(237,234,224,.55);}
   .m-sw{width:8px;height:8px;border-radius:2px;} .m-sw.search{background:var(--gold);} .m-sw.catalog{background:var(--blue);}
   .m-table{display:flex; flex-direction:column;}
-  .m-row{display:grid; grid-template-columns:3px 1fr auto auto; gap:8px; align-items:center; padding:6px 2px; border-bottom:1px solid rgba(255,255,255,.06); overflow:hidden;}
+  .m-row{display:grid; grid-template-columns:18px 1fr auto auto; gap:8px; align-items:center; padding:6px 2px; border-bottom:1px solid rgba(255,255,255,.06); overflow:hidden;}
   .m-row:last-child{border-bottom:0;}
-  .m-row .bar{width:3px; height:20px; border-radius:2px;}
-  .m-row.search .bar{background:var(--gold);} .m-row.catalog .bar{background:var(--blue);}
+  /* fix-type icon: yellow magnifier = search fix, blue document = catalog fix */
+  .m-row .ricon{display:grid; place-items:center;}
   .m-row .nm{min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:13.5px; font-weight:600;}
   .m-row .sl{font-family:var(--mono); font-size:11.5px; color:var(--pass); text-align:right;}
   .m-row .mo{font-family:var(--mono); font-size:13.5px; font-weight:600; text-align:right; min-width:52px;}
   .m-row.reserved{outline:1px dashed rgba(255,255,255,.12); outline-offset:-2px; border-radius:6px;}
-  .m-row.reserved .bar{opacity:.25;} .m-row.reserved .nm,.m-row.reserved .sl,.m-row.reserved .mo{opacity:0;}
+  .m-row.reserved .ricon{opacity:.25;} .m-row.reserved .nm,.m-row.reserved .sl,.m-row.reserved .mo{opacity:0;}
   .m-row .nm,.m-row .sl,.m-row .mo{transition:opacity .25s;}
 
   .m-total{border-top:1px solid rgba(255,255,255,.1); margin-top:8px; padding-top:9px; display:flex; align-items:flex-end; gap:14px;}
@@ -158,15 +158,15 @@
 
   <div class="rev" id="revSys">
   <div class="m-panel m-pipe idle" id="mPipe">
+    <div class="m-lab">Diagnosis</div>
     <div class="m-pipe-col leak" id="pLeak">
-      <div class="m-h red">Revenue leak</div>
-      <div class="m-pipe-act" id="leakAct"></div>
       <div class="m-pipe-item" id="leakItem">awaiting searches</div>
+      <div class="m-pipe-act" id="leakAct"></div>
+      <div class="m-prob" id="leakProb"></div>
       <div class="m-pipe-tag" id="leakTag">idle</div>
     </div>
-    <div class="m-pipe-arrow" id="pArrow">→</div>
+    <div class="m-lab">Fix</div>
     <div class="m-pipe-col fix" id="pFix">
-      <div class="m-h white">⚙ Proposed fix</div>
       <div class="m-pipe-act" id="fixAct"></div>
       <div class="m-pipe-item" id="fixItem"></div>
       <div class="m-pipe-tag" id="fixTag"></div>
@@ -176,8 +176,7 @@
 
   <div class="rev" id="revRec">
   <div class="m-panel m-recovery" id="mRecovery">
-    <div class="m-h green">Recovery Monitor<span class="s">recovered revenue per fix</span></div>
-    <div class="m-legend"><span><i class="m-sw search"></i> Search fix</span><span><i class="m-sw catalog"></i> Catalog fix</span></div>
+    <div class="m-h green">Recovery Monitor</div>
     <div class="m-table" id="mTable"></div>
     <div class="m-total">
       <!-- sparkline draws left→right, bottom→top, advancing only while
@@ -219,10 +218,13 @@
      query the catalog has no description to match. */
   const EVENTS=[
     {item:'snekers', type:'search', act:'Set typo tolerance', detail:'snekers → Sneakers', tag:'Search engine',
+     problem:'Likely a typo of “sneakers” — typo tolerance is off.',
      row:{type:'search', nm:'snekers → sneakers', sl:41, mo:3260}},
     {item:'trainers', type:'search', act:'Create synonym', detail:'trainers = running shoes', tag:'Search engine',
+     problem:'Catalog calls these “running shoes” — no synonym for “trainers”.',
      row:{type:'search', nm:'trainers → running shoes', sl:64, mo:6080}},
     {item:'shoes for standing all day', type:'catalog', act:'Add product description', detail:'Cloudfoam + “all-day support”', tag:'Data enrichment',
+     problem:'Intent query — the products have no descriptions to match it.',
      row:{type:'catalog', nm:'standing all day · description', sl:38, mo:4370}},
   ];
   const COL={ search:{bg:'rgba(250,225,148,.16)',fg:'#fae194',bd:'rgba(250,225,148,.6)'},
@@ -241,7 +243,10 @@
   // build the reserved recovery rows up front
   const rowEls = EVENTS.map(ev=>{
     const el=document.createElement('div'); el.className='m-row reserved '+ev.row.type;
-    el.innerHTML='<span class="bar"></span><span class="nm">'+ev.row.nm+'</span><span class="sl">+0</span><span class="mo">$0</span>';
+    const IC=ev.row.type==='search'
+      ?'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fae194" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>'
+      :'<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#9ec5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg>';
+    el.innerHTML='<span class="ricon">'+IC+'</span><span class="nm">'+ev.row.nm+'</span><span class="sl">+0</span><span class="mo">$0</span>';
     $('#mTable').appendChild(el); return el;
   });
 
@@ -284,6 +289,7 @@
     $('#pLeak').className='m-pipe-col leak'+(leakOn?' on':'')+(state==='hit'?' hitp':'')+(state==='fix'?' dim':'');
     $('#leakAct').textContent=leakOn?'search returned 0 results':'';
     $('#leakItem').textContent=leakOn?'"'+ev.item+'"':'awaiting searches';
+    $('#leakProb').textContent=leakOn?ev.problem:'';
     $('#leakTag').className='m-pipe-tag'+(leakOn?' show leak':'');
     $('#leakTag').textContent=leakOn?'Revenue leak':'idle';
     // right column: the proposed fix
@@ -293,7 +299,6 @@
     $('#fixItem').textContent=fixOn?ev.detail:'';
     $('#fixTag').className='m-pipe-tag'+(fixOn?' show '+ev.type:'');
     $('#fixTag').textContent=fixOn?'→ '+ev.tag:'';
-    $('#pArrow').className='m-pipe-arrow'+(fixOn?' on '+ev.type:'');
   }
 
   function setFlyer(on,from,to,k,color,text){

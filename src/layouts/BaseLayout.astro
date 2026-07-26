@@ -266,7 +266,7 @@ const canonicalUrl = `${siteUrl}${path}`;
                 items-start so the Contact ghost pins to the TOP of the
                 Book CTA instead of centering against (Book + caption),
                 matching the hero treatment. */}
-            <div class="flex flex-wrap md:flex-nowrap items-start justify-start md:justify-center gap-sm">
+            <div class="footer-cta-row flex flex-wrap items-start justify-start md:justify-center gap-sm">
               <div class="flex flex-col items-start md:items-center gap-1">
                 <a
                   href="https://cal.com/tuncho-granados-uibzst/15min"
@@ -326,6 +326,7 @@ const canonicalUrl = `${siteUrl}${path}`;
         font-family: "Hanken Grotesk", sans-serif;
         font-weight: 600;
         font-size: 15px;
+        white-space: nowrap;   /* the label NEVER breaks into two rows */
         padding: 14px 28px;
         border-radius: 8px;
         border: 1px solid transparent;
@@ -350,6 +351,13 @@ const canonicalUrl = `${siteUrl}${path}`;
       .footer-cta--ghost:hover {
         color: rgba(237, 234, 224, 0.9);
         border-color: rgba(237, 234, 224, 0.6);
+      }
+      /* when the footer's center column gets tight, stack: Book spans
+         edge to edge on top, Contact full-width below */
+      @media (min-width: 768px) and (max-width: 1279px) {
+        .footer-cta-row { flex-wrap: wrap; }
+        .footer-cta-row > div { width: 100%; }
+        .footer-cta-row .footer-cta { width: 100%; justify-content: center; }
       }
     </style>
   </body>

@@ -79,7 +79,7 @@
     grp.className = "cb-group";
     const c = document.createElement("div");
     c.className = "cb-base";
-    c.innerHTML = '<div class="cb-b-h"><span class="cps-c-dot"></span><span class="cb-b-name"></span></div>'
+    c.innerHTML = '<div class="cb-b-h"><span class="cb-b-name"></span></div>'
       + '<div class="cb-b-chips"></div>';
     c.querySelector(".cb-b-name").textContent = b.name;
     const at = c.querySelector(".cb-b-chips");
