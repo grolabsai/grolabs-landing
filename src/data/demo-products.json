@@ -5,9 +5,12 @@
     "brand": "Harbor & Thread",
     "category": "Shirts",
     "description": "Washed cotton oxford with a button-down collar and a tailored slim fit. Reinforced placket, mother-of-pearl buttons.",
-    "image_url": "https://placehold.co/600x400/1F1F23/fae194?text=Oxford+Button-Down",
+    "image_url": "/demo/shirt-oxford.svg",
     "price": 68.0,
-    "attribute_tags": ["button-down", "slim fit"],
+    "attribute_tags": [
+      "button-down",
+      "slim fit"
+    ],
     "_data_quality_note": "Full attributes filled. Ranks 2/2 against the button-down + slim fit query."
   },
   {
@@ -16,9 +19,12 @@
     "brand": "Northgrove",
     "category": "Shirts",
     "description": "Lightweight stretch poplin with a button-down collar, cut in a slim fit that moves with you. Wrinkle-resistant.",
-    "image_url": "https://placehold.co/600x400/2A2118/fae194?text=Stretch+Poplin",
+    "image_url": "/demo/shirt-poplin.svg",
     "price": 59.0,
-    "attribute_tags": ["button-down", "slim fit"],
+    "attribute_tags": [
+      "button-down",
+      "slim fit"
+    ],
     "_data_quality_note": "Second full 2/2 match — shows the query isn't a one-off."
   },
   {
@@ -27,9 +33,12 @@
     "brand": "FieldWear Co",
     "category": "Shirts",
     "description": "Sturdy cotton twill with a button-down collar in a relaxed, regular cut for all-day comfort.",
-    "image_url": "https://placehold.co/600x400/241712/fae194?text=Classic+Twill",
+    "image_url": "/demo/shirt-twill.svg",
     "price": 54.0,
-    "attribute_tags": ["button-down", "regular fit"],
+    "attribute_tags": [
+      "button-down",
+      "regular fit"
+    ],
     "_data_quality_note": "The deliberate NOT-slim-fit result: it matches button-down, so it's returned, and its gray 'slim fit' pill is what demonstrates per-attribute match visibility."
   },
   {
@@ -38,7 +47,7 @@
     "brand": "HomeStyle",
     "category": "Shirts",
     "description": "Crisp all-day staple with a trim cut, a full-length placket and a soft rolled collar. A wardrobe classic.",
-    "image_url": "https://placehold.co/600x400/1A1612/fae194?text=Everyday+Cotton",
+    "image_url": "/demo/shirt-everyday.svg",
     "price": 39.0,
     "attribute_tags": [],
     "_data_quality_note": "The punchline. It IS a slim-fit button-down (trim cut, buttoned placket, rolled collar) but the merchant never filled a single attribute — and the description deliberately avoids the words 'button' and 'slim', so keyword search can't find it. Only the category sweep reveals it: 'Hidden · attributes missing'."

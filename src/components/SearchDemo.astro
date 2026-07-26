@@ -256,7 +256,9 @@ const STRINGS = {
     color: rgba(239, 68, 68, 0.75);
   }
 
-  /* On narrow viewports the right cluster wraps under the info column. */
+  /* On narrow viewports the right cluster wraps under the info column —
+     into COLUMN 2, so the pills stay left-aligned with the name/brand
+     and the left column belongs to the image alone. */
   @media (max-width: 640px) {
     .search-demo-row {
       grid-template-columns: 40px 1fr;
@@ -265,7 +267,7 @@ const STRINGS = {
       padding: 12px 14px;
     }
     .search-demo-right {
-      grid-column: 1 / -1;
+      grid-column: 2;
       justify-content: space-between;
     }
   }
