@@ -206,18 +206,23 @@ const canonicalUrl = `${siteUrl}${path}`;
     </header>
 
     <style is:global>
-      /* Nav row hides while scrolling down, returns on scroll up. On
-         mobile it collapses (header gets shorter — the pinned sections
-         watch the header height and adapt); on desktop it just fades. */
+      /* Scrolling down hides chrome; scrolling up brings it back.
+         Desktop: only the nav row fades. Mobile: the ENTIRE header
+         (logo + menu + Book call) slides away, and slides back complete
+         on reverse scroll. The slide is a transform, so the header's
+         measured height — which the pinned sections read via --cps-top —
+         never changes. */
       nav[data-site-nav] {
-        transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.25s ease, padding 0.25s ease;
+        transition: opacity 0.25s ease, transform 0.25s ease;
       }
-      header.nav-hidden nav[data-site-nav] {
-        opacity: 0; transform: translateY(-6px); pointer-events: none;
+      @media (min-width: 768px) {
+        header.nav-hidden nav[data-site-nav] {
+          opacity: 0; transform: translateY(-6px); pointer-events: none;
+        }
       }
       @media (max-width: 767px) {
-        nav[data-site-nav] { max-height: 40px; overflow: hidden; }
-        header.nav-hidden nav[data-site-nav] { max-height: 0; padding-top: 0; margin-top: -12px; }
+        header { transition: transform 0.3s ease; }
+        header.nav-hidden { transform: translateY(-102%); }
       }
     </style>
     <script is:inline>
@@ -358,6 +363,16 @@ const canonicalUrl = `${siteUrl}${path}`;
         .footer-cta-row { flex-wrap: wrap; }
         .footer-cta-row > div { width: 100%; }
         .footer-cta-row .footer-cta { width: 100%; justify-content: center; }
+      }
+      /* mobile: same rectangle as the hero CTAs — Book + Contact on ONE
+         line spanning the full width (Book absorbs the leftover width,
+         Contact keeps its natural size on the right; nothing wraps) */
+      @media (max-width: 767px) {
+        .footer-cta-row { flex-wrap: nowrap; width: 100%; gap: 10px; }
+        .footer-cta-row > div { flex: 1 1 auto; min-width: 0; }
+        .footer-cta-row .footer-cta { padding: 12px 14px; font-size: 13px; }
+        .footer-cta-row .footer-cta--primary { width: 100%; justify-content: center; }
+        .footer-cta-row .footer-cta--ghost { flex: 0 0 auto; }
       }
     </style>
   </body>

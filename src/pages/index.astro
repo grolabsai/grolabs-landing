@@ -8,7 +8,6 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchDemo from '../components/SearchDemo.astro';
-import SearchCopyHelper from '../components/SearchCopyHelper.astro';
 import DiagnosticWidget from '../components/DiagnosticWidget.astro';
 import VideoEmbed from '../components/VideoEmbed.astro';
 
@@ -156,7 +155,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       </div>
 
       <div class="hero-v2-stage-col">
-        <div class="hero-v2-stat-box lifted-glass">
+        <div class="hero-v2-stat-box lifted-glass" data-hero-stats>
           <div class="hero-v2-stat-row">
             <span class="hero-v2-stat-99">99%</span>
             <p class="hero-v2-stat-text">of visitors never become customers<br />in many online stores.</p>
@@ -173,6 +172,24 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    // Mobile hero hand-off: on the first stretch of scroll the stats
+    // block first climbs on its own (a head start relative to the page),
+    // then settles and moves together with everything else.
+    (function () {
+      var box = document.querySelector('[data-hero-stats]');
+      if (!box) return;
+      function onScroll() {
+        if (window.innerWidth > 767) { box.style.transform = ''; return; }
+        var k = Math.max(0, 1 - window.scrollY / 280);   // 1 at top → 0 by 280px
+        box.style.transform = 'translateY(' + (k * 72).toFixed(1) + 'px)';
+      }
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', onScroll);
+      onScroll();
+    })();
+  </script>
 
   <!-- Booking embed — Calendly's inline widget themed yellow + dark to
        match the inverted footer. Hidden by default; revealed when the
@@ -891,7 +908,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     :root{--cps-bg:#0c0c0f;--cps-line:rgba(255,255,255,.09);--cps-txt:#e8e8ee;--cps-dim:#8b8d98;--cps-accent:#fae194;--cps-blue:#9ec5ff;--cps-green:#34d399;--cps-ink:#24252b}
 
     .cps{background:radial-gradient(130% 130% at 26% 18%,#15161d 0%,#0c0c0f 58%,#07070a 100%);font-family:"Hanken Grotesk",-apple-system,sans-serif}
-    .cps-track{height:560vh;position:relative}
+    .cps-track{height:480vh;position:relative}
     .cps-stage{position:sticky;top:0;height:100svh;min-height:560px;display:flex;flex-direction:column;justify-content:flex-start;gap:12px;padding:14px 16px 40px;overflow:hidden}
     .cps-inner{width:100%;max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 
@@ -901,7 +918,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .cps-h2{font-family:"Permanent Marker","Hanken Grotesk",cursive;font-size:clamp(34px,4vw,54px);font-weight:400;letter-spacing:.005em;color:#fff;line-height:1.06;margin:0;text-wrap:balance}
     .cps-sub{font-size:18px;line-height:1.55;color:rgba(237,234,224,.62);max-width:620px;margin:18px 0 0;text-wrap:pretty}
     .cps-sub em{font-style:normal;color:var(--cps-accent);font-weight:500}
-    @media (max-width:760px){.cps-head-wrap{padding:64px 14px 0}.cps-sub{font-size:16px}.cps-eyebrow{font-size:11px;letter-spacing:.18em}}
+    /* mobile: standard 16px side margins, and the paragraph fills the
+       full line — text-wrap:pretty (Safari re-rags the whole paragraph)
+       left a big ragged right edge, so it's disabled below 760px */
+    @media (max-width:760px){.cps-head-wrap{padding:64px 16px 0}.cps-sub{font-size:16px;text-wrap:normal;max-width:none}.cps-eyebrow{font-size:11px;letter-spacing:.18em}}
 
     /* ── spreadsheet ── */
     .cps-sheet{background:#fff;border-radius:7px;box-shadow:0 24px 60px -24px rgba(0,0,0,.85),0 0 0 1px rgba(255,255,255,.12);position:relative}
@@ -994,7 +1014,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .cps-cards{margin-top:68px}
     }
     @media (max-width:760px){
-      .cps-stage{padding:12px 14px 36px}
+      .cps-stage{padding:12px 16px 36px}
       .cps-c{padding:10px 11px;gap:7px}
       .cps-chip{padding:2px 7px;font-size:10.5px}
       .cps-r-c{font-size:12px;line-height:1.9}
@@ -1012,10 +1032,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        --cps-top is set from the header's measured height by the config
        script; shrinking the stage (rather than padding it) keeps the
        engine's clientHeight-based auto-fit correct. ── */
-    /* 140px shorter than the viewport: the strip below the pinned
-       stage is where the next section rises during the end-of-track
-       dwell (the GRO→RRE hand-off pattern) */
+    /* shorter than the viewport: the strip below the pinned stage is
+       where the next section rises during the end-of-track dwell (the
+       GRO→RRE hand-off pattern). The strip must be LARGER than the
+       section's own bottom padding (100px desktop / 50px mobile) or the
+       padding swallows the whole rise window. */
     .cps-stage{top:var(--cps-top,0px);height:calc(100svh - var(--cps-top,0px) - 140px)}
+    @media (min-width:768px){
+      .cps-stage{height:calc(100svh - var(--cps-top,0px) - 300px)}
+    }
 
     /* ── site override: the two base cards keep their left/right
        positions on mobile too (the rows travel sideways into them);
@@ -1218,21 +1243,22 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        only the category sweep reveals it.
        Sits on the lighter canvas bg so the search panel inside it can
        use the floating-card shadow treatment from the hero. -->
-  <section class="sd-section relative py-xl md:py-2xl px-margin-mobile md:px-margin-desktop bg-canvas overflow-hidden reveal">
+  <section class="sd-section relative px-margin-mobile md:px-margin-desktop bg-canvas" data-sd-scroll>
+    <div class="sd-track">
+    <div class="sd-stage">
     <div class="max-w-page mx-auto sd-grid">
       <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block sd-eb">
         Try it out
       </span>
-      <div class="sd-side">
-      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg sd-title">
         Search Demo
       </h2>
+      <div class="sd-side">
 
-      <!-- Copy-to-clipboard helper: stays on the LEFT with the copy. -->
-      <SearchCopyHelper />
-
-      <!-- Feature list on the LEFT below the helper; the glass search
-           panel sits on the RIGHT, top-aligned with the eyebrow. -->
+      <!-- Feature list on the LEFT; the glass search panel sits on the
+           RIGHT, top-aligned with the eyebrow. The search itself is
+           scroll-driven: the query types itself as the visitor scrolls
+           and live Meilisearch results refine underneath. -->
       <div class="sd-below">
 
         <!-- Yellow-icon feature list. Material Symbols stand in for
@@ -1294,26 +1320,80 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       </div>
       <div class="sd-panel"><SearchDemo /></div>
     </div>
+    </div>
+    </div>
   </section>
 
   <style is:global>
     /* Search Demo — the standard two-column layout: eyebrow row on top,
-       title + copy chip + features left, the glass panel right and
-       top-aligned with the eyebrow. Stacks below lg. */
+       title + features left, the glass panel right and top-aligned with
+       the eyebrow. Stacks below lg with the PANEL FIRST (search block on
+       top, feature list underneath). The whole section is a pinned
+       scroll stage: the query types itself with scroll progress and the
+       hand-off dwell lets the next (yellow) section rise below. */
+    .sd-track { height: 170vh; position: relative; }
+    .sd-stage { position: sticky; top: calc(var(--cps-top, 0px) + 12px); }
     .sd-grid { display: flex; flex-direction: column; }
+    .sd-grid .sd-panel { order: 3; margin-bottom: 28px; }
+    .sd-grid .sd-side { order: 4; }
     @media (min-width: 1024px) {
       .sd-grid {
         display: grid;
         grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-        grid-template-rows: auto 1fr;
+        grid-template-rows: auto auto 1fr;
         column-gap: 64px; row-gap: 0;
         align-items: start;
       }
       .sd-eb { grid-column: 1; grid-row: 1; }
-      .sd-side { grid-column: 1; grid-row: 2; }
-      .sd-panel { grid-column: 2; grid-row: 1 / 3; align-self: start; }
+      .sd-title { grid-column: 1; grid-row: 2; }
+      .sd-side { grid-column: 1; grid-row: 3; order: 0; }
+      .sd-panel { grid-column: 2; grid-row: 1 / 4; align-self: start; order: 0; margin-bottom: 0; }
+    }
+    /* while the scroll-typing runs, light the input like a real focus */
+    .search-demo-input-wrap.is-typing {
+      border-color: rgba(250, 225, 148, 0.5);
+      box-shadow: 0 0 0 3px rgba(250, 225, 148, 0.12);
+    }
+    @media (max-width: 767px) {
+      .search-demo-results { min-height: 240px; }
     }
   </style>
+
+  <script is:inline>
+    // Scroll-executed search demo (Version A): scroll progress types the
+    // query character by character into the real search input and fires
+    // the live Meilisearch search-as-you-type pipeline via input events.
+    // Rewinding the scroll un-types the query and clears the results.
+    (function () {
+      var sec = document.querySelector('[data-sd-scroll]');
+      if (!sec) return;
+      var track = sec.querySelector('.sd-track'),
+          stage = sec.querySelector('.sd-stage'),
+          input = sec.querySelector('[data-search-input]'),
+          wrap  = sec.querySelector('.search-demo-input-wrap');
+      if (!track || !stage || !input) return;
+      var QUERY = 'button-down, slim fit';
+      var T0 = 0.08, T1 = 0.7;      // typing window within the pinned range
+      var lastN = -1;
+      function onScroll() {
+        var r = track.getBoundingClientRect();
+        var off = parseFloat(getComputedStyle(stage).top) || 0;
+        var span = r.height - stage.offsetHeight - off;
+        if (span <= 0) return;
+        var p = Math.min(1, Math.max(0, (off - r.top) / span));
+        var t = Math.min(1, Math.max(0, (p - T0) / (T1 - T0)));
+        var n = Math.round(t * QUERY.length);
+        if (n === lastN) return;
+        lastN = n;
+        input.value = QUERY.slice(0, n);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        if (wrap) wrap.classList.toggle('is-typing', n > 0 && n < QUERY.length);
+      }
+      addEventListener('scroll', onScroll, { passive: true });
+      addEventListener('resize', onScroll);
+      onScroll();
+    })();
+  </script>
 
   {/* ============================================================
        Quick assessment — diagnostic scan. Always visible, placed BELOW
@@ -2576,7 +2656,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        in from the right with an arrow from the breach to the
        notification it triggered. -->
   {/* NOTE: no overflow-hidden here — it would break the sticky pin */}
-  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary reveal" data-tdm>
+  <section class="relative py-xl md:py-3xl px-margin-mobile md:px-margin-desktop bg-primary" data-tdm>
     <div class="max-w-page mx-auto">
       <!-- Eyebrow + title + lede on the yellow surface. -->
       <span class="font-mono tracking-[0.2em] text-xs uppercase mb-4 block text-black font-bold">

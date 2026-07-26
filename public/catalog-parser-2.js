@@ -25,10 +25,11 @@
   const seg = (v, a, b) => cl((v - a) / (b - a));
 
   /* ── Timing · bottom row first ──────────────────────────────── */
-  /* END at 0.86: the remaining track ≈ one viewport of scroll, which
-     is exactly the window where the next section rises over the still,
-     pinned catalog — the rise starts the moment the parse finishes. */
-  const START = 0.006, END = 0.86, LEN = (END - START) / N;
+  /* END at 0.97: the rise window (the last ~140px of the sticky range,
+     where the next section climbs over the still, pinned catalog) opens
+     at ≈0.97 of the range — so the parse finishes exactly as the rise
+     begins, with no dead scroll in between. */
+  const START = 0.006, END = 0.97, LEN = (END - START) / N;
   const slotOf = (i) => N - 1 - i;
   const rowQ = (p, i) => cl((p - (START + slotOf(i) * LEN)) / LEN);
 

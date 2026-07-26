@@ -83,7 +83,9 @@
 
   /* pipeline — leak stays on the LEFT, the proposed fix appears beside
      it on the RIGHT (it does not replace the leak) */
-  .m-prob{font-size:22px; line-height:1.3; color:rgba(237,234,224,.6); min-height:17px; margin:2px 0 4px;}
+  /* diagnosis message — same size as the fix text; WHITE so the message
+     itself carries the emphasis (not oversized gray) */
+  .m-prob{font-size:14.5px; font-weight:600; line-height:1.4; color:var(--bone); min-height:17px; margin:2px 0 4px;}
   .m-pipe.idle{opacity:.5;}
   .m-pipe-col{position:relative; background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:11px 12px; display:flex; flex-direction:column; box-shadow:0 10px 22px rgba(0,0,0,.5); transition:border-color .25s, background .25s, opacity .3s;}
   .m-pipe-col.idle{opacity:.5;}
