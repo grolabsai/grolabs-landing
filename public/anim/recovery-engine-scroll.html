@@ -121,7 +121,7 @@
   .m-row .sl{font-family:var(--mono); font-size:11.5px; color:var(--pass); text-align:right;}
   .m-row .mo{font-family:var(--mono); font-size:13.5px; font-weight:600; text-align:right; min-width:52px;}
   .m-row.reserved{outline:1px dashed rgba(255,255,255,.12); outline-offset:-2px; border-radius:6px;}
-  .m-row.reserved .ricon{opacity:.25;} .m-row.reserved .nm,.m-row.reserved .sl,.m-row.reserved .mo{opacity:0;}
+  .m-row.reserved .ricon{opacity:0;}   /* fix type unknown until it lands */ .m-row.reserved .nm,.m-row.reserved .sl,.m-row.reserved .mo{opacity:0;}
   .m-row .nm,.m-row .sl,.m-row .mo{transition:opacity .25s;}
 
   .m-total{border-top:1px solid rgba(255,255,255,.1); margin-top:8px; padding-top:9px; display:flex; align-items:flex-end; gap:14px;}
@@ -137,7 +137,9 @@
   .m-total-val .u{font-size:.42em; opacity:.65;}
   .m-total-sub{font-family:var(--mono); font-size:11.5px; color:rgba(237,234,224,.55);}
   .m-total-sub b{color:var(--pass);}
-  .m-recovery.done{border-color:rgba(52,211,153,.45); box-shadow:0 10px 22px rgba(0,0,0,.5),0 0 0 1px rgba(52,211,153,.22),0 0 30px rgba(52,211,153,.12);}
+  /* monitor active — same treatment as diagnose/fix: colored border +
+     light wash + soft glow, green */
+  .m-recovery.on{border-color:rgba(52,211,153,.45); background:rgba(52,211,153,.05); box-shadow:0 10px 22px rgba(0,0,0,.5),0 0 0 1px rgba(52,211,153,.22),0 0 24px rgba(52,211,153,.12);}
 
   #mFlyer{position:fixed; left:0; top:0; z-index:90; pointer-events:none; opacity:0; font-family:var(--mono); font-size:10px; font-weight:600; padding:5px 9px; border-radius:7px; border:1px solid; white-space:nowrap; box-shadow:0 6px 18px rgba(0,0,0,.5); transform-origin:center;}
 </style>
@@ -145,7 +147,6 @@
 <body>
 <div class="m-wrap" id="mWrap">
 
-  <div class="z-lab">The shopper's screen</div>
   <div class="shop">
     <div class="shop-bar"><span class="shop-dot r"></span><span class="shop-dot y"></span><span class="shop-dot g"></span><span class="shop-url">yourstore.com</span></div>
     <div class="shop-body">
@@ -289,6 +290,8 @@
     document.body.style.zoom=zoom<0.999?String(zoom.toFixed(3)):'1';
     // wrapping differs at the applied zoom — re-lock in the final space
     if(zoom<0.999) lockPipeHeight();
+    // let the parent hug the glass slab to the actual content height
+    try{ parent.postMessage({type:'rre-h', h: Math.ceil($('#mWrap').getBoundingClientRect().height)+18}, '*'); }catch(e){}
   }
   function center(el){ const r=el.getBoundingClientRect(); return {x:(r.left+r.width/2)/zoom, y:(r.top+r.height/2)/zoom}; }
 
@@ -321,7 +324,9 @@
   }
 
   function render(P){
-    P=clamp(P,0,1);
+    // finish at 85% of the track — the final 15% is a pinned dwell so
+    // the next section scrolls into view over a still animation
+    P=clamp(P/0.85,0,1);
     const t=clamp((P-INTRO)/(FINALE-INTRO),0,1)*EVENTS.length;
     const i=Math.min(EVENTS.length-1,Math.floor(t));  // active event
     const lt=P<INTRO?0:clamp(t-i,0,1);                // local t in the event
@@ -352,16 +357,14 @@
     const qT=$('#qText');
     if(typing){ qT.textContent=ev.item.slice(0,chars); qT.className=''; }
     else { qT.textContent='Search products…'; qT.className='ph'; }
-    // yellow while the search is being performed (on the light UI a
-    // darker gold keeps it readable)
-    qT.style.color=(typing&&lt<PH.res)?'#c98a12':'';
-
     /* vertical labels take their block's active color */
     const DIMC='rgba(237,234,224,.5)';
     $('#vl0').style.color=(started&&lt<PH.fly1[0]&&chars>0)?'#fae194':DIMC;
     $('#vl1').style.color=(started&&lt>=PH.fly1[1]&&lt<PH.leakEnd)?'#f0a3a3':DIMC;
     $('#vl2').style.color=(started&&lt>=PH.leakEnd&&lt<PH.fly2[1])?(ev.type==='catalog'?'#9ec5ff':'#fae194'):DIMC;
-    $('#vl3').style.color=((started&&lt>=PH.fly2[1]&&lt<=PH.roll[1])||P>0.97)?'#34d399':DIMC;
+    const monOn=(started&&lt>=PH.fly2[1]&&lt<=PH.roll[1])||P>0.97;
+    $('#vl3').style.color=monOn?'#34d399':DIMC;
+    $('#mRecovery').classList.toggle('on',monOn);
     $('#qCaret').style.display=typing&&lt<PH.res?'':'none';
     const qBox=$('#shopQ');
     qBox.classList.toggle('live',typing&&lt<PH.click[1]);
@@ -438,7 +441,6 @@
     } else $('#guide').style.opacity='0';
 
     /* finale: recovery panel locks green, rest greys out */
-    $('#mRecovery').classList.toggle('done',P>0.97);
     $('#mWrap').classList.toggle('ended',P>0.985);
   }
 

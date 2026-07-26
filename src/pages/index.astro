@@ -767,8 +767,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         </div>
         <p class="rre-lede">
           Every search is a signal. We learn from all of them, catch the queries
-          quietly leaking revenue, and fix them — in the search engine or your
-          product catalog. Scroll to run the engine.
+          quietly leaking revenue, and fix them — in the <span style="color:#fae194">search engine</span> or your
+          <span style="color:#9ec5ff">product catalog</span>.
         </p>
       </header>
     </div>
@@ -782,8 +782,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             </div>
             <p class="rre-lede">
               Every search is a signal. We learn from all of them, catch the queries
-              quietly leaking revenue, and fix them — in the search engine or your
-              product catalog. Scroll to run the engine.
+              quietly leaking revenue, and fix them — in the <span style="color:#fae194">search engine</span> or your
+              <span style="color:#9ec5ff">product catalog</span>.
             </p>
           </header>
           <div class="anim-glass">
@@ -875,6 +875,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       addEventListener('scroll', send, { passive: true });
       addEventListener('resize', send);
       frame.addEventListener('load', send);
+      // hug the glass slab to the animation's real content height
+      addEventListener('message', function (e) {
+        var d = e.data;
+        if (d && d.type === 'rre-h' && typeof d.height === 'undefined' && typeof d.h === 'number') {
+          frame.style.height = Math.max(320, Math.min(d.h, innerHeight - 80)) + 'px';
+        }
+      });
       send();
     })();
   </script>
@@ -2613,9 +2620,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           </div>
           <div class="tdm-phone" id="tdmPhone">
             <div class="tp-notch"></div>
+            <div class="tp-date">Friday, July 24</div>
             <div class="tp-time">9:41</div>
-            <div class="tp-sub">GroLabs · Live monitor</div>
-            <div class="tp-card">
+            <div class="tp-card" id="tdmAlert">
               <div class="tp-ic">!</div>
               <div>
                 <div class="tp-tt">Traffic dropped <b>5.3%</b></div>
@@ -2715,7 +2722,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .tp-home { margin-top: auto; width: 72px; height: 4px; border-radius: 99px; background: rgba(255,255,255,.25); align-self: center; }
     .tp-notch { width: 64px; height: 16px; background: #000; border-radius: 10px; margin: 0 auto 12px; }
     .tp-time { font-size: 30px; font-weight: 600; text-align: center; color: #fff; line-height: 1; }
-    .tp-sub { font-size: 12.5px; text-align: center; color: rgba(237,234,224,.5); margin: 5px 0 14px; }
+    .tp-date { font-size: 12px; text-align: center; color: rgba(237,234,224,.6); margin: 2px 0 4px; }
+    .tp-card { margin-top: 14px; }
     .tp-card { background: #17181d; border: 1.5px solid rgba(239,68,68,.6); border-radius: 13px; padding: 11px; display: flex; gap: 9px; box-shadow: 0 0 22px rgba(239,68,68,.18); }
     .tp-ic { flex: none; width: 26px; height: 26px; border-radius: 8px; background: #ef4444; color: #fff; font-weight: 800; font-size: 15px; display: grid; place-items: center; }
     .tp-tt { font-size: 13.5px; font-weight: 700; color: #fff; line-height: 1.25; }
@@ -3102,26 +3110,33 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         end3.setAttribute('opacity', breached ? 1 : 0);
         ann3.setAttribute('opacity', breached ? 1 : 0);
         c3.classList.toggle('alert', breached);
-        // arrow DOWN out of the breach — before the phone
-        var ak = ease(seg(pf, 0.56, 0.72));
-        var pk = ease(seg(pf, 0.74, 0.9));
+        // 1 · the phone appears first — just time and date
+        var pk = ease(seg(pf, 0.50, 0.60));
+        // 2 · the red line draws from the breach to the phone's SIDE
+        var ak = ease(seg(pf, 0.62, 0.74));
+        // 3 · the alert slides in right→left, continuing the arrow
+        var alk = ease(seg(pf, 0.74, 0.84));
+        var alertEl = document.getElementById('tdmAlert');
+        phone.style.opacity = pk.toFixed(3);
+        phone.style.transform = 'translateY(' + ((1 - pk) * 16).toFixed(1) + 'px)';
         if (ak > 0) {
           var sr = stage.getBoundingClientRect();
           var dr = dot3.getBoundingClientRect();
           var pr = phone.getBoundingClientRect();
+          var ar = alertEl.getBoundingClientRect();
           var x0 = dr.left + dr.width / 2 - sr.left, y0 = dr.bottom - sr.top + 4;
-          var x1a = pr.left + pr.width / 2 - sr.left, y1a = pr.top - sr.top - 10;
+          var x1a = pr.right - sr.left + 10, y1a = ar.top + ar.height / 2 - sr.top;
           linkP.setAttribute('d', 'M' + x0.toFixed(1) + ' ' + y0.toFixed(1) +
-            ' C' + x0.toFixed(1) + ' ' + ((y0 + y1a) / 2).toFixed(1) + ' ' + x1a.toFixed(1) + ' ' + ((y0 + y1a) / 2).toFixed(1) + ' ' + x1a.toFixed(1) + ' ' + y1a.toFixed(1));
+            ' C' + x0.toFixed(1) + ' ' + ((y0 + y1a) / 2).toFixed(1) + ' ' + (x1a + 70).toFixed(1) + ' ' + y1a.toFixed(1) + ' ' + x1a.toFixed(1) + ' ' + y1a.toFixed(1));
           var AL = linkP.getTotalLength();
           linkP.style.strokeDasharray = (AL * ak).toFixed(1) + ' ' + (AL + 2).toFixed(1);
           linkP.style.opacity = '1';
-          linkH.setAttribute('d', 'M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l-6 -11 M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l6 -11');
+          // arrival is leftward → barbs open to the right
+          linkH.setAttribute('d', 'M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l11 -6 M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l11 6');
           linkH.style.opacity = ak > 0.95 ? '1' : '0';
         } else { linkP.style.opacity = '0'; linkH.style.opacity = '0'; }
-        // then the phone (in flow below the graph; it only fades/rises)
-        phone.style.opacity = pk.toFixed(3);
-        phone.style.transform = 'translateY(' + ((1 - pk) * 16).toFixed(1) + 'px)';
+        alertEl.style.opacity = alk.toFixed(3);
+        alertEl.style.transform = 'translateX(' + ((1 - alk) * 30).toFixed(1) + 'px)';
       }
       addEventListener('scroll', render, { passive: true });
       addEventListener('resize', render);
