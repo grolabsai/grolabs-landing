@@ -34,7 +34,9 @@
   }
   /* left padding = a reserved gutter where the yellow guide line runs, so
      it sits BESIDE the blocks instead of crossing over them */
-  .m-wrap{max-width:488px; width:100%; margin:0 auto; padding-left:28px; transform:translateX(-14px); display:flex; flex-direction:column; gap:8px; position:relative;}
+  .m-wrap{max-width:500px; width:100%; margin:0 auto; padding-left:40px; transform:translateX(-20px); display:flex; flex-direction:column; gap:8px; position:relative;}
+  /* vertical stage labels down the left gutter, one per block */
+  .v-lab{position:absolute; left:2px; writing-mode:vertical-rl; font-family:var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:rgba(237,234,224,.5); transition:opacity .4s ease, filter .5s ease;}
   #guide{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:60; opacity:0;}
   #guide path{fill:none; stroke:#f5c518; stroke-width:4.5; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
   #guidePath{filter:drop-shadow(0 2px 6px rgba(245,197,24,.3));}
@@ -73,19 +75,17 @@
 
   /* ── engine panels (dark) ── */
   .m-panel{background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:11px 12px; box-shadow:0 10px 22px rgba(0,0,0,.5); display:flex; flex-direction:column; transition:filter .5s ease, opacity .5s ease;}
-  .m-wrap.ended :is(.m-pipe,.shop,.z-lab){ filter:grayscale(1); opacity:.45; }
+  .m-wrap.ended :is(.m-pipe-col,.shop,.z-lab,.v-lab){ filter:grayscale(1); opacity:.45; }
   .m-h{font-family:var(--mono); font-size:12.5px; letter-spacing:.16em; text-transform:uppercase;}
   .m-h .s{display:block; font-size:11px; letter-spacing:.03em; color:rgba(237,234,224,.4); margin-top:3px; text-transform:none;}
   .green{color:var(--pass);} .gold{color:var(--gold);} .blue{color:var(--blue);} .red{color:var(--leak);} .white{color:var(--bone);}
 
   /* pipeline — leak stays on the LEFT, the proposed fix appears beside
      it on the RIGHT (it does not replace the leak) */
-  .m-pipe{min-height:96px; display:flex; flex-direction:column; gap:7px; padding:10px 11px;}
-  .m-lab{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:rgba(237,234,224,.5);}
-  .m-lab::after{content:""; flex:1; height:1px; background:rgba(255,255,255,.12);}
   .m-prob{font-size:22px; line-height:1.3; color:rgba(237,234,224,.6); min-height:17px; margin:2px 0 4px;}
   .m-pipe.idle{opacity:.5;}
-  .m-pipe-col{position:relative; border:1px solid rgba(255,255,255,.10); border-radius:9px; padding:9px 10px; display:flex; flex-direction:column; transition:border-color .25s, background .25s;}
+  .m-pipe-col{position:relative; background:var(--surface); border:1px solid rgba(255,255,255,.10); border-radius:12px; padding:11px 12px; display:flex; flex-direction:column; box-shadow:0 10px 22px rgba(0,0,0,.5); transition:border-color .25s, background .25s, opacity .3s;}
+  .m-pipe-col.idle{opacity:.5;}
   .m-pipe-col .m-pipe-tag{position:absolute; top:8px; right:8px; margin:0;}
   .m-pipe-col .m-pipe-item{padding-right:132px;}
   .m-pipe-col .m-h{font-size:11.5px;}
@@ -158,14 +158,11 @@
   </div>
 
   <div class="rev" id="revSys">
-  <div class="m-panel m-pipe idle" id="mPipe">
-    <div class="m-lab">Diagnosis</div>
     <div class="m-pipe-col leak" id="pLeak">
       <div class="m-pipe-item" id="leakItem">awaiting searches</div>
       <div class="m-prob" id="leakProb"></div>
       <div class="m-pipe-tag" id="leakTag">idle</div>
     </div>
-    <div class="m-lab">Fix</div>
     <div class="m-pipe-col fix" id="pFix">
       <div class="m-pipe-act" id="fixAct"></div>
       <div class="m-pipe-item" id="fixItem"></div>
@@ -196,12 +193,17 @@
   </div>
   </div>
 
+  <span class="v-lab" id="vl0">Search</span>
+  <span class="v-lab" id="vl1">Diagnose</span>
+  <span class="v-lab" id="vl2">Fix</span>
+  <span class="v-lab" id="vl3">Monitor</span>
+
   <!-- hand-drawn guide line: after each payout it sweeps from the updated
        total up the left side to the search box; erased tail-first when the
        next search starts typing -->
   <svg id="guide" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-    <path id="guidePath" d="M 79 96.5 C 55 103.5,13 101,4.6 89 C 1 80.5,1.2 42,2.6 16.5 C 2.9 11,5.2 8.4,10 9.1" />
-    <path id="guideHead" d="M 10 9.1 L 7 11.7 M 10 9.1 L 7.1 6.8" />
+    <path id="guidePath" d="M 79 96.5 C 55 103.5,14 101,6.4 89 C 3.6 80.5,3.8 42,5.4 16.5 C 5.7 11,7.4 8.4,11.4 9.1" />
+    <path id="guideHead" d="M 11.4 9.1 L 8.4 11.7 M 11.4 9.1 L 8.5 6.8" />
   </svg>
 </div>
 <div id="mFlyer"></div>
@@ -259,15 +261,20 @@
      the Recovery Monitor up and down): measure the tallest leak/fix
      state across every event and lock the card to that height. */
   function lockPipeHeight(){
-    const pipe=$('#mPipe');
-    pipe.style.minHeight='';
-    let max=0;
+    const pl=$('#pLeak'), pf=$('#pFix');
+    pl.style.minHeight=''; pf.style.minHeight='';
+    let mL=0, mF=0;
     EVENTS.forEach(ev=>{
-      setPipe('leak',ev); max=Math.max(max,pipe.offsetHeight);
-      setPipe('fix',ev);  max=Math.max(max,pipe.offsetHeight);
+      setPipe('leak',ev); mL=Math.max(mL,pl.offsetHeight);
+      setPipe('fix',ev);  mL=Math.max(mL,pl.offsetHeight); mF=Math.max(mF,pf.offsetHeight);
     });
     setPipe('idle',EVENTS[0]);
-    pipe.style.minHeight=max+'px';
+    pl.style.minHeight=mL+'px'; pf.style.minHeight=mF+'px';
+    // vertical stage labels: pin each to its block's top edge
+    [['#vl0','.shop'],['#vl1','#pLeak'],['#vl2','#pFix'],['#vl3','#mRecovery']].forEach(function(pair){
+      const lab=$(pair[0]), el=$(pair[1]);
+      if(lab&&el) lab.style.top=el.offsetTop+'px';
+    });
   }
 
   let zoom=1;
@@ -285,15 +292,14 @@
   function setPipe(state,ev){
     // left column: the leak — stays visible while the fix shows on the right
     const leakOn=state!=='idle';
-    $('#mPipe').className='m-panel m-pipe'+(state==='idle'?' idle':'');
-    $('#pLeak').className='m-pipe-col leak'+(leakOn?' on':'')+(state==='hit'?' hitp':'')+(state==='fix'?' dim':'');
+    $('#pLeak').className='m-pipe-col leak'+(leakOn?' on':' idle')+(state==='hit'?' hitp':'')+(state==='fix'?' dim':'');
     $('#leakItem').textContent=leakOn?'"'+ev.item+'"':'awaiting searches';
     $('#leakProb').textContent=leakOn?ev.problem:'';
     $('#leakTag').className='m-pipe-tag'+(leakOn?' show leak':'');
     $('#leakTag').textContent=leakOn?'Revenue leak':'idle';
     // right column: the proposed fix
     const fixOn=state==='fix';
-    $('#pFix').className='m-pipe-col fix'+(fixOn?' on '+ev.type:'');
+    $('#pFix').className='m-pipe-col fix'+(fixOn?' on '+ev.type:(state==='idle'?' idle':''));
     $('#fixAct').textContent=fixOn?ev.act:'';
     $('#fixItem').textContent=fixOn?ev.detail:'';
     var TAGIC={search:'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>',
@@ -332,6 +338,10 @@
       el.style.transform=v<1?'translateY('+(-(1-v)*10).toFixed(1)+'px)':'';
       el.style.visibility=v<=0?'hidden':'';
     });
+    // the vertical stage labels appear with their blocks
+    $('#vl1').style.opacity=sysRev.toFixed(3);
+    $('#vl2').style.opacity=sysRev.toFixed(3);
+    $('#vl3').style.opacity=recRev.toFixed(3);
 
     /* 1 · storefront: the query types in */
     const chars=Math.round(ev.item.length*seg(lt,0,PH.typeEnd));
