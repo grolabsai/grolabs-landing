@@ -14,7 +14,7 @@
   const q1 = (s) => root.querySelector(s);
   const track = q1(".cps-track"), stage = q1(".cps-stage"), inner = q1(".cps-inner");
   const sheet = q1(".cps-sheet"), rowsEl = q1(".cps-rows"), head = q1(".cps-head"), trail = q1(".cps-trail");
-  const wrap = q1(".cb-wrap"), basesEl = q1(".cb-bases"), varsEl = q1(".cb-vars"), links = q1(".cb-links");
+  const wrap = q1(".cb-wrap"), groupsEl = q1(".cb-groups"), headsEl = q1(".cb-heads"), links = q1(".cb-links");
   const hintEl = q1(".cps-hint"), sheetCount = q1(".cps-sheet-n"), sheetDone = q1(".cps-sheet-done");
   const ROWS = CFG.rows, N = ROWS.length;
   const NS = "http://www.w3.org/2000/svg";
@@ -70,11 +70,17 @@
     const f = (id) => Math.min.apply(null, ROWS.map((r, i) => (r.base === id ? slotOf(i) : 99)));
     return f(a.id) - f(b.id);
   });
+  /* Each base gets a GROUP band: base card left, its variants right —
+     the first variant of each base aligns with its base's top, and
+     because groups are separate, connector lines can never cross. */
+  const varRefs = new Array(N);
   const baseRefs = BASES.map((b) => {
+    const grp = document.createElement("div");
+    grp.className = "cb-group";
     const c = document.createElement("div");
     c.className = "cb-base";
     c.innerHTML = '<div class="cb-b-h"><span class="cps-c-dot"></span><span class="cb-b-name"></span></div>'
-      + '<div class="cb-b-chips"></div><div class="cb-b-f"></div>';
+      + '<div class="cb-b-chips"></div>';
     c.querySelector(".cb-b-name").textContent = b.name;
     const at = c.querySelector(".cb-b-chips");
     b.attrs.forEach(([k, v]) => {
@@ -86,31 +92,33 @@
       ch.style.setProperty("--on", "1");
       at.appendChild(ch);
     });
-    basesEl.appendChild(c);
+    grp.appendChild(c);
+    const gv = document.createElement("div");
+    gv.className = "cb-gvars";
+    grp.appendChild(gv);
+    groupsEl.appendChild(grp);
     const mine = ROWS.map((r, i) => (r.base === b.id ? i : -1)).filter((i) => i >= 0);
-    return { el: c, foot: c.querySelector(".cb-b-f"), base: b, mine,
+    // this base's variant slots, stacked in parse order from the top
+    mine.slice().sort((x, y) => slotOf(x) - slotOf(y)).forEach((i) => {
+      const r = ROWS[i];
+      const v = document.createElement("div");
+      v.className = "cb-var";
+      v.innerHTML = '<span class="cps-pill cb-v-pill"></span><span class="cps-pill cb-v-pill"></span>'
+        + '<span class="cb-v-sku"></span><span class="cb-v-price"></span>';
+      const pills = v.querySelectorAll(".cb-v-pill");
+      pills[0].textContent = r.vals[0][1];
+      pills[1].textContent = r.vals[1][1];
+      v.querySelector(".cb-v-sku").textContent = r.sku;
+      v.querySelector(".cb-v-price").textContent = "$" + r.price.toFixed(2);
+      gv.appendChild(v);
+      const path = document.createElementNS(NS, "path");
+      links.appendChild(path);
+      varRefs[i] = { el: v, path };
+    });
+    return { el: c, base: b, mine,
       first: mine.reduce((a, i) => (slotOf(i) < slotOf(a) ? i : a), mine[0]) };
   });
   const baseOf = {}; baseRefs.forEach((b) => { baseOf[b.base.id] = b; });
-
-  /* ── Variant mini-cards (RIGHT column, one per row, parse order) ── */
-  const varRefs = new Array(N);
-  [...ROWS].map((r, i) => i).sort((a, b) => slotOf(a) - slotOf(b)).forEach((i) => {
-    const r = ROWS[i];
-    const v = document.createElement("div");
-    v.className = "cb-var";
-    v.innerHTML = '<span class="cps-pill cb-v-pill"></span><span class="cps-pill cb-v-pill"></span>'
-      + '<span class="cb-v-sku"></span><span class="cb-v-price"></span>';
-    const pills = v.querySelectorAll(".cb-v-pill");
-    pills[0].textContent = r.vals[0][1];
-    pills[1].textContent = r.vals[1][1];
-    v.querySelector(".cb-v-sku").textContent = r.sku;
-    v.querySelector(".cb-v-price").textContent = "$" + r.price.toFixed(2);
-    varsEl.appendChild(v);
-    const path = document.createElementNS(NS, "path");
-    links.appendChild(path);
-    varRefs[i] = { el: v, pills, path };
-  });
 
   /* ── Measure + auto-fit ─────────────────────────────────────── */
   let cur = 0, fit = 1, ready = false;
@@ -159,7 +167,7 @@
       const lift = es(seg(q, 0.5, 0.64));
       const travel = eo(seg(q, 0.56, 0.96));
       const collapse = es(seg(q, 0.56, 0.80));
-      const fade = eo(seg(q, 0.74, 0.99));
+      const fade = eo(seg(q, 0.86, 0.99));   // vanish exactly at arrival
       if (q > 0 && q < 1) { active = i; activeQ = q; }
       if (q >= 0.80) parsed++;
 
@@ -172,11 +180,12 @@
       r.bub.style.opacity = bv.toFixed(3);
       r.bub.style.setProperty("--s", (0.8 + 0.2 * es(seg(q, 0.52, 0.66))).toFixed(3));
 
-      // travel toward THIS row's variant slot on the right
-      const v = varRefs[i];
-      const slot = inWrap(v.el);
-      const dx = (wrap.offsetLeft + slot.x) - (sheet.offsetLeft + 8);
-      const dy = (wrap.offsetTop + slot.y) - (sheet.offsetTop + rowsEl.offsetTop + r.li.offsetTop);
+      // travel PRECISELY to this row's landing spot: base-creating rows
+      // fly LEFT into the base card they create; variant rows fly RIGHT
+      // into their exact slot
+      const tgt = ROWS[i].isNew ? inWrap(baseOf[ROWS[i].base].el) : inWrap(varRefs[i].el);
+      const dx = (wrap.offsetLeft + tgt.x) - (sheet.offsetLeft + 8);
+      const dy = (wrap.offsetTop + tgt.y) - (sheet.offsetTop + rowsEl.offsetTop + r.li.offsetTop);
       r.box.style.transform = "translate(" + (dx * travel).toFixed(1) + "px," + (dy * travel).toFixed(1) + "px) scale(" + (1 - 0.45 * travel).toFixed(3) + ")";
       r.box.style.opacity = (1 - fade).toFixed(3);
       r.li.style.height = collapse <= 0.001 ? "auto" : (r.h * (1 - collapse)).toFixed(1) + "px";
@@ -204,22 +213,22 @@
     sheetDone.style.opacity = dn.toFixed(3);
     sheetDone.style.height = (dn * 30).toFixed(1) + "px";
 
-    /* base cards reveal with their first row */
+    /* base cards reveal as their creating row arrives; column titles
+       appear with the very first travel */
     baseRefs.forEach((b) => {
-      const rev = es(seg(rowQ(p, b.first), 0.72, 0.98));
+      const rev = es(seg(rowQ(p, b.first), 0.60, 0.82));
       b.el.style.setProperty("--rev", rev.toFixed(3));
-      let n = 0;
-      b.mine.forEach((i) => { if (rowQ(p, i) >= 0.80) n++; });
-      b.foot.textContent = n + (n === 1 ? " variant" : " variants");
     });
+    headsEl.style.opacity = es(seg(rowQ(p, N - 1), 0.5, 0.85)).toFixed(3);
 
     /* variant cards fill + arrowed links back to their base */
     rowRefs.forEach((_, i) => {
       const q = rowQ(p, i);
       const v = varRefs[i];
-      const on = es(seg(q, 0.78, 0.95));
+      const nw = ROWS[i].isNew;
+      const on = es(nw ? seg(q, 0.86, 0.97) : seg(q, 0.80, 0.94));
       v.el.style.setProperty("--vo", on.toFixed(3));
-      v.el.classList.toggle("onv", q >= 0.80);
+      v.el.classList.toggle("onv", q >= (nw ? 0.88 : 0.80));
       const b = baseOf[ROWS[i].base];
       const bb = inWrap(b.el), ss = inWrap(v.el);
       const x0 = bb.x + bb.w, y0 = bb.y + bb.h / 2;
@@ -229,7 +238,7 @@
         "M" + x0 + " " + y0 + " C" + mx + " " + y0 + " " + mx + " " + y1 + " " + x1 + " " + y1 +
         " M" + x1 + " " + y1 + " l-6 -4 M" + x1 + " " + y1 + " l-6 4");
       const L = v.path.getTotalLength();
-      const k = es(seg(q, 0.82, 0.99));
+      const k = es(nw ? seg(q, 0.90, 1) : seg(q, 0.84, 0.99));
       v.path.style.strokeDasharray = (L * k).toFixed(1) + " " + (L + 2).toFixed(1);
       v.path.style.opacity = k > 0 ? "1" : "0";
     });

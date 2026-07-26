@@ -879,63 +879,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     })();
   </script>
 
-  {/* ============================================================
-       Catalog Parser — Alchemus. Scroll-driven section: an Excel feed
-       is scanned row by row (yellow beam, tokens turn into coloured
-       pills), each row drops into its product base card, and a full
-       SKU table builds underneath. Engine is public/catalog-parser.js
-       (ship as-is, do not edit); every visual is a pure function of
-       scroll progress, so scrolling up rewinds the parse. Markup,
-       class names and DOM nesting inside .cps-inner must not change —
-       the engine queries and measures that structure.
-       ============================================================ */}
-  <section class="cps" id="cps" data-screen-label="Catalog Parser">
-    {/* below lg the head sits above the track; at lg+ it lives inside
-        the pinned stage's left column (.cps-side) */}
-    <div class="cps-head-wrap cps-head-sm">
-      <div class="cps-eyebrow">Alchemus — AI catalog Enrichment agent</div>
-      <h2 class="cps-h2">Product Catalog</h2>
-      <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
-    </div>
-    <div class="cps-track">
-      <div class="cps-stage">
-        <div class="cps-cols">
-        <div class="cps-eyebrow cps-side-eb">Alchemus — AI catalog Enrichment agent</div>
-        <div class="cps-side">
-          <h2 class="cps-h2">Product Catalog</h2>
-          <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
-        </div>
-        <div class="anim-glass">
-        <div class="cps-inner">
-
-          <div class="cps-sheet">
-            <div class="cps-sheet-bar"><span class="cps-sheet-x">X</span><span class="cps-sheet-f">product_feed.xlsx</span><span class="cps-sheet-tab">Sheet1</span><span class="cps-sheet-n">7 rows</span></div>
-            <div class="cps-sheet-head"><span class="cps-gut">#</span><span style="flex:1">A</span><span class="cps-scol">B</span><span class="cps-pcol">C</span></div>
-            <div class="cps-sheet-r1"><span class="cps-gut">1</span><span style="flex:1">product_title</span><span class="cps-scol">sku</span><span class="cps-pcol">price</span></div>
-            <ul class="cps-rows"></ul>
-            <div class="cps-trail"></div><div class="cps-head"></div>
-            <div class="cps-sheet-done">all rows processed</div>
-          </div>
-
-          <div class="cps-cards"></div>
-
-          <div class="cps-table">
-            <table>
-              <thead><tr><th>SKU</th><th class="v">Color</th><th class="v">Size</th><th class="a">Closure</th><th class="a">Sleeve</th><th class="r">Price</th></tr></thead>
-              <tbody class="cps-tbody"></tbody>
-            </table>
-          </div>
-
-          <div class="cps-legend"><span><i style="background:#fff"></i>Product base</span><span><i style="background:#9ec5ff"></i>Attribute</span><span><i style="background:#fae194"></i>Variant axis</span></div>
-
-        </div>
-        </div>
-        </div>
-        <div class="cps-hint"><b></b><span>Scroll to run the parser</span></div>
-      </div>
-    </div>
-  </section>
-
   <style is:global>
     :root{--cps-bg:#0c0c0f;--cps-line:rgba(255,255,255,.09);--cps-txt:#e8e8ee;--cps-dim:#8b8d98;--cps-accent:#fae194;--cps-blue:#9ec5ff;--cps-green:#34d399;--cps-ink:#24252b}
 
@@ -1159,7 +1102,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       ],
     };
   </script>
-  <script is:inline src={`${base}/catalog-parser.js`}></script>
 
   {/* ============================================================
        Catalog Parser V2 — EXPERIMENT (base → variants map). Same
@@ -1168,11 +1110,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        (color · size · sku · price), each landing with an arrowed link
        to its base. Engine: /catalog-parser-2.js.
        ============================================================ */}
-  <section class="cps" id="cps2" data-screen-label="Catalog Parser v2">
+  <section class="cps" id="cps2" data-screen-label="Catalog Parser">
     <div class="cps-head-wrap">
-      <div class="cps-eyebrow">Alchemus — AI catalog Enrichment agent · v2 experiment</div>
-      <h2 class="cps-h2">Product Catalog — base &amp; variants</h2>
-      <p class="cps-sub"><em>Alchemus</em> maps every feed row to a product base and its variants — one base, many variants, connected.</p>
+      <div class="cps-eyebrow">Alchemus — AI catalog Enrichment agent</div>
+      <h2 class="cps-h2">Product Catalog</h2>
+      <p class="cps-sub"><em>Alchemus</em> transforms product catalogs into a structured foundation that enables AI-powered search to maximize product discovery and conversion.</p>
     </div>
     <div class="cps-track">
       <div class="cps-stage">
@@ -1188,8 +1130,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           </div>
 
           <div class="cb-wrap">
-            <div class="cb-col cb-bases"></div>
-            <div class="cb-col cb-vars"></div>
+            <div class="cb-heads"><span>Product Base</span><span>Product Variant</span></div>
+            <div class="cb-groups"></div>
             <svg class="cb-links" aria-hidden="true"></svg>
           </div>
 
@@ -1200,18 +1142,22 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   </section>
 
   <style is:global>
-    /* v2 base→variants relationship view */
+    /* v2 base→variants relationship view — grouped: each base and ITS
+       variants share a band, so connector lines can never cross */
     #cps2 .cps-inner{position:relative}
-    .cb-wrap{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:64px;margin-top:44px}
-    .cb-col{display:flex;flex-direction:column;gap:10px}
-    .cb-bases{justify-content:center;gap:26px}
+    .cb-wrap{position:relative;display:flex;flex-direction:column;margin-top:40px}
+    .cb-heads{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);column-gap:44px;margin-bottom:10px;opacity:0;font:600 10px/1 ui-monospace,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:rgba(237,234,224,.45)}
+    .cb-groups{display:flex;flex-direction:column;gap:20px}
+    .cb-group{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);column-gap:44px;align-items:start}
     .cb-base{--rev:0;opacity:var(--rev);transform:translateY(calc((1 - var(--rev))*10px));border:1px solid rgba(255,255,255,.09);border-radius:12px;background:linear-gradient(#1b1c23,#161720);padding:10px 12px;display:flex;flex-direction:column;gap:7px}
-    .cb-b-h{display:flex;align-items:center;gap:8px}
-    .cb-b-name{font-size:13px;font-weight:600;color:#fff;line-height:1.25}
+    .cb-b-h{display:flex;align-items:flex-start;gap:8px}
+    .cb-b-h .cps-c-dot{margin-top:5px}
+    .cb-b-name{font-size:13px;font-weight:600;color:#fff;line-height:1.3;text-wrap:balance}
     .cb-b-chips{display:flex;flex-wrap:wrap;gap:6px}
-    .cb-b-f{font:500 10px/1 ui-monospace,Menlo,monospace;color:#6d6f7a}
-    .cb-var{--vo:0;display:flex;align-items:center;gap:7px;border:1px dashed rgba(255,255,255,.14);border-radius:9px;padding:6px 9px;min-height:34px;transition:border-color .25s,background .25s}
-    .cb-var.onv{border-style:solid;border-color:rgba(250,225,148,.35);background:rgba(250,225,148,.04)}
+    .cb-gvars{display:flex;flex-direction:column;gap:8px}
+    /* variants are INVISIBLE until created — no pre-drawn grid */
+    .cb-var{--vo:0;display:flex;align-items:center;gap:7px;border:1px solid transparent;border-radius:9px;padding:6px 9px;min-height:34px;transition:border-color .25s,background .25s}
+    .cb-var.onv{border-color:rgba(250,225,148,.35);background:rgba(250,225,148,.04)}
     .cb-var>*{opacity:var(--vo)}
     .cb-var .cb-v-pill{--on:1}
     .cb-v-sku{font:600 11px/1 ui-monospace,Menlo,monospace;color:#fff;margin-left:auto}
@@ -1219,9 +1165,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .cb-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
     .cb-links path{fill:none;stroke:rgba(250,225,148,.6);stroke-width:1.5;stroke-linecap:round}
     @media (max-width:760px){
-      .cb-wrap{gap:20px;margin-top:32px}
+      .cb-wrap{margin-top:28px}
+      .cb-heads{column-gap:30px;font-size:8.5px}
+      .cb-group{column-gap:30px;grid-template-columns:minmax(0,4fr) minmax(0,5fr)}
       .cb-base{padding:8px 9px}
-      .cb-b-name{font-size:11.5px}
+      .cb-b-name{font-size:11px}
       .cb-var{padding:5px 7px;min-height:30px;gap:5px}
       .cb-v-sku,.cb-v-price{font-size:10px}
     }
@@ -2586,6 +2534,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         the red arrow draws downward out of the breach first, and only
         then the phone fades in under it. */}
     <div class="tdm-flow max-w-page mx-auto">
+      <div class="tdm-fin-track">
+        <div class="tdm-fin-stage">
+          <div class="tdm-dash">
+          <div class="tdm-2up">
       <div class="tdm-card" id="tdmC1">
         <div class="tdm-ct">Week-over-week change — the detector that misses slow drift</div>
         <svg id="tdmS1" class="tdm-svg" viewBox="0 0 360 190" aria-hidden="true"></svg>
@@ -2596,8 +2548,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         <svg id="tdmS2" class="tdm-svg" viewBox="0 0 360 190" aria-hidden="true"></svg>
         <div class="tdm-note">Adds up every small shortfall below the baseline. Sustained drift crosses the decision limit weeks before any single-week alarm would fire.</div>
       </div>
-      <div class="tdm-fin-track">
-        <div class="tdm-fin-stage">
+      </div>
           <div class="tdm-card tdm-wide" id="tdmC3">
             <div class="tdm-ct">Daily sessions vs the rolling week</div>
             <div class="tdm-legend">
@@ -2606,6 +2557,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             </div>
             <svg id="tdmS3" class="tdm-svg" viewBox="0 0 720 190" aria-hidden="true"></svg>
             <div class="tdm-note">Days of the week have their own rhythm, so any two adjacent days differ for reasons that have nothing to do with performance. The rolling line is the honest trend.</div>
+          </div>
           </div>
           <div class="tdm-phone" id="tdmPhone">
             <div class="tp-notch"></div>
@@ -2627,19 +2579,29 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   </section>
 
   <style is:global>
-    /* ── traffic-monitor story: app-exact dark glass tiles on yellow ── */
-    .tdm-flow { display: flex; flex-direction: column; align-items: center; gap: 48px; }
+    /* ── traffic-monitor story: a BLACK dashboard block on the yellow
+       band; each chart card is true glass over it (vertical sheen,
+       top → bottom) ── */
+    .tdm-flow { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+    /* the BLACK panels are the dashboard itself — they contain ONLY the
+       chart cards; the phone (a sent message) lives outside, on the
+       yellow band */
+    .tdm-dash { width: 100%; position: relative;
+      background: #0a0a0a; border-radius: 20px; padding: 24px;
+      box-shadow: 0 24px 60px -20px rgba(0,0,0,.45);
+      display: flex; flex-direction: column; gap: 28px; align-items: center; }
+    .tdm-2up { width: 100%; display: flex; flex-direction: column; gap: 28px; align-items: center; }
     /* desktop: the two detectors share one row, each half the width of
        the rhythm chart below (which spans the full row) */
     @media (min-width: 1024px) {
-      .tdm-flow { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1000px; margin: 0 auto; align-items: stretch; }
+      .tdm-flow { max-width: 1000px; margin: 0 auto; }
+      .tdm-2up { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
       /* !important: the base .tdm-card.tdm-wide max-width rule is
          declared later in this block and would win otherwise */
       .tdm-card, .tdm-card.tdm-wide { max-width: none !important; width: 100%; }
       /* reserve a fixed title zone (tallest sibling title = 3 lines) so
          every chart starts at the same y regardless of title wrap */
       .tdm-ct { min-height: 48px; }
-      .tdm-fin-track { grid-column: 1 / -1; margin-top: 24px; }
     }
     /* standard container: blocks align by CONTAINER size, not content —
        flex column with the caption pinned to the bottom, so differing
@@ -2647,10 +2609,22 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .tdm-card {
       width: 100%; max-width: 560px;
       display: flex; flex-direction: column;
-      background: linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.02) 60%, rgba(255,255,255,.035)), #0d0d10;
-      border: 0; border-radius: 14px; padding: 16px 18px 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07);
+      background: linear-gradient(180deg,
+        rgba(255,255,255,0.13) 0%,
+        rgba(255,255,255,0.05) 36%,
+        rgba(255,255,255,0.012) 100%),
+        rgba(28,29,36,0.55);
+      backdrop-filter: blur(18px) saturate(180%);
+      -webkit-backdrop-filter: blur(18px) saturate(180%);
+      border: 0; border-radius: 16px; padding: 16px 18px 14px;
+      box-shadow: 0 18px 48px rgba(0,0,0,.5), inset 0 1px 1px rgba(255,255,255,.10);
       transition: box-shadow .3s;
+    }
+    @media (max-width: 768px) {
+      .tdm-card {
+        backdrop-filter: none; -webkit-backdrop-filter: none;
+        background: linear-gradient(180deg, #292a30 0%, #1e1f25 36%, #17181c 100%);
+      }
     }
     .tdm-card.tdm-wide { max-width: 860px; }
     .tdm-card.alert { box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.07), 0 0 0 1px rgba(239,68,68,.4), 0 0 26px rgba(239,68,68,.25); }
@@ -2664,13 +2638,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
     /* finale: the last chart pins near the top; the space below stays
        clear for the arrow + phone */
-    .tdm-fin-track { height: 230vh; position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .tdm-fin-track { height: 260vh; position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; }
     .tdm-fin-stage {
       position: sticky;
-      top: calc(var(--cps-top, 0px) + 14px);
+      /* top is set by JS: the block pins so the LAST chart sits at the
+         top of the page (the upper charts continue above the fold,
+         inside the same black block) */
+      top: 0;
       width: 100%;
-      height: calc(100svh - var(--cps-top, 0px) - 28px);
-      display: flex; flex-direction: column; align-items: center;
+      display: flex; flex-direction: column; align-items: center; gap: 20px;
     }
     .tdm-fin-stage .tdm-card { position: relative; z-index: 1; }
     /* the phone sits IN FLOW directly under the pinned graph (small
@@ -2696,7 +2672,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .tdm-link { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 2; }
     .tdm-link path { fill: none; stroke: #dc2626; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
     @media (max-width: 680px) {
-      .tdm-flow { gap: 28px; }
+      .tdm-flow { gap: 24px; }
+      .tdm-dash { padding: 14px 12px; border-radius: 16px; gap: 22px; }
       /* all graph blocks the same width on mobile */
       .tdm-card, .tdm-card.tdm-wide { max-width: none; width: 100%; }
       .tdm-card { padding: 12px 13px 10px; }
@@ -2814,12 +2791,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        centered, and the big stat numbers top-align with their text ── */
     @media (max-width: 767px) {
       .hero-v2-tagline { text-align: center; }
-      .hero-v2-ctas { flex-wrap: nowrap; gap: 10px; }
+      /* CTAs span the full width: yellow flush left, Contact flush right */
+      .hero-v2-ctas { flex-wrap: nowrap; gap: 10px; width: 100%; justify-content: space-between; }
       .hero-v2-btn { padding: 12px 14px; font-size: 13px; white-space: nowrap; }
       .hero-v2-stat-row { align-items: flex-start; }
       /* marker glyphs carry ~0.1em of leading; nudge so the 99% cap
          height sits level with the first text line's cap height */
       .hero-v2-stat-99 { margin-top: 0.08em; }
+      /* first scene = the hero alone; the stat block stays below the
+         fold until the user scrolls */
+      .hero-v2-copy {
+        min-height: calc(100svh - 200px);
+        display: flex; flex-direction: column; justify-content: center;
+      }
     }
     @media (max-width: 350px) {
       .hero-v2-btn { padding: 10px 10px; font-size: 11.5px; }
@@ -3044,12 +3028,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         // when the track reaches mid-screen (the lines begin drawing on
         // approach), runs through the anchor at the top, and continues
         // through breach → arrow → phone while pinned
+        var dash = sec.querySelector('.tdm-dash');
+        var off0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cps-top')) || 0;
+        var c3Rel = dash.offsetTop + c3.offsetTop;
+        // pin the WHOLE dashboard block so the LAST chart sits at the top
+        var pinTop = off0 + 14 - c3Rel;
+        if (Math.abs(parseFloat(stage.style.top || '1e9') - pinTop) > 0.5) stage.style.top = pinTop.toFixed(1) + 'px';
         var r = fin.getBoundingClientRect();
-        var off = parseFloat(getComputedStyle(stage).top) || 0;
         var span = r.height - stage.offsetHeight;
-        var startY = innerHeight * 0.55;
-        var total = (startY - off) + span;
-        var pf = total > 0 ? clamp((startY - r.top) / total, 0, 1) : 0;
+        // pf runs from "chart 3 at mid-screen" through the pin to the end
+        var A = innerHeight * 0.55 - c3Rel;
+        var total = (A - pinTop) + span;
+        var pf = total > 0 ? clamp((A - r.top) / total, 0, 1) : 0;
         // chart 3: card+axes on approach, then the continuous sweep
         applyCard(c3, ax3, Math.max(cardP(c3), pf > 0 ? 1 : 0));
         clip3d.r.setAttribute('width', (plotW3 * ease(seg(pf, 0.02, 0.20))).toFixed(1));
