@@ -308,22 +308,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <div class="rf-pin">
         <div class="rf-inner max-w-page mx-auto">
           <div class="rf-grid">
-            <span class="rf-eyebrow">How?</span>
+            <span class="rf-eyebrow">Ecommerce funnel</span>
             <div class="rf-copycol">
-            <h2 class="rf-title">GRO Framework</h2>
+            <h2 class="rf-title">Revenue Leak %</h2>
             <div class="rf-copy">
-              <p>The GRO Framework frees you to:</p>
-              {/* G / R / O spelled vertically in a thin left column; the
-                  text wraps only inside the wide right column, never
-                  under the letters. */}
-              <div class="rf-gro">
-                <span class="rf-cap">G</span>
-                <p>row the business while we</p>
-                <span class="rf-cap">R</span>
-                <p>ecover lost revenue and</p>
-                <span class="rf-cap">O</span>
-                <p>ptimize the revenue recovery engine.</p>
-              </div>
+              <p>Revenue Leaks occur when unnecessary friction prevents ready-to-buy customers from discovering, understanding, trusting, or purchasing the desired product.</p>
             </div>
             </div>
 
@@ -333,18 +322,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
                   <svg class="rf-marks" viewBox="0 0 1080 520" preserveAspectRatio="none" aria-hidden="true">
                     <path id="rfRule1" class="rf-ruleln" pathLength="1" d="M 300 246 C 430 244 560 248 680 245 C 730 244 770 247 800 246" />
                     <path id="rfRule2" class="rf-ruleln" pathLength="1" d="M 300 398 C 430 401 560 396 680 399 C 730 400 770 398 800 398" />
-                    <path id="rfArA"   pathLength="1" d="M 230 136 C 150 132 140 200 152 268 C 162 322 196 344 238 352" />
-                    <path id="rfArAh1" pathLength="1" d="M 238 352 L 214 346" />
-                    <path id="rfArAh2" pathLength="1" d="M 238 352 L 228 330" />
-                    <path id="rfArB"   pathLength="1" d="M 230 206 C 128 204 106 262 124 314 C 140 350 196 366 234 360" />
-                    <path id="rfArBh1" pathLength="1" d="M 234 360 L 210 355" />
-                    <path id="rfArBh2" pathLength="1" d="M 234 360 L 224 338" />
+                    <path id="rfArF"   pathLength="1" d="M 150 196 C 126 262 146 330 224 356" />
+                    <path id="rfArFh1" pathLength="1" d="M 224 356 l -20 -7" />
+                    <path id="rfArFh2" pathLength="1" d="M 224 356 l -15 13" />
                     <path id="rfArD"   pathLength="1" d="M 248 372 C 214 384 210 410 230 428 C 236 433 243 436 250 436" />
                     <path id="rfArDh1" pathLength="1" d="M 250 436 L 232 431" />
                     <path id="rfArDh2" pathLength="1" d="M 250 436 L 240 419" />
                     <path id="rfCirc1" class="rf-circle" pathLength="1" d="M 250 448 C 244 414 440 402 560 404 C 700 406 802 412 798 442 C 802 470 700 478 560 476 C 420 474 250 472 248 446 C 247 432 268 422 296 418" />
                     <path id="rfCirc2" class="rf-circle" pathLength="1" d="M 242 454 C 236 412 440 396 566 398 C 712 400 812 408 808 444 C 812 474 704 484 560 482 C 412 480 244 478 242 450 C 241 434 266 422 296 414" />
                   </svg>
+
+                  <div class="rf-hand rf-fix-note" id="rfFixTxt">Fix revenue leaks</div>
 
                   <div class="rf-op rf-row rf-auto" id="rfOpConv" style="top:136px;">&times;</div>
                   <div class="rf-op rf-row rf-auto" id="rfOpAov"  style="top:206px;">&times;</div>
@@ -491,6 +479,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
     .rf-marks .rf-ruleln { stroke: #fff; stroke-width: 3; }   /* dividers = white */
     .rf-marks .rf-circle { stroke: #34d399; stroke-width: 4; }/* green = answer circle only */
+    /* two lines, broken at the WORD boundary: "Fix revenue" / "leaks" —
+       clear of the Conversion column */
+    .rf-fix-note { position: absolute; left: 26px; top: 98px; width: 218px;
+      font-size: 34px; line-height: 1.12; color: #fae194; transform: rotate(-8deg);
+      overflow-wrap: normal; word-break: keep-all; }
     @keyframes rfDrawln { to { stroke-dashoffset: 0; } }
     .rf-go #rfRule1 { animation: rfDrawln .5s ease 1.06s both; }
   </style>
@@ -532,26 +525,31 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         return spans;
       }
       function P(id) { return section.querySelector('[id="' + id + '"]'); }
+      // v2 copy: the Conversion/AOV arrows are replaced by a handwritten
+      // "Fix revenue leaks" note + one red arrow into Recovered revenue
+      var v2 = section.classList.contains('rf-v2');
       var recLetters = splitLetters(P('rfWRec'));
       var potLetters = splitLetters(P('rfWPot'));
+      var fixLetters = v2 ? splitLetters(P('rfFixTxt')) : [];
 
       function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
       function seg(t, a, b) { return clamp((t - a) / (b - a), 0, 1); }
 
-      var arA = [P('rfArA'), P('rfArAh1'), P('rfArAh2')];
-      var arB = [P('rfArB'), P('rfArBh1'), P('rfArBh2')];
+      var arA = v2 ? null : [P('rfArA'), P('rfArAh1'), P('rfArAh2')];
+      var arB = v2 ? null : [P('rfArB'), P('rfArBh1'), P('rfArBh2')];
+      var arF = v2 ? [P('rfArF'), P('rfArFh1'), P('rfArFh2')] : null;
       var arD = [P('rfArD'), P('rfArDh1'), P('rfArDh2')];
       var rule2 = P('rfRule2'), c1 = P('rfCirc1'), c2 = P('rfCirc2');
 
       // Reduced motion (or no scrub): render the fully-drawn final frame.
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         ['rfOpConv','rfOpAov','rfOpAct','rfOpRec','rfOpPot','rfSRec','rfSPot'].forEach(function (id) {
-          var e = P(id); e.style.animation = 'none'; e.style.opacity = '1';
+          var e = P(id); if (!e) return; e.style.animation = 'none'; e.style.opacity = '1';
         });
-        ['rfRule1','rfRule2','rfArA','rfArAh1','rfArAh2','rfArB','rfArBh1','rfArBh2','rfArD','rfArDh1','rfArDh2','rfCirc1','rfCirc2'].forEach(function (id) {
-          P(id).style.strokeDashoffset = 0;
+        ['rfRule1','rfRule2','rfArA','rfArAh1','rfArAh2','rfArB','rfArBh1','rfArBh2','rfArD','rfArDh1','rfArDh2','rfArF','rfArFh1','rfArFh2','rfCirc1','rfCirc2'].forEach(function (id) {
+          var e = P(id); if (e) e.style.strokeDashoffset = 0;
         });
-        recLetters.concat(potLetters).forEach(function (s) { s.style.opacity = '1'; });
+        recLetters.concat(potLetters).concat(fixLetters).forEach(function (s) { s.style.opacity = '1'; });
         return;
       }
 
@@ -592,8 +590,15 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         if (total <= 0) return;
         var t = clamp(-r.top / total, 0, 1);
 
-        arrow(arA, t, 0.00, 0.08, 0.11);
-        arrow(arB, t, 0.13, 0.21, 0.24);
+        if (v2) {
+          // handwrite the note first; the arrow leaves the pen only
+          // AFTER the last letter, then the timeline continues as before
+          writeLetters(fixLetters, seg(t, 0.02, 0.16));
+          arrow(arF, t, 0.17, 0.23, 0.25);
+        } else {
+          arrow(arA, t, 0.00, 0.08, 0.11);
+          arrow(arB, t, 0.13, 0.21, 0.24);
+        }
         showEl(P('rfOpRec'), seg(t, 0.26, 0.30));
         writeLetters(recLetters, seg(t, 0.31, 0.44));
         showEl(P('rfSRec'), seg(t, 0.45, 0.48));
