@@ -325,11 +325,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
                     <path id="rfArF"   pathLength="1" d="M 150 196 C 126 262 146 330 224 356" />
                     <path id="rfArFh1" pathLength="1" d="M 224 356 l -20 -7" />
                     <path id="rfArFh2" pathLength="1" d="M 224 356 l -15 13" />
-                    <path id="rfArD"   pathLength="1" d="M 248 372 C 214 384 210 410 230 428 C 236 433 243 436 250 436" />
-                    <path id="rfArDh1" pathLength="1" d="M 250 436 L 232 431" />
-                    <path id="rfArDh2" pathLength="1" d="M 250 436 L 240 419" />
-                    <path id="rfCirc1" class="rf-circle" pathLength="1" d="M 250 448 C 244 414 440 402 560 404 C 700 406 802 412 798 442 C 802 470 700 478 560 476 C 420 474 250 472 248 446 C 247 432 268 422 296 418" />
-                    <path id="rfCirc2" class="rf-circle" pathLength="1" d="M 242 454 C 236 412 440 396 566 398 C 712 400 812 408 808 444 C 812 474 704 484 560 482 C 412 480 244 478 242 450 C 241 434 266 422 296 414" />
                   </svg>
 
                   <div class="rf-hand rf-fix-note" id="rfFixTxt">Fix revenue leaks</div>
@@ -482,7 +477,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* two lines, broken at the WORD boundary: "Fix revenue" / "leaks" —
        clear of the Conversion column */
     .rf-fix-note { position: absolute; left: 26px; top: 98px; width: 218px;
-      font-size: 34px; line-height: 1.12; color: #fae194; transform: rotate(-8deg);
+      font-size: 36px; line-height: 1.12; color: #fae194; transform: rotate(-8deg);
       overflow-wrap: normal; word-break: keep-all; }
     @keyframes rfDrawln { to { stroke-dashoffset: 0; } }
     .rf-go #rfRule1 { animation: rfDrawln .5s ease 1.06s both; }
@@ -603,12 +598,11 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         writeLetters(recLetters, seg(t, 0.31, 0.44));
         showEl(P('rfSRec'), seg(t, 0.45, 0.48));
         dash(rule2, seg(t, 0.50, 0.57));
-        arrow(arD, t, 0.59, 0.68, 0.71);
+        if (!v2) arrow(arD, t, 0.59, 0.68, 0.71);
         showEl(P('rfOpPot'), seg(t, 0.73, 0.77));
         writeLetters(potLetters, seg(t, 0.78, 0.90));
         showEl(P('rfSPot'), seg(t, 0.90, 0.93));
-        dash(c1, seg(t, 0.93, 0.965));
-        dash(c2, seg(t, 0.965, 1.0));
+        if (!v2) { dash(c1, seg(t, 0.93, 0.965)); dash(c2, seg(t, 0.965, 1.0)); }
       }
       window.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
