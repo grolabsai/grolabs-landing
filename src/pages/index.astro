@@ -297,6 +297,85 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
+  {/* ============================================================
+       GRO Framework COPY (.rf-v2) — experimental sandbox duplicate of
+       the section above; same markup + per-section scoped driver, so
+       it animates independently. Edit freely without touching the
+       original.
+       ============================================================ */}
+  <section class="rf-section rf-v2" data-rf data-screen-label="GRO Framework Copy">
+    <div class="rf-track" data-rf-track>
+      <div class="rf-pin">
+        <div class="rf-inner max-w-page mx-auto">
+          <div class="rf-grid">
+            <span class="rf-eyebrow">How?</span>
+            <div class="rf-copycol">
+            <h2 class="rf-title">GRO Framework</h2>
+            <div class="rf-copy">
+              <p>The GRO Framework frees you to:</p>
+              {/* G / R / O spelled vertically in a thin left column; the
+                  text wraps only inside the wide right column, never
+                  under the letters. */}
+              <div class="rf-gro">
+                <span class="rf-cap">G</span>
+                <p>row the business while we</p>
+                <span class="rf-cap">R</span>
+                <p>ecover lost revenue and</p>
+                <span class="rf-cap">O</span>
+                <p>ptimize the revenue recovery engine.</p>
+              </div>
+            </div>
+            </div>
+
+            <div class="rf-box lifted-glass">
+              <div class="rf-stage-wrap" data-rf-wrap>
+                <div class="rf-stage" data-rf-stage>
+                  <svg class="rf-marks" viewBox="0 0 1080 520" preserveAspectRatio="none" aria-hidden="true">
+                    <path id="rfRule1" class="rf-ruleln" pathLength="1" d="M 300 246 C 430 244 560 248 680 245 C 730 244 770 247 800 246" />
+                    <path id="rfRule2" class="rf-ruleln" pathLength="1" d="M 300 398 C 430 401 560 396 680 399 C 730 400 770 398 800 398" />
+                    <path id="rfArA"   pathLength="1" d="M 230 136 C 150 132 140 200 152 268 C 162 322 196 344 238 352" />
+                    <path id="rfArAh1" pathLength="1" d="M 238 352 L 214 346" />
+                    <path id="rfArAh2" pathLength="1" d="M 238 352 L 228 330" />
+                    <path id="rfArB"   pathLength="1" d="M 230 206 C 128 204 106 262 124 314 C 140 350 196 366 234 360" />
+                    <path id="rfArBh1" pathLength="1" d="M 234 360 L 210 355" />
+                    <path id="rfArBh2" pathLength="1" d="M 234 360 L 224 338" />
+                    <path id="rfArD"   pathLength="1" d="M 248 372 C 214 384 210 410 230 428 C 236 433 243 436 250 436" />
+                    <path id="rfArDh1" pathLength="1" d="M 250 436 L 232 431" />
+                    <path id="rfArDh2" pathLength="1" d="M 250 436 L 240 419" />
+                    <path id="rfCirc1" class="rf-circle" pathLength="1" d="M 250 448 C 244 414 440 402 560 404 C 700 406 802 412 798 442 C 802 470 700 478 560 476 C 420 474 250 472 248 446 C 247 432 268 422 296 418" />
+                    <path id="rfCirc2" class="rf-circle" pathLength="1" d="M 242 454 C 236 412 440 396 566 398 C 712 400 812 408 808 444 C 812 474 704 484 560 482 C 412 480 244 478 242 450 C 241 434 266 422 296 414" />
+                  </svg>
+
+                  <div class="rf-op rf-row rf-auto" id="rfOpConv" style="top:136px;">&times;</div>
+                  <div class="rf-op rf-row rf-auto" id="rfOpAov"  style="top:206px;">&times;</div>
+                  <div class="rf-op rf-row rf-auto" id="rfOpAct"  style="top:288px;">=</div>
+                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpRec" style="top:358px;">+</div>
+                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpPot" style="top:442px;">=</div>
+
+                  <div class="rf-word rf-row" style="top:66px;">Traffic</div>
+                  <div class="rf-word rf-row" style="top:136px;">Conversion</div>
+                  <div class="rf-word rf-row" style="top:206px;">Average order value</div>
+                  <div class="rf-word rf-row" style="top:288px;">Actual revenue</div>
+                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWRec" style="top:358px;">Recovered revenue</div>
+                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWPot" style="top:442px;">Potential revenue</div>
+
+                  <div class="rf-sym rf-row" style="top:66px;">
+                    <svg viewBox="0 0 64 64" aria-label="traffic"><circle cx="32" cy="21" r="11" fill="currentColor"/><path d="M11 56 C11 38 53 38 53 56 Z" fill="currentColor"/></svg>
+                  </div>
+                  <div class="rf-sym rf-row" style="top:136px;">%</div>
+                  <div class="rf-sym rf-row" style="top:206px;">$</div>
+                  <div class="rf-sym rf-row" style="top:288px;">$</div>
+                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSRec" style="top:358px;">$</div>
+                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSPot" style="top:442px;">$$</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <style is:global>
     /* ─────────── GRO Framework (scroll-scrubbed revenue formula) ─────────── */
     .rf-section {
@@ -420,9 +499,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     // GRO Framework — scroll-scrubbed annotation timeline ("one pen": a single
     // stroke draws at any moment; arrowheads only after their shaft; signs
     // complete before their word writes letter-by-letter).
-    (function () {
-      var section = document.querySelector('[data-rf]');
-      if (!section) return;
+    // Runs once per [data-rf] section (the page can carry experimental
+    // COPIES of the framework); every lookup is scoped to the section,
+    // so duplicated ids stay isolated per copy.
+    document.querySelectorAll('[data-rf]').forEach(function (section) {
       var track = section.querySelector('[data-rf-track]');
       var wrap = section.querySelector('[data-rf-wrap]');
       var stage = section.querySelector('[data-rf-stage]');
@@ -451,12 +531,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         }
         return spans;
       }
-      var recLetters = splitLetters(document.getElementById('rfWRec'));
-      var potLetters = splitLetters(document.getElementById('rfWPot'));
+      function P(id) { return section.querySelector('[id="' + id + '"]'); }
+      var recLetters = splitLetters(P('rfWRec'));
+      var potLetters = splitLetters(P('rfWPot'));
 
       function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
       function seg(t, a, b) { return clamp((t - a) / (b - a), 0, 1); }
-      function P(id) { return document.getElementById(id); }
 
       var arA = [P('rfArA'), P('rfArAh1'), P('rfArAh2')];
       var arB = [P('rfArB'), P('rfArBh1'), P('rfArBh2')];
@@ -528,7 +608,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       window.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
       update();
-    })();
+    });
   </script>
 
 
