@@ -26,6 +26,8 @@ const defaults = {
     nav: {
       home: 'Home',
       resources: 'Resources',
+      books: 'Books',
+      simulators: 'Simulators',
       blog: 'Blog',
     },
     footer: {
@@ -45,6 +47,8 @@ const defaults = {
     nav: {
       home: 'Inicio',
       resources: 'Recursos',
+      books: 'Libros',
+      simulators: 'Simuladores',
       blog: 'Blog',
     },
     footer: {
@@ -82,6 +86,11 @@ const {
 
 const home = isSpanish ? `${base}/es/` : (base || '/');
 const resourcesHref = isSpanish ? `${base}/es/resources` : `${base}/resources`;
+// Resources submenu targets. Books = the existing reading-list page.
+// Simulators points at the (only) simulator for now; no ES port yet,
+// so both locales share the EN page.
+const booksHref = resourcesHref;
+const simulatorsHref = `${base}/resources/simulators/unit-economics`;
 const blogHref = isSpanish ? `${base}/es/blog` : `${base}/blog`;
 const siteUrl = 'https://grolabs.ai';
 const ogImageUrl = `${siteUrl}${base}/og-image.png`;
@@ -195,9 +204,25 @@ const canonicalUrl = `${siteUrl}${path}`;
           <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none" href={home}>
             {t.nav.home}
           </a>
-          <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none" href={resourcesHref}>
-            {t.nav.resources}
-          </a>
+          {/* Resources dropdown — Books + Simulators. CSS-only: opens on
+              hover/focus-within (desktop) and on tap-focus (mobile). The
+              trigger itself still navigates to the reading list, so
+              keyboard/no-hover users are never dead-ended. */}
+          <div class="nav-dd">
+            <a
+              class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none inline-flex items-center gap-1"
+              href={resourcesHref}
+              aria-haspopup="true"
+            >
+              {t.nav.resources}<span class="nav-dd-caret" aria-hidden="true">▾</span>
+            </a>
+            <div class="nav-dd-panel">
+              <div class="nav-dd-menu">
+                <a href={booksHref}>{t.nav.books}</a>
+                <a href={simulatorsHref}>{t.nav.simulators}</a>
+              </div>
+            </div>
+          </div>
           <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none" href={blogHref}>
             {t.nav.blog}
           </a>
@@ -373,6 +398,65 @@ const canonicalUrl = `${siteUrl}${path}`;
         .footer-cta-row .footer-cta { padding: 12px 14px; font-size: 13px; }
         .footer-cta-row .footer-cta--primary { width: 100%; justify-content: center; }
         .footer-cta-row .footer-cta--ghost { flex: 0 0 auto; }
+      }
+
+      /* ─────────── Header nav dropdown (Resources) ───────────
+         CSS-only: hover opens on desktop, focus-within covers keyboard
+         and mobile tap (the trigger link gains focus before the
+         navigation would fire, so a second tap on a submenu item works).
+         The panel's padding-top bridges the hover gap between trigger
+         and menu so the pointer never leaves the dropdown region. */
+      .nav-dd {
+        position: relative;
+        display: inline-flex;
+      }
+      .nav-dd-caret {
+        font-size: 8px;
+        line-height: 1;
+        opacity: 0.6;
+        transition: transform 0.15s;
+      }
+      .nav-dd:hover .nav-dd-caret,
+      .nav-dd:focus-within .nav-dd-caret {
+        transform: translateY(1px);
+        opacity: 1;
+      }
+      .nav-dd-panel {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        padding-top: 14px;
+        display: none;
+        z-index: 60;
+      }
+      .nav-dd:hover .nav-dd-panel,
+      .nav-dd:focus-within .nav-dd-panel {
+        display: block;
+      }
+      .nav-dd-menu {
+        min-width: 160px;
+        background: #131316;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 6px;
+        box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+      }
+      .nav-dd-menu a {
+        display: block;
+        font-family: monospace;
+        font-size: 12px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #EDEAE0;
+        text-decoration: none;
+        padding: 10px 14px;
+        border-radius: 6px;
+        transition: color 0.15s, background 0.15s;
+      }
+      .nav-dd-menu a:hover {
+        color: #fae194;
+        background: rgba(255, 255, 255, 0.04);
       }
     </style>
   </body>

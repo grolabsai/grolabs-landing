@@ -1,0 +1,111 @@
+/* Unit Economics Simulator — GroLabs-branded port of the UX Economics
+   calculator stylesheet. Same class structure/DOM contract as the original
+   (the inline script renders into these classes); only the tokens changed:
+   canvas palette, kinetic-yellow accent, Hanken Grotesk + Permanent Marker,
+   JetBrains Mono. Imported from the simulator page only, so these
+   selectors never load on other routes. */
+:root{
+  --acc:#fae194;
+  --acc-deep:#d4af37;
+  --acc-dim:rgba(250,225,148,.10);
+  --acc-border:rgba(250,225,148,.35);
+  --sim-card:#17171b;
+  --sim-track:#232329;
+  --border:rgba(255,255,255,.06);
+  --border2:rgba(255,255,255,.14);
+  --text:#EDEAE0;
+  --text2:rgba(237,234,224,.65);
+  --text3:rgba(237,234,224,.4);
+  --green:#10b981;
+  --amber:#d97706;
+  --danger:#ef4444;
+  --mono:'JetBrains Mono',ui-monospace,'Courier New',monospace;
+  --sans:'Hanken Grotesk',sans-serif;
+  --marker:'Permanent Marker',cursive;
+}
+
+/* STEP SECTIONS */
+.step-section{max-width:1160px;margin:0 auto;padding:28px 32px 0}
+.step-header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.step-num{font-family:var(--marker);font-size:30px;color:var(--acc);line-height:1}
+.step-info{display:flex;flex-direction:column}
+.step-title{font-family:var(--sans);font-size:17px;font-weight:600;color:var(--text)}
+.step-sub{font-family:var(--mono);font-size:12px;color:var(--text3);margin-top:2px}
+.step-options{display:flex;gap:8px;flex-wrap:wrap}
+.s-btn{font-family:var(--mono);font-size:13px;letter-spacing:.03em;padding:12px 22px;border-radius:8px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:150px}
+.s-btn .s-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.5}
+.s-btn .s-name{font-weight:500;color:var(--text)}
+.s-btn:hover{border-color:var(--acc-border);color:var(--text)}
+.s-btn.on{background:var(--acc-dim);color:var(--text);border:2px solid var(--acc)}
+.s-btn.on .s-label{opacity:.9;color:var(--acc)}
+.s-btn.on .s-name{color:var(--text)}
+.step-divider{max-width:1160px;margin:24px auto 0;padding:0 32px}
+.step-divider-line{height:1px;background:var(--border)}
+
+.app{max-width:1160px;margin:0 auto;padding:28px 32px 60px}
+.grid-main{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:24px;align-items:start}
+#kpi-panel{position:sticky;top:96px}
+.left-col{display:flex;flex-direction:column;gap:24px}
+.grid-charts{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:900px){.grid-main{grid-template-columns:1fr}#kpi-panel{position:static}.grid-charts{grid-template-columns:1fr}}
+.sec-lbl{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:16px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sec-lbl:first-child{margin-top:0;padding-top:0;border-top:none}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+.inp-row{margin-bottom:14px}
+.inp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.inp-name{font-size:14px;color:var(--text2)}
+.inp-val{font-family:var(--mono);font-size:14px;font-weight:500;color:var(--text)}
+.app input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;background:var(--sim-track);outline:none;cursor:pointer;padding:0;border:none}
+.app input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--acc);cursor:pointer;border:2px solid #131316;transition:transform .1s}
+.app input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.ratio-card{background:var(--sim-card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:12px;border-left:3px solid var(--green);position:relative;overflow:hidden}
+.ratio-card::after{content:attr(data-bg);font-family:var(--marker);font-size:56px;position:absolute;right:-2px;top:-6px;opacity:.05;color:var(--text);pointer-events:none;line-height:1}
+.r-lbl{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.r-val{font-family:var(--sans);font-weight:800;font-size:44px;line-height:1;margin-bottom:6px}
+.r-status{font-family:var(--mono);font-size:13px}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kc{background:var(--sim-card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.kc .kl{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.kc .kv{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text)}
+.chart-box{background:var(--sim-card);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.ch-title{font-family:var(--mono);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.ch-legend{display:flex;gap:18px;margin-bottom:12px}
+.ch-leg{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;color:var(--text2)}
+.ch-dot{width:10px;height:3px;border-radius:1px}
+.chart-area{position:relative;height:200px}
+.diag-item{border-left:3px solid var(--green);padding:16px 20px;margin-bottom:10px;background:var(--sim-card);border-radius:0 12px 12px 0}
+.dt{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px}
+.db{font-size:13px;color:var(--text2);line-height:1.7}
+.inv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+@media(max-width:700px){.inv-grid{grid-template-columns:1fr 1fr}}
+.inv-card{background:var(--sim-card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.inv-card .inv-l{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.inv-card .inv-v{font-family:var(--sans);font-weight:800;font-size:28px;line-height:1;margin-bottom:4px}
+.inv-card .inv-s{font-family:var(--mono);font-size:11px}
+.tier-badge{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:3px;margin-left:8px}
+.tb-v1{background:rgba(16,185,129,.15);color:var(--green)}
+.tb-v2{background:rgba(250,225,148,.15);color:var(--acc)}
+.tb-v3{background:rgba(217,119,6,.15);color:var(--amber)}
+.waterfall{margin-bottom:24px}
+.wf-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.wf-label{font-size:13px;color:var(--text2);width:160px;flex-shrink:0}
+.wf-bar-wrap{flex:1;height:20px;background:var(--sim-track);border-radius:3px;overflow:hidden;position:relative}
+.wf-bar{height:100%;border-radius:3px;transition:width .3s}
+.wf-val{font-family:var(--mono);font-size:13px;font-weight:500;width:80px;text-align:right;flex-shrink:0}
+
+/* GET FAMILIAR / GLOSSARY */
+.glossary-section{padding:0 32px 40px;max-width:1160px;margin:0 auto}
+.gloss-title{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--text);margin-bottom:22px;display:flex;align-items:center;gap:12px}
+.gloss-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.gloss-body{opacity:1}
+.gloss-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.gl-card{background:var(--sim-card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .2s}
+.gl-card:hover{border-color:var(--border2)}
+.gl-card.expanded{border-color:var(--acc-border)}
+.gl-term{font-size:14px;font-weight:600;color:var(--text);display:flex;justify-content:space-between;align-items:center}
+.gl-term .gl-plus{font-family:var(--mono);font-size:16px;color:var(--text3);transition:transform .2s}
+.gl-card.expanded .gl-plus{transform:rotate(45deg);color:var(--acc)}
+.gl-def{font-size:13px;color:var(--text2);line-height:1.7;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:none}
+.gl-card.expanded .gl-def{display:block}
+.gl-why{font-size:12px;color:var(--text3);margin-top:8px;font-style:italic}
+.gl-formula{font-family:var(--mono);font-size:11px;color:var(--acc-deep);background:rgba(212,175,55,.08);padding:6px 10px;border-radius:4px;margin-top:8px;display:inline-block}

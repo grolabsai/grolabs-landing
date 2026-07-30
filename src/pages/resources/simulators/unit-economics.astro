@@ -1,0 +1,962 @@
+---
+/** Unit Economics Simulator — the interactive three-tier calculator,
+ * ported from the UX Economics site and re-skinned with GroLabs styling
+ * (simulator.css carries the tokens). The DOM is built and updated
+ * entirely by the inline script below, so its CSS lives in a page-scoped
+ * global stylesheet rather than scoped styles. Chart.js is injected
+ * through the head-extra slot. Linked from the Resources ▸ Simulators
+ * nav submenu. */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import '../../../styles/simulator.css';
+---
+<BaseLayout
+  title="Unit Economics Simulator | GroLabs"
+  description="Free three-tier unit economics simulator — from viability check to investment-grade analysis. LTV, CAC, payback, break-even, and runway from a handful of sliders."
+>
+  <Fragment slot="head-extra">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" is:inline></script>
+  </Fragment>
+
+  <section class="relative mt-2xl pt-2xl bg-canvas overflow-hidden reveal">
+    <div class="max-w-page mx-auto px-margin-mobile md:px-margin-desktop">
+      <span class="text-primary font-mono tracking-[0.2em] text-xs uppercase mb-4 block">
+        Resources · Simulators
+      </span>
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md">
+        Unit Economics Simulator
+      </h2>
+      <p class="text-secondary-fixed-dim text-body-lg max-w-2xl">
+        Free unit economics diagnosis for your business — LTV, CAC, payback,
+        break-even, and runway from a handful of sliders.
+      </p>
+    </div>
+  </section>
+
+  <!-- STEP 1: Pick Your Depth -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <div class="step-title">Pick Your Depth</div>
+      </div>
+    </div>
+    <div class="step-options" id="tier-tabs">
+      <button class="s-btn on" data-t="v1"><span class="s-label">V1</span><span class="s-name">Viability Check</span></button>
+      <button class="s-btn" data-t="v2"><span class="s-label">V2</span><span class="s-name">Growth Model</span></button>
+      <button class="s-btn" data-t="v3"><span class="s-label">V3</span><span class="s-name">Investment Grade</span></button>
+    </div>
+  </div>
+  <div class="step-divider"><div class="step-divider-line"></div></div>
+
+  <!-- STEP 2: Choose Your Model -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <div class="step-title">Choose Your Model</div>
+      </div>
+    </div>
+    <div class="step-options" id="model-tabs">
+      <button class="s-btn on" data-m="saas"><span class="s-label">Recurring</span><span class="s-name">SaaS</span></button>
+      <button class="s-btn" data-m="ecomm"><span class="s-label">Product</span><span class="s-name">E-commerce</span></button>
+      <button class="s-btn" data-m="svc"><span class="s-label">Project</span><span class="s-name">Service</span></button>
+      <button class="s-btn" data-m="mkt"><span class="s-label">Platform</span><span class="s-name">Marketplace</span></button>
+    </div>
+  </div>
+  <div class="step-divider"><div class="step-divider-line"></div></div>
+
+  <!-- STEP 3: Enter Your Business Metrics -->
+  <div class="step-section">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <div class="step-title">Enter Your Business Metrics</div>
+        <div class="step-sub">Adjust the sliders below to reflect your actual business performance.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="grid-main">
+      <div class="left-col">
+        <div id="inp-panel"></div>
+        <div id="waterfall-panel"></div>
+        <div class="grid-charts">
+          <div class="chart-box"><div class="ch-title">Payback curve — cumulative margin vs. CAC</div><div class="ch-legend"><span class="ch-leg"><span class="ch-dot" style="background:#fae194"></span>Cum. margin / user</span><span class="ch-leg"><span class="ch-dot" style="background:#ef4444;opacity:.7"></span>CAC threshold</span></div><div class="chart-area"><canvas id="c1"></canvas></div></div>
+          <div class="chart-box"><div class="ch-title">Break-even — users vs. monthly contribution</div><div class="ch-legend"><span class="ch-leg"><span class="ch-dot" style="background:#fae194"></span>Total CM / month</span><span class="ch-leg"><span class="ch-dot" style="background:rgba(237,234,224,.35)"></span>Fixed + acquisition costs</span></div><div class="chart-area"><canvas id="c2"></canvas></div></div>
+        </div>
+        <div id="inv-panel"></div>
+        <div><div class="sec-lbl">Diagnosis</div><div id="diag-panel"></div></div>
+      </div>
+      <div id="kpi-panel"></div>
+    </div>
+  </div>
+
+  <!-- GET FAMILIAR -->
+  <div class="glossary-section">
+    <div class="gloss-title" id="gloss-title">Get Familiar — Key Terms</div>
+    <div class="gloss-body">
+      <div class="gloss-grid" id="gloss-grid"></div>
+    </div>
+  </div>
+
+  <script is:inline>
+const R='#ef4444',G='#10b981',A='#d97706',B='#fae194'
+
+/* ══════════════════════════════════════════════
+   TIER DEFINITIONS — Hero content per tier
+   ══════════════════════════════════════════════ */
+const TIER_META={
+  v1:{
+    title:'Revenue is vanity. Margin is sanity.<br>Unit economics is <span class="hl">reality</span>.',
+    desc:'Every startup has a pitch deck. Very few have a unit economics model that survives first contact with a spreadsheet. Eight sliders. Sixty seconds. The truth your P&L has been hiding.',
+    sub:'Do I have a business?',
+    quote:'\u201cThe spreadsheet is always a tomorrow task \u2014 until tomorrow is the reason the business doesn\u2019t survive.\u201d'
+  },
+  v2:{
+    title:'Growth without unit economics is just<br><span class="hl">sophisticated burning</span>.',
+    desc:'You\u2019ve found traction. Now prove the economics survive scaling. Churn-adjusted payback, blended CAC, net revenue retention \u2014 the metrics that separate fundable companies from fast-growing money pits.',
+    sub:'Can I pitch this to investors?',
+    quote:'\u201cThe most expensive lesson in startups: scaling a broken model only makes it break faster.\u201d'
+  },
+  v3:{
+    title:'The math your investors run<br><span class="hl">behind closed doors</span>.',
+    desc:'DCF-adjusted lifetime value. Cohort retention curves. Burn Multiple and Magic Number. This is the model behind the term sheet \u2014 the one VCs build in their own spreadsheets before they tell you their decision.',
+    sub:'What is this business actually worth?',
+    quote:'\u201cInvestors don\u2019t fund products. They fund unit economics that compound.\u201d'
+  }
+}
+
+/* ══════════════════════════════════════════════
+   MODEL DEFINITIONS — All tiers × all models
+   ══════════════════════════════════════════════ */
+
+/* ── Input builder helper ── */
+function I(id,l,u,mn,mx,st,df,g){return{id,l,u,mn,mx,st,df,g:g||'rv'}}
+
+/* ── SaaS ── */
+const SAAS={
+  label:'SaaS',uLabel:'subscribers',
+  v1:{
+    inputs:[
+      I('arpu','Monthly price / subscriber','$',5,500,5,49,'rv'),
+      I('users','Active subscribers','',10,5000,10,200,'rv'),
+      I('churn','Monthly churn rate','%',0.5,25,0.5,5,'rv'),
+      I('cts','Cost to serve / user / mo','$',0,25,0.5,3.5,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
+      I('nc','New subscribers / month','',5,500,5,50,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,10000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
+    ],
+    calc(v){
+      const cm=v.arpu-v.cts
+      const ltv=cm>0?cm/(v.churn/100):0
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw}
+    }
+  },
+  v2:{
+    inputs:[
+      I('arpu','Monthly price / subscriber','$',5,500,5,49,'rv'),
+      I('users','Active subscribers','',10,5000,10,200,'rv'),
+      I('churn','Monthly churn rate','%',0.5,25,0.5,5,'rv'),
+      I('gm','Base gross margin','%',30,95,1,70,'rv'),
+      I('nrr','Net Revenue Retention (annual)','%',95,150,0.5,103,'rv'),
+      I('infra','Hosting / infra per user / mo','$',0,15,0.25,1.5,'vc'),
+      I('suprt','Support cost per user / mo','$',0,10,0.25,1,'vc'),
+      I('proc','Payment processing fee','%',0,5,0.1,2.9,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
+      I('nc','New subscribers / month','',5,500,5,50,'ac'),
+      I('orgpct','% from organic / referral','%',0,80,5,30,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,10000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
+    ],
+    calc(v){
+      const vc=v.infra+v.suprt+v.arpu*(v.proc/100)
+      const cm=v.arpu*(v.gm/100)-vc
+      const egm=v.arpu>0?cm/v.arpu*100:0
+      const nrrMo=Math.pow(v.nrr/100,1/12)
+      const netChurn=Math.max(0.001,(v.churn/100)-(nrrMo-1))
+      const ltv=cm>0?cm/netChurn:0
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      const c=v.churn/100
+      const pbAdj=cm>0&&c>0?-Math.log(1-cac*c/cm)/Math.log(1-c):cm>0?cac/cm:9999
+      const pb=isFinite(pbAdj)&&pbAdj>0?pbAdj:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const netNew=v.nc-(v.users*c)
+      const beMonths=netNew>0&&isFinite(be)?(Math.max(0,be-v.users))/netNew:9999
+      const beCACcost=isFinite(be)?Math.max(0,Math.ceil(be)-v.users)*cac:0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw,egm,vc,paidCAC,netChurn,nrrMo,pbAdj,beMonths,beCACcost,netNew}
+    }
+  },
+  v3:{
+    inputs:[
+      I('arpu','Monthly price / subscriber','$',5,500,5,49,'rv'),
+      I('users','Active subscribers','',10,5000,10,200,'rv'),
+      I('churn','Monthly churn rate','%',0.5,25,0.5,5,'rv'),
+      I('gm','Base gross margin','%',30,95,1,70,'rv'),
+      I('nrr','Net Revenue Retention (annual)','%',95,150,0.5,103,'rv'),
+      I('contr','Monthly contraction MRR','%',0,10,0.1,1,'rv'),
+      I('infra','Hosting / infra per user / mo','$',0,15,0.25,1.5,'vc'),
+      I('suprt','Support cost per user / mo','$',0,10,0.25,1,'vc'),
+      I('proc','Payment processing fee','%',0,5,0.1,2.9,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
+      I('nc','New subscribers / month','',5,500,5,50,'ac'),
+      I('orgpct','% from organic / referral','%',0,80,5,30,'ac'),
+      I('sales','Sales team monthly cost','$',0,50000,500,3000,'ac'),
+      I('onboard','Onboarding cost per user','$',0,500,10,50,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,10000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
+      I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
+      I('revgr','YoY revenue growth','%',0,300,5,60,'cp'),
+      I('ebitda','EBITDA margin','%',-50,50,1,-10,'cp'),
+    ],
+    calc(v){
+      const vc=v.infra+v.suprt+v.arpu*(v.proc/100)
+      const cm=v.arpu*(v.gm/100)-vc
+      const cm1=v.arpu*(v.gm/100)
+      const cm2=cm
+      const cm3=cm-(v.fixed/Math.max(1,v.users))
+      const egm=v.arpu>0?cm/v.arpu*100:0
+      const nrrMo=Math.pow(v.nrr/100,1/12)
+      const netChurn=Math.max(0.001,(v.churn/100)-(nrrMo-1))
+      const ltvSimple=cm>0?cm/netChurn:0
+      const c=v.churn/100
+      const rMo=Math.pow(1+v.wacc/100,1/12)-1
+      const al=0.4,be2=Math.min(.99,c*2.5),ga=c*0.3
+      let ltvDCF=0
+      for(let t=1;t<=60;t++){
+        const surv=al*Math.pow(1-be2,t)+(1-al)*Math.pow(1-ga,t)
+        ltvDCF+=cm*surv*Math.pow(nrrMo,t)/Math.pow(1+rMo,t)
+      }
+      if(cm<=0)ltvDCF=0
+      const ltv=ltvDCF
+      const ltvGap=ltvSimple>0?((ltvSimple-ltvDCF)/ltvSimple*100):0
+      const totalAcqCost=v.mkt+v.sales
+      const fullyCAC=v.nc>0?(totalAcqCost+v.onboard*v.nc)/v.nc:0
+      const cac=fullyCAC
+      const blendedCAC=v.nc>0?v.mkt/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      let pbNPV=0
+      if(cm>0){
+        let cumul=0
+        for(let t=1;t<=120;t++){
+          const surv=al*Math.pow(1-be2,t)+(1-al)*Math.pow(1-ga,t)
+          cumul+=cm*surv/Math.pow(1+rMo,t)
+          if(cumul>=cac){pbNPV=t;break}
+        }
+        if(pbNPV===0)pbNPV=9999
+      }else pbNPV=9999
+      const pb=pbNPV
+      const be=cm>0?(v.fixed+totalAcqCost)/cm:1/0
+      const pl=v.users*cm-v.fixed-totalAcqCost
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      const arr=v.users*v.arpu*12
+      const magicNum=v.mkt>0?(arr*(v.revgr/100/12))/(totalAcqCost):0
+      const netNewARR=arr*(v.revgr/100)
+      const burnMult=burn>0&&netNewARR>0?(burn*12)/netNewARR:burn>0?9999:0
+      const rule40=v.revgr+v.ebitda
+      const expMRR=v.users*v.arpu*(nrrMo-1)
+      const churnedMRR=v.users*v.arpu*c
+      const contrMRR=v.users*v.arpu*(v.contr/100)
+      const newMRR=v.nc*v.arpu
+      const quickRatio=(churnedMRR+contrMRR)>0?(newMRR+expMRR)/(churnedMRR+contrMRR):9999
+      const grr=1-(c+v.contr/100)
+      return{cm,ltv,ltvSimple,ltvDCF,ltvGap,cac,fullyCAC,blendedCAC,paidCAC,ratio,pb,be,pl,burn,rw,egm,vc,cm1,cm2,cm3,netChurn,nrrMo,magicNum,burnMult,rule40,quickRatio,grr}
+    }
+  }
+}
+
+/* ── E-commerce ── */
+const ECOMM={
+  label:'E-commerce',uLabel:'customers',
+  v1:{
+    inputs:[
+      I('aov','Average order value','$',10,1000,5,80,'rv'),
+      I('users','Active customers (12mo)','',10,5000,10,300,'rv'),
+      I('freq','Orders per customer / year','x/yr',1,24,0.5,4,'rv'),
+      I('life','Customer lifetime','yrs',0.5,10,0.5,2,'rv'),
+      I('margin','Product margin','%',10,80,1,40,'rv'),
+      I('cpo','Cost per order (fulfill+proc+returns)','$',0,50,0.5,12,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,3000,'ac'),
+      I('nc','New customers / month','',5,500,5,30,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,8000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,100000,'cp'),
+    ],
+    calc(v){
+      const cmOrd=v.aov*(v.margin/100)-v.cpo
+      const cm=cmOrd*(v.freq/12)
+      const ltv=cmOrd*v.freq*v.life
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw}
+    }
+  },
+  v2:{
+    inputs:[
+      I('aov','Average order value','$',10,1000,5,80,'rv'),
+      I('users','Active customers (12mo)','',10,5000,10,300,'rv'),
+      I('freq','Orders per customer / year','x/yr',1,24,0.5,4,'rv'),
+      I('life','Customer lifetime','yrs',0.5,10,0.5,2,'rv'),
+      I('gm','Product gross margin','%',10,80,1,40,'rv'),
+      I('fulfl','Fulfillment cost per order','$',0,50,0.5,8,'vc'),
+      I('retrn','Return rate','%',0,40,0.5,10,'vc'),
+      I('retcost','Return processing cost (% of AOV)','%',5,80,5,30,'vc'),
+      I('proc','Payment processing fee','%',0,5,0.1,2.9,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,3000,'ac'),
+      I('nc','New customers / month','',5,500,5,30,'ac'),
+      I('orgpct','% from organic / referral','%',0,80,5,20,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,8000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,100000,'cp'),
+    ],
+    calc(v){
+      const retCost=v.aov*(v.retrn/100)*(v.retcost/100)
+      const vc=v.fulfl+v.aov*(v.proc/100)+retCost
+      const cmOrd=v.aov*(v.gm/100)-vc
+      const egm=v.aov>0?cmOrd/v.aov*100:0
+      const cm=cmOrd*(v.freq/12)
+      const ltv=cmOrd*v.freq*v.life
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw,egm,vc,paidCAC,cmOrd}
+    }
+  },
+  v3:{
+    inputs:[
+      I('aov','Average order value','$',10,1000,5,80,'rv'),
+      I('users','Active customers (12mo)','',10,5000,10,300,'rv'),
+      I('freq','Orders per customer / year','x/yr',1,24,0.5,4,'rv'),
+      I('life','Customer lifetime','yrs',0.5,10,0.5,2,'rv'),
+      I('gm','Product gross margin','%',10,80,1,40,'rv'),
+      I('fulfl','Fulfillment cost per order','$',0,50,0.5,8,'vc'),
+      I('retrn','Return rate','%',0,40,0.5,10,'vc'),
+      I('retcost','Return processing cost (% of AOV)','%',5,80,5,30,'vc'),
+      I('proc','Payment processing fee','%',0,5,0.1,2.9,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,3000,'ac'),
+      I('nc','New customers / month','',5,500,5,30,'ac'),
+      I('orgpct','% from organic / referral','%',0,80,5,20,'ac'),
+      I('sales','Sales/partnerships monthly cost','$',0,20000,500,0,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,8000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,100000,'cp'),
+      I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
+      I('revgr','YoY revenue growth','%',0,200,5,40,'cp'),
+      I('ebitda','EBITDA margin','%',-50,50,1,-5,'cp'),
+    ],
+    calc(v){
+      const retCost=v.aov*(v.retrn/100)*(v.retcost/100)
+      const vc=v.fulfl+v.aov*(v.proc/100)+retCost
+      const cmOrd=v.aov*(v.gm/100)-vc
+      const cm=cmOrd*(v.freq/12)
+      const egm=v.aov>0?cmOrd/v.aov*100:0
+      const rMo=Math.pow(1+v.wacc/100,1/12)-1
+      const moLife=v.life*12
+      let ltvDCF=0
+      for(let t=1;t<=Math.min(moLife,60);t++){ltvDCF+=cm/Math.pow(1+rMo,t)}
+      const ltvSimple=cmOrd*v.freq*v.life
+      const ltvGap=ltvSimple>0?((ltvSimple-ltvDCF)/ltvSimple*100):0
+      const ltv=ltvDCF
+      const totalAcq=v.mkt+(v.sales||0)
+      const cac=v.nc>0?totalAcq/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+totalAcq)/cm:1/0
+      const pl=v.users*cm-v.fixed-totalAcq
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      const rule40=(v.revgr||0)+(v.ebitda||0)
+      const burnMult=burn>0?(burn*12)/Math.max(1,v.users*v.aov*v.freq*(v.revgr/100)):9999
+      return{cm,ltv,ltvSimple,ltvDCF,ltvGap,cac,paidCAC,ratio,pb,be,pl,burn,rw,egm,vc,rule40,burnMult}
+    }
+  }
+}
+
+/* ── Service ── */
+const SVC={
+  label:'Service',uLabel:'clients',
+  v1:{
+    inputs:[
+      I('pv','Average project value','$',500,100000,500,5000,'rv'),
+      I('users','Active clients','',1,500,1,15,'rv'),
+      I('ppy','Projects per client / year','x/yr',0.5,12,0.5,2,'rv'),
+      I('cl','Client lifetime','yrs',0.5,10,0.5,3,'rv'),
+      I('delcost','Total delivery cost','%',10,85,1,55,'rv'),
+      I('mkt','Monthly acquisition spend','$',500,50000,500,2000,'ac'),
+      I('nc','New clients / month','',1,50,1,3,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,12000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,80000,'cp'),
+    ],
+    calc(v){
+      const cpp=v.pv*(1-v.delcost/100)
+      const cm=cpp*(v.ppy/12)
+      const ltv=cpp*v.ppy*v.cl
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw}
+    }
+  },
+  v2:{
+    inputs:[
+      I('pv','Average project value','$',500,100000,500,5000,'rv'),
+      I('users','Active clients','',1,500,1,15,'rv'),
+      I('ppy','Projects per client / year','x/yr',0.5,12,0.5,2,'rv'),
+      I('cl','Client lifetime','yrs',0.5,10,0.5,3,'rv'),
+      I('cogs','Internal labor / COGS','%',10,80,1,40,'rv'),
+      I('subco','Subcontractor cost','%',0,50,1,15,'vc'),
+      I('overh','Overhead per project','$',0,5000,50,300,'vc'),
+      I('mkt','Monthly acquisition spend','$',500,50000,500,2000,'ac'),
+      I('nc','New clients / month','',1,50,1,3,'ac'),
+      I('orgpct','% from referral / inbound','%',0,90,5,40,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,12000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,80000,'cp'),
+    ],
+    calc(v){
+      const vc=v.pv*(v.subco/100)+v.overh
+      const cpp=v.pv*(1-v.cogs/100)-vc
+      const egm=v.pv>0?cpp/v.pv*100:0
+      const cm=cpp*(v.ppy/12)
+      const ltv=cpp*v.ppy*v.cl
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw,egm,vc,paidCAC}
+    }
+  },
+  v3:{
+    inputs:[
+      I('pv','Average project value','$',500,100000,500,5000,'rv'),
+      I('users','Active clients','',1,500,1,15,'rv'),
+      I('ppy','Projects per client / year','x/yr',0.5,12,0.5,2,'rv'),
+      I('cl','Client lifetime','yrs',0.5,10,0.5,3,'rv'),
+      I('cogs','Internal labor / COGS','%',10,80,1,40,'rv'),
+      I('util','Utilization rate','%',40,100,5,70,'rv'),
+      I('subco','Subcontractor cost','%',0,50,1,15,'vc'),
+      I('overh','Overhead per project','$',0,5000,50,300,'vc'),
+      I('mkt','Monthly acquisition spend','$',500,50000,500,2000,'ac'),
+      I('nc','New clients / month','',1,50,1,3,'ac'),
+      I('orgpct','% from referral / inbound','%',0,90,5,40,'ac'),
+      I('sales','BD / sales monthly cost','$',0,20000,500,2000,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,12000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,80000,'cp'),
+      I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
+      I('revgr','YoY revenue growth','%',0,200,5,30,'cp'),
+      I('ebitda','EBITDA margin','%',-50,50,1,5,'cp'),
+    ],
+    calc(v){
+      const vc=v.pv*(v.subco/100)+v.overh
+      const utilAdj=v.util/100
+      const effCogs=v.cogs/utilAdj
+      const cpp=v.pv*(1-Math.min(99,effCogs)/100)-vc
+      const egm=v.pv>0?cpp/v.pv*100:0
+      const cm=cpp*(v.ppy/12)
+      const rMo=Math.pow(1+v.wacc/100,1/12)-1
+      const moLife=v.cl*12
+      let ltvDCF=0
+      for(let t=1;t<=Math.min(moLife,60);t++){ltvDCF+=cm/Math.pow(1+rMo,t)}
+      const ltvSimple=cpp*v.ppy*v.cl
+      const ltv=ltvDCF
+      const ltvGap=ltvSimple>0?((ltvSimple-ltvDCF)/ltvSimple*100):0
+      const totalAcq=v.mkt+(v.sales||0)
+      const cac=v.nc>0?totalAcq/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+totalAcq)/cm:1/0
+      const pl=v.users*cm-v.fixed-totalAcq
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      const rule40=(v.revgr||0)+(v.ebitda||0)
+      return{cm,ltv,ltvSimple,ltvDCF,ltvGap,cac,paidCAC,ratio,pb,be,pl,burn,rw,egm,vc,rule40,utilAdj}
+    }
+  }
+}
+
+/* ── Marketplace ── */
+const MKT={
+  label:'Marketplace',uLabel:'active users',
+  v1:{
+    inputs:[
+      I('gmv','Average transaction GMV','$',10,5000,10,150,'rv'),
+      I('take','Platform take rate','%',1,30,0.5,10,'rv'),
+      I('users','Monthly active users','',10,10000,10,500,'rv'),
+      I('txmo','Transactions per user / month','x/mo',0.5,20,0.5,2,'rv'),
+      I('churn','Monthly user churn','%',1,30,0.5,8,'rv'),
+      I('cts','Cost per user / month (infra+proc)','$',0,10,0.25,1.5,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
+      I('nc','New users / month','',5,1000,5,80,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,20000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
+    ],
+    calc(v){
+      const rev=v.gmv*(v.take/100)*v.txmo
+      const cm=rev-v.cts
+      const ltv=cm>0?cm/(v.churn/100):0
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const ratio=cac>0?ltv/cac:0
+      const pb=cm>0?cac/cm:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw}
+    }
+  },
+  v2:{
+    inputs:[
+      I('gmv','Average transaction GMV','$',10,5000,10,150,'rv'),
+      I('take','Platform take rate','%',1,30,0.5,10,'rv'),
+      I('users','Monthly active users','',10,10000,10,500,'rv'),
+      I('txmo','Transactions per user / month','x/mo',0.5,20,0.5,2,'rv'),
+      I('churn','Monthly user churn','%',1,30,0.5,8,'rv'),
+      I('gm','Margin on platform revenue','%',20,95,1,65,'rv'),
+      I('infra','Infra cost per user / month','$',0,5,0.05,0.5,'vc'),
+      I('proc','Payment processing (% GMV)','%',0,3,0.05,0.3,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
+      I('nc','New users / month','',5,1000,5,80,'ac'),
+      I('orgpct','% from organic / viral','%',0,80,5,25,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,20000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
+    ],
+    calc(v){
+      const rev=v.gmv*(v.take/100)*v.txmo
+      const vc=v.infra+v.gmv*(v.proc/100)*v.txmo
+      const cm=rev*(v.gm/100)-vc
+      const egm=rev>0?cm/rev*100:0
+      const c=v.churn/100
+      const ltv=cm>0?cm/c:0
+      const cac=v.nc>0?v.mkt/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      const pbAdj=cm>0&&c>0?-Math.log(1-cac*c/cm)/Math.log(1-c):cm>0?cac/cm:9999
+      const pb=isFinite(pbAdj)&&pbAdj>0?pbAdj:9999
+      const be=cm>0?(v.fixed+v.mkt)/cm:1/0
+      const pl=v.users*cm-v.fixed-v.mkt
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      return{cm,ltv,cac,ratio,pb,be,pl,burn,rw,egm,vc,paidCAC}
+    }
+  },
+  v3:{
+    inputs:[
+      I('gmv','Average transaction GMV','$',10,5000,10,150,'rv'),
+      I('take','Platform take rate','%',1,30,0.5,10,'rv'),
+      I('users','Monthly active users','',10,10000,10,500,'rv'),
+      I('txmo','Transactions per user / month','x/mo',0.5,20,0.5,2,'rv'),
+      I('churn','Monthly user churn','%',1,30,0.5,8,'rv'),
+      I('gm','Margin on platform revenue','%',20,95,1,65,'rv'),
+      I('infra','Infra cost per user / month','$',0,5,0.05,0.5,'vc'),
+      I('proc','Payment processing (% GMV)','%',0,3,0.05,0.3,'vc'),
+      I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
+      I('nc','New users / month','',5,1000,5,80,'ac'),
+      I('orgpct','% from organic / viral','%',0,80,5,25,'ac'),
+      I('sales','Sales/partnerships monthly cost','$',0,30000,500,2000,'ac'),
+      I('fixed','Monthly fixed costs','$',1000,100000,1000,20000,'cp'),
+      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
+      I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
+      I('revgr','YoY revenue growth','%',0,300,5,80,'cp'),
+      I('ebitda','EBITDA margin','%',-50,50,1,-15,'cp'),
+    ],
+    calc(v){
+      const rev=v.gmv*(v.take/100)*v.txmo
+      const vc=v.infra+v.gmv*(v.proc/100)*v.txmo
+      const cm=rev*(v.gm/100)-vc
+      const egm=rev>0?cm/rev*100:0
+      const c=v.churn/100
+      const rMo=Math.pow(1+v.wacc/100,1/12)-1
+      const al=0.4,be2=Math.min(.99,c*2.5),ga=c*0.3
+      let ltvDCF=0
+      for(let t=1;t<=60;t++){
+        const surv=al*Math.pow(1-be2,t)+(1-al)*Math.pow(1-ga,t)
+        ltvDCF+=cm*surv/Math.pow(1+rMo,t)
+      }
+      if(cm<=0)ltvDCF=0
+      const ltvSimple=cm>0?cm/c:0
+      const ltv=ltvDCF
+      const ltvGap=ltvSimple>0?((ltvSimple-ltvDCF)/ltvSimple*100):0
+      const totalAcq=v.mkt+(v.sales||0)
+      const cac=v.nc>0?totalAcq/v.nc:0
+      const paidNew=v.nc*(1-v.orgpct/100)
+      const paidCAC=paidNew>0?v.mkt/paidNew:0
+      const ratio=cac>0?ltv/cac:0
+      let pbNPV=0
+      if(cm>0){let cu=0;for(let t=1;t<=120;t++){const s=al*Math.pow(1-be2,t)+(1-al)*Math.pow(1-ga,t);cu+=cm*s/Math.pow(1+rMo,t);if(cu>=cac){pbNPV=t;break}};if(!pbNPV)pbNPV=9999}else pbNPV=9999
+      const pb=pbNPV
+      const be=cm>0?(v.fixed+totalAcq)/cm:1/0
+      const pl=v.users*cm-v.fixed-totalAcq
+      const burn=pl<0?-pl:0
+      const rw=burn>0?v.cash/burn:9999
+      const rule40=(v.revgr||0)+(v.ebitda||0)
+      const burnMult=burn>0?(burn*12)/Math.max(1,v.users*rev*12*(v.revgr/100)):9999
+      return{cm,ltv,ltvSimple,ltvDCF,ltvGap,cac,paidCAC,ratio,pb,be,pl,burn,rw,egm,vc,rule40,burnMult}
+    }
+  }
+}
+
+const ALL_MODELS={saas:SAAS,ecomm:ECOMM,svc:SVC,mkt:MKT}
+
+/* ══════════════════════════════════════════════
+   STATE & HELPERS
+   ══════════════════════════════════════════════ */
+let ct='v1', cm2='saas', vals={}
+function curModel(){return ALL_MODELS[cm2]}
+function curTier(){return curModel()[ct]}
+const f$=v=>(v<0?'-$':'$')+Math.abs(Math.round(v)).toLocaleString()
+const f1=v=>parseFloat(v.toFixed(1))
+const fVal=(v,inp)=>{if(inp.u==='$')return'$'+Math.round(v).toLocaleString();if(inp.u==='%')return f1(v)+'%';if(inp.u)return f1(v)+'\u00a0'+inp.u;return''+Math.round(v)}
+const fMo=v=>v>=999?'\u221e':Math.round(v)+' mo'
+const fRat=v=>(isFinite(v)&&v>0)?f1(v)+'\u00d7':'0.0\u00d7'
+const fBe=v=>isFinite(v)?Math.ceil(v).toLocaleString():'\u221e'
+const rCol=r=>r>=3?G:r>=1.5?A:R
+const rLab=r=>r>=5?'Strong \u2014 scale with confidence':r>=3?'Healthy \u2014 ready to invest':r>=1.5?'Marginal \u2014 improve first':r>=1?'Near break-even \u2014 fragile':'Negative \u2014 fix before spending'
+const pbCol=m=>m<=12?G:m<=18?A:R
+const rwCol=m=>m>=999||m>=18?G:m>=12?A:R
+
+function initVals(){vals={};curTier().inputs.forEach(i=>vals[i.id]=i.mn)}
+
+/* ══════════════════════════════════════════════
+   RENDERING
+   ══════════════════════════════════════════════ */
+function render(){
+  const t=curTier(),r=t.calc(vals)
+  drawInputs(t)
+  drawKPI(r)
+  drawWaterfall(r)
+  drawCharts()
+  drawInvestor(r)
+  drawDiagnosis(r)
+  drawGlossary()
+}
+
+function drawInputs(tier){
+  const GRP={rv:'Revenue & retention',vc:'Variable costs',ac:'Acquisition',cp:'Capital & runway'}
+  let cur='',html=''
+  tier.inputs.forEach(inp=>{
+    if(inp.g!==cur){cur=inp.g;html+=`<div class="sec-lbl">${GRP[inp.g]||inp.g}</div>`}
+    html+=`<div class="inp-row"><div class="inp-top"><span class="inp-name">${inp.l}</span><span class="inp-val" id="v_${inp.id}">${fVal(vals[inp.id],inp)}</span></div><input type="range" min="${inp.mn}" max="${inp.mx}" step="${inp.st}" value="${vals[inp.id]}" data-id="${inp.id}" oninput="onSlide(this)"></div>`
+  })
+  document.getElementById('inp-panel').innerHTML=html
+}
+
+function drawKPI(r){
+  const col=rCol(r.ratio),plc=r.pl>=0?G:R
+  const bgText=rLab(r.ratio).split('\u2014')[0].trim()
+  const ul=curModel().uLabel
+  let extra=''
+
+  if(ct==='v2'){
+    extra=`
+    ${r.egm!==undefined?`<div class="kc"><div class="kl">Effective GM</div><div class="kv">${f1(r.egm)}%</div></div>`:''}
+    ${r.paidCAC!==undefined?`<div class="kc"><div class="kl">Paid CAC</div><div class="kv">${f$(r.paidCAC)}</div></div>`:''}
+    ${r.beMonths!==undefined?`<div class="kc"><div class="kl">BE timeline</div><div class="kv" style="color:${r.beMonths<=12?G:r.beMonths<=24?A:R}">${fMo(r.beMonths)}</div></div>`:''}`
+  }
+  if(ct==='v3'){
+    extra=`
+    ${r.egm!==undefined?`<div class="kc"><div class="kl">Effective GM</div><div class="kv">${f1(r.egm)}%</div></div>`:''}
+    ${r.paidCAC!==undefined?`<div class="kc"><div class="kl">Paid CAC</div><div class="kv">${f$(r.paidCAC)}</div></div>`:''}
+    ${r.ltvSimple!==undefined?`<div class="kc"><div class="kl">Simple LTV</div><div class="kv" style="color:var(--text3)">${f$(r.ltvSimple)}</div></div>`:''}`
+  }
+
+  document.getElementById('kpi-panel').innerHTML=`
+    <div class="ratio-card" data-bg="${bgText}" style="border-left-color:${col}">
+      <div class="r-lbl">LTV : CAC ratio<span class="tier-badge ${ct==='v1'?'tb-v1':ct==='v2'?'tb-v2':'tb-v3'}">${ct==='v1'?'Simple':ct==='v2'?'NRR-adj':'DCF'}</span></div>
+      <div class="r-val" style="color:${col}">${fRat(r.ratio)}</div>
+      <div class="r-status" style="color:${col}">${rLab(r.ratio)}</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kc"><div class="kl">${ct==='v3'?'DCF ':''}Lifetime Value</div><div class="kv">${f$(r.ltv)}</div></div>
+      <div class="kc"><div class="kl">${ct==='v3'?'Fully-loaded ':''}CAC</div><div class="kv">${f$(r.cac)}</div></div>
+      <div class="kc"><div class="kl">${ct==='v3'?'NPV ':''}Payback</div><div class="kv" style="color:${pbCol(r.pb)}">${fMo(r.pb)}</div></div>
+      <div class="kc"><div class="kl">Runway</div><div class="kv" style="color:${rwCol(r.rw)}">${fMo(r.rw)}</div></div>
+      <div class="kc"><div class="kl">CM / user / mo</div><div class="kv" style="color:${r.cm>0?G:R}">${f$(r.cm)}</div></div>
+      <div class="kc"><div class="kl">Break-even</div><div class="kv">${fBe(r.be)} ${ul}</div></div>
+      <div class="kc"><div class="kl">Monthly P/L</div><div class="kv" style="color:${plc}">${r.pl>=0?'+':''}${f$(r.pl)}</div></div>
+      ${extra}
+    </div>`
+}
+
+function drawWaterfall(r){
+  const wp=document.getElementById('waterfall-panel')
+  if(ct==='v1'||!r.egm){wp.innerHTML='';return}
+  const price=vals.arpu||vals.aov||vals.pv||(vals.gmv&&vals.take?vals.gmv*(vals.take/100):0)||0
+  if(!price){wp.innerHTML='';return}
+  const gp=r.cm1!==undefined?r.cm1:price*((vals.gm||vals.margin||100)/100)
+  const vc2=r.vc||0
+  const cmVal=r.cm||0
+  const mx=Math.max(price,1)
+  wp.innerHTML=`<div class="sec-lbl">Margin waterfall (per unit)</div><div class="waterfall">
+    <div class="wf-row"><span class="wf-label">Revenue</span><div class="wf-bar-wrap"><div class="wf-bar" style="width:100%;background:${B}"></div></div><span class="wf-val">${f$(price)}</span></div>
+    ${vals.gm!==undefined?`<div class="wf-row"><span class="wf-label">After COGS (GM ${f1(vals.gm)}%)</span><div class="wf-bar-wrap"><div class="wf-bar" style="width:${Math.max(0,gp/mx*100)}%;background:${A}"></div></div><span class="wf-val">${f$(gp)}</span></div>`:''}
+    <div class="wf-row"><span class="wf-label">− Variable costs</span><div class="wf-bar-wrap"><div class="wf-bar" style="width:${Math.max(0,vc2/mx*100)}%;background:${R}"></div></div><span class="wf-val" style="color:${R}">−${f$(vc2)}</span></div>
+    <div class="wf-row"><span class="wf-label">Contribution margin</span><div class="wf-bar-wrap"><div class="wf-bar" style="width:${Math.max(0,cmVal/mx*100)}%;background:${cmVal>0?G:R}"></div></div><span class="wf-val" style="color:${cmVal>0?G:R}">${f$(cmVal)}</span></div>
+  </div>`
+}
+
+function drawInvestor(r){
+  const ip=document.getElementById('inv-panel')
+  if(ct!=='v3'){ip.innerHTML='';return}
+  const items=[]
+  if(r.ltvGap!==undefined)items.push(['LTV gap','Simple vs DCF',`${Math.round(r.ltvGap)}%`,r.ltvGap>30?R:r.ltvGap>15?A:G])
+  if(r.magicNum!==undefined)items.push(['Magic #','Sales efficiency',f1(r.magicNum)+'×',r.magicNum>=0.75?G:r.magicNum>=0.5?A:R])
+  if(r.burnMult!==undefined&&r.burnMult<9999)items.push(['Burn mult.','Capital efficiency',f1(r.burnMult)+'×',r.burnMult<=1?G:r.burnMult<=2?A:R])
+  if(r.rule40!==undefined)items.push(['Rule of 40','Growth + margin',Math.round(r.rule40),r.rule40>=40?G:r.rule40>=25?A:R])
+  if(r.quickRatio!==undefined&&r.quickRatio<999)items.push(['Quick ratio','Growth quality',f1(r.quickRatio)+'×',r.quickRatio>=4?G:r.quickRatio>=2?A:R])
+  if(r.grr!==undefined)items.push(['GRR','Gross retention',Math.round(r.grr*100)+'%',r.grr>=0.9?G:r.grr>=0.8?A:R])
+  if(!items.length){ip.innerHTML='';return}
+  ip.innerHTML=`<div class="sec-lbl">Investment metrics<span class="tier-badge tb-v3">V3 only</span></div><div class="inv-grid">${items.map(([l,s,v,c])=>`<div class="inv-card"><div class="inv-l">${l}</div><div class="inv-v" style="color:${c}">${v}</div><div class="inv-s" style="color:${c}">${s}</div></div>`).join('')}</div>`
+}
+
+/* ── Charts ── */
+let ch1=null,ch2=null
+const COPTS={responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},animation:{duration:250},plugins:{legend:{display:false},tooltip:{backgroundColor:'#17171b',borderColor:'rgba(255,255,255,.12)',borderWidth:1,titleColor:'rgba(237,234,224,.65)',bodyColor:'#EDEAE0',padding:8}}}
+
+function drawCharts(){
+  if(ch1){ch1.destroy();ch1=null}
+  if(ch2){ch2.destroy();ch2=null}
+  const t=curTier(),r=t.calc(vals)
+  const ul=curModel().uLabel
+  const hasChurn=vals.churn!==undefined
+  const c=hasChurn?(vals.churn/100):0
+  const mo=Array.from({length:36},(_,i)=>i+1)
+  const lifeMonths=vals.life?vals.life*12:36
+
+  // Payback curve
+  let cmData
+  if(hasChurn&&ct!=='v1'){
+    // churn-adjusted (Tier 2+)
+    cmData=mo.map(m=>r.cm>0?r.cm*(1-Math.pow(1-c,m))/c:0)
+  } else if(hasChurn){
+    cmData=mo.map(m=>r.cm*m)
+  } else {
+    // lifetime-based: cap at lifetime
+    cmData=mo.map(m=>m<=lifeMonths?r.cm*m:r.cm*lifeMonths)
+  }
+
+  try{
+    ch1=new Chart(document.getElementById('c1'),{type:'line',data:{labels:mo,datasets:[
+      {label:'Cum. margin/user',data:cmData,borderColor:B,backgroundColor:'rgba(250,225,148,.08)',fill:true,tension:0.4,pointRadius:0,borderWidth:2},
+      {label:'CAC threshold',data:mo.map(()=>r.cac),borderColor:R,borderDash:[5,3],pointRadius:0,borderWidth:1.5,fill:false}
+    ]},options:{...COPTS,scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(237,234,224,.4)',font:{size:12},maxTicksLimit:9}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(237,234,224,.4)',font:{size:12},callback:v=>'$'+Math.round(v).toLocaleString()}}}}})
+  }catch(e){console.warn('C1:',e)}
+
+  // Break-even chart — fixed + mkt as the threshold
+  const totalFixed=(vals.fixed||0)+(vals.mkt||0)+(vals.sales||0)
+  const mx2=Math.max((vals.users||10)*2,isFinite(r.be)?r.be*1.6:(vals.users||10)*3,50)
+  const pts=Array.from({length:16},(_,i)=>Math.round(i*mx2/15))
+  try{
+    ch2=new Chart(document.getElementById('c2'),{type:'line',data:{labels:pts,datasets:[
+      {label:'Total CM/month',data:pts.map(u=>u*r.cm),borderColor:B,backgroundColor:'rgba(250,225,148,.07)',fill:true,tension:0.1,pointRadius:0,borderWidth:2},
+      {label:'Fixed + acq costs',data:pts.map(()=>totalFixed),borderColor:'rgba(237,234,224,.35)',borderDash:[4,3],pointRadius:0,borderWidth:1.5,fill:false}
+    ]},options:{...COPTS,scales:{x:{title:{display:true,text:ul,color:'rgba(237,234,224,.4)',font:{size:12}},grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(237,234,224,.4)',font:{size:12},maxTicksLimit:8}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(237,234,224,.4)',font:{size:12},callback:v=>'$'+Math.round(v).toLocaleString()}}}}})
+  }catch(e){console.warn('C2:',e)}
+}
+
+/* ── Diagnosis ── */
+function drawDiagnosis(r){
+  const items=[]
+  const ul=curModel().uLabel
+
+  // Core verdict
+  if(r.cm<=0)
+    items.push([R,'Negative contribution margin \u2014 structural crisis','Variable costs exceed revenue per user. Every new user deepens losses. Fix pricing or cost structure before spending on growth.'])
+  else if(r.ratio<1)
+    items.push([R,'Unit economics are negative','You spend more acquiring customers than they generate. Address pricing, churn, or variable costs first.'])
+  else if(r.ratio<2)
+    items.push([A,'Marginal unit economics \u2014 fragile','LTV barely covers CAC. A small CPC spike or churn increase pushes you negative.'])
+  else if(r.ratio<3)
+    items.push([A,'Below the 3\u00d7 investor benchmark','Close. Small improvements in churn or variable costs can unlock investor-grade metrics.'])
+  else if(r.ratio<5)
+    items.push([G,'Healthy unit economics \u2014 ready to scale','3\u00d7 confirmed. Validate across cohorts before aggressive acquisition spend.'])
+  else
+    items.push([G,'Strong unit economics \u2014 you may be underinvesting in growth','At 5\u00d7+ you have room to accelerate acquisition without financial risk.'])
+
+  // Break-even
+  if(!isFinite(r.be))
+    items.push([R,'Break-even unreachable','Fix contribution margin before adding users.'])
+  else{
+    const gap=r.be/(vals.users||1)
+    if(gap<=1) items.push([G,'Past break-even \u2014 '+Math.ceil(r.be).toLocaleString()+' needed, you have '+(vals.users||0).toLocaleString(),'Every new user adds directly to profit.'])
+    else if(gap>3) items.push([R,'Far from break-even \u2014 need '+Math.ceil(r.be).toLocaleString()+' '+ul,'Your runway is your primary constraint. Validate unit economics faster.'])
+    else items.push([A,'Approaching break-even \u2014 need '+Math.ceil(r.be).toLocaleString()+' '+ul+', have '+(vals.users||0).toLocaleString(),'Within reach. Focus on retention while carefully adding new users.'])
+  }
+
+  // Runway
+  if(r.rw<6) items.push([R,'Critical: under 6 months of runway','Immediate action required. Cut burn, accelerate revenue, or begin fundraising now.'])
+  else if(r.rw<12) items.push([R,'Under 12 months \u2014 start fundraising conversations','Even if you prefer not to raise, prepare materials and start conversations.'])
+  else if(r.rw<18) items.push([A,'12\u201318 months of runway \u2014 monitor closely','Workable but thin. Avoid unvalidated hiring or expensive experiments.'])
+  else items.push([G,'Runway is healthy \u2014 use it with intention','18+ months gives you space for disciplined Build-Measure-Learn cycles.'])
+
+  // Tier 2+ specific
+  if(ct!=='v1'&&r.paidCAC!==undefined&&r.cac>0){
+    const paidRatio=r.paidCAC/r.cac
+    if(paidRatio>2) items.push([A,'Paid CAC is '+f1(paidRatio)+'\u00d7 your blended CAC','You rely heavily on organic channels. If organic dries up, your economics change dramatically.'])
+  }
+
+  // Tier 3 specific
+  if(ct==='v3'){
+    if(r.ltvGap>30) items.push([R,'Your simple LTV overstates by '+Math.round(r.ltvGap)+'%','Time value of money and cohort decay significantly reduce real LTV. Use DCF-adjusted numbers for decisions.'])
+    else if(r.ltvGap>15) items.push([A,'LTV gap: simple overstates by '+Math.round(r.ltvGap)+'%','Meaningful difference. Use DCF LTV for investor conversations.'])
+
+    if(r.rule40!==undefined){
+      if(r.rule40>=40) items.push([G,'Rule of 40: '+Math.round(r.rule40)+' \u2014 exceeds threshold','Growth + profitability balance is strong. Attractive to growth investors.'])
+      else if(r.rule40>=25) items.push([A,'Rule of 40: '+Math.round(r.rule40)+' \u2014 below threshold','Need either faster growth or better margins to reach investor benchmark.'])
+      else items.push([R,'Rule of 40: '+Math.round(r.rule40)+' \u2014 significantly below','Neither growing fast enough nor profitable enough. Prioritize one.'])
+    }
+
+    if(r.magicNum!==undefined&&r.magicNum>0){
+      if(r.magicNum>=0.75) items.push([G,'Magic Number: '+f1(r.magicNum)+'\u00d7 \u2014 efficient sales','Sales spend is generating strong ARR returns.'])
+      else if(r.magicNum>=0.5) items.push([A,'Magic Number: '+f1(r.magicNum)+'\u00d7 \u2014 mediocre efficiency','You\u2019re spending $'+f1(1/r.magicNum)+' for every $1 of new ARR.'])
+      else items.push([R,'Magic Number: '+f1(r.magicNum)+'\u00d7 \u2014 inefficient','Sales spend is not translating to revenue. Fix sales cycle, ACV, or channel mix.'])
+    }
+  }
+
+  document.getElementById('diag-panel').innerHTML=items.map(([c,t2,b])=>
+    `<div class="diag-item" style="border-left-color:${c}"><div class="dt">${t2}</div><div class="db">${b}</div></div>`
+  ).join('')
+}
+
+/* ══════════════════════════════════════════════
+   EVENT HANDLERS
+   ══════════════════════════════════════════════ */
+function onSlide(el){
+  const id=el.dataset.id
+  vals[id]=parseFloat(el.value)
+  const inp=curTier().inputs.find(x=>x.id===id)
+  const lbl=document.getElementById('v_'+id)
+  if(lbl)lbl.textContent=fVal(vals[id],inp)
+  const r=curTier().calc(vals)
+  drawKPI(r)
+  drawWaterfall(r)
+  drawCharts()
+  drawInvestor(r)
+  drawDiagnosis(r)
+}
+
+// Tier tabs
+document.getElementById('tier-tabs').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-t]')
+  if(!btn)return
+  const newTier=btn.dataset.t
+  if(newTier===ct)return
+  const oldVals={...vals}
+  ct=newTier
+  document.querySelectorAll('#tier-tabs .s-btn').forEach(t=>t.classList.remove('on'))
+  btn.classList.add('on')
+  initVals()
+  // Preserve overlapping values from previous tier
+  Object.keys(oldVals).forEach(k=>{if(vals[k]!==undefined)vals[k]=oldVals[k]})
+  render()
+})
+
+// Model tabs
+document.getElementById('model-tabs').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-m]')
+  if(!btn)return
+  cm2=btn.dataset.m
+  document.querySelectorAll('#model-tabs .s-btn').forEach(t=>t.classList.remove('on'))
+  btn.classList.add('on')
+  initVals()
+  render()
+})
+
+/* ══════════════════════════════════════════════
+   GLOSSARY DATA
+   ══════════════════════════════════════════════ */
+const GLOSSARY={
+  v1:[
+    {term:'LTV (Lifetime Value)',def:'The total revenue a single customer generates over their entire relationship with your business, minus the variable costs to serve them.',why:'If you don\u2019t know this number, you\u2019re guessing how much you can afford to spend acquiring customers.',formula:'LTV = Contribution margin per month \u00f7 Monthly churn rate'},
+    {term:'CAC (Customer Acquisition Cost)',def:'The total cost to acquire one new customer. Includes all marketing spend, divided by the number of customers that spend produced.',why:'The counterpart to LTV. If CAC > LTV, every customer you acquire makes you poorer.',formula:'CAC = Monthly marketing spend \u00f7 New customers per month'},
+    {term:'LTV:CAC Ratio',def:'How many dollars of lifetime value you generate for every dollar spent acquiring a customer. The fundamental measure of unit economics health.',why:'Below 1\u00d7 means you\u2019re losing money on every customer. The industry benchmark is 3\u00d7 or higher.',formula:'Ratio = LTV \u00f7 CAC'},
+    {term:'Churn Rate',def:'The percentage of customers who stop paying you each month. Even small differences in churn have massive compounding effects on LTV.',why:'A 5% monthly churn means you lose half your customers every year. A 2% churn means you keep 78%. That single variable can 2.5\u00d7 your LTV.'},
+    {term:'Contribution Margin',def:'Revenue per customer minus the variable costs of serving that customer. The money each customer contributes toward covering your fixed costs and generating profit.',why:'If this number is negative, growth makes losses worse, not better. Fix this first.'},
+    {term:'Payback Period',def:'How many months it takes for a customer\u2019s contribution margin to repay the cost of acquiring them.',why:'Shorter payback means faster cash recycling. If payback exceeds 18 months, you need deep pockets or patient investors.',formula:'Payback = CAC \u00f7 Monthly contribution margin'},
+    {term:'Break-even',def:'The number of customers needed for total contribution margin to cover all fixed costs and marketing spend.',why:'Below this number, you\u2019re burning cash. Above it, each new customer adds directly to profit.'},
+    {term:'Runway',def:'How many months your cash will last at the current burn rate. The clock that determines every strategic decision.',why:'Under 6 months is a crisis. Under 12, start fundraising. Over 18 gives you room to experiment.'},
+  ],
+  v2:[
+    {term:'Net Revenue Retention (NRR)',def:'Measures how much revenue you retain and expand from existing customers over time, including upgrades, downgrades, and churn. 100% means you keep everything; above 100% means existing customers grow.',why:'NRR above 100% is the SaaS superpower \u2014 it means you grow even without acquiring new customers. Top SaaS companies run 120%+.',formula:'NRR = (Starting MRR + Expansion \u2212 Contraction \u2212 Churn) \u00f7 Starting MRR'},
+    {term:'Blended vs. Paid CAC',def:'Blended CAC divides all marketing spend by all new customers (including organic). Paid CAC divides spend only by paid-channel customers. The gap reveals your organic dependency.',why:'If paid CAC is 3\u00d7 your blended CAC, you\u2019re heavily reliant on organic channels. If organic dries up, your real economics are much worse than they appear.'},
+    {term:'Effective Gross Margin',def:'Your real margin after subtracting all variable per-unit costs (hosting, support, payment processing) from the base gross margin.',why:'Many founders report 70% gross margin but forget to subtract $3/user in hosting and 2.9% in Stripe fees. Effective GM reveals the truth.'},
+    {term:'Churn-Adjusted Payback',def:'Payback period that accounts for the probability that some customers will churn before they\u2019ve repaid their acquisition cost.',why:'Simple payback assumes every customer stays long enough to pay back. In reality, some churn early. This metric is honest about that.'},
+    {term:'Margin Waterfall',def:'A visual breakdown showing how revenue flows through cost layers: COGS reduces revenue to gross profit, then variable costs reduce it to contribution margin.',why:'Shows you exactly where money disappears between the top line and what actually contributes to covering fixed costs.'},
+    {term:'Break-even Timeline',def:'Not just how many users you need, but how many months it will take to reach break-even at your current growth rate, and how much CAC cash you\u2019ll burn getting there.',why:'Knowing you need 300 users is useless without knowing it takes 8 months and $30K in acquisition cost to get there.'},
+    {term:'Net Churn',def:'Monthly churn rate minus the expansion rate from NRR. Can be negative (net negative churn) if expansion revenue exceeds lost revenue.',why:'Net negative churn means your existing customer base grows in value over time even without new sales. The holy grail of SaaS.'},
+    {term:'Scenario Analysis',def:'Stress-testing your model by adjusting key variables up and down to see how sensitive your unit economics are to changes in the market.',why:'If a 50% increase in churn makes your model collapse, it\u2019s fragile. You need to know which variables are existential threats.'},
+  ],
+  v3:[
+    {term:'DCF-Adjusted LTV',def:'Lifetime value calculated using discounted cash flow \u2014 future revenue is worth less than today\u2019s revenue because of the time value of money and risk. Uses a WACC discount rate.',why:'Simple LTV can overstate value by 20-40%. A $1,000 LTV at 12% WACC over 3 years is really worth ~$780. VCs always discount; you should too.',formula:'LTV\u1d48\u1d9c\u1da0 = \u03a3 [CM \u00d7 S(t) \u00d7 NRR\u1d57] \u00f7 (1+r)\u1d57'},
+    {term:'sBG Retention Model',def:'Shifted Beta-Geometric model. Instead of assuming all customers churn at the same flat rate, it models two segments: high-risk early churners and sticky long-term users.',why:'In reality, churn isn\u2019t flat \u2014 most churn happens early, and survivors are stickier. This model captures that, making LTV calculations more accurate.'},
+    {term:'WACC (Discount Rate)',def:'Weighted Average Cost of Capital. The rate of return required to justify the risk of the investment. Used to discount future cash flows to present value.',why:'A higher WACC means future revenue is worth less today. Early-stage startups typically have a 15-25% WACC due to high risk.'},
+    {term:'Fully-Loaded CAC',def:'The true all-in cost to acquire a customer, including not just marketing spend but sales team salaries, onboarding costs, and any other acquisition-related overhead.',why:'Marketing spend alone understates CAC by 30-60% for companies with sales teams. Investors will calculate this even if you don\u2019t.'},
+    {term:'Magic Number',def:'A sales efficiency metric: how much new Annual Recurring Revenue is generated for each dollar of sales and marketing spend in the prior period.',why:'Above 0.75\u00d7 means your sales engine is efficient enough to invest more. Below 0.5\u00d7 signals a leaky funnel or misallocated spend.',formula:'Magic # = Net New ARR \u00f7 Prior Period S&M Spend'},
+    {term:'Burn Multiple',def:'How much cash you burn for each dollar of net new ARR you generate. The inverse of capital efficiency.',why:'Below 1\u00d7 is elite. 1-2\u00d7 is healthy. Above 2\u00d7 means you\u2019re paying too much for growth. VCs increasingly use this alongside LTV:CAC.',formula:'Burn Multiple = Net Burn \u00f7 Net New ARR'},
+    {term:'Rule of 40',def:'Revenue growth rate plus EBITDA margin should exceed 40%. A combined measure that balances growth against profitability.',why:'The board-level metric that says: if you\u2019re not growing fast, you\u2019d better be profitable \u2014 and vice versa. Below 25 is a red flag.',formula:'Rule of 40 = YoY Growth % + EBITDA Margin %'},
+    {term:'Quick Ratio (SaaS)',def:'New MRR plus expansion MRR, divided by churned MRR plus contraction MRR. Measures how \u201cleaky\u201d your growth is.',why:'Above 4\u00d7 means for every dollar lost, you add four. Below 2\u00d7 means you\u2019re filling a bucket with a hole in it.',formula:'Quick Ratio = (New + Expansion) \u00f7 (Churn + Contraction)'},
+    {term:'Gross Revenue Retention (GRR)',def:'The percentage of revenue retained from existing customers excluding expansion. Only counts losses from churn and downgrades.',why:'GRR below 85% is a red flag even if NRR is above 100%. It means you\u2019re masking customer dissatisfaction with upsells to whoever stays.'},
+    {term:'LTV Gap',def:'The percentage difference between your simple LTV calculation and the DCF-adjusted version. Shows how much naive math overstates your customer value.',why:'If the gap is 30%+, your simple LTV:CAC ratio is dangerously optimistic. Decisions based on inflated LTV lead to overspending on acquisition.'},
+  ]
+}
+
+/* ── Glossary rendering ── */
+function drawGlossary(){
+  const terms=[...GLOSSARY.v1]
+  if(ct==='v2'||ct==='v3') terms.push(...GLOSSARY.v2)
+  if(ct==='v3') terms.push(...GLOSSARY.v3)
+  const grid=document.getElementById('gloss-grid')
+  grid.innerHTML=terms.map((t,i)=>`
+    <div class="gl-card" onclick="this.classList.toggle('expanded')">
+      <div class="gl-term"><span>${t.term}</span><span class="gl-plus">+</span></div>
+      <div class="gl-def">
+        ${t.def}
+        ${t.why?`<div class="gl-why">${t.why}</div>`:''}
+        ${t.formula?`<div class="gl-formula">${t.formula}</div>`:''}
+      </div>
+    </div>
+  `).join('')
+}
+
+/* ── INIT ── */
+initVals()
+render()
+  </script>
+</BaseLayout>
