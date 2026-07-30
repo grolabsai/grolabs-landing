@@ -88,7 +88,22 @@ import '../../../styles/simulator.css';
         <div id="inv-panel"></div>
         <div><div class="sec-lbl">Diagnosis</div><div id="diag-panel"></div></div>
       </div>
-      <div id="kpi-panel"></div>
+      <div id="kpi-panel">
+        <div id="kpi-main"></div>
+        <!-- Layer 3 — Runway. Static markup (identical across models/tiers)
+             so dragging the cash slider never gets destroyed by the
+             kpi-main innerHTML rewrites. -->
+        <div class="layer-card" id="runway-card">
+          <div class="layer-lbl">3 · Runway</div>
+          <div class="bd">
+            <div class="inp-row" style="margin-bottom:8px">
+              <div class="inp-top"><span class="inp-name">Cash on hand</span><span class="inp-val" id="v_cash">$50,000</span></div>
+              <input type="range" min="10000" max="2000000" step="10000" value="50000" id="cash-slider" oninput="onCash(this)">
+            </div>
+            <div class="rw-line" id="rw-out"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -146,7 +161,6 @@ const SAAS={
       I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
       I('nc','New subscribers / month','',5,500,5,50,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,10000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
     ],
     calc(v){
       const cm=v.arpu-v.cts
@@ -175,7 +189,6 @@ const SAAS={
       I('nc','New subscribers / month','',5,500,5,50,'ac'),
       I('orgpct','% from organic / referral','%',0,80,5,30,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,10000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
     ],
     calc(v){
       const vc=v.infra+v.suprt+v.arpu*(v.proc/100)
@@ -218,7 +231,6 @@ const SAAS={
       I('sales','Sales team monthly cost','$',0,50000,500,3000,'ac'),
       I('onboard','Onboarding cost per user','$',0,500,10,50,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,10000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
       I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
       I('revgr','YoY revenue growth','%',0,300,5,60,'cp'),
       I('ebitda','EBITDA margin','%',-50,50,1,-10,'cp'),
@@ -296,7 +308,6 @@ const ECOMM={
       I('mkt','Monthly marketing spend','$',500,50000,500,3000,'ac'),
       I('nc','New customers / month','',5,500,5,30,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,8000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,100000,'cp'),
     ],
     calc(v){
       const cmOrd=v.aov*(v.margin/100)-v.cpo
@@ -327,7 +338,6 @@ const ECOMM={
       I('nc','New customers / month','',5,500,5,30,'ac'),
       I('orgpct','% from organic / referral','%',0,80,5,20,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,8000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,100000,'cp'),
     ],
     calc(v){
       const retCost=v.aov*(v.retrn/100)*(v.retcost/100)
@@ -364,7 +374,6 @@ const ECOMM={
       I('orgpct','% from organic / referral','%',0,80,5,20,'ac'),
       I('sales','Sales/partnerships monthly cost','$',0,20000,500,0,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,8000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,100000,'cp'),
       I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
       I('revgr','YoY revenue growth','%',0,200,5,40,'cp'),
       I('ebitda','EBITDA margin','%',-50,50,1,-5,'cp'),
@@ -412,7 +421,6 @@ const SVC={
       I('mkt','Monthly acquisition spend','$',500,50000,500,2000,'ac'),
       I('nc','New clients / month','',1,50,1,3,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,12000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,80000,'cp'),
     ],
     calc(v){
       const cpp=v.pv*(1-v.delcost/100)
@@ -441,7 +449,6 @@ const SVC={
       I('nc','New clients / month','',1,50,1,3,'ac'),
       I('orgpct','% from referral / inbound','%',0,90,5,40,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,12000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,80000,'cp'),
     ],
     calc(v){
       const vc=v.pv*(v.subco/100)+v.overh
@@ -476,7 +483,6 @@ const SVC={
       I('orgpct','% from referral / inbound','%',0,90,5,40,'ac'),
       I('sales','BD / sales monthly cost','$',0,20000,500,2000,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,12000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,80000,'cp'),
       I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
       I('revgr','YoY revenue growth','%',0,200,5,30,'cp'),
       I('ebitda','EBITDA margin','%',-50,50,1,5,'cp'),
@@ -525,7 +531,6 @@ const MKT={
       I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
       I('nc','New users / month','',5,1000,5,80,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,20000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
     ],
     calc(v){
       const rev=v.gmv*(v.take/100)*v.txmo
@@ -555,7 +560,6 @@ const MKT={
       I('nc','New users / month','',5,1000,5,80,'ac'),
       I('orgpct','% from organic / viral','%',0,80,5,25,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,20000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
     ],
     calc(v){
       const rev=v.gmv*(v.take/100)*v.txmo
@@ -592,7 +596,6 @@ const MKT={
       I('orgpct','% from organic / viral','%',0,80,5,25,'ac'),
       I('sales','Sales/partnerships monthly cost','$',0,30000,500,2000,'ac'),
       I('fixed','Monthly fixed costs','$',1000,100000,1000,20000,'cp'),
-      I('cash','Cash on hand','$',10000,2000000,10000,200000,'cp'),
       I('wacc','Discount rate (WACC)','%',5,30,1,12,'cp'),
       I('revgr','YoY revenue growth','%',0,300,5,80,'cp'),
       I('ebitda','EBITDA margin','%',-50,50,1,-15,'cp'),
@@ -639,6 +642,10 @@ const ALL_MODELS={saas:SAAS,ecomm:ECOMM,svc:SVC,mkt:MKT}
    STATE & HELPERS
    ══════════════════════════════════════════════ */
 let ct='v1', cm2='saas', vals={}
+/* Cash on hand lives OUTSIDE the model inputs (Layer 3 — Runway).
+   It's synced into vals.cash so the per-tier calc() functions keep
+   working unchanged; the unit-economics layers never read it. */
+let cashVal=50000
 function curModel(){return ALL_MODELS[cm2]}
 function curTier(){return curModel()[ct]}
 const f$=v=>(v<0?'-$':'$')+Math.abs(Math.round(v)).toLocaleString()
@@ -652,7 +659,7 @@ const rLab=r=>r>=5?'Strong \u2014 scale with confidence':r>=3?'Healthy \u2014 re
 const pbCol=m=>m<=12?G:m<=18?A:R
 const rwCol=m=>m>=999||m>=18?G:m>=12?A:R
 
-function initVals(){vals={};curTier().inputs.forEach(i=>vals[i.id]=i.mn)}
+function initVals(){vals={};curTier().inputs.forEach(i=>vals[i.id]=i.mn);vals.cash=cashVal}
 
 /* ══════════════════════════════════════════════
    RENDERING
@@ -669,7 +676,7 @@ function render(){
 }
 
 function drawInputs(tier){
-  const GRP={rv:'Revenue & retention',vc:'Variable costs',ac:'Acquisition',cp:'Capital & runway'}
+  const GRP={rv:'Revenue & retention',vc:'Variable costs',ac:'Acquisition',cp:'Fixed costs & capital'}
   let cur='',html=''
   tier.inputs.forEach(inp=>{
     if(inp.g!==cur){cur=inp.g;html+=`<div class="sec-lbl">${GRP[inp.g]||inp.g}</div>`}
@@ -679,40 +686,90 @@ function drawInputs(tier){
 }
 
 function drawKPI(r){
-  const col=rCol(r.ratio),plc=r.pl>=0?G:R
+  const col=rCol(r.ratio)
   const bgText=rLab(r.ratio).split('\u2014')[0].trim()
   const ul=curModel().uLabel
-  let extra=''
+  const users=vals.users||0
+  const fixed=vals.fixed||0
+  const contrib=users*r.cm
+  const opRes=contrib-fixed
+  const acq=opRes-r.pl
+  const opc=opRes>=0?G:R
+  const plc=r.pl>=0?G:R
 
+  /* The lifetime assumption behind LTV, stated inline (Layer 2). */
+  let asm=''
+  if(vals.churn!==undefined)asm=`assumes ${f1(vals.churn)}%/mo churn`
+  else if(vals.life!==undefined)asm=`assumes ${f1(vals.life)}-yr lifetime`
+  else if(vals.cl!==undefined)asm=`assumes ${f1(vals.cl)}-yr client lifetime`
+
+  let extra=''
   if(ct==='v2'){
     extra=`
-    ${r.egm!==undefined?`<div class="kc"><div class="kl">Effective GM</div><div class="kv">${f1(r.egm)}%</div></div>`:''}
     ${r.paidCAC!==undefined?`<div class="kc"><div class="kl">Paid CAC</div><div class="kv">${f$(r.paidCAC)}</div></div>`:''}
     ${r.beMonths!==undefined?`<div class="kc"><div class="kl">BE timeline</div><div class="kv" style="color:${r.beMonths<=12?G:r.beMonths<=24?A:R}">${fMo(r.beMonths)}</div></div>`:''}`
   }
   if(ct==='v3'){
     extra=`
-    ${r.egm!==undefined?`<div class="kc"><div class="kl">Effective GM</div><div class="kv">${f1(r.egm)}%</div></div>`:''}
     ${r.paidCAC!==undefined?`<div class="kc"><div class="kl">Paid CAC</div><div class="kv">${f$(r.paidCAC)}</div></div>`:''}
     ${r.ltvSimple!==undefined?`<div class="kc"><div class="kl">Simple LTV</div><div class="kv" style="color:var(--text3)">${f$(r.ltvSimple)}</div></div>`:''}`
   }
 
-  document.getElementById('kpi-panel').innerHTML=`
-    <div class="ratio-card" data-bg="${bgText}" style="border-left-color:${col}">
-      <div class="r-lbl">LTV : CAC ratio<span class="tier-badge ${ct==='v1'?'tb-v1':ct==='v2'?'tb-v2':'tb-v3'}">${ct==='v1'?'Simple':ct==='v2'?'NRR-adj':'DCF'}</span></div>
-      <div class="r-val" style="color:${col}">${fRat(r.ratio)}</div>
-      <div class="r-status" style="color:${col}">${rLab(r.ratio)}</div>
+  document.getElementById('kpi-main').innerHTML=`
+    <div class="layer-card">
+      <div class="layer-lbl">1 \u00b7 Unit profitability</div>
+      <div class="kpi-grid">
+        <div class="kc"><div class="kl">CM / user / mo</div><div class="kv" style="color:${r.cm>0?G:R}">${f$(r.cm)}</div><div class="kv-note">no acquisition, no lifetime</div></div>
+        ${r.egm!==undefined?`<div class="kc"><div class="kl">Effective GM</div><div class="kv">${f1(r.egm)}%</div></div>`:''}
+      </div>
+      <div class="bd">
+        <div class="bd-row"><span>Contribution (${users.toLocaleString()} ${ul})</span><span class="bd-val" style="color:${contrib>=0?G:R}">${contrib>=0?'+':''}${f$(contrib)}</span></div>
+        <div class="bd-row"><span>&minus; Fixed costs</span><span class="bd-val" style="color:${R}">&minus;${f$(fixed)}</span></div>
+        <div class="bd-row bd-total"><span>Operating result (pre-acquisition)</span><span class="bd-val" style="color:${opc}">${opRes>=0?'+':''}${f$(opRes)}</span></div>
+      </div>
     </div>
-    <div class="kpi-grid">
-      <div class="kc"><div class="kl">${ct==='v3'?'DCF ':''}Lifetime Value</div><div class="kv">${f$(r.ltv)}</div></div>
-      <div class="kc"><div class="kl">${ct==='v3'?'Fully-loaded ':''}CAC</div><div class="kv">${f$(r.cac)}</div></div>
-      <div class="kc"><div class="kl">${ct==='v3'?'NPV ':''}Payback</div><div class="kv" style="color:${pbCol(r.pb)}">${fMo(r.pb)}</div></div>
-      <div class="kc"><div class="kl">Runway</div><div class="kv" style="color:${rwCol(r.rw)}">${fMo(r.rw)}</div></div>
-      <div class="kc"><div class="kl">CM / user / mo</div><div class="kv" style="color:${r.cm>0?G:R}">${f$(r.cm)}</div></div>
-      <div class="kc"><div class="kl">Break-even</div><div class="kv">${fBe(r.be)} ${ul}</div></div>
-      <div class="kc"><div class="kl">Monthly P/L</div><div class="kv" style="color:${plc}">${r.pl>=0?'+':''}${f$(r.pl)}</div></div>
-      ${extra}
+    <div class="layer-card">
+      <div class="layer-lbl">2 \u00b7 Acquisition &amp; lifetime</div>
+      <div class="ratio-card" data-bg="${bgText}" style="border-left-color:${col}">
+        <div class="r-lbl">LTV : CAC ratio<span class="tier-badge ${ct==='v1'?'tb-v1':ct==='v2'?'tb-v2':'tb-v3'}">${ct==='v1'?'Simple':ct==='v2'?'NRR-adj':'DCF'}</span></div>
+        <div class="r-val" style="color:${col}">${fRat(r.ratio)}</div>
+        <div class="r-status" style="color:${col}">${rLab(r.ratio)}</div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kc"><div class="kl">${ct==='v3'?'DCF ':''}Lifetime Value</div><div class="kv">${f$(r.ltv)}</div>${asm?`<div class="kv-note">${asm}</div>`:''}</div>
+        <div class="kc"><div class="kl">${ct==='v3'?'Fully-loaded ':''}CAC</div><div class="kv">${f$(r.cac)}</div></div>
+        <div class="kc"><div class="kl">${ct==='v3'?'NPV ':''}Payback</div><div class="kv" style="color:${pbCol(r.pb)}">${fMo(r.pb)}</div><div class="kv-note">assumption-free once paid back</div></div>
+        <div class="kc"><div class="kl">Break-even</div><div class="kv">${fBe(r.be)} ${ul}</div></div>
+        ${extra}
+      </div>
+      <div class="bd">
+        <div class="bd-row"><span>Operating result</span><span class="bd-val" style="color:${opc}">${opRes>=0?'+':''}${f$(opRes)}</span></div>
+        <div class="bd-row"><span>&minus; Acquisition spend</span><span class="bd-val" style="color:${R}">&minus;${f$(acq)}</span></div>
+        <div class="bd-row bd-total"><span>Monthly P/L (all-in)</span><span class="bd-val" style="color:${plc}">${r.pl>=0?'+':''}${f$(r.pl)}</span></div>
+      </div>
     </div>`
+  updateRunway(r)
+}
+
+/* Layer 3 \u2014 Runway. Only the result line re-renders; the cash slider is
+   static markup so it survives kpi-main rewrites mid-drag. */
+function updateRunway(r){
+  const out=document.getElementById('rw-out')
+  if(!out)return
+  if(r.pl>=0){
+    out.innerHTML=`<span style="color:${G}">Profitable \u2014 cash isn't being consumed \u00b7 runway \u221e</span>`
+  }else{
+    out.innerHTML=`Runway: <span style="font-weight:600;color:${rwCol(r.rw)}">${fMo(r.rw)}</span> <span style="color:var(--text3)">at ${f$(r.burn)}/mo burn</span>`
+  }
+}
+
+function onCash(el){
+  cashVal=parseFloat(el.value)
+  vals.cash=cashVal
+  document.getElementById('v_cash').textContent='$'+Math.round(cashVal).toLocaleString()
+  const r=curTier().calc(vals)
+  updateRunway(r)
+  drawDiagnosis(r)
 }
 
 function drawWaterfall(r){
@@ -820,12 +877,6 @@ function drawDiagnosis(r){
     else items.push([A,'Approaching break-even \u2014 need '+Math.ceil(r.be).toLocaleString()+' '+ul+', have '+(vals.users||0).toLocaleString(),'Within reach. Focus on retention while carefully adding new users.'])
   }
 
-  // Runway
-  if(r.rw<6) items.push([R,'Critical: under 6 months of runway','Immediate action required. Cut burn, accelerate revenue, or begin fundraising now.'])
-  else if(r.rw<12) items.push([R,'Under 12 months \u2014 start fundraising conversations','Even if you prefer not to raise, prepare materials and start conversations.'])
-  else if(r.rw<18) items.push([A,'12\u201318 months of runway \u2014 monitor closely','Workable but thin. Avoid unvalidated hiring or expensive experiments.'])
-  else items.push([G,'Runway is healthy \u2014 use it with intention','18+ months gives you space for disciplined Build-Measure-Learn cycles.'])
-
   // Tier 2+ specific
   if(ct!=='v1'&&r.paidCAC!==undefined&&r.cac>0){
     const paidRatio=r.paidCAC/r.cac
@@ -849,6 +900,13 @@ function drawDiagnosis(r){
       else items.push([R,'Magic Number: '+f1(r.magicNum)+'\u00d7 \u2014 inefficient','Sales spend is not translating to revenue. Fix sales cycle, ACV, or channel mix.'])
     }
   }
+
+  // Runway \u2014 Layer 3, so it closes the diagnosis instead of leading it.
+  if(r.pl>=0) items.push([G,'Profitable \u2014 runway is not a constraint','Monthly result is positive, so cash on hand is not being consumed. Runway only matters if the P/L turns negative.'])
+  else if(r.rw<6) items.push([R,'Critical: under 6 months of runway','Immediate action required. Cut burn, accelerate revenue, or begin fundraising now.'])
+  else if(r.rw<12) items.push([R,'Under 12 months \u2014 start fundraising conversations','Even if you prefer not to raise, prepare materials and start conversations.'])
+  else if(r.rw<18) items.push([A,'12\u201318 months of runway \u2014 monitor closely','Workable but thin. Avoid unvalidated hiring or expensive experiments.'])
+  else items.push([G,'Runway is healthy \u2014 use it with intention','18+ months gives you space for disciplined Build-Measure-Learn cycles.'])
 
   document.getElementById('diag-panel').innerHTML=items.map(([c,t2,b])=>
     `<div class="diag-item" style="border-left-color:${c}"><div class="dt">${t2}</div><div class="db">${b}</div></div>`
