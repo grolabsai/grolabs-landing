@@ -79,7 +79,11 @@ import '../../../styles/simulator.css';
   <div class="app">
     <div class="grid-main">
       <div class="left-col">
-        <div id="inp-panel"></div>
+        <div class="input-zone">
+          <div class="zone-lbl">Your numbers — adjust anything</div>
+          <div id="inp-panel"></div>
+        </div>
+        <div class="zone-lbl zone-lbl--out">What it means — computed live from your numbers</div>
         <div id="waterfall-panel"></div>
         <div class="grid-charts">
           <div class="chart-box"><div class="ch-title">Payback curve — cumulative margin vs. CAC</div><div class="ch-legend"><span class="ch-leg"><span class="ch-dot" style="background:#fae194"></span>Cum. margin / user</span><span class="ch-leg"><span class="ch-dot" style="background:#ef4444;opacity:.7"></span>CAC threshold</span></div><div class="chart-area"><canvas id="c1"></canvas></div></div>
@@ -89,15 +93,18 @@ import '../../../styles/simulator.css';
         <div><div class="sec-lbl">Diagnosis</div><div id="diag-panel"></div></div>
       </div>
       <div id="kpi-panel">
+        <div class="zone-lbl zone-lbl--out">What it means — computed live</div>
         <div id="kpi-main"></div>
         <!-- Layer 3 — Runway. Static markup (identical across models/tiers)
              so dragging the cash slider never gets destroyed by the
              kpi-main innerHTML rewrites. -->
         <div class="layer-card" id="runway-card">
           <div class="layer-lbl">3 · Runway</div>
-          <div class="bd">
+          <!-- attn-beam + the centered hint run until the first drag on the
+               cash slider, then onCash() removes both for the session. -->
+          <div class="bd attn-beam" id="runway-bd">
             <div class="inp-row" style="margin-bottom:8px">
-              <div class="inp-top"><span class="inp-name">Cash on hand</span><span class="inp-val" id="v_cash">$50,000</span></div>
+              <div class="inp-top"><span class="inp-name">Cash on hand</span><span class="cash-hint" id="cash-hint">‹ drag to set your value ›</span><span class="inp-val" id="v_cash">$50,000</span></div>
               <input type="range" min="10000" max="2000000" step="10000" value="50000" id="cash-slider" oninput="onCash(this)">
             </div>
             <div class="rw-line" id="rw-out"></div>
@@ -156,7 +163,6 @@ const SAAS={
     inputs:[
       I('arpu','Monthly price / subscriber','$',5,500,5,49,'rv'),
       I('users','Active subscribers','',10,5000,10,200,'rv'),
-      I('churn','Monthly churn rate','%',0.5,25,0.5,5,'rv'),
       I('cts','Cost to serve / user / mo','$',0,25,0.5,3.5,'vc'),
       I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
       I('nc','New subscribers / month','',5,500,5,50,'ac'),
@@ -164,7 +170,7 @@ const SAAS={
     ],
     calc(v){
       const cm=v.arpu-v.cts
-      const ltv=cm>0?cm/(v.churn/100):0
+      const ltv=cm>0?cm*12:0
       const cac=v.nc>0?v.mkt/v.nc:0
       const ratio=cac>0?ltv/cac:0
       const pb=cm>0?cac/cm:9999
@@ -196,7 +202,11 @@ const SAAS={
       const egm=v.arpu>0?cm/v.arpu*100:0
       const nrrMo=Math.pow(v.nrr/100,1/12)
       const netChurn=Math.max(0.001,(v.churn/100)-(nrrMo-1))
-      const ltv=cm>0?cm/netChurn:0
+      /* 1-yr customer value: expected contribution over the first 12
+         months only (churn + NRR expansion applied within the year) —
+         a year statement, not a lifetime projection. */
+      let ltv=0
+      if(cm>0){for(let t=0;t<12;t++)ltv+=cm*Math.pow(nrrMo,t)*Math.pow(1-(v.churn/100),t)}
       const cac=v.nc>0?v.mkt/v.nc:0
       const paidNew=v.nc*(1-v.orgpct/100)
       const paidCAC=paidNew>0?v.mkt/paidNew:0
@@ -302,7 +312,6 @@ const ECOMM={
       I('aov','Average order value','$',10,1000,5,80,'rv'),
       I('users','Active customers (12mo)','',10,5000,10,300,'rv'),
       I('freq','Orders per customer / year','x/yr',1,24,0.5,4,'rv'),
-      I('life','Customer lifetime','yrs',0.5,10,0.5,2,'rv'),
       I('margin','Product margin','%',10,80,1,40,'rv'),
       I('cpo','Cost per order (fulfill+proc+returns)','$',0,50,0.5,12,'vc'),
       I('mkt','Monthly marketing spend','$',500,50000,500,3000,'ac'),
@@ -312,7 +321,7 @@ const ECOMM={
     calc(v){
       const cmOrd=v.aov*(v.margin/100)-v.cpo
       const cm=cmOrd*(v.freq/12)
-      const ltv=cmOrd*v.freq*v.life
+      const ltv=cmOrd*v.freq
       const cac=v.nc>0?v.mkt/v.nc:0
       const ratio=cac>0?ltv/cac:0
       const pb=cm>0?cac/cm:9999
@@ -328,7 +337,6 @@ const ECOMM={
       I('aov','Average order value','$',10,1000,5,80,'rv'),
       I('users','Active customers (12mo)','',10,5000,10,300,'rv'),
       I('freq','Orders per customer / year','x/yr',1,24,0.5,4,'rv'),
-      I('life','Customer lifetime','yrs',0.5,10,0.5,2,'rv'),
       I('gm','Product gross margin','%',10,80,1,40,'rv'),
       I('fulfl','Fulfillment cost per order','$',0,50,0.5,8,'vc'),
       I('retrn','Return rate','%',0,40,0.5,10,'vc'),
@@ -345,7 +353,7 @@ const ECOMM={
       const cmOrd=v.aov*(v.gm/100)-vc
       const egm=v.aov>0?cmOrd/v.aov*100:0
       const cm=cmOrd*(v.freq/12)
-      const ltv=cmOrd*v.freq*v.life
+      const ltv=cmOrd*v.freq
       const cac=v.nc>0?v.mkt/v.nc:0
       const paidNew=v.nc*(1-v.orgpct/100)
       const paidCAC=paidNew>0?v.mkt/paidNew:0
@@ -416,7 +424,6 @@ const SVC={
       I('pv','Average project value','$',500,100000,500,5000,'rv'),
       I('users','Active clients','',1,500,1,15,'rv'),
       I('ppy','Projects per client / year','x/yr',0.5,12,0.5,2,'rv'),
-      I('cl','Client lifetime','yrs',0.5,10,0.5,3,'rv'),
       I('delcost','Total delivery cost','%',10,85,1,55,'rv'),
       I('mkt','Monthly acquisition spend','$',500,50000,500,2000,'ac'),
       I('nc','New clients / month','',1,50,1,3,'ac'),
@@ -425,7 +432,7 @@ const SVC={
     calc(v){
       const cpp=v.pv*(1-v.delcost/100)
       const cm=cpp*(v.ppy/12)
-      const ltv=cpp*v.ppy*v.cl
+      const ltv=cpp*v.ppy
       const cac=v.nc>0?v.mkt/v.nc:0
       const ratio=cac>0?ltv/cac:0
       const pb=cm>0?cac/cm:9999
@@ -441,7 +448,6 @@ const SVC={
       I('pv','Average project value','$',500,100000,500,5000,'rv'),
       I('users','Active clients','',1,500,1,15,'rv'),
       I('ppy','Projects per client / year','x/yr',0.5,12,0.5,2,'rv'),
-      I('cl','Client lifetime','yrs',0.5,10,0.5,3,'rv'),
       I('cogs','Internal labor / COGS','%',10,80,1,40,'rv'),
       I('subco','Subcontractor cost','%',0,50,1,15,'vc'),
       I('overh','Overhead per project','$',0,5000,50,300,'vc'),
@@ -455,7 +461,7 @@ const SVC={
       const cpp=v.pv*(1-v.cogs/100)-vc
       const egm=v.pv>0?cpp/v.pv*100:0
       const cm=cpp*(v.ppy/12)
-      const ltv=cpp*v.ppy*v.cl
+      const ltv=cpp*v.ppy
       const cac=v.nc>0?v.mkt/v.nc:0
       const paidNew=v.nc*(1-v.orgpct/100)
       const paidCAC=paidNew>0?v.mkt/paidNew:0
@@ -526,7 +532,6 @@ const MKT={
       I('take','Platform take rate','%',1,30,0.5,10,'rv'),
       I('users','Monthly active users','',10,10000,10,500,'rv'),
       I('txmo','Transactions per user / month','x/mo',0.5,20,0.5,2,'rv'),
-      I('churn','Monthly user churn','%',1,30,0.5,8,'rv'),
       I('cts','Cost per user / month (infra+proc)','$',0,10,0.25,1.5,'vc'),
       I('mkt','Monthly marketing spend','$',500,50000,500,5000,'ac'),
       I('nc','New users / month','',5,1000,5,80,'ac'),
@@ -535,7 +540,7 @@ const MKT={
     calc(v){
       const rev=v.gmv*(v.take/100)*v.txmo
       const cm=rev-v.cts
-      const ltv=cm>0?cm/(v.churn/100):0
+      const ltv=cm>0?cm*12:0
       const cac=v.nc>0?v.mkt/v.nc:0
       const ratio=cac>0?ltv/cac:0
       const pb=cm>0?cac/cm:9999
@@ -567,7 +572,9 @@ const MKT={
       const cm=rev*(v.gm/100)-vc
       const egm=rev>0?cm/rev*100:0
       const c=v.churn/100
-      const ltv=cm>0?cm/c:0
+      /* 1-yr customer value — churn applied within the 12 months only. */
+      let ltv=0
+      if(cm>0){for(let t=0;t<12;t++)ltv+=cm*Math.pow(1-c,t)}
       const cac=v.nc>0?v.mkt/v.nc:0
       const paidNew=v.nc*(1-v.orgpct/100)
       const paidCAC=paidNew>0?v.mkt/paidNew:0
@@ -661,6 +668,10 @@ const rwCol=m=>m>=999||m>=18?G:m>=12?A:R
 
 function initVals(){vals={};curTier().inputs.forEach(i=>vals[i.id]=i.mn);vals.cash=cashVal}
 
+/* Yellow track fill up to the thumb — the "this is yours to change"
+   affordance. --fill drives the input[type=range] background gradient. */
+function setFill(el){const p=(el.value-el.min)/(el.max-el.min)*100;el.style.setProperty('--fill',p+'%')}
+
 /* ══════════════════════════════════════════════
    RENDERING
    ══════════════════════════════════════════════ */
@@ -683,6 +694,7 @@ function drawInputs(tier){
     html+=`<div class="inp-row"><div class="inp-top"><span class="inp-name">${inp.l}</span><span class="inp-val" id="v_${inp.id}">${fVal(vals[inp.id],inp)}</span></div><input type="range" min="${inp.mn}" max="${inp.mx}" step="${inp.st}" value="${vals[inp.id]}" data-id="${inp.id}" oninput="onSlide(this)"></div>`
   })
   document.getElementById('inp-panel').innerHTML=html
+  document.querySelectorAll('#inp-panel input[type=range]').forEach(setFill)
 }
 
 function drawKPI(r){
@@ -697,11 +709,20 @@ function drawKPI(r){
   const opc=opRes>=0?G:R
   const plc=r.pl>=0?G:R
 
-  /* The lifetime assumption behind LTV, stated inline (Layer 2). */
+  /* V1/V2 report a 1-year customer value — a year statement, no
+     lifetime projection. V3 (investor math) keeps DCF lifetime LTV and
+     states the assumption driving it. */
+  const isYr=ct!=='v3'
   let asm=''
-  if(vals.churn!==undefined)asm=`assumes ${f1(vals.churn)}%/mo churn`
-  else if(vals.life!==undefined)asm=`assumes ${f1(vals.life)}-yr lifetime`
-  else if(vals.cl!==undefined)asm=`assumes ${f1(vals.cl)}-yr client lifetime`
+  if(isYr){
+    if(vals.freq!==undefined)asm=`${f1(vals.freq)} orders/yr × CM/order — one-year statement`
+    else if(vals.ppy!==undefined)asm=`${f1(vals.ppy)} projects/yr × CM/project — one-year statement`
+    else asm='12-mo statement — no lifetime projection'
+  }else{
+    if(vals.churn!==undefined)asm=`assumes ${f1(vals.churn)}%/mo churn`
+    else if(vals.life!==undefined)asm=`assumes ${f1(vals.life)}-yr lifetime`
+    else if(vals.cl!==undefined)asm=`assumes ${f1(vals.cl)}-yr client lifetime`
+  }
 
   let extra=''
   if(ct==='v2'){
@@ -729,14 +750,14 @@ function drawKPI(r){
       </div>
     </div>
     <div class="layer-card">
-      <div class="layer-lbl">2 \u00b7 Acquisition &amp; lifetime</div>
+      <div class="layer-lbl">2 \u00b7 Acquisition &amp; ${isYr?'1-year value':'lifetime'}</div>
       <div class="ratio-card" data-bg="${bgText}" style="border-left-color:${col}">
-        <div class="r-lbl">LTV : CAC ratio<span class="tier-badge ${ct==='v1'?'tb-v1':ct==='v2'?'tb-v2':'tb-v3'}">${ct==='v1'?'Simple':ct==='v2'?'NRR-adj':'DCF'}</span></div>
+        <div class="r-lbl">${isYr?'1-yr value':'LTV'} : CAC ratio<span class="tier-badge ${ct==='v1'?'tb-v1':ct==='v2'?'tb-v2':'tb-v3'}">${ct==='v1'?'Simple':ct==='v2'?'NRR-adj':'DCF'}</span></div>
         <div class="r-val" style="color:${col}">${fRat(r.ratio)}</div>
         <div class="r-status" style="color:${col}">${rLab(r.ratio)}</div>
       </div>
       <div class="kpi-grid">
-        <div class="kc"><div class="kl">${ct==='v3'?'DCF ':''}Lifetime Value</div><div class="kv">${f$(r.ltv)}</div>${asm?`<div class="kv-note">${asm}</div>`:''}</div>
+        <div class="kc"><div class="kl">${isYr?'1-yr customer value':'DCF Lifetime Value'}</div><div class="kv">${f$(r.ltv)}</div>${asm?`<div class="kv-note">${asm}</div>`:''}</div>
         <div class="kc"><div class="kl">${ct==='v3'?'Fully-loaded ':''}CAC</div><div class="kv">${f$(r.cac)}</div></div>
         <div class="kc"><div class="kl">${ct==='v3'?'NPV ':''}Payback</div><div class="kv" style="color:${pbCol(r.pb)}">${fMo(r.pb)}</div><div class="kv-note">assumption-free once paid back</div></div>
         <div class="kc"><div class="kl">Break-even</div><div class="kv">${fBe(r.be)} ${ul}</div></div>
@@ -766,6 +787,12 @@ function updateRunway(r){
 function onCash(el){
   cashVal=parseFloat(el.value)
   vals.cash=cashVal
+  setFill(el)
+  /* User responded — retire the attention beam + hint for good. */
+  const bd=document.getElementById('runway-bd')
+  if(bd)bd.classList.remove('attn-beam')
+  const h=document.getElementById('cash-hint')
+  if(h)h.remove()
   document.getElementById('v_cash').textContent='$'+Math.round(cashVal).toLocaleString()
   const r=curTier().calc(vals)
   updateRunway(r)
@@ -859,7 +886,7 @@ function drawDiagnosis(r){
   else if(r.ratio<1)
     items.push([R,'Unit economics are negative','You spend more acquiring customers than they generate. Address pricing, churn, or variable costs first.'])
   else if(r.ratio<2)
-    items.push([A,'Marginal unit economics \u2014 fragile','LTV barely covers CAC. A small CPC spike or churn increase pushes you negative.'])
+    items.push([A,'Marginal unit economics \u2014 fragile','Customer value barely covers CAC. A small CPC spike or churn increase pushes you negative.'])
   else if(r.ratio<3)
     items.push([A,'Below the 3\u00d7 investor benchmark','Close. Small improvements in churn or variable costs can unlock investor-grade metrics.'])
   else if(r.ratio<5)
@@ -919,6 +946,7 @@ function drawDiagnosis(r){
 function onSlide(el){
   const id=el.dataset.id
   vals[id]=parseFloat(el.value)
+  setFill(el)
   const inp=curTier().inputs.find(x=>x.id===id)
   const lbl=document.getElementById('v_'+id)
   if(lbl)lbl.textContent=fVal(vals[id],inp)
@@ -962,9 +990,9 @@ document.getElementById('model-tabs').addEventListener('click',e=>{
    ══════════════════════════════════════════════ */
 const GLOSSARY={
   v1:[
-    {term:'LTV (Lifetime Value)',def:'The total revenue a single customer generates over their entire relationship with your business, minus the variable costs to serve them.',why:'If you don\u2019t know this number, you\u2019re guessing how much you can afford to spend acquiring customers.',formula:'LTV = Contribution margin per month \u00f7 Monthly churn rate'},
-    {term:'CAC (Customer Acquisition Cost)',def:'The total cost to acquire one new customer. Includes all marketing spend, divided by the number of customers that spend produced.',why:'The counterpart to LTV. If CAC > LTV, every customer you acquire makes you poorer.',formula:'CAC = Monthly marketing spend \u00f7 New customers per month'},
-    {term:'LTV:CAC Ratio',def:'How many dollars of lifetime value you generate for every dollar spent acquiring a customer. The fundamental measure of unit economics health.',why:'Below 1\u00d7 means you\u2019re losing money on every customer. The industry benchmark is 3\u00d7 or higher.',formula:'Ratio = LTV \u00f7 CAC'},
+    {term:'1-Year Customer Value',def:'The contribution a single customer generates in one year \u2014 e.g., 6 orders \u00d7 margin per order, or 12 months \u00d7 monthly contribution. A year statement you can verify against your books, not a lifetime projection.',why:'How long a customer will stay is the most speculative number in unit economics. A one-year window removes that guess entirely: you either earned it or you didn\u2019t.',formula:'1-yr value = CM per order \u00d7 orders per year (or CM/mo \u00d7 12)'},
+    {term:'CAC (Customer Acquisition Cost)',def:'The total cost to acquire one new customer. Includes all marketing spend, divided by the number of customers that spend produced.',why:'The counterpart to customer value. If CAC exceeds what a customer brings in, every customer you acquire makes you poorer.',formula:'CAC = Monthly marketing spend \u00f7 New customers per month'},
+    {term:'Value : CAC Ratio',def:'How many dollars of first-year customer value you generate for every dollar spent acquiring a customer. The fundamental measure of unit economics health.',why:'Below 1\u00d7 means a customer doesn\u2019t even repay their acquisition cost within a year. 3\u00d7 or higher is the healthy benchmark.',formula:'Ratio = 1-yr value \u00f7 CAC'},
     {term:'Churn Rate',def:'The percentage of customers who stop paying you each month. Even small differences in churn have massive compounding effects on LTV.',why:'A 5% monthly churn means you lose half your customers every year. A 2% churn means you keep 78%. That single variable can 2.5\u00d7 your LTV.'},
     {term:'Contribution Margin',def:'Revenue per customer minus the variable costs of serving that customer. The money each customer contributes toward covering your fixed costs and generating profit.',why:'If this number is negative, growth makes losses worse, not better. Fix this first.'},
     {term:'Payback Period',def:'How many months it takes for a customer\u2019s contribution margin to repay the cost of acquiring them.',why:'Shorter payback means faster cash recycling. If payback exceeds 18 months, you need deep pockets or patient investors.',formula:'Payback = CAC \u00f7 Monthly contribution margin'},
@@ -1015,6 +1043,7 @@ function drawGlossary(){
 
 /* ── INIT ── */
 initVals()
+setFill(document.getElementById('cash-slider'))
 render()
   </script>
 </BaseLayout>
