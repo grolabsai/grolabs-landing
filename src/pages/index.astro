@@ -123,9 +123,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
   </Fragment>
 
   <!-- ============================================================
-       Audit hero — headline / tagline / lede / CTAs on the left;
-       the audit prompt + URL/email input on the right. (The original
-       stat-card hero was removed; this is now the only hero.)
+       Audit hero — headline / tagline / CTAs as ONE centered block.
+       The stat card that used to sit beside it now opens the yellow
+       "reality check" section directly below, so the first viewport
+       carries a single element and nothing else.
        ============================================================ -->
   <section class="hero-v2 relative px-margin-mobile md:px-margin-desktop pt-xl pb-xl md:pt-3xl md:pb-3xl overflow-hidden" data-hero-audit>
     <div id="particles-container"></div>
@@ -153,43 +154,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <a href="mailto:growth@grolabs.ai" class="hero-v2-btn hero-v2-btn--ghost">Contact</a>
         </div>
       </div>
-
-      <div class="hero-v2-stage-col">
-        <div class="hero-v2-stat-box lifted-glass" data-hero-stats>
-          <div class="hero-v2-stat-row">
-            <span class="hero-v2-stat-99">99%</span>
-            <p class="hero-v2-stat-text">of visitors never become customers<br />in many online stores.</p>
-          </div>
-          <div class="hero-v2-stat-row">
-            <span class="hero-v2-stat-99">1%</span>
-            <p class="hero-v2-stat-text">conversion uplift<br />would result in</p>
-          </div>
-          <div class="hero-v2-stat-row">
-            <span class="hero-v2-stat-99 hero-v2-stat-accent">2x</span>
-            <p class="hero-v2-stat-sales hero-v2-stat-accent">sales!</p>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
-
-  <script is:inline>
-    // Mobile hero hand-off: on the first stretch of scroll the stats
-    // block first climbs on its own (a head start relative to the page),
-    // then settles and moves together with everything else.
-    (function () {
-      var box = document.querySelector('[data-hero-stats]');
-      if (!box) return;
-      function onScroll() {
-        if (window.innerWidth > 767) { box.style.transform = ''; return; }
-        var k = Math.max(0, 1 - window.scrollY / 280);   // 1 at top → 0 by 280px
-        box.style.transform = 'translateY(' + (k * 72).toFixed(1) + 'px)';
-      }
-      addEventListener('scroll', onScroll, { passive: true });
-      addEventListener('resize', onScroll);
-      onScroll();
-    })();
-  </script>
 
   <!-- Booking embed — Calendly's inline widget themed yellow + dark to
        match the inverted footer. Hidden by default; revealed when the
@@ -217,12 +183,49 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     </div>
   </section>
 
+  {/* ============================================================
+       Reality check — the stat block that used to share the hero now
+       opens its own section on yellow, with the two questions the rest
+       of the page answers standing beside it.
+       Placed AFTER the booking embed so the embed still opens directly
+       under the hero CTA that reveals it.
+       ============================================================ */}
+  <section
+    class="rc-section bg-primary px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl"
+    data-screen-label="Reality check"
+  >
+    <div class="rc-grid max-w-page mx-auto">
+      <div class="hero-v2-stat-box lifted-glass">
+        <div class="hero-v2-stat-row">
+          <span class="hero-v2-stat-99">99%</span>
+          <p class="hero-v2-stat-text">of visitors never become customers<br />in many online stores.</p>
+        </div>
+        <div class="hero-v2-stat-row">
+          <span class="hero-v2-stat-99">1%</span>
+          <p class="hero-v2-stat-text">conversion uplift<br />would result in</p>
+        </div>
+        <div class="hero-v2-stat-row">
+          <span class="hero-v2-stat-99 hero-v2-stat-accent">2x</span>
+          <p class="hero-v2-stat-sales hero-v2-stat-accent">sales!</p>
+        </div>
+      </div>
 
+      {/* The <br>s only take effect on mobile (see .rc-ask-br) — that is
+          the one width where the questions cannot hold a single line, and
+          "…your / conversion rate?" is the break that keeps the subject
+          intact on the first row. */}
+      <div class="rc-asks">
+        <p class="rc-ask">Do you know your<br class="rc-ask-br" /> conversion rate?</p>
+        <p class="rc-ask">Do you know your<br class="rc-ask-br" /> revenue leak rate?</p>
+      </div>
+    </div>
+  </section>
 
   {/* ============================================================
-       Revenue Leak % (rf-v2) — scroll-scrubbed "handwritten" revenue
-       formula: the pen writes "Fix revenue leaks" and draws its arrow
-       into Recovered revenue, then the formula completes.
+       Revenue leak rate (rf-v2) — scroll-scrubbed "handwritten" revenue
+       formula: the pen writes "Fix revenue leaks" across the top of the
+       card and draws its arrow down into Recovered revenue, then the
+       formula completes.
        ============================================================ */}
   <section class="rf-section rf-v2" data-rf data-screen-label="GRO Framework Copy">
     <div class="rf-track" data-rf-track>
@@ -231,7 +234,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <div class="rf-grid">
             <span class="rf-eyebrow">Ecommerce funnel</span>
             <div class="rf-copycol">
-            <h2 class="rf-title">Revenue Leak %</h2>
+            <h2 class="rf-title">Revenue leak rate</h2>
             <div class="rf-copy">
               <p>Revenue Leaks occur when unnecessary friction prevents ready-to-buy customers from discovering, understanding, trusting, or purchasing the desired product.</p>
             </div>
@@ -240,37 +243,37 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             <div class="rf-box lifted-glass">
               <div class="rf-stage-wrap" data-rf-wrap>
                 <div class="rf-stage" data-rf-stage>
-                  <svg class="rf-marks" viewBox="0 0 1080 520" preserveAspectRatio="none" aria-hidden="true">
-                    <path id="rfRule1" class="rf-ruleln" pathLength="1" d="M 300 246 C 430 244 560 248 680 245 C 730 244 770 247 800 246" />
-                    <path id="rfRule2" class="rf-ruleln" pathLength="1" d="M 300 398 C 430 401 560 396 680 399 C 730 400 770 398 800 398" />
-                    <path id="rfArF"   pathLength="1" d="M 150 196 C 126 262 146 330 224 356" />
-                    <path id="rfArFh1" pathLength="1" d="M 224 356 l -20 -7" />
-                    <path id="rfArFh2" pathLength="1" d="M 224 356 l -15 13" />
+                  <svg class="rf-marks" viewBox="0 0 1080 596" preserveAspectRatio="none" aria-hidden="true">
+                    <path id="rfRule1" class="rf-ruleln" pathLength="1" d="M 334 322 C 464 320 594 324 714 321 C 764 320 804 323 834 322" />
+                    <path id="rfRule2" class="rf-ruleln" pathLength="1" d="M 334 474 C 464 477 594 472 714 475 C 764 476 804 474 834 474" />
+                    <path id="rfArF"   pathLength="1" d="M 344 70 C 226 88 174 210 180 320 C 185 400 232 396 284 430" />
+                    <path id="rfArFh1" pathLength="1" d="M 284 430 l -19 -5" />
+                    <path id="rfArFh2" pathLength="1" d="M 284 430 l -5 -19" />
                   </svg>
 
                   <div class="rf-hand rf-fix-note" id="rfFixTxt">Fix revenue leaks</div>
 
-                  <div class="rf-op rf-row rf-auto" id="rfOpConv" style="top:136px;">&times;</div>
-                  <div class="rf-op rf-row rf-auto" id="rfOpAov"  style="top:206px;">&times;</div>
-                  <div class="rf-op rf-row rf-auto" id="rfOpAct"  style="top:288px;">=</div>
-                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpRec" style="top:358px;">+</div>
-                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpPot" style="top:442px;">=</div>
+                  <div class="rf-op rf-row rf-auto" id="rfOpConv" style="top:212px;">&times;</div>
+                  <div class="rf-op rf-row rf-auto" id="rfOpAov"  style="top:282px;">&times;</div>
+                  <div class="rf-op rf-row rf-auto" id="rfOpAct"  style="top:364px;">=</div>
+                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpRec" style="top:434px;">+</div>
+                  <div class="rf-op rf-row rf-marker rf-hidden" id="rfOpPot" style="top:518px;">=</div>
 
-                  <div class="rf-word rf-row" style="top:66px;">Traffic</div>
-                  <div class="rf-word rf-row" style="top:136px;">Conversion</div>
-                  <div class="rf-word rf-row" style="top:206px;">Average order value</div>
-                  <div class="rf-word rf-row" style="top:288px;">Actual revenue</div>
-                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWRec" style="top:358px;">Recovered revenue</div>
-                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWPot" style="top:442px;">Potential revenue</div>
+                  <div class="rf-word rf-row" style="top:142px;">Traffic</div>
+                  <div class="rf-word rf-row" style="top:212px;">Conversion</div>
+                  <div class="rf-word rf-row" style="top:282px;">Average order value</div>
+                  <div class="rf-word rf-row" style="top:364px;">Actual revenue</div>
+                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWRec" style="top:434px;">Recovered revenue</div>
+                  <div class="rf-word rf-row rf-hand rf-marker" id="rfWPot" style="top:518px;">Potential revenue</div>
 
-                  <div class="rf-sym rf-row" style="top:66px;">
+                  <div class="rf-sym rf-row" style="top:142px;">
                     <svg viewBox="0 0 64 64" aria-label="traffic"><circle cx="32" cy="21" r="11" fill="currentColor"/><path d="M11 56 C11 38 53 38 53 56 Z" fill="currentColor"/></svg>
                   </div>
-                  <div class="rf-sym rf-row" style="top:136px;">%</div>
-                  <div class="rf-sym rf-row" style="top:206px;">$</div>
-                  <div class="rf-sym rf-row" style="top:288px;">$</div>
-                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSRec" style="top:358px;">$</div>
-                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSPot" style="top:442px;">$$</div>
+                  <div class="rf-sym rf-row" style="top:212px;">%</div>
+                  <div class="rf-sym rf-row" style="top:282px;">$</div>
+                  <div class="rf-sym rf-row" style="top:364px;">$</div>
+                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSRec" style="top:434px;">$</div>
+                  <div class="rf-sym rf-row rf-marker rf-hidden" id="rfSPot" style="top:518px;">$$</div>
                 </div>
               </div>
             </div>
@@ -355,17 +358,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
     @media (max-width: 767px) { .rf-box { padding: 14px 10px; } }
 
-    /* Stage: fixed 1080×520 design space, uniformly scaled to the box width */
+    /* Stage: fixed 1080×596 design space, uniformly scaled to the box width.
+       The top ~110px is the annotation band — the note is written across it
+       horizontally, which is what freed the left gutter the note used to
+       occupy and let the equation columns centre in the design space. */
     .rf-stage-wrap { position: relative; width: 100%; overflow: hidden; }
     .rf-stage {
       position: absolute; top: 0; left: 0;
-      width: 1080px; height: 520px;
+      width: 1080px; height: 596px;
       transform-origin: top left;
       color: #fff;
     }
     .rf-row { position: absolute; transform: translateY(-50%); white-space: nowrap; }
     .rf-op {
-      left: 222px; width: 64px; text-align: right;
+      left: 256px; width: 64px; text-align: right;
       font-family: "Permanent Marker", cursive; font-size: 44px; line-height: 1;
       opacity: 0; color: #fff;
     }
@@ -377,14 +383,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .rf-go #rfOpConv { animation: rfOpIn .26s cubic-bezier(.5,.05,.3,1) .22s both; }
     .rf-go #rfOpAov  { animation: rfOpIn .26s cubic-bezier(.5,.05,.3,1) .50s both; }
     .rf-go #rfOpAct  { animation: rfOpIn .26s cubic-bezier(.5,.05,.3,1) .78s both; }
-    .rf-word { left: 300px; font-size: 44px; font-weight: 500; letter-spacing: -0.01em; color: #fff; }
-    .rf-sym  { left: 712px; text-align: left; width: 240px; font-size: 44px; font-weight: 600; color: #fff; }
+    .rf-word { left: 334px; font-size: 44px; font-weight: 500; letter-spacing: -0.01em; color: #fff; }
+    .rf-sym  { left: 746px; text-align: left; width: 240px; font-size: 44px; font-weight: 600; color: #fff; }
     .rf-sym svg { width: 38px; height: 38px; vertical-align: -5px; }
     .rf-hand { font-family: "Permanent Marker", cursive; font-weight: 400; letter-spacing: 0.005em; }
     .rf-ltr { display: inline-block; opacity: 0; }
     .rf-marker { color: #fae194; }
     .rf-hidden { opacity: 0; }
-    .rf-marks { position: absolute; inset: 0; width: 1080px; height: 520px; pointer-events: none; overflow: visible; }
+    .rf-marks { position: absolute; inset: 0; width: 1080px; height: 596px; pointer-events: none; overflow: visible; }
     .rf-marks path {
       fill: none; stroke: #fae194; stroke-width: 4.5;      /* arrows = yellow */
       stroke-linecap: round; stroke-linejoin: round;
@@ -395,11 +401,14 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
     .rf-marks .rf-ruleln { stroke: #fff; stroke-width: 3; }   /* dividers = white */
     .rf-marks .rf-circle { stroke: #34d399; stroke-width: 4; }/* green = answer circle only */
-    /* two lines, broken at the WORD boundary: "Fix revenue" / "leaks" —
-       clear of the Conversion column */
-    .rf-fix-note { position: absolute; left: 26px; top: 98px; width: 218px;
-      font-size: 36px; line-height: 1.12; color: #fae194; transform: rotate(-8deg);
-      overflow-wrap: normal; word-break: keep-all; }
+    /* One horizontal line across the top band. Upright and unrotated: at
+       mobile scale a tilted two-line note was the thing that could not be
+       read, and rotating it was also what forced the equation off-centre
+       to keep a left gutter clear for it. Yellow, like the arrow it starts
+       and the Recovered revenue row that arrow lands on. */
+    .rf-fix-note { position: absolute; left: 0; right: 0; top: 46px;
+      text-align: center; font-size: 44px; line-height: 1.1; color: #fae194;
+      white-space: nowrap; }
     @keyframes rfDrawln { to { stroke-dashoffset: 0; } }
     .rf-go #rfRule1 { animation: rfDrawln .5s ease 1.06s both; }
   </style>
@@ -416,15 +425,20 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       var wrap = section.querySelector('[data-rf-wrap]');
       var stage = section.querySelector('[data-rf-stage]');
 
-      // Uniformly scale the 1080×520 stage to the box width. On mobile,
-      // crop to the design window that actually has content (x 100–830)
-      // so the equation fills the card instead of leaving side margins.
+      // Uniformly scale the 1080×596 stage to the box width. On mobile,
+      // crop to the design window that actually has content (x 168–850:
+      // the arrow's bow on the left, the rules' right end on the
+      // right) so the equation fills the card instead of leaving side
+      // margins. That window is much narrower than it used to be — with
+      // the note moved to the top band there is no left gutter to keep in
+      // frame — which is what makes the type render larger, and legible,
+      // on a phone.
       function fit() {
         var mobile = window.matchMedia('(max-width: 767px)').matches;
-        var DW = mobile ? 730 : 1080, OX = mobile ? 100 : 0;
+        var DW = mobile ? 682 : 1080, OX = mobile ? 168 : 0;
         var s = wrap.clientWidth / DW;
         stage.style.transform = 'translateX(' + (-OX * s) + 'px) scale(' + s + ')';
-        wrap.style.height = Math.round(520 * s) + 'px';
+        wrap.style.height = Math.round(596 * s) + 'px';
       }
       window.addEventListener('resize', fit);
       fit();
@@ -1610,7 +1624,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       .rre-head { margin-bottom: 28px; }
     }
 
-    /* ─────────── Hero v2 — merged hero + stats ─────────── */
+    /* ─────────── Hero v2 — one centered block ─────────── */
     /* Fill the first viewport (minus the header) with the hero alone so
        the opening view isn't distracted by the section below; content
        stays vertically centered in that space. */
@@ -1620,19 +1634,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         min-height: calc(100svh - 80px);   /* viewport minus the site header */
       }
     }
+    /* Single column, centered on both axes: the stat card that used to
+       hold the right half now lives in its own section below, so there is
+       no second column left to balance against. */
     .hero-v2-grid {
       display: grid;
-      grid-template-columns: minmax(0, 50fr) minmax(0, 50fr);
-      gap: 64px;
-      align-items: center;
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+      text-align: center;
       width: 100%;
     }
-    @media (max-width: 1100px) {
-      /* minmax(0,1fr), not 1fr: plain 1fr means minmax(auto,1fr), and the
-         nowrap headline's min-content width would inflate the column past
-         the viewport, clipping the title/CTAs/stat box on the right. */
-      .hero-v2-grid { grid-template-columns: minmax(0, 1fr); gap: 56px; }
-    }
+    .hero-v2-copy { max-width: 100%; }
 
     .hero-v2-headline {
       margin: 0 0 14px;
@@ -1657,10 +1669,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     @media (max-width: 767px) {
       .hero-v2-line { font-size: clamp(24px, 8.4vw, 38px); }
     }
-    /* two-column hero: size the nowrap headline to its HALF-width column
-       so it never runs under the (translucent) stat card */
+    /* The headline no longer shares the row with the stat card, so it is
+       sized against the full page width again rather than a half column. */
     @media (min-width: 1101px) {
-      .hero-v2-line { font-size: clamp(34px, 3.5vw, 56px); }
+      .hero-v2-line { font-size: clamp(44px, 5.2vw, 76px); }
     }
 
     .hero-v2-tagline {
@@ -1695,8 +1707,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        stack. align-items on the parent + align-self on the ghost is
        belt-and-suspenders so flex-wrap or browser defaults can't push
        the ghost down. */
-    .hero-v2-ctas { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
-    .hero-v2-cta-stack { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    /* Centered hero: the CTA row centres in the column and the note
+       centres under its own button. */
+    .hero-v2-ctas { display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+    .hero-v2-cta-stack { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; }
     .hero-v2-btn--ghost { align-self: flex-start; }
     .hero-v2-cta-note {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -1905,10 +1919,57 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .audit-action .hero-v2-audit-btn { width: 100%; justify-content: center; }
 
     /* Right column: 99% stat + line on top, audit card moved below. */
-    [data-hero-audit] .hero-v2-grid { align-items: stretch; }
     [data-hero-audit] .hero-v2-copy { display: flex; flex-direction: column; }
-    [data-hero-audit] .hero-v2-lede { margin-top: auto; }
-    .hero-v2-stage-col { display: flex; flex-direction: column; gap: 28px; width: 100%; max-width: 560px; margin-left: auto; }
+
+    /* ─────────── Reality check — stat card left, questions right, yellow ───────────
+       The stat card keeps its dark surface: on the yellow ground the dark
+       block is what separates the evidence (measured numbers) from the two
+       questions asked of the reader, which are page copy, not data. */
+    .rc-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 64px;
+      align-items: center;
+      width: 100%;
+    }
+    @media (max-width: 1100px) {
+      .rc-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+    }
+    /* Solid fill, not the translucent .lifted-glass one. Over yellow the
+       55%-opaque glass tints the card and it reads as a yellowish block
+       instead of a black one; the sheen gradient goes with it, since a
+       highlight that assumes a dark page behind it does the same thing. */
+    .rc-section .hero-v2-stat-box {
+      background: #131316;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .rc-asks { display: flex; flex-direction: column; gap: 28px; }
+    .rc-ask {
+      font-family: "Permanent Marker", cursive;
+      font-weight: 400;
+      /* near-black, the same ink the other yellow bands use — pure black
+         is heavier than this palette's dark end */
+      color: #0e0e11;
+      /* Sized so the LONGER question ("…revenue leak rate?", 18.5× its own
+         font size in Permanent Marker) sets on one line in its half-column
+         at every width from 1101px — where the two-column grid starts and
+         the column is at its narrowest — up to the 1440px page cap.
+         Below 1101px the column is full width and this is moot; on mobile
+         it wraps deliberately, at .rc-ask-br. */
+      font-size: clamp(22px, 2.15vw, 34px);
+      line-height: 1.15;
+      letter-spacing: 0.005em;
+      margin: 0;
+    }
+    /* Above mobile the questions hold one line, so the authored break is
+       switched off and the space after it keeps the words apart. */
+    .rc-ask-br { display: none; }
+    @media (max-width: 767px) {
+      .rc-ask-br { display: inline; }
+      .rc-ask { text-align: center; }
+    }
+
     .hero-v2-stat-box {
       background: #1c1d24;            /* lighter-shade block, same as the quote card */
       border: 1px solid rgba(255,255,255,0.05);
@@ -1932,7 +1993,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     .hero-v2-stat-text { font-family: "Hanken Grotesk", sans-serif; color: #ffffff; font-size: 20px; line-height: 1.4; margin: 0; }
     .hero-v2-stat-sales { font-family: "Permanent Marker", cursive; font-size: clamp(38px, 4vw, 56px); line-height: 0.9; margin: 0; }
     .hero-v2-stat-accent { color: #fae194; }
-    .hero-v2-stage-col .hero-v2-audit { max-width: none; margin-left: 0; }
 
     /* Icons inside the URL + email inputs (lighter-gray shade). */
     .hero-v2-audit-field { position: relative; display: block; }
@@ -3043,8 +3103,8 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       /* marker glyphs carry ~0.1em of leading; nudge so the 99% cap
          height sits level with the first text line's cap height */
       .hero-v2-stat-99 { margin-top: 0.08em; }
-      /* first scene = the hero alone; the stat block stays below the
-         fold until the user scrolls */
+      /* first scene = the hero alone, centered; the yellow reality-check
+         section stays below the fold until the user scrolls */
       .hero-v2-copy {
         min-height: calc(100svh - 200px);
         display: flex; flex-direction: column; justify-content: center;
