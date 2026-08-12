@@ -1699,10 +1699,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Hanken Grotesk", sans-serif;
       font-size: clamp(15px, 1.4vw, 19px);
       line-height: 1.6;
-      /* Bone-white — was rgba(…, 0.6) which read as gray on the dark
-         hero. Solid bone gives the lede the same weight as the rest of
-         the hero copy so it reads as primary, not auxiliary. */
-      color: #EDEAE0;
+      /* Same 70%-bone gray every other section's paragraphs use
+         (see .rf-copy p) so body copy reads as one tone site-wide. */
+      color: rgba(237, 234, 224, 0.7);
       /* Centered hero column: auto inline margins keep the capped
          paragraph centered under the headline. */
       margin: 0 auto 44px;
