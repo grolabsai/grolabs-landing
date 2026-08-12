@@ -133,11 +133,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
     <div class="hero-v2-grid max-w-page mx-auto relative z-10 reveal active">
       <div class="hero-v2-copy">
+        <p class="hero-v2-eyebrow">Revenue Recovery Engine</p>
         <h1 class="hero-v2-headline">
-          <span class="hero-v2-line">Recover <span style="color: #fae194">lost revenue</span></span>
-          <span class="hero-v2-line"><span class="hero-v2-amp">&amp;</span> grow your business</span>
+          <span class="hero-v2-line">Stop <span style="color: #fae194">Revenue Leakage</span>:</span>
+          <span class="hero-v2-line hero-v2-line--sub">Recover lost sales from traffic you already paid for.</span>
         </h1>
-        <p class="hero-v2-tagline">Without paying for more traffic</p>
+        <p class="hero-v2-lede">
+          At zero added management cost or time on your end, our AI Revenue
+          Recovery Engine and dedicated team of growth strategists enrich your
+          catalog and fine-tune your search to recover lost revenue while you
+          stay focused on growing your business.
+        </p>
         <div class="hero-v2-ctas" data-hero-ctas>
           <div class="hero-v2-cta-stack">
             <a
@@ -1646,9 +1652,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     }
     .hero-v2-copy { max-width: 100%; }
 
+    .hero-v2-eyebrow {
+      font-family: monospace;
+      color: #fae194;
+      font-size: clamp(11px, 1.2vw, 15px);
+      line-height: 1.4;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin: 0 0 18px;
+    }
+
     .hero-v2-headline {
-      margin: 0 0 14px;
-      display: flex; flex-direction: column; gap: 4px;
+      margin: 0 0 24px;
+      display: flex; flex-direction: column; gap: 10px;
     }
     .hero-v2-line {
       font-family: "Permanent Marker", cursive;
@@ -1664,38 +1680,43 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       margin-right: 0.08em;
       position: relative; top: -0.02em;
     }
+    /* Second title line is ~2.5× the length of the first, so it gets its
+       own smaller scale and is allowed to wrap (balanced) instead of
+       being forced onto one nowrap line that would clip on narrow
+       viewports. */
+    .hero-v2-line--sub {
+      white-space: normal;
+      text-wrap: balance;
+      font-size: clamp(24px, 2.6vw, 38px);
+      line-height: 1.15;
+      max-width: 22ch;
+      margin-inline: auto;
+    }
     /* must come AFTER the base .hero-v2-line rule to win the cascade:
        scale the nowrap headline to the viewport so it never clips */
     @media (max-width: 767px) {
       .hero-v2-line { font-size: clamp(24px, 8.4vw, 38px); }
+      .hero-v2-line--sub { font-size: clamp(17px, 5.4vw, 24px); }
     }
     /* The headline no longer shares the row with the stat card, so it is
        sized against the full page width again rather than a half column. */
     @media (min-width: 1101px) {
       .hero-v2-line { font-size: clamp(44px, 5.2vw, 76px); }
-    }
-
-    .hero-v2-tagline {
-      font-family: monospace;
-      color: #fae194;
-      font-size: clamp(12px, 1.4vw, 18px);   /* -2pt again vs prior 14/16/20 clamp */
-      line-height: 1.4;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      margin: 14px 0 56px;
-      white-space: nowrap;
+      .hero-v2-line--sub { font-size: clamp(28px, 2.8vw, 42px); }
     }
 
     .hero-v2-lede {
       font-family: "Hanken Grotesk", sans-serif;
-      font-size: 20px;
-      line-height: 1.55;
+      font-size: clamp(15px, 1.4vw, 19px);
+      line-height: 1.6;
       /* Bone-white — was rgba(…, 0.6) which read as gray on the dark
          hero. Solid bone gives the lede the same weight as the rest of
          the hero copy so it reads as primary, not auxiliary. */
       color: #EDEAE0;
-      margin: 0 0 32px;
-      max-width: 580px;
+      /* Centered hero column: auto inline margins keep the capped
+         paragraph centered under the headline. */
+      margin: 0 auto 44px;
+      max-width: 640px;
     }
 
     .hero-v2-lede-accent {
