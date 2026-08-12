@@ -135,8 +135,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <div class="hero-v2-copy">
         <p class="hero-v2-eyebrow">Revenue Recovery Engine</p>
         <h1 class="hero-v2-headline">
-          <span class="hero-v2-line">Stop <span style="color: #fae194">Revenue Leakage</span>:</span>
-          <span class="hero-v2-line hero-v2-line--sub">Recover lost sales from traffic you already paid for.</span>
+          <span class="hero-v2-line hero-v2-line--wrap">Recover lost revenue from traffic you already paid for.</span>
         </h1>
         <p class="hero-v2-lede">
           At zero added management cost or time on your end, our AI Revenue
@@ -216,13 +215,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
         </div>
       </div>
 
-      {/* The <br>s only take effect on mobile (see .rc-ask-br) — that is
-          the one width where the questions cannot hold a single line, and
-          "…your / conversion rate?" is the break that keeps the subject
-          intact on the first row. */}
+      {/* The <br>s are authored breaks at every width (see .rc-ask-br):
+          these sentences are too long to hold a single line even in the
+          two-column grid, and breaking before "Your …" keeps each rate
+          name intact on its own row. */}
       <div class="rc-asks">
-        <p class="rc-ask">Do you know your<br class="rc-ask-br" /> conversion rate?</p>
-        <p class="rc-ask">Do you know your<br class="rc-ask-br" /> revenue leak rate?</p>
+        <p class="rc-ask">Perhaps You&rsquo;re Tracking<br class="rc-ask-br" /> Your Conversion Rate.</p>
+        <p class="rc-ask">But Do You Know<br class="rc-ask-br" /> Your Revenue Leak Rate?</p>
       </div>
     </div>
   </section>
@@ -1675,34 +1674,25 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       letter-spacing: 0.005em;
       white-space: nowrap;
     }
-    .hero-v2-amp {
-      font-size: 0.75em;
-      margin-right: 0.08em;
-      position: relative; top: -0.02em;
-    }
-    /* Second title line is ~2.5× the length of the first, so it gets its
-       own smaller scale and is allowed to wrap (balanced) instead of
-       being forced onto one nowrap line that would clip on narrow
-       viewports. */
-    .hero-v2-line--sub {
+    /* The single-sentence title is too long for one nowrap line, so it
+       wraps (balanced) at the full headline size inside a ch-capped
+       measure instead of being viewport-scaled down to fit. */
+    .hero-v2-line--wrap {
       white-space: normal;
       text-wrap: balance;
-      font-size: clamp(24px, 2.6vw, 38px);
-      line-height: 1.15;
-      max-width: 22ch;
+      line-height: 1.12;
+      max-width: 24ch;
       margin-inline: auto;
     }
     /* must come AFTER the base .hero-v2-line rule to win the cascade:
-       scale the nowrap headline to the viewport so it never clips */
+       scale the headline to the viewport so it never clips */
     @media (max-width: 767px) {
       .hero-v2-line { font-size: clamp(24px, 8.4vw, 38px); }
-      .hero-v2-line--sub { font-size: clamp(17px, 5.4vw, 24px); }
     }
     /* The headline no longer shares the row with the stat card, so it is
        sized against the full page width again rather than a half column. */
     @media (min-width: 1101px) {
       .hero-v2-line { font-size: clamp(44px, 5.2vw, 76px); }
-      .hero-v2-line--sub { font-size: clamp(28px, 2.8vw, 42px); }
     }
 
     .hero-v2-lede {
@@ -1972,22 +1962,18 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       /* near-black, the same ink the other yellow bands use — pure black
          is heavier than this palette's dark end */
       color: #0e0e11;
-      /* Sized so the LONGER question ("…revenue leak rate?", 18.5× its own
-         font size in Permanent Marker) sets on one line in its half-column
-         at every width from 1101px — where the two-column grid starts and
-         the column is at its narrowest — up to the 1440px page cap.
-         Below 1101px the column is full width and this is moot; on mobile
-         it wraps deliberately, at .rc-ask-br. */
+      /* Both sentences set as two authored lines (broken at .rc-ask-br),
+         so the size only has to fit the longer HALF-sentence ("Your
+         Revenue Leak Rate?") in the half-column from 1101px up. */
       font-size: clamp(22px, 2.15vw, 34px);
       line-height: 1.15;
       letter-spacing: 0.005em;
       margin: 0;
     }
-    /* Above mobile the questions hold one line, so the authored break is
-       switched off and the space after it keeps the words apart. */
-    .rc-ask-br { display: none; }
+    /* Authored break is active at every width — the full sentences never
+       fit one line, and the break spot keeps each rate name whole. */
+    .rc-ask-br { display: inline; }
     @media (max-width: 767px) {
-      .rc-ask-br { display: inline; }
       .rc-ask { text-align: center; }
     }
 
