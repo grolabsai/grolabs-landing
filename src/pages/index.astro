@@ -3443,8 +3443,16 @@ const bookingIsExternal = bookingUrl.startsWith('http');
             // arrival is leftward → barbs open to the right
             linkH.setAttribute('d', 'M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l11 -6 M' + x1a.toFixed(1) + ' ' + y1a.toFixed(1) + ' l11 6');
           }
-          var AL = linkP.getTotalLength();
-          linkP.style.strokeDasharray = (AL * ak).toFixed(1) + ' ' + (AL + 2).toFixed(1);
+          if (ak >= 0.999) {
+            // settled state: no dash mask at all. getTotalLength() can be
+            // stale right after a layout shift (fonts/resize, notably in
+            // WebKit), and a dash sized from a stale length leaves the
+            // line ending mid-air with the head detached at the endpoint.
+            linkP.style.strokeDasharray = 'none';
+          } else {
+            var AL = linkP.getTotalLength();
+            linkP.style.strokeDasharray = (AL * ak).toFixed(1) + ' ' + (AL + 2).toFixed(1);
+          }
           linkP.style.opacity = '1';
           // pen behavior: the head appears only once the line is FULLY drawn
           linkH.style.opacity = ak >= 0.999 ? '1' : '0';
@@ -3461,6 +3469,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       addEventListener('load', render);
       setTimeout(render, 600);
       setTimeout(render, 2000);
+      // layout shifts with no scroll/resize event (late fonts, iframe
+      // sizing) move the phone after the link line was measured — the
+      // observer re-renders so the line re-anchors to the new geometry
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(function () { render(); }).observe(stage);
+      }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
       render();
     })();
   </script>
