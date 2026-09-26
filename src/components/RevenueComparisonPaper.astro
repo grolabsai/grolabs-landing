@@ -5,13 +5,13 @@
 ---
 <section class="rv-paper py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop" data-rv data-screen-label="P&L annotated">
   <div class="max-w-page mx-auto">
-  <div class="font-mono tracking-[0.2em] text-xs uppercase text-primary mb-2 md:mb-4 block">Best way to double revenue?</div>
-  <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">Increase ad spend?</h2>
+  <div class="font-mono tracking-[0.2em] text-xs uppercase text-primary mb-2 md:mb-4 block">Both ways double your revenue</div>
+  <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">Only one pays.</h2>
 
   <div class="sheets">
     <!-- PLAN A -->
     <article class="sheet a">
-      <div class="plan">Plan A: spend more on ads</div>
+      <div class="plan" style="--d:.1s">Plan A: spend more on ads</div>
       <div class="ph"><span class="s">Your store &middot; per month</span></div>
       <div class="row"><span class="lab">Visitors<span class="note" style="--d:1.3s">need 2&times; &rarr;</span></span><span class="v x" style="--d:1s">100K</span><span class="n"><span class="hw" style="--d:1s">200K</span></span></div>
       <div class="row"><span>Conversion</span><span class="v">1.0%</span><span class="n"><span class="carry">1.0%</span></span></div>
@@ -37,7 +37,7 @@
 
     <!-- PLAN B -->
     <article class="sheet b">
-      <div class="plan">Plan B: convert more, increase average order value</div>
+      <div class="plan" style="--d:.1s">Plan B: convert more, increase average order value</div>
       <div class="ph"><span class="s">Your store &middot; per month</span></div>
       <div class="row"><span>Visitors</span><span class="v"><span class="tag" style="--d:1s">same!</span>100K</span><span class="n"><span class="carry">100K</span></span></div>
       <div class="row"><span class="lab">Conversion<span class="note" style="--d:1.3s">half &rarr;</span></span><span class="v x" style="--d:1s">1.0%</span><span class="n"><span class="hw" style="--d:1s">1.4%</span></span></div>
@@ -65,6 +65,7 @@
 
   <div class="summary">
     <article class="sheet c">
+      <div class="plan" style="--d:.15s">Side by side</div>
       <div class="ph"><span class="s">Same revenue &middot; per month</span></div>
       <div class="crow chead"><span></span><span class="ca">Plan A</span><span class="cb">Plan B</span></div>
       <div class="crow"><span>Revenue uplift</span><span class="ca">+$100K</span><span class="cb">+$100K</span></div>
@@ -72,8 +73,8 @@
       <div class="crow"><span>Growth services</span><span class="ca">$0</span><span class="cb pos">$4K</span></div>
       <div class="crow"><span>Profit increase</span><span class="ca">+$12K</span><span class="cb">+$36K</span></div>
       <div class="crow"><span>Profit difference</span><span class="ca"></span><span class="cb pos">+$24K</span></div>
-      <div class="crow ctotal"><span>Profit multiple</span><span class="ca">2&times;</span><span class="cb">4&times;</span></div>
-      <div class="engine" style="--d:3.4s">
+      <div class="crow ctotal"><span>Profit multiple</span><span class="ca" style="--d:.7s">2&times;</span><span class="cb" style="--d:1s">4&times;</span></div>
+      <div class="engine" style="--d:1.5s">
         <p>Unlike risky upfront ad spend that offers no guarantees, our growth services are completely <span class="eng-hi">risk-free</span>&mdash;we bill at the end of the month after you clear the profit, <span class="eng-hi">protecting your monthly cash flow</span>.</p>
         <p>Marketing and ad spend are indispensable tools for growth. However, your existing investment holds massive, untapped revenue potential. We don&rsquo;t replace your marketing; we simply stop the leaks to extract maximum value from the traffic you&rsquo;ve already paid for.</p>
       </div>
@@ -114,7 +115,11 @@
 @media(max-width:980px){.sheet.a,.sheet.b{transform:none;margin-top:0}}
 .sheet::before{content:"";position:absolute;inset:0;border-radius:3px;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0 1px,transparent 1px 3px)}
 .plan{position:absolute;top:-24px;right:22px;font-family:"Permanent Marker",cursive;font-size:25px;line-height:1;transform:rotate(-3deg);padding:6px 12px;border-radius:4px;background:var(--paper);box-shadow:0 6px 14px -6px rgba(0,0,0,.3)}
-.a .plan{color:var(--red)} .b .plan{color:var(--green)}
+.a .plan{color:var(--red)} .b .plan{color:var(--green)} .c .plan{color:var(--print)}
+/* Marker is a pen mark, so it is written in; Special Elite is printed and
+   is already on the sheet when it arrives. */
+.plan{opacity:0;transition:opacity .3s ease var(--d),transform .3s ease var(--d)}
+.go .plan{opacity:1}
 .ph{display:flex;justify-content:flex-end;align-items:baseline;border-bottom:1.5px solid var(--print);padding-bottom:10px;margin-bottom:6px}
 .ph .t{font-size:19px;letter-spacing:.08em}
 .ph .s{font-size:14px;color:var(--print2)}
@@ -159,12 +164,20 @@
 .a .note{color:var(--red)} .b .note{color:var(--green)}
 .go .note{opacity:1}
 /* The bottom of each sheet shows how the figure was reached and nothing else. */
+/* The rule is printed, so it is already there; the working is written a line
+   at a time, then the arrow, then the answer it arrives at. */
 .maths{margin-top:22px;padding-top:16px;border-top:1.5px solid var(--print);
-  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
-  opacity:0;transition:opacity .5s ease var(--d)}
-.go .maths{opacity:1}
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.mrow{opacity:0;transition:opacity .25s ease var(--md)}
+.go .mrow{opacity:1}
+.msteps .mrow:nth-child(1){--md:calc(var(--d) - .4s)}
+.msteps .mrow:nth-child(2){--md:calc(var(--d) - .2s)}
+.msteps .mrow:nth-child(3){--md:var(--d)}
 .mrow{font-family:"Caveat",cursive;font-weight:600;font-size:23px;line-height:1.25;white-space:nowrap}
-.mres{font-family:"Permanent Marker",cursive;font-size:40px;line-height:1.1;flex-shrink:0}
+.mres{font-family:"Permanent Marker",cursive;font-size:40px;line-height:1.1;flex-shrink:0;
+  opacity:0;transform:translateY(4px);
+  transition:opacity .3s ease calc(var(--d) + .95s),transform .3s ease calc(var(--d) + .95s)}
+.go .mres{opacity:1;transform:none}
 /* hand stroke from the division to the answer it produces */
 .marrow{flex:0 0 95px;height:38px;align-self:flex-end;margin-bottom:6px;overflow:visible}
 .marrow path{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
@@ -184,7 +197,10 @@
 .chead .ca{color:var(--red)} .chead .cb{color:var(--green)}
 .crow .neg{color:var(--red)} .crow .pos{color:var(--green)}
 .ctotal{border-bottom:0;border-top:1.5px solid var(--print);margin-top:4px;min-height:62px}
-.ctotal .ca,.ctotal .cb{font-family:"Permanent Marker",cursive;font-size:28px}
+.ctotal .ca,.ctotal .cb{font-family:"Permanent Marker",cursive;font-size:28px;
+  opacity:0;transform:translateY(4px) rotate(-3deg);
+  transition:opacity .3s ease var(--d),transform .3s ease var(--d)}
+.go .ctotal .ca,.go .ctotal .cb{opacity:1;transform:rotate(-3deg)}
 .ctotal .ca{color:var(--red)} .ctotal .cb{color:var(--green)}
 
 .verdict{margin-top:22px;display:flex;align-items:baseline;gap:14px;font-family:"Caveat",cursive;font-weight:700;font-size:30px;line-height:1.1;opacity:0;transition:opacity .5s ease var(--d)}
@@ -247,11 +263,44 @@
 </style>
 
 <script>
-document.querySelectorAll('[data-rv]').forEach(function(s){
-  var go=function(){s.classList.add('go');};
-  if(matchMedia('(prefers-reduced-motion: reduce)').matches){go();return;}
-  var target=s.querySelector('.cards, .sheets')||s;
-  var io=new IntersectionObserver(function(e){if(e[0].isIntersecting){go();io.disconnect();}},{threshold:.25});
-  io.observe(target);
+// Each sheet writes itself when it arrives, so the three cards do not all
+// play at once while two of them are still off screen. Every .go rule in this
+// file targets a descendant of a sheet, so the class lives on the sheet.
+document.querySelectorAll('[data-rv]').forEach(function (section) {
+  var pending = [].slice.call(section.querySelectorAll('.sheet'));
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function write(sheet: Element) {
+    sheet.classList.add('go');
+    pending = pending.filter(function (s) { return s !== sheet; });
+    if (!pending.length) removeEventListener('scroll', onScroll);
+  }
+  // A sheet is "reached" once any part of it has come up the screen, whether
+  // or not an observer ever caught it mid-flight.
+  function reached(sheet: Element) { return sheet.getBoundingClientRect().top < innerHeight; }
+
+  if (reduce) { pending.slice().forEach(write); return; }
+
+  var queued = false;
+  function onScroll() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () {
+      queued = false;
+      pending.slice().forEach(function (s) { if (reached(s)) write(s); });
+    });
+  }
+  // The observer handles the ordinary case. A fast flick can carry a sheet
+  // from below the fold to above it inside one frame, crossing no threshold
+  // at all, so a scroll backstop resolves anything it misses — otherwise the
+  // card is left with its printed rows and none of its pen marks.
+  addEventListener('scroll', onScroll, { passive: true });
+  pending.slice().forEach(function (sheet) {
+    if (reached(sheet)) { write(sheet); return; }
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { write(sheet); io.disconnect(); }
+    }, { threshold: 0.15 });
+    io.observe(sheet);
+  });
 });
 </script>
