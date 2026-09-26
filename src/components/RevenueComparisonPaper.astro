@@ -178,12 +178,11 @@
 .msteps .mrow:nth-child(2){--md:calc(var(--d) - .2s)}
 .msteps .mrow:nth-child(3){--md:var(--d)}
 .mrow{font-family:"Caveat",cursive;font-weight:600;font-size:23px;line-height:1.25;white-space:nowrap}
-/* The answer is the point of the card, so it is set three times the working
-   and parked bottom-right. It travels with its arrow: on a phone the pair
-   drops to its own row, because beside the working there is only room for
-   56px of it. */
+/* The answer is set to the height of the three working lines beside it —
+   3 lines x 1.25 line-height = 3.75x the working's own size — so the block
+   reads as one square of ink rather than a line with a tail. */
 .mans{display:flex;align-items:center;gap:18px;flex-shrink:0}
-.mres{font-family:"Permanent Marker",cursive;font-size:120px;line-height:1;flex-shrink:0;
+.mres{font-family:"Permanent Marker",cursive;font-size:calc(23px * 3.75);line-height:1;flex-shrink:0;
   opacity:0;transform:translateY(4px);
   transition:opacity .3s ease calc(var(--d) + .95s),transform .3s ease calc(var(--d) + .95s)}
 .go .mres{opacity:1;transform:none}
@@ -256,10 +255,12 @@
 .verdict{font-size:21px;gap:10px}
 .engine{font-size:14px;padding:15px 16px;margin-top:18px}
 .mrow{font-size:19px}
-.mres{font-size:96px}
+.mres{font-size:calc(19px * 3.75)}
 .maths{gap:6px}
-.mans{flex-basis:100%;justify-content:flex-end;gap:10px;margin-top:2px}
-.marrow{flex:0 0 50px;height:22px;margin-bottom:10px}
+/* back in line with the working: a 71px answer is 75px wide, which fits
+   the 116px left beside it once the arrow is trimmed. */
+.mans{gap:8px}
+.marrow{flex:0 0 30px;height:16px;margin-bottom:6px}
 .summary{margin-top:44px}
 .sheet.c{transform:none}
 .crow{grid-template-columns:minmax(0,1fr) 76px 76px;gap:8px;font-size:15px;min-height:44px}
