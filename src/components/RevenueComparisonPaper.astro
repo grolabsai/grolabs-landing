@@ -24,9 +24,14 @@
         <div class="msteps">
           <div class="mrow">$200K &times; 40% = $80K</div>
           <div class="mrow">$80K &minus; $56K = $24K</div>
-          <div class="mrow">$12K &rarr; $24K</div>
+          <div class="mrow">$24K &divide; $12K</div>
         </div>
-        <div class="mres">2.0&times;</div>
+        <svg class="marrow" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true">
+          <path class="mshaft" pathLength="1" d="M3 38 C 28 39, 54 31, 80 14"/>
+          <path class="mbarb" pathLength="1" d="M80 14 l -13 2"/>
+          <path class="mbarb" pathLength="1" d="M80 14 l -4 -11"/>
+        </svg>
+        <div class="mres">2&times;</div>
       </div>
     </article>
 
@@ -46,9 +51,14 @@
         <div class="msteps">
           <div class="mrow">$200K &times; 40% = $80K</div>
           <div class="mrow">$80K &minus; $28K &minus; $4K = $48K</div>
-          <div class="mrow">$12K &rarr; $48K</div>
+          <div class="mrow">$48K &divide; $12K</div>
         </div>
-        <div class="mres">4.0&times;</div>
+        <svg class="marrow" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true">
+          <path class="mshaft" pathLength="1" d="M3 38 C 28 39, 54 31, 80 14"/>
+          <path class="mbarb" pathLength="1" d="M80 14 l -13 2"/>
+          <path class="mbarb" pathLength="1" d="M80 14 l -4 -11"/>
+        </svg>
+        <div class="mres">4&times;</div>
       </div>
     </article>
   </div>
@@ -62,7 +72,7 @@
       <div class="crow"><span>Growth services</span><span class="ca">$0</span><span class="cb pos">$4K</span></div>
       <div class="crow"><span>Profit increase</span><span class="ca">+$12K</span><span class="cb">+$36K</span></div>
       <div class="crow"><span>Profit difference</span><span class="ca"></span><span class="cb pos">+$24K</span></div>
-      <div class="crow ctotal"><span>Profit multiple</span><span class="ca">2.0&times;</span><span class="cb">4.0&times;</span></div>
+      <div class="crow ctotal"><span>Profit multiple</span><span class="ca">2&times;</span><span class="cb">4&times;</span></div>
       <div class="engine" style="--d:3.4s">
         <p>Our Revenue Recovery Engine increases both conversion rate and average order value to increase profit without increasing ad spend.</p>
         <p>Ad spend is paid upfront, hoping for a return. Growth services are paid on results &mdash; out of sales already made, so the cost never runs ahead of the revenue.</p>
@@ -153,8 +163,15 @@
   display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
   opacity:0;transition:opacity .5s ease var(--d)}
 .go .maths{opacity:1}
-.mrow{font-family:"Permanent Marker",cursive;font-size:18px;line-height:1.5;white-space:nowrap}
+.mrow{font-family:"Caveat",cursive;font-weight:600;font-size:23px;line-height:1.25;white-space:nowrap}
 .mres{font-family:"Permanent Marker",cursive;font-size:40px;line-height:1.1;flex-shrink:0}
+/* hand stroke from the division to the answer it produces */
+.marrow{flex:0 0 92px;height:38px;align-self:flex-end;margin-bottom:6px;overflow:visible}
+.marrow path{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1}
+.a .marrow path{stroke:var(--red)} .b .marrow path{stroke:var(--green)}
+.go .marrow .mshaft{stroke-dashoffset:0;transition:stroke-dashoffset .5s ease calc(var(--d) + .25s)}
+.go .marrow .mbarb{stroke-dashoffset:0;transition:stroke-dashoffset .16s ease calc(var(--d) + .7s)}
 .a .mrow,.a .mres{color:var(--red)} .b .mrow,.b .mres{color:var(--green)}
 
 /* Summary sheet: the two plans beside each other, nothing but the deltas. */
@@ -212,8 +229,10 @@
 .tag{font-size:22px;margin-right:8px}
 .verdict{font-size:21px;gap:10px}
 .engine{font-size:14.5px;padding:14px 15px;margin-top:18px}
-.mrow{font-size:14.5px}
+.mrow{font-size:19px}
 .mres{font-size:32px}
+.maths{gap:6px}
+.marrow{flex:0 0 42px;height:26px;margin-bottom:4px}
 .summary{margin-top:44px}
 .sheet.c{transform:none}
 .crow{grid-template-columns:minmax(0,1fr) 76px 76px;gap:8px;font-size:15px;min-height:44px}
