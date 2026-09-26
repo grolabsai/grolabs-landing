@@ -10,6 +10,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SearchDemo from '../components/SearchDemo.astro';
 import DiagnosticWidget from '../components/DiagnosticWidget.astro';
 import VideoEmbed from '../components/VideoEmbed.astro';
+import RevenueComparisonPaper from '../components/RevenueComparisonPaper.astro';
+import RevenueLeakPaper from '../components/RevenueLeakPaper.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -135,13 +137,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       <div class="hero-v2-copy">
         <p class="hero-v2-eyebrow">Revenue Recovery Engine</p>
         <h1 class="hero-v2-headline">
-          <span class="hero-v2-line hero-v2-line--wrap">Recover lost revenue from traffic you already paid for.</span>
+          <span class="hero-v2-line hero-v2-line--wrap">Recover lost revenue</span>
         </h1>
         <p class="hero-v2-lede">
-          At zero added management cost or time on your end, our AI Revenue
-          Recovery Engine and dedicated team of growth strategists enrich your
-          catalog and fine-tune your search to recover lost revenue while you
-          stay focused on growing your business.
+          Our AI and growth strategists turn the <span class="text-primary font-semibold">traffic you already paid for</span> into sales, with zero effort on your end.
         </p>
         <div class="hero-v2-ctas" data-hero-ctas>
           <div class="hero-v2-cta-stack">
@@ -195,8 +194,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        Placed AFTER the booking embed so the embed still opens directly
        under the hero CTA that reveals it.
        ============================================================ */}
+  <RevenueComparisonPaper />
+
+  {/* Replaced by <RevenueComparisonPaper /> above — kept, hidden, so it can
+      be restored by removing the `hidden` class. */}
   <section
-    class="rc-section bg-primary px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl"
+    class="hidden rc-section bg-primary px-margin-mobile md:px-margin-desktop py-2xl md:py-3xl"
     data-screen-label="Reality check"
   >
     <div class="rc-grid max-w-page mx-auto">
@@ -232,7 +235,10 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        card and draws its arrow down into Recovered revenue, then the
        formula completes.
        ============================================================ */}
-  <section class="rf-section rf-v2" data-rf data-screen-label="GRO Framework Copy">
+  <RevenueLeakPaper bookingUrl={bookingUrl} />
+
+  {/* Replaced by <RevenueLeakPaper /> above — kept, hidden. */}
+  <section class="hidden rf-section rf-v2" data-rf data-screen-label="GRO Framework Copy">
     <div class="rf-track" data-rf-track>
       <div class="rf-pin">
         <div class="rf-inner max-w-page mx-auto">
@@ -1184,7 +1190,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        (color · size · sku · price), each landing with an arrowed link
        to its base. Engine: /catalog-parser-2.js.
        ============================================================ */}
-  <section class="cps" id="cps2" data-screen-label="Catalog Parser">
+  <section class="hidden cps" id="cps2" data-screen-label="Catalog Parser">
     <div class="cps-head-wrap cps-head-sm">
       <div class="cps-eyebrow">Alchemus — AI catalog Enrichment agent</div>
       <h2 class="cps-h2">Product Catalog</h2>
@@ -1281,7 +1287,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        only the category sweep reveals it.
        Sits on the lighter canvas bg so the search panel inside it can
        use the floating-card shadow treatment from the hero. -->
-  <section class="sd-section relative px-margin-mobile md:px-margin-desktop bg-canvas" data-sd-scroll>
+  <section class="hidden sd-section relative px-margin-mobile md:px-margin-desktop bg-canvas" data-sd-scroll>
     <div class="sd-track">
     <div class="sd-stage">
     <div class="max-w-page mx-auto sd-grid">
