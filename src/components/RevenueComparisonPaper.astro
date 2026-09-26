@@ -26,12 +26,14 @@
           <div class="mrow">$80K &minus; $56K = $24K</div>
           <div class="mrow">$24K &divide; $12K</div>
         </div>
-        <svg class="marrow" viewBox="0 0 100 40" aria-hidden="true">
-          <path class="mshaft" pathLength="1" d="M6 32 C 28 33, 52 26, 80 16"/>
-          <path class="mbarb" pathLength="1" d="M80 16 l -14 -2"/>
-          <path class="mbarb" pathLength="1" d="M80 16 l -9 10"/>
+        <div class="mans">
+          <svg class="marrow" viewBox="0 0 100 40" aria-hidden="true">
+            <path class="mshaft" pathLength="1" d="M6 32 C 28 33, 52 26, 80 16"/>
+            <path class="mbarb" pathLength="1" d="M80 16 l -14 -2"/>
+            <path class="mbarb" pathLength="1" d="M80 16 l -9 10"/>
         </svg>
-        <div class="mres">2&times;</div>
+          <div class="mres">2&times;</div>
+        </div>
       </div>
     </article>
 
@@ -53,12 +55,14 @@
           <div class="mrow">$80K &minus; $28K &minus; $4K = $48K</div>
           <div class="mrow">$48K &divide; $12K</div>
         </div>
-        <svg class="marrow" viewBox="0 0 100 40" aria-hidden="true">
-          <path class="mshaft" pathLength="1" d="M6 32 C 28 33, 52 26, 80 16"/>
-          <path class="mbarb" pathLength="1" d="M80 16 l -14 -2"/>
-          <path class="mbarb" pathLength="1" d="M80 16 l -9 10"/>
+        <div class="mans">
+          <svg class="marrow" viewBox="0 0 100 40" aria-hidden="true">
+            <path class="mshaft" pathLength="1" d="M6 32 C 28 33, 52 26, 80 16"/>
+            <path class="mbarb" pathLength="1" d="M80 16 l -14 -2"/>
+            <path class="mbarb" pathLength="1" d="M80 16 l -9 10"/>
         </svg>
-        <div class="mres">4&times;</div>
+          <div class="mres">4&times;</div>
+        </div>
       </div>
     </article>
   </div>
@@ -174,7 +178,12 @@
 .msteps .mrow:nth-child(2){--md:calc(var(--d) - .2s)}
 .msteps .mrow:nth-child(3){--md:var(--d)}
 .mrow{font-family:"Caveat",cursive;font-weight:600;font-size:23px;line-height:1.25;white-space:nowrap}
-.mres{font-family:"Permanent Marker",cursive;font-size:40px;line-height:1.1;flex-shrink:0;
+/* The answer is the point of the card, so it is set three times the working
+   and parked bottom-right. It travels with its arrow: on a phone the pair
+   drops to its own row, because beside the working there is only room for
+   56px of it. */
+.mans{display:flex;align-items:center;gap:18px;flex-shrink:0}
+.mres{font-family:"Permanent Marker",cursive;font-size:120px;line-height:1;flex-shrink:0;
   opacity:0;transform:translateY(4px);
   transition:opacity .3s ease calc(var(--d) + .95s),transform .3s ease calc(var(--d) + .95s)}
 .go .mres{opacity:1;transform:none}
@@ -247,9 +256,10 @@
 .verdict{font-size:21px;gap:10px}
 .engine{font-size:14px;padding:15px 16px;margin-top:18px}
 .mrow{font-size:19px}
-.mres{font-size:32px}
+.mres{font-size:96px}
 .maths{gap:6px}
-.marrow{flex:0 0 50px;height:20px;margin-bottom:4px}
+.mans{flex-basis:100%;justify-content:flex-end;gap:10px;margin-top:2px}
+.marrow{flex:0 0 50px;height:22px;margin-bottom:10px}
 .summary{margin-top:44px}
 .sheet.c{transform:none}
 .crow{grid-template-columns:minmax(0,1fr) 76px 76px;gap:8px;font-size:15px;min-height:44px}
