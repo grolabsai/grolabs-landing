@@ -136,7 +136,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     <div class="hero-v2-grid max-w-page mx-auto relative z-10 reveal active">
       <div class="hero-v2-copy">
         <h1 class="hero-v2-headline">
-          <span class="hero-v2-line hero-v2-line--wrap">Recover lost revenue</span>
+          <span class="hero-v2-line hero-v2-line--wrap"><span class="hl-w">Recover</span> <span class="hl-w">lost revenue</span></span>
         </h1>
         <p class="hero-v2-lede">
           <span class="hero-v2-lede-row">Our AI and growth strategists turn the</span>
@@ -1699,7 +1699,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* must come AFTER the base .hero-v2-line rule to win the cascade:
        scale the headline to the viewport so it never clips */
     @media (max-width: 767px) {
-      .hero-v2-line { font-size: clamp(42px, 15vw, 66px); }
+      /* Two rows on a phone: "Recover" / "lost revenue". The size is derived
+         from the longer row — "lost revenue" measures ~6.19x its font-size in
+         Permanent Marker, so this keeps it on one line from 320px up. The
+         24ch cap has to go, or it, not the viewport, decides the measure. */
+      .hl-w { display: block; }
+      .hero-v2-line--wrap { max-width: none; }
+      .hero-v2-line { font-size: min(calc((100vw - 44px) / 6.4), 54px); }
+      /* The two rows sit centred between the header and the lede: the copy
+         column stops centring its whole stack, and the space above the title
+         (main's 56px + this 60px, less the 55px header) matches the space
+         below it. */
+      .hero-v2 { padding-top: 60px; }
+      .hero-v2-headline { margin-bottom: 61px; }
     }
     /* The headline no longer shares the row with the stat card, so it is
        sized against the full page width again rather than a half column. */
@@ -3130,11 +3142,13 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       /* marker glyphs carry ~0.1em of leading; nudge so the 99% cap
          height sits level with the first text line's cap height */
       .hero-v2-stat-99 { margin-top: 0.08em; }
-      /* first scene = the hero alone, centered; the yellow reality-check
-         section stays below the fold until the user scrolls */
+      /* first scene = the hero alone; the yellow reality-check section stays
+         below the fold until the user scrolls. The stack starts at the top
+         rather than centring, so the title's own spacing decides where it
+         sits — see .hero-v2 padding-top / .hero-v2-headline margin above. */
       .hero-v2-copy {
         min-height: calc(100svh - 200px);
-        display: flex; flex-direction: column; justify-content: center;
+        display: flex; flex-direction: column; justify-content: flex-start;
       }
     }
     @media (max-width: 350px) {
