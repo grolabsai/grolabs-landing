@@ -26,10 +26,10 @@
           <div class="mrow">$80K &minus; $56K = $24K</div>
           <div class="mrow">$24K &divide; $12K</div>
         </div>
-        <svg class="marrow" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true">
-          <path class="mshaft" pathLength="1" d="M3 38 C 28 39, 54 31, 80 14"/>
-          <path class="mbarb" pathLength="1" d="M80 14 l -13 2"/>
-          <path class="mbarb" pathLength="1" d="M80 14 l -4 -11"/>
+        <svg class="marrow" viewBox="0 0 100 40" aria-hidden="true">
+          <path class="mshaft" pathLength="1" d="M6 32 C 28 33, 52 26, 80 16"/>
+          <path class="mbarb" pathLength="1" d="M80 16 l -14 -2"/>
+          <path class="mbarb" pathLength="1" d="M80 16 l -9 10"/>
         </svg>
         <div class="mres">2&times;</div>
       </div>
@@ -53,10 +53,10 @@
           <div class="mrow">$80K &minus; $28K &minus; $4K = $48K</div>
           <div class="mrow">$48K &divide; $12K</div>
         </div>
-        <svg class="marrow" viewBox="0 0 100 44" preserveAspectRatio="none" aria-hidden="true">
-          <path class="mshaft" pathLength="1" d="M3 38 C 28 39, 54 31, 80 14"/>
-          <path class="mbarb" pathLength="1" d="M80 14 l -13 2"/>
-          <path class="mbarb" pathLength="1" d="M80 14 l -4 -11"/>
+        <svg class="marrow" viewBox="0 0 100 40" aria-hidden="true">
+          <path class="mshaft" pathLength="1" d="M6 32 C 28 33, 52 26, 80 16"/>
+          <path class="mbarb" pathLength="1" d="M80 16 l -14 -2"/>
+          <path class="mbarb" pathLength="1" d="M80 16 l -9 10"/>
         </svg>
         <div class="mres">4&times;</div>
       </div>
@@ -166,12 +166,12 @@
 .mrow{font-family:"Caveat",cursive;font-weight:600;font-size:23px;line-height:1.25;white-space:nowrap}
 .mres{font-family:"Permanent Marker",cursive;font-size:40px;line-height:1.1;flex-shrink:0}
 /* hand stroke from the division to the answer it produces */
-.marrow{flex:0 0 92px;height:38px;align-self:flex-end;margin-bottom:6px;overflow:visible}
+.marrow{flex:0 0 95px;height:38px;align-self:flex-end;margin-bottom:6px;overflow:visible}
 .marrow path{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
   vector-effect:non-scaling-stroke;stroke-dasharray:1;stroke-dashoffset:1}
 .a .marrow path{stroke:var(--red)} .b .marrow path{stroke:var(--green)}
-.go .marrow .mshaft{stroke-dashoffset:0;transition:stroke-dashoffset .5s ease calc(var(--d) + .25s)}
-.go .marrow .mbarb{stroke-dashoffset:0;transition:stroke-dashoffset .16s ease calc(var(--d) + .7s)}
+.go .marrow .mshaft{stroke-dashoffset:0;transition:stroke-dashoffset .5s ease-out calc(var(--d) + .25s)}
+.go .marrow .mbarb{stroke-dashoffset:0;transition:stroke-dashoffset .18s ease-out calc(var(--d) + .78s)}
 .a .mrow,.a .mres{color:var(--red)} .b .mrow,.b .mres{color:var(--green)}
 
 /* Summary sheet: the two plans beside each other, nothing but the deltas. */
@@ -232,7 +232,7 @@
 .mrow{font-size:19px}
 .mres{font-size:32px}
 .maths{gap:6px}
-.marrow{flex:0 0 42px;height:26px;margin-bottom:4px}
+.marrow{flex:0 0 50px;height:20px;margin-bottom:4px}
 .summary{margin-top:44px}
 .sheet.c{transform:none}
 .crow{grid-template-columns:minmax(0,1fr) 76px 76px;gap:8px;font-size:15px;min-height:44px}
