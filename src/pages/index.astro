@@ -139,7 +139,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
           <span class="hero-v2-line hero-v2-line--wrap">Recover lost revenue</span>
         </h1>
         <p class="hero-v2-lede">
-          Our AI and growth strategists turn the <span class="text-primary font-semibold">traffic you already paid for</span> into sales, with zero effort on your end.
+          <span class="hero-v2-lede-row">Our AI and growth strategists turn the</span>
+          <span class="hero-v2-lede-row text-primary font-semibold">traffic you already paid for</span>
+          <span class="hero-v2-lede-row">into sales, with zero effort on your end.</span>
         </p>
         <div class="hero-v2-ctas" data-hero-ctas>
           <div class="hero-v2-cta-stack">
@@ -1717,6 +1719,9 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       margin: 0 auto 44px;
       max-width: 640px;
     }
+    /* Three rows, so the highlighted phrase always sits on its own centered
+       line rather than wherever the measure happens to break it. */
+    .hero-v2-lede-row { display: block; }
     /* Phone-first: the lede roughly doubles so the paragraph reads at arm's
        length. Must come AFTER the base rule above — same specificity, so
        source order decides. The CTA keeps its size and its thumb position. */

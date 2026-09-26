@@ -21,10 +21,12 @@
       <div class="row"><span>Ad spend</span><span class="v x" style="--d:1.5s">$28K</span><span class="n" style="--d:1.5s"><span class="circ"><span class="hw">$56K</span><svg class="loop" viewBox="0 0 100 40" preserveAspectRatio="none"><path pathLength="1" vector-effect="non-scaling-stroke" d="M8 22 C 6 8, 40 3, 62 4 C 86 5, 97 13, 95 23 C 92 34, 60 38, 38 37 C 16 36, 3 30, 9 18 C 12 12, 22 8, 30 7"/></svg></span></span></div>
       <div class="row total"><span>Profit</span><span class="v x" style="--d:2.4s">$12K</span><span class="n"><span class="hw big" style="--d:2.4s">$24K</span></span></div>
       <div class="maths" style="--d:3s">
-        <div class="mrow">$200K &times; 40% = $80K</div>
-        <div class="mrow">$80K &minus; $56K = $24K</div>
-        <div class="mrow">$24K &divide; $12K = 2.0&times;</div>
-        <div class="mres">+100%</div>
+        <div class="msteps">
+          <div class="mrow">$200K &times; 40% = $80K</div>
+          <div class="mrow">$80K &minus; $56K = $24K</div>
+          <div class="mrow">$12K &rarr; $24K</div>
+        </div>
+        <div class="mres">2.0&times;</div>
       </div>
     </article>
 
@@ -38,13 +40,15 @@
       <div class="row subtotal"><span class="lab">Revenue<span class="note" style="--d:0.5s">goal: 2&times; &rarr;</span></span><span class="v x" style="--d:0.2s">$100K</span><span class="n"><span class="hw" style="--d:0.2s">$200K</span></span></div>
       <div class="row"><span>Margin percentage</span><span class="v">40%</span><span class="n"><span class="carry">40%</span></span></div>
       <div class="row"><span>Ad spend</span><span class="v"><span class="tag" style="--d:2.2s">same!</span>$28K</span><span class="n"><span class="carry">$28K</span></span></div>
-      <div class="row"><span>Growth services</span><span class="v">&mdash;</span><span class="n"><span class="hw" style="--d:2.3s">$5K</span></span></div>
-      <div class="row total"><span>Profit</span><span class="v x" style="--d:2.4s">$12K</span><span class="n" style="position:relative;isolation:isolate"><span class="hl" style="--d:2.4s"></span><span class="hw big" style="--d:2.4s">$47K</span></span></div>
+      <div class="row"><span>Growth services</span><span class="v">&mdash;</span><span class="n"><span class="hw" style="--d:2.3s">$4K</span></span></div>
+      <div class="row total"><span>Profit</span><span class="v x" style="--d:2.4s">$12K</span><span class="n" style="position:relative;isolation:isolate"><span class="hl" style="--d:2.4s"></span><span class="hw big" style="--d:2.4s">$48K</span></span></div>
       <div class="maths" style="--d:3s">
-        <div class="mrow">$200K &times; 40% = $80K</div>
-        <div class="mrow">$80K &minus; $28K &minus; $5K = $47K</div>
-        <div class="mrow">$47K &divide; $12K = 3.9&times;</div>
-        <div class="mres">+292%</div>
+        <div class="msteps">
+          <div class="mrow">$200K &times; 40% = $80K</div>
+          <div class="mrow">$80K &minus; $28K &minus; $4K = $48K</div>
+          <div class="mrow">$12K &rarr; $48K</div>
+        </div>
+        <div class="mres">4.0&times;</div>
       </div>
     </article>
   </div>
@@ -55,10 +59,10 @@
       <div class="crow chead"><span></span><span class="ca">Plan A</span><span class="cb">Plan B</span></div>
       <div class="crow"><span>Revenue uplift</span><span class="ca">+$100K</span><span class="cb">+$100K</span></div>
       <div class="crow"><span>Ad spend increase</span><span class="ca neg">+$28K</span><span class="cb">$0</span></div>
-      <div class="crow"><span>Growth services</span><span class="ca">$0</span><span class="cb pos">$5K</span></div>
-      <div class="crow"><span>Profit increase</span><span class="ca">+$12K</span><span class="cb">+$35K</span></div>
-      <div class="crow"><span>Profit difference</span><span class="ca"></span><span class="cb pos">+$23K</span></div>
-      <div class="crow ctotal"><span>Profit uplift</span><span class="ca">+100%</span><span class="cb">+292%</span></div>
+      <div class="crow"><span>Growth services</span><span class="ca">$0</span><span class="cb pos">$4K</span></div>
+      <div class="crow"><span>Profit increase</span><span class="ca">+$12K</span><span class="cb">+$36K</span></div>
+      <div class="crow"><span>Profit difference</span><span class="ca"></span><span class="cb pos">+$24K</span></div>
+      <div class="crow ctotal"><span>Profit multiple</span><span class="ca">2.0&times;</span><span class="cb">4.0&times;</span></div>
       <div class="engine" style="--d:3.4s">
         <p>Our Revenue Recovery Engine increases both conversion rate and average order value to increase profit without increasing ad spend.</p>
         <p>Ad spend is paid upfront, hoping for a return. Growth services are paid on results &mdash; out of sales already made, so the cost never runs ahead of the revenue.</p>
@@ -146,10 +150,11 @@
 .go .note{opacity:1}
 /* The bottom of each sheet shows how the figure was reached and nothing else. */
 .maths{margin-top:22px;padding-top:16px;border-top:1.5px solid var(--print);
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
   opacity:0;transition:opacity .5s ease var(--d)}
 .go .maths{opacity:1}
 .mrow{font-family:"Permanent Marker",cursive;font-size:18px;line-height:1.5;white-space:nowrap}
-.mres{font-family:"Permanent Marker",cursive;font-size:40px;line-height:1.2;margin-top:6px}
+.mres{font-family:"Permanent Marker",cursive;font-size:40px;line-height:1.1;flex-shrink:0}
 .a .mrow,.a .mres{color:var(--red)} .b .mrow,.b .mres{color:var(--green)}
 
 /* Summary sheet: the two plans beside each other, nothing but the deltas. */
