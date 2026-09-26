@@ -5,9 +5,14 @@
 ---
 <section class="rv-paper py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop" data-rv data-screen-label="P&L annotated">
   <div class="max-w-page mx-auto">
-  <div class="font-mono tracking-[0.2em] text-xs uppercase text-primary mb-2 md:mb-4 block">Growth strategies</div>
-  <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md md:mb-lg">Traffic &rarr; Conversion</h2>
-  <p class="sub">Marketing and ad spend are indispensable tools for growth. However, your existing investment holds massive, untapped revenue potential. Right now, slightly increasing your conversion rate delivers a much higher impact than dumping more cash into traffic.</p>
+  <div class="intro">
+    <span class="intro-eb font-mono tracking-[0.2em] text-xs uppercase text-primary mb-2 md:mb-4 block">Growth strategies</span>
+    <div class="introcopy">
+      <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-md md:mb-lg">Traffic &rarr; Conversion</h2>
+      <p class="sub">Marketing and ad spend are indispensable tools for growth. However, your existing investment holds massive, untapped revenue potential. Right now, slightly increasing your conversion rate delivers a much higher impact than dumping more cash into traffic.</p>
+    </div>
+    <aside class="askcard"><p class="ask">Let&rsquo;s compare the impact of doubling ad spend versus increasing 40% in conversion and order value.</p></aside>
+  </div>
 
   <div class="sheets">
     <!-- PLAN A -->
@@ -108,8 +113,30 @@
    redefined here. This component previously carried its own larger scale,
    which is why its title did not match the sections around it. */
 .rv-paper h2{text-wrap:balance}
-.sub{font-size:clamp(17px,1.5vw,21px);line-height:1.55;color:rgba(237,234,224,.7);max-width:620px;text-wrap:pretty;margin-bottom:56px}
-.sub p+p{margin-top:16px}
+.sub{font-size:clamp(17px,1.5vw,21px);line-height:1.55;color:rgba(237,234,224,.7);max-width:620px;text-wrap:pretty;margin:0}
+
+/* Intro band: copy on the left, the question card on the right, the card's
+   top level with the title rather than the eyebrow — the same shape the
+   leak-score section uses. */
+.intro{display:grid;grid-template-columns:1fr;row-gap:0;margin-bottom:56px}
+.askcard{width:100%;max-width:440px;margin-top:32px;padding:30px 32px;border:0;border-radius:18px;
+  position:relative;isolation:isolate;
+  background:linear-gradient(180deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.05) 36%,rgba(255,255,255,.012) 100%),rgba(28,29,36,.55);
+  backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);
+  box-shadow:0 18px 48px rgba(0,0,0,.5),inset 0 1px 1px rgba(255,255,255,.10)}
+.askcard>*{position:relative;z-index:1}
+.ask{color:#EDEAE0;font-family:"Hanken Grotesk",sans-serif;font-size:clamp(17px,1.6vw,20px);
+  line-height:1.45;font-weight:600;text-wrap:pretty;margin:0}
+@media(min-width:860px){
+  .intro{grid-template-columns:1.15fr 1fr;column-gap:56px;align-items:start}
+  .intro>.intro-eb{grid-column:1;grid-row:1}
+  .introcopy{grid-column:1;grid-row:2}
+  .askcard{grid-column:2;grid-row:2;justify-self:end;margin-top:0}
+}
+@media(max-width:768px){
+  /* blur is the expensive part on phones */
+  .askcard{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(28,29,36,.92)}
+}
 .sheets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:56px;align-items:start}
 @media(max-width:980px){.sheets{grid-template-columns:1fr;gap:48px;max-width:600px;margin:0 auto}}
 /* paper */
@@ -255,7 +282,8 @@
 .tag{font-size:22px;margin-right:8px}
 .verdict{font-size:21px;gap:10px}
 .engine{font-size:14px;padding:15px 16px;margin-top:18px}
-.sub{margin-bottom:36px}
+.intro{margin-bottom:36px}
+.askcard{max-width:none;padding:24px 22px;margin-top:24px}
 .mrow{font-size:19px}
 .mres{font-size:calc(19px * 3.75)}
 .maths{gap:6px}
