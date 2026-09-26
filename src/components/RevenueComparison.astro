@@ -46,7 +46,14 @@
 
 .rv-eq{--y:#fae194;--txt:#EDEAE0;--t2:rgba(237,234,224,.55);--t3:rgba(237,234,224,.32);--red:#ef8f8f;--green:#5ec98f}
 .rv-eq{box-sizing:border-box;background:#131316;color:#EDEAE0;font-family:"Hanken Grotesk",sans-serif}
-.rv-eq *{box-sizing:border-box;margin:0;padding:0}
+/* box-sizing only. A `.rv-eq *` reset is rewritten by Astro to
+   `.rv-eq[data-astro-cid-…] [data-astro-cid-…]` — a descendant selector
+   carrying TWO attributes, specificity (0,3,0) — which outranks every
+   single-class rule in this file (0,2,0) and silently zeroes their
+   margins and padding. Default margins are zeroed by Tailwind's
+   preflight in the page, and by the reset in the standalone mockup's
+   own <head>. Never put margin/padding back in here. */
+.rv-eq,.rv-eq *{box-sizing:border-box}
 .sec{max-width:1280px;margin:0 auto;padding:96px 32px}
 .eyebrow{font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--y);margin-bottom:18px}
 /* Scoped to the section on purpose: Astro rewrites the `*` reset above to
