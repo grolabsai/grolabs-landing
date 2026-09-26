@@ -54,11 +54,15 @@
       <div class="ph"><span class="s">Same revenue &middot; per month</span></div>
       <div class="crow chead"><span></span><span class="ca">Plan A</span><span class="cb">Plan B</span></div>
       <div class="crow"><span>Revenue uplift</span><span class="ca">+$100K</span><span class="cb">+$100K</span></div>
-      <div class="crow"><span>Ad spend increase</span><span class="ca">+$28K</span><span class="cb">$0</span></div>
-      <div class="crow"><span>Growth services</span><span class="ca">$0</span><span class="cb">$5K</span></div>
+      <div class="crow"><span>Ad spend increase</span><span class="ca neg">+$28K</span><span class="cb">$0</span></div>
+      <div class="crow"><span>Growth services</span><span class="ca">$0</span><span class="cb pos">$5K</span></div>
       <div class="crow"><span>Profit increase</span><span class="ca">+$12K</span><span class="cb">+$35K</span></div>
+      <div class="crow"><span>Profit difference</span><span class="ca"></span><span class="cb pos">+$23K</span></div>
       <div class="crow ctotal"><span>Profit uplift</span><span class="ca">+100%</span><span class="cb">+292%</span></div>
-      <p class="engine" style="--d:3.4s">Our Revenue Recovery Engine increases both conversion rate and average order value to increase profit without increasing ad spend.</p>
+      <div class="engine" style="--d:3.4s">
+        <p>Our Revenue Recovery Engine increases both conversion rate and average order value to increase profit without increasing ad spend.</p>
+        <p>Ad spend is paid upfront, hoping for a return. Growth services are paid on results &mdash; out of sales already made, so the cost never runs ahead of the revenue.</p>
+      </div>
     </article>
   </div>
   </div>
@@ -156,6 +160,7 @@
 .crow .ca,.crow .cb{text-align:right;font-variant-numeric:tabular-nums}
 .chead{border-bottom:1.5px solid var(--print);font-size:14px;letter-spacing:.06em}
 .chead .ca{color:var(--red)} .chead .cb{color:var(--green)}
+.crow .neg{color:var(--red)} .crow .pos{color:var(--green)}
 .ctotal{border-bottom:0;border-top:1.5px solid var(--print);margin-top:4px;min-height:62px}
 .ctotal .ca,.ctotal .cb{font-family:"Permanent Marker",cursive;font-size:28px}
 .ctotal .ca{color:var(--red)} .ctotal .cb{color:var(--green)}
@@ -169,6 +174,7 @@
 .engine{margin-top:22px;background:var(--y);color:#18181b;font-family:"Hanken Grotesk",sans-serif;
   font-size:16px;line-height:1.5;padding:16px 18px;border-radius:6px;text-wrap:pretty;
   opacity:0;transition:opacity .5s ease var(--d)}
+.engine p+p{margin-top:10px}
 .go .engine{opacity:1}
 .foot{font-size:12.5px;color:rgba(237,234,224,.45);margin-top:40px;line-height:1.5;max-width:900px}
 .close{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:center;margin-top:64px}
