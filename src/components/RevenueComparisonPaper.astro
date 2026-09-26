@@ -258,7 +258,51 @@
 .ctotal .ca,.ctotal .cb{font-size:23px}
 .verdict strong{font-size:32px}
 }
-@media (prefers-reduced-motion:reduce){.rv-paper *{transition:none!important}}
+/* ── Scroll-driven: the pen follows the reader's thumb ─────────────────
+   Each mark carries its own view() timeline, so it is written as it travels
+   up the screen and un-writes if the reader scrolls back. Progress comes
+   from the compositor, not from scroll events, so it does not stutter
+   during iOS momentum the way a JS-scrubbed timeline does.
+   Order inside a row is kept by offsetting the ranges rather than by
+   delays: the old value is struck through before the new one is written.
+   Browsers without view() keep the entry-triggered reveal above. */
+@supports (animation-timeline: view()) {
+  @keyframes penIn    { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes penWrite { from { opacity: 0; transform: translateY(4px) rotate(-3deg) }
+                        to   { opacity: 1; transform: rotate(-3deg) } }
+  @keyframes penStrike{ from { transform: scaleX(0) rotate(-4deg) }
+                        to   { transform: scaleX(1) rotate(-4deg) } }
+  @keyframes penSkew  { from { transform: skew(-8deg) scaleX(0) }
+                        to   { transform: skew(-8deg) scaleX(1) } }
+  @keyframes penWipe  { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+  @keyframes penDraw  { from { stroke-dashoffset: 1 } to { stroke-dashoffset: 0 } }
+
+  .sheet .plan, .sheet .note, .sheet .tag, .sheet .hw, .sheet .mrow, .sheet .mres,
+  .sheet .engine, .sheet .ctotal .ca, .sheet .ctotal .cb, .sheet .hl,
+  .sheet .x::after, .sheet .loop path, .sheet .marrow path, .sheet .rule.pen svg {
+    animation-timeline: view();
+    animation-fill-mode: both;
+    animation-timing-function: linear;
+    transition: none;
+  }
+  .sheet .plan            { animation-name: penIn;     animation-range: cover 5%  cover 30%; }
+  .sheet .x::after        { animation-name: penStrike; animation-range: cover 15% cover 35%; }
+  .sheet .note,
+  .sheet .tag             { animation-name: penIn;     animation-range: cover 25% cover 45%; }
+  .sheet .hw              { animation-name: penWrite;  animation-range: cover 30% cover 50%; }
+  .sheet .hl              { animation-name: penSkew;   animation-range: cover 35% cover 55%; }
+  .sheet .loop path       { animation-name: penDraw;   animation-range: cover 38% cover 60%; }
+  .sheet .rule.pen svg    { animation-name: penWipe;   animation-range: cover 25% cover 50%; }
+  .sheet .mrow            { animation-name: penIn;     animation-range: cover 15% cover 40%; }
+  .sheet .marrow .mshaft  { animation-name: penDraw;   animation-range: cover 35% cover 60%; }
+  .sheet .marrow .mbarb   { animation-name: penDraw;   animation-range: cover 62% cover 70%; }
+  .sheet .mres            { animation-name: penIn;     animation-range: cover 55% cover 75%; }
+  .sheet .ctotal .ca,
+  .sheet .ctotal .cb      { animation-name: penWrite;  animation-range: cover 30% cover 55%; }
+  .sheet .engine          { animation-name: penIn;     animation-range: cover 15% cover 45%; }
+}
+
+@media (prefers-reduced-motion:reduce){.rv-paper *{transition:none!important;animation:none!important}}
 
 </style>
 

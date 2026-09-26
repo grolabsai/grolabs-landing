@@ -215,8 +215,38 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
 .arrow{left:-4px;top:26px;width:56px;height:236px}
 }
 
+/* ── Scroll-driven: the pen follows the reader's thumb ─────────────────
+   Same approach as the comparison sheets — each mark carries its own view()
+   timeline, so it is written as it travels up the screen and un-writes on
+   the way back. Compositor-driven, so it does not stutter during iOS
+   momentum. Letters stagger off their own --i rather than a delay.
+   Browsers without view() keep the entry-triggered reveal above. */
+@supports (animation-timeline: view()) {
+  @keyframes leakIn    { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes leakWrite { from { opacity: 0; transform: translateY(4px) rotate(-3deg) }
+                         to   { opacity: 1; transform: rotate(-3deg) } }
+  @keyframes leakWipe  { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+  @keyframes leakDraw  { from { stroke-dashoffset: 1 } to { stroke-dashoffset: 0 } }
+
+  .sheet .hwline .ltr, .sheet .hw, .sheet .arrow path, .sheet .rule.pen svg {
+    animation-timeline: view();
+    animation-fill-mode: both;
+    animation-timing-function: linear;
+    transition: none;
+  }
+  .sheet .fixnote .ltr   { animation-name: leakIn;
+                           animation-range: cover calc(12% + var(--i) * 0.7%) cover calc(30% + var(--i) * 0.7%); }
+  .sheet .arrow .shaft   { animation-name: leakDraw; animation-range: cover 30% cover 55%; }
+  .sheet .arrow .barb    { animation-name: leakDraw; animation-range: cover 56% cover 64%; }
+  .sheet .r.pen .op.hw   { animation-name: leakWrite; animation-range: cover 35% cover 52%; }
+  .sheet .r.pen .lb .ltr { animation-name: leakIn;
+                           animation-range: cover calc(38% + var(--i) * 0.6%) cover calc(54% + var(--i) * 0.6%); }
+  .sheet .r.pen .sym.hw  { animation-name: leakWrite; animation-range: cover 55% cover 72%; }
+  .sheet .rule.pen svg   { animation-name: leakWipe;  animation-range: cover 45% cover 62%; }
+}
+
 @media (prefers-reduced-motion:reduce){
-.rl-paper *{transition:none!important}
+.rl-paper *{transition:none!important;animation:none!important}
 .rl-paper .hw,.rl-paper .hwline .ltr{opacity:1;transform:none}
 .rl-paper .arrow path{stroke-dashoffset:0}
 .rl-paper .rule.pen svg{transform:scaleX(1)}
@@ -228,11 +258,20 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
     // Split every handwritten line into letters so the pen writes across it
     // instead of the whole phrase fading in at once.
     section.querySelectorAll('[data-split]').forEach(function (el) {
+      // Astro scopes this file's CSS by a data-astro-cid-* attribute it stamps
+      // on the markup it compiles. A span built here has no such attribute, so
+      // every scoped rule — including the one that hides a letter before it is
+      // written — silently fails to match it. Carry the parent's attribute on.
+      var cid = null;
+      for (var a = 0; a < el.attributes.length; a++) {
+        if (el.attributes[a].name.indexOf('data-astro-cid-') === 0) { cid = el.attributes[a].name; break; }
+      }
       var text = el.textContent.trim();
       el.textContent = '';
       for (var i = 0; i < text.length; i++) {
         var s = document.createElement('span');
         s.className = 'ltr';
+        if (cid) s.setAttribute(cid, '');
         s.style.setProperty('--i', String(i));
         s.textContent = text[i];
         if (text[i] === ' ') s.style.whiteSpace = 'pre';
