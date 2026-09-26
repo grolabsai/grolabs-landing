@@ -1698,7 +1698,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* must come AFTER the base .hero-v2-line rule to win the cascade:
        scale the headline to the viewport so it never clips */
     @media (max-width: 767px) {
-      .hero-v2-line { font-size: clamp(24px, 8.4vw, 38px); }
+      .hero-v2-line { font-size: clamp(44px, 15.5vw, 68px); }
     }
     /* The headline no longer shares the row with the stat card, so it is
        sized against the full page width again rather than a half column. */
@@ -1717,6 +1717,12 @@ const bookingIsExternal = bookingUrl.startsWith('http');
          paragraph centered under the headline. */
       margin: 0 auto 44px;
       max-width: 640px;
+    }
+    /* Phone-first: the lede roughly doubles so the paragraph reads at arm's
+       length. Must come AFTER the base rule above — same specificity, so
+       source order decides. The CTA keeps its size and its thumb position. */
+    @media (max-width: 767px) {
+      .hero-v2-lede { font-size: 22px; line-height: 1.5; margin: 0 auto 32px; }
     }
 
     .hero-v2-lede-accent {

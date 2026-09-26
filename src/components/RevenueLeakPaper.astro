@@ -143,27 +143,27 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
 
 /* ── the sheet ───────────────────────────────────────────────────────── */
 .sheetwrap{display:flex;justify-content:center}
-.sheet{position:relative;width:100%;max-width:440px;background:var(--paper);color:var(--print);
+.sheet{position:relative;width:100%;max-width:470px;background:var(--paper);color:var(--print);
   padding:34px 40px 30px;border-radius:3px;font-family:"Special Elite",monospace;transform:rotate(-1deg);
   box-shadow:0 1px 2px rgba(0,0,0,.4),0 30px 60px -18px rgba(0,0,0,.8)}
 @media(max-width:860px){.sheet{transform:none}}
 .sheet::before{content:"";position:absolute;inset:0;border-radius:3px;pointer-events:none;
   background:repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0 1px,transparent 1px 3px)}
 .ph{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1.5px solid var(--print);padding-bottom:10px;margin-bottom:4px}
-.ph .t{font-size:18px;letter-spacing:.1em}
-.ph .s{font-size:12px;color:var(--print2)}
+.ph .t{font-size:20px;letter-spacing:.1em}
+.ph .s{font-size:14px;color:var(--print2)}
 
 .eq{position:relative}
 .noteband{min-height:56px;display:flex;align-items:center;padding-left:52px}
-.fixnote{font-family:"Caveat",cursive;font-weight:700;font-size:26px;line-height:1;color:var(--green);transform:rotate(-3deg)}
+.fixnote{font-family:"Caveat",cursive;font-weight:700;font-size:28px;line-height:1;color:var(--green);transform:rotate(-3deg)}
 
 /* op, then label and symbol side by side so each line reads as one phrase
    ("Conversion %"). The symbol stays a SIBLING of the label, never a child:
    the letter-splitting rewrites the label's contents and would eat it. */
-.r{display:flex;align-items:center;min-height:50px;font-size:17px}
-.op{flex:0 0 30px;margin-right:12px;font-size:19px;text-align:right}
+.r{display:flex;align-items:center;min-height:50px;font-size:19px}
+.op{flex:0 0 30px;margin-right:12px;font-size:21px;text-align:right}
 .sym{margin-left:.35em;font-variant-numeric:tabular-nums}
-.sym svg{width:19px;height:19px;display:inline-block;vertical-align:-3px}
+.sym svg{width:21px;height:21px;display:inline-block;vertical-align:-3px}
 .rule{height:0;margin:9px 0 7px}
 .rule svg{display:block;width:100%;height:6px;overflow:visible}
 .rule path{fill:none;stroke-width:1.8;stroke-linecap:round;vector-effect:non-scaling-stroke}
@@ -177,9 +177,9 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
 
 /* ── the pen ─────────────────────────────────────────────────────────── */
 .hw{font-family:"Permanent Marker",cursive;color:var(--green)}
-.r.pen .op,.r.pen .sym{font-size:22px}
-.r.pen .lb{font-size:21px;transform:rotate(-1.2deg)}
-.sym.big{font-size:26px}
+.r.pen .op,.r.pen .sym{font-size:24px}
+.r.pen .lb{font-size:23px;transform:rotate(-1.2deg)}
+.sym.big{font-size:28px}
 
 .hw:not(.hwline){opacity:0;transform:translateY(4px) rotate(-3deg);
   transition:opacity .3s ease var(--base),transform .3s ease var(--base)}
@@ -200,15 +200,14 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
 @media(max-width:600px){
 .askcard{max-width:none;padding:26px 22px}
 .sheet{padding:26px 20px 24px;max-width:none}
-.ph .t{font-size:16px}
+.ph .t{font-size:18px}
 .noteband{min-height:48px;padding-left:44px}
-.fixnote{font-size:22px}
-.r{min-height:44px;font-size:14px}
-.op{flex-basis:24px;margin-right:9px}
-.op{font-size:17px}
-.r.pen .op,.r.pen .sym{font-size:19px}
-.r.pen .lb{font-size:17px}
-.sym.big{font-size:22px}
+.fixnote{font-size:24px}
+.r{min-height:44px;font-size:16px}
+.op{flex-basis:24px;margin-right:9px;font-size:19px}
+.r.pen .op,.r.pen .sym{font-size:21px}
+.r.pen .lb{font-size:19px}
+.sym.big{font-size:24px}
 .arrow{left:-4px;top:26px;width:56px;height:236px}
 }
 
