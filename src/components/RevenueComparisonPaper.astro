@@ -73,7 +73,10 @@
       <div class="crow"><span>Profit increase</span><span class="ca">+$12K</span><span class="cb">+$36K</span></div>
       <div class="crow"><span>Profit difference</span><span class="ca"></span><span class="cb pos">+$24K</span></div>
       <div class="crow ctotal"><span>Profit multiple</span><span class="ca">2&times;</span><span class="cb">4&times;</span></div>
-      <p class="engine" style="--d:3.4s">Unlike risky upfront ad spend that offers no guarantees, our growth services are completely <span class="eng-hi">risk-free</span>&mdash;we bill at the end of the month after you clear the profit, <span class="eng-hi">protecting your monthly cash flow</span>.</p>
+      <div class="engine" style="--d:3.4s">
+        <p>Unlike risky upfront ad spend that offers no guarantees, our growth services are completely <span class="eng-hi">risk-free</span>&mdash;we bill at the end of the month after you clear the profit, <span class="eng-hi">protecting your monthly cash flow</span>.</p>
+        <p>Marketing and ad spend are indispensable tools for growth that deserve your full focus. However, the investment you already made holds massive, untapped revenue potential. Our goal isn&rsquo;t to replace your marketing, but to stop the leaks and extract the maximum possible value from the traffic you&rsquo;ve already paid for.</p>
+      </div>
     </article>
   </div>
   </div>
@@ -190,10 +193,11 @@
 .go .verdict{opacity:1}
 /* Not part of the printed sheet: our claim, so it takes the brand yellow
    and the site's regular sans rather than the typewriter face. */
-.engine{margin-top:22px;background:#131316;color:#EDEAE0;font-family:"Caveat",cursive;font-weight:600;
-  font-size:22px;line-height:1.4;padding:16px 18px;border-radius:6px;text-wrap:pretty;
+.engine{margin-top:22px;background:#131316;color:#EDEAE0;font-family:"Hanken Grotesk",sans-serif;
+  font-size:15.5px;line-height:1.55;padding:18px 20px;border-radius:6px;text-wrap:pretty;
   opacity:0;transition:opacity .5s ease var(--d)}
-.eng-hi{color:var(--y)}
+.engine p+p{margin-top:12px}
+.eng-hi{color:var(--y);font-weight:600}
 .go .engine{opacity:1}
 .foot{font-size:12.5px;color:rgba(237,234,224,.45);margin-top:40px;line-height:1.5;max-width:900px}
 .close{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:center;margin-top:64px}
@@ -225,7 +229,7 @@
 .hw.big{font-size:25px}
 .tag{font-size:22px;margin-right:8px}
 .verdict{font-size:21px;gap:10px}
-.engine{font-size:19px;padding:14px 15px;margin-top:18px}
+.engine{font-size:14px;padding:15px 16px;margin-top:18px}
 .mrow{font-size:19px}
 .mres{font-size:32px}
 .maths{gap:6px}
