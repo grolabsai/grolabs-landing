@@ -6,7 +6,7 @@
 <section class="rv-paper py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop" data-rv data-screen-label="P&L annotated">
   <div class="max-w-page mx-auto">
   <div class="font-mono tracking-[0.2em] text-xs uppercase text-primary mb-2 md:mb-4 block">Best way to double revenue?</div>
-  <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">Increase ad spend, or conversion?</h2>
+  <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">Increase ad spend?</h2>
 
   <div class="sheets">
     <!-- PLAN A -->
@@ -35,6 +35,7 @@
       <div class="row"><span>Ad spend</span><span class="v"><span class="tag" style="--d:2.2s">same!</span>$28K</span><span class="n"><span class="carry">$28K</span></span></div>
       <div class="row total"><span>Profit</span><span class="v x" style="--d:2.4s">$12K</span><span class="n" style="position:relative;isolation:isolate"><span class="hl" style="--d:2.4s"></span><span class="hw big" style="--d:2.4s">$52K</span></span></div>
       <div class="verdict" style="--d:3s"><strong>+333%</strong><span>profit, with the same ad spend.</span></div>
+      <p class="engine" style="--d:3.4s">Our Revenue Recovery Engine increases both conversion rate and average order value to increase profit without increasing ad spend.</p>
     </article>
   </div>
   </div>
@@ -120,6 +121,12 @@
 .verdict strong{font-family:"Permanent Marker",cursive;font-weight:400;font-size:44px}
 .a .verdict{color:var(--red)} .b .verdict{color:var(--green)}
 .go .verdict{opacity:1}
+/* Not part of the printed sheet: our claim, so it takes the brand yellow
+   and the site's regular sans rather than the typewriter face. */
+.engine{margin-top:22px;background:var(--y);color:#18181b;font-family:"Hanken Grotesk",sans-serif;
+  font-size:16px;line-height:1.5;padding:16px 18px;border-radius:6px;text-wrap:pretty;
+  opacity:0;transition:opacity .5s ease var(--d)}
+.go .engine{opacity:1}
 .foot{font-size:12.5px;color:rgba(237,234,224,.45);margin-top:40px;line-height:1.5;max-width:900px}
 .close{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:center;margin-top:64px}
 @media(max-width:900px){.close{grid-template-columns:1fr}}
@@ -148,6 +155,7 @@
 .hw.big{font-size:25px}
 .tag{font-size:22px;margin-right:8px}
 .verdict{font-size:21px;gap:10px}
+.engine{font-size:14.5px;padding:14px 15px;margin-top:18px}
 .verdict strong{font-size:32px}
 }
 @media (prefers-reduced-motion:reduce){.rv-paper *{transition:none!important}}
