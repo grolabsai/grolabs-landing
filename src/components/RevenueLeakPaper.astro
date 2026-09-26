@@ -216,10 +216,12 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
 }
 
 /* ── Scroll-driven: the pen follows the reader's thumb ─────────────────
-   Same approach as the comparison sheets — each mark carries its own view()
-   timeline, so it is written as it travels up the screen and un-writes on
-   the way back. Compositor-driven, so it does not stutter during iOS
-   momentum. Letters stagger off their own --i rather than a delay.
+   Every mark hangs off the SHEET's timeline, not its own, so the whole sheet
+   is written by the time the sheet has arrived — on its own timeline a mark
+   low in the sheet is still early in its personal journey while the sheet is
+   already on screen, and the bottom of the sheet sat blank. Letters stagger
+   off their own --i within that shared run.
+   Compositor-driven, so no scroll listener and no iOS momentum stutter.
    Browsers without view() keep the entry-triggered reveal above. */
 @supports (animation-timeline: view()) {
   @keyframes leakIn    { from { opacity: 0 } to { opacity: 1 } }
@@ -228,21 +230,23 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
   @keyframes leakWipe  { from { transform: scaleX(0) } to { transform: scaleX(1) } }
   @keyframes leakDraw  { from { stroke-dashoffset: 1 } to { stroke-dashoffset: 0 } }
 
+  .sheet { view-timeline-name: --leaksheet; }
+
   .sheet .hwline .ltr, .sheet .hw, .sheet .arrow path, .sheet .rule.pen svg {
-    animation-timeline: view();
+    animation-timeline: --leaksheet;
     animation-fill-mode: both;
     animation-timing-function: linear;
     transition: none;
   }
   .sheet .fixnote .ltr   { animation-name: leakIn;
-                           animation-range: cover calc(12% + var(--i) * 0.7%) cover calc(30% + var(--i) * 0.7%); }
-  .sheet .arrow .shaft   { animation-name: leakDraw; animation-range: cover 30% cover 55%; }
-  .sheet .arrow .barb    { animation-name: leakDraw; animation-range: cover 56% cover 64%; }
-  .sheet .r.pen .op.hw   { animation-name: leakWrite; animation-range: cover 35% cover 52%; }
+                           animation-range: entry calc(8% + var(--i) * 0.5%) entry calc(18% + var(--i) * 0.5%); }
+  .sheet .arrow .shaft   { animation-name: leakDraw; animation-range: entry 24% entry 36%; }
+  .sheet .arrow .barb    { animation-name: leakDraw; animation-range: entry 37% entry 41%; }
+  .sheet .r.pen .op.hw   { animation-name: leakWrite; animation-range: entry 30% entry 40%; }
   .sheet .r.pen .lb .ltr { animation-name: leakIn;
-                           animation-range: cover calc(38% + var(--i) * 0.6%) cover calc(54% + var(--i) * 0.6%); }
-  .sheet .r.pen .sym.hw  { animation-name: leakWrite; animation-range: cover 55% cover 72%; }
-  .sheet .rule.pen svg   { animation-name: leakWipe;  animation-range: cover 45% cover 62%; }
+                           animation-range: entry calc(34% + var(--i) * 0.4%) entry calc(44% + var(--i) * 0.4%); }
+  .sheet .r.pen .sym.hw  { animation-name: leakWrite; animation-range: entry 46% entry 56%; }
+  .sheet .rule.pen svg   { animation-name: leakWipe;  animation-range: entry 40% entry 50%; }
 }
 
 @media (prefers-reduced-motion:reduce){
