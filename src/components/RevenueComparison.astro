@@ -45,7 +45,10 @@
 <style>
 
 .rv-eq{--y:#fae194;--txt:#EDEAE0;--t2:rgba(237,234,224,.55);--t3:rgba(237,234,224,.32);--red:#ef8f8f;--green:#5ec98f}
-.rv-eq{box-sizing:border-box;background:#131316;color:#EDEAE0;font-family:"Hanken Grotesk",sans-serif}
+/* canvas-deeper, not canvas: this section sits between the hero and the
+   leak-score section, which are both on canvas. Alternating is what keeps
+   them reading as separate blocks. Token from docs/STYLEGUIDE.md. */
+.rv-eq{box-sizing:border-box;background:#0E0E11;color:#EDEAE0;font-family:"Hanken Grotesk",sans-serif}
 /* box-sizing only. A `.rv-eq *` reset is rewritten by Astro to
    `.rv-eq[data-astro-cid-…] [data-astro-cid-…]` — a descendant selector
    carrying TWO attributes, specificity (0,3,0) — which outranks every

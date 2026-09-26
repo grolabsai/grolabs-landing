@@ -3,9 +3,10 @@
 // Use this OR RevenueComparison.astro, not both.
 // Fonts required (already loaded in BaseLayout): Hanken Grotesk, Permanent Marker, Caveat, Special Elite.
 ---
-<section class="sec rv-paper" data-rv data-screen-label="P&L annotated">
+<section class="rv-paper py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop" data-rv data-screen-label="P&L annotated">
+  <div class="max-w-page mx-auto">
   <div class="eyebrow">Best way to double revenue?</div>
-  <h2>Increase ad spend, or conversion?</h2>
+  <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">Increase ad spend, or conversion?</h2>
 
   <div class="sheets">
     <!-- PLAN A -->
@@ -36,13 +37,16 @@
       <div class="verdict" style="--d:3s"><strong>+333%</strong><span>profit, with the same ad spend.</span></div>
     </article>
   </div>
-
+  </div>
 </section>
 
 <style>
 
 .rv-paper{--y:#fae194;--ink:#131316;--paper:#f7f4ec;--print:#2b2a27;--print2:#77736a;--red:#c8372d;--green:#1f8a4c;--hl:rgba(250,225,148,.85)}
-.rv-paper{box-sizing:border-box;background:#131316;color:#EDEAE0;font-family:"Hanken Grotesk",sans-serif}
+/* canvas-deeper, not canvas: this section sits between the hero and the
+   leak-score section, which are both on canvas. Alternating is what keeps
+   them reading as separate blocks. Token from docs/STYLEGUIDE.md. */
+.rv-paper{box-sizing:border-box;background:#0E0E11;color:#EDEAE0;font-family:"Hanken Grotesk",sans-serif}
 /* box-sizing only. A `.rv-paper *` reset is rewritten by Astro to
    `.rv-paper[data-astro-cid-…] [data-astro-cid-…]` — a descendant selector
    carrying TWO attributes, specificity (0,3,0) — which outranks every
@@ -51,12 +55,13 @@
    preflight in the page, and by the reset in the standalone mockup's
    own <head>. Never put margin/padding back in here. */
 .rv-paper,.rv-paper *{box-sizing:border-box}
-.sec{max-width:1240px;margin:0 auto;padding:96px 32px 96px}
-.eyebrow{font-family:ui-monospace,Menlo,monospace;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--y);margin-bottom:18px}
-/* Scoped to the section on purpose: Astro rewrites the `*` reset above to
-   `.rv-paper *[data-astro-cid-…]` (0,2,0), which outranks a bare `h2` (0,1,1) and
-   silently zeroes this margin in the page. Keep the class prefix. */
-.rv-paper h2{font-family:"Permanent Marker",cursive;font-weight:400;font-size:clamp(38px,5vw,68px);line-height:1.02;margin-bottom:64px;text-wrap:balance}
+
+.eyebrow{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--y);margin-bottom:16px}
+/* The section heading is the site-wide one — font-marker/uppercase/text-4xl
+   md:text-5xl, per docs/STYLEGUIDE.md — set as classes on the element, not
+   redefined here. This component previously carried its own larger scale,
+   which is why its title did not match the sections around it. */
+.rv-paper h2{text-wrap:balance}
 .sub{font-size:clamp(17px,1.5vw,21px);line-height:1.55;color:rgba(237,234,224,.7);max-width:620px;text-wrap:pretty;margin-bottom:64px}
 .sheets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:56px;align-items:start}
 @media(max-width:980px){.sheets{grid-template-columns:1fr;gap:48px;max-width:600px;margin:0 auto}}
@@ -118,7 +123,6 @@
    label, and put the plan tag back in the flow. Both value columns stay
    right-aligned. */
 @media(max-width:600px){
-.sec{padding:64px 20px}
 .sheet{padding:26px 18px 24px}
 .plan{position:static;display:inline-block;margin-bottom:14px;font-size:21px;box-shadow:none;padding:0}
 .ph{padding-bottom:8px}

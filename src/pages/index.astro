@@ -1588,14 +1588,19 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
       margin: 0 0 18px;
     }
+    /* Matches the site-wide section heading (text-4xl / md:text-5xl,
+       uppercase) from docs/STYLEGUIDE.md, so every section title on the page
+       reads at one size. */
     .rre-title {
       font-family: "Permanent Marker", cursive;
       font-weight: 400;
       color: #EDEAE0;
-      font-size: clamp(28px, 3.4vw, 44px);
+      font-size: 36px;
+      text-transform: uppercase;
       line-height: 1.1;
       margin: 0;
     }
+    @media (min-width: 768px) { .rre-title { font-size: 48px; } }
     /* Replay control — yellow border + yellow text, transparent fill. */
     .rre-replay {
       flex: 0 0 auto;
