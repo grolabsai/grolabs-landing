@@ -135,7 +135,6 @@ const bookingIsExternal = bookingUrl.startsWith('http');
 
     <div class="hero-v2-grid max-w-page mx-auto relative z-10 reveal active">
       <div class="hero-v2-copy">
-        <p class="hero-v2-eyebrow">Revenue Recovery Engine</p>
         <h1 class="hero-v2-headline">
           <span class="hero-v2-line hero-v2-line--wrap">Recover lost revenue</span>
         </h1>
@@ -1680,7 +1679,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
       font-family: "Permanent Marker", cursive;
       font-weight: 400;
       color: #EDEAE0;
-      font-size: clamp(38px, 4.8vw, 66px);
+      font-size: clamp(36px, 4.8vw, 64px);
       line-height: 1;
       letter-spacing: 0.005em;
       white-space: nowrap;
@@ -1698,17 +1697,17 @@ const bookingIsExternal = bookingUrl.startsWith('http');
     /* must come AFTER the base .hero-v2-line rule to win the cascade:
        scale the headline to the viewport so it never clips */
     @media (max-width: 767px) {
-      .hero-v2-line { font-size: clamp(44px, 15.5vw, 68px); }
+      .hero-v2-line { font-size: clamp(42px, 15vw, 66px); }
     }
     /* The headline no longer shares the row with the stat card, so it is
        sized against the full page width again rather than a half column. */
     @media (min-width: 1101px) {
-      .hero-v2-line { font-size: clamp(44px, 5.2vw, 76px); }
+      .hero-v2-line { font-size: clamp(42px, 5.2vw, 74px); }
     }
 
     .hero-v2-lede {
       font-family: "Hanken Grotesk", sans-serif;
-      font-size: clamp(15px, 1.4vw, 19px);
+      font-size: clamp(13px, 1.4vw, 17px);
       line-height: 1.6;
       /* Same 70%-bone gray every other section's paragraphs use
          (see .rf-copy p) so body copy reads as one tone site-wide. */
@@ -1722,7 +1721,7 @@ const bookingIsExternal = bookingUrl.startsWith('http');
        length. Must come AFTER the base rule above — same specificity, so
        source order decides. The CTA keeps its size and its thumb position. */
     @media (max-width: 767px) {
-      .hero-v2-lede { font-size: 22px; line-height: 1.5; margin: 0 auto 32px; }
+      .hero-v2-lede { font-size: 20px; line-height: 1.5; margin: 0 auto 32px; }
     }
 
     .hero-v2-lede-accent {
