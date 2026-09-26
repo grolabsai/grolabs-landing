@@ -106,6 +106,7 @@ All four are loaded by `BaseLayout.astro` via Google Fonts.
 |----------------------------------|----------------|--------------------------|-------|
 | Section vertical padding         | `py-2xl` (80)  | `md:py-3xl` (160)        | Apply to outer `<section>`, NEVER to the inner `max-w-page` div. |
 | Section title → content gap      | `mb-lg` (24)   | `md:mb-[48px]`           | On every section `<h2>`. |
+| Section eyebrow → title gap      | `mb-2` (8)     | `md:mb-4` (16)           | Halves on mobile. Applies to every eyebrow, custom-CSS or Tailwind. A component's own scoped style cannot inherit the page's rule, so state it on the element. |
 | Horizontal page padding          | `px-margin-mobile` | `md:px-margin-desktop` | Always on outer `<section>`, paired with `max-w-page mx-auto` inner div. |
 | Footer top padding               | `pt-2xl` (80)  | `md:pt-[120px]`          | 3× the bottom — extra breathing room before footer content. |
 

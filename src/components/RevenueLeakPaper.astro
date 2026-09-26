@@ -24,7 +24,7 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
 <section class="rl-paper py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop" data-rl data-screen-label="Revenue leak score (paper)">
   <div class="rl-grid max-w-page mx-auto">
 
-    <span class="eyebrow">Ecommerce funnel</span>
+    <span class="font-mono tracking-[0.2em] text-xs uppercase text-primary mb-2 md:mb-4 block">Ecommerce funnel</span>
 
     <div class="copy">
       <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg">Revenue Leak Score</h2>
@@ -103,16 +103,20 @@ const { bookingUrl = 'https://cal.com/tuncho-granados-uibzst/15min' } = Astro.pr
 /* Stacked by default. From 860px the copy and the ask card share the top
    row — the card's top lines up with the title, not the eyebrow — and the
    sheet takes a full-width row beneath them. */
-.rl-grid{display:grid;grid-template-columns:1fr;gap:32px}
+/* row-gap stays 0: the eyebrow is a grid item, so any row-gap would stack
+   on top of its own mb-4 and push the title away from it. Blocks that do
+   want separation carry their own margin. */
+.rl-grid{display:grid;grid-template-columns:1fr;row-gap:0}
+.askcard{margin-top:32px}
+.sheetwrap{margin-top:32px}
 @media(min-width:860px){
   .rl-grid{grid-template-columns:1.15fr 1fr;column-gap:56px;row-gap:0;align-items:start}
   .eyebrow{grid-column:1;grid-row:1}
   .copy{grid-column:1;grid-row:2}
-  .askcard{grid-column:2;grid-row:2;align-self:start;justify-self:end}
+  .askcard{grid-column:2;grid-row:2;align-self:start;justify-self:end;margin-top:0}
   .sheetwrap{grid-column:1/-1;grid-row:3;margin-top:72px}
 }
 
-.eyebrow{display:block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--y);margin-bottom:16px}
 /* Site-wide section heading classes on the element (see STYLEGUIDE.md); the
    component no longer defines its own scale. */
 .rl-paper h2{text-wrap:balance}

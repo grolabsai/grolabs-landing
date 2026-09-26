@@ -5,7 +5,7 @@
 ---
 <section class="rv-paper py-2xl md:py-3xl px-margin-mobile md:px-margin-desktop" data-rv data-screen-label="P&L annotated">
   <div class="max-w-page mx-auto">
-  <div class="eyebrow">Best way to double revenue?</div>
+  <div class="font-mono tracking-[0.2em] text-xs uppercase text-primary mb-2 md:mb-4 block">Best way to double revenue?</div>
   <h2 class="font-marker uppercase text-white text-4xl md:text-5xl mb-lg md:mb-[48px]">Increase ad spend, or conversion?</h2>
 
   <div class="sheets">
@@ -14,8 +14,8 @@
       <div class="plan">Plan A: spend more on ads</div>
       <div class="ph"><span class="s">Your store &middot; per month</span></div>
       <div class="row"><span class="lab">Visitors<span class="note" style="--d:1.3s">need 2&times; &rarr;</span></span><span class="v x" style="--d:1s">100K</span><span class="n"><span class="hw" style="--d:1s">200K</span></span></div>
-      <div class="row"><span>Conversion rate</span><span class="v">1.0%</span><span class="n"></span></div>
-      <div class="row"><span>Average order value</span><span class="v">$100</span><span class="n"></span></div>
+      <div class="row"><span>Conversion rate</span><span class="v">1.0%</span><span class="n"><span class="carry">1.0%</span></span></div>
+      <div class="row"><span>Average order value</span><span class="v">$100</span><span class="n"><span class="carry">$100</span></span></div>
       <div class="row subtotal"><span class="lab">Revenue<span class="note" style="--d:0.5s">goal: 2&times; &rarr;</span></span><span class="v x" style="--d:0.2s">$100K</span><span class="n"><span class="hw" style="--d:0.2s">$200K</span></span></div>
       <div class="row"><span>Cost of goods</span><span class="v x" style="--d:2s">$60K</span><span class="n"><span class="hw" style="--d:2s">$120K</span></span></div>
       <div class="row"><span class="lab">Ad spend<span class="note" style="--d:1.8s">clicks get pricier &rarr;</span></span><span class="v x" style="--d:1.5s">$28K</span><span class="n" style="--d:1.5s"><span class="circ"><span class="hw">$66K</span><svg class="loop" viewBox="0 0 100 40" preserveAspectRatio="none"><path pathLength="1" vector-effect="non-scaling-stroke" d="M8 22 C 6 8, 40 3, 62 4 C 86 5, 97 13, 95 23 C 92 34, 60 38, 38 37 C 16 36, 3 30, 9 18 C 12 12, 22 8, 30 7"/></svg></span></span></div>
@@ -25,14 +25,14 @@
 
     <!-- PLAN B -->
     <article class="sheet b">
-      <div class="plan">Plan B: convert more, sell more</div>
+      <div class="plan">Plan B: convert more, increase average order value</div>
       <div class="ph"><span class="s">Your store &middot; per month</span></div>
-      <div class="row"><span>Visitors</span><span class="v">100K</span><span class="n"><span class="hw same" style="--d:1s">same!</span></span></div>
+      <div class="row"><span>Visitors</span><span class="v"><span class="tag" style="--d:1s">same!</span>100K</span><span class="n"><span class="carry">100K</span></span></div>
       <div class="row"><span class="lab">Conversion rate<span class="note" style="--d:1.3s">half the lift &rarr;</span></span><span class="v x" style="--d:1s">1.0%</span><span class="n"><span class="hw" style="--d:1s">1.4%</span></span></div>
       <div class="row"><span class="lab">Average order value<span class="note" style="--d:1.8s">the other half &rarr;</span></span><span class="v x" style="--d:1.5s">$100</span><span class="n"><span class="hw" style="--d:1.5s">$143</span></span></div>
       <div class="row subtotal"><span class="lab">Revenue<span class="note" style="--d:0.5s">goal: 2&times; &rarr;</span></span><span class="v x" style="--d:0.2s">$100K</span><span class="n"><span class="hw" style="--d:0.2s">$200K</span></span></div>
       <div class="row"><span>Cost of goods</span><span class="v x" style="--d:2s">$60K</span><span class="n"><span class="hw" style="--d:2s">$120K</span></span></div>
-      <div class="row"><span>Ad spend</span><span class="v">$28K</span><span class="n"><span class="hw same" style="--d:2.2s">same!</span></span></div>
+      <div class="row"><span>Ad spend</span><span class="v"><span class="tag" style="--d:2.2s">same!</span>$28K</span><span class="n"><span class="carry">$28K</span></span></div>
       <div class="row total"><span>Profit</span><span class="v x" style="--d:2.4s">$12K</span><span class="n" style="position:relative;isolation:isolate"><span class="hl" style="--d:2.4s"></span><span class="hw big" style="--d:2.4s">$52K</span></span></div>
       <div class="verdict" style="--d:3s"><strong>+333%</strong><span>profit, with the same ad spend.</span></div>
     </article>
@@ -56,7 +56,6 @@
    own <head>. Never put margin/padding back in here. */
 .rv-paper,.rv-paper *{box-sizing:border-box}
 
-.eyebrow{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--y);margin-bottom:16px}
 /* The section heading is the site-wide one — font-marker/uppercase/text-4xl
    md:text-5xl, per docs/STYLEGUIDE.md — set as classes on the element, not
    redefined here. This component previously carried its own larger scale,
@@ -94,7 +93,15 @@
 .hw{font-family:"Permanent Marker",cursive;font-size:24px;line-height:1;white-space:nowrap;display:inline-block;opacity:0;transform:translateY(4px) rotate(-3deg);transition:opacity .35s ease calc(var(--d) + .3s),transform .35s ease calc(var(--d) + .3s)}
 .a .hw{color:var(--red)} .b .hw{color:var(--green)}
 .go .hw{opacity:1;transform:rotate(-3deg)}
-.hw.same{font-family:"Caveat",cursive;font-size:27px;font-weight:700}
+/* An untouched line still prints its figure in the right-hand column, in
+   the sheet's own typeface, so the column reads as a complete statement
+   you can multiply and subtract straight down. */
+.carry{font-variant-numeric:tabular-nums;color:var(--print)}
+/* "same!" sits to the LEFT of the original figure, not in the new column. */
+.tag{font-family:"Caveat",cursive;font-weight:700;font-size:27px;line-height:1;margin-right:10px;
+  opacity:0;transition:opacity .35s ease calc(var(--d) + .3s)}
+.a .tag{color:var(--red)} .b .tag{color:var(--green)}
+.go .tag{opacity:1}
 .hw.big{font-size:32px}
 /* circle + highlighter */
 .circ{position:relative;display:inline-block}
@@ -139,7 +146,7 @@
 .note{font-size:18px!important;line-height:1}
 .hw{font-size:20px}
 .hw.big{font-size:25px}
-.hw.same{font-size:22px}
+.tag{font-size:22px;margin-right:8px}
 .verdict{font-size:21px;gap:10px}
 .verdict strong{font-size:32px}
 }
