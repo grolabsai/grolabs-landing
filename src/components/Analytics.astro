@@ -6,11 +6,16 @@
  * environment without the var configured stays analytics-free (same
  * graceful-fallback pattern as the booking URL).
  *
- * Consent defaults to DENIED. GA4 loads but stores nothing and sends
- * only cookieless "consent signals" until the visitor accepts via the
- * ConsentBanner, which calls window.gtag('consent', 'update', ...).
- * A previously-stored "granted" choice is re-applied on every load.
+ * In CONSENT_REGIONS (EEA, UK, CH) consent defaults to DENIED: GA4 loads
+ * but stores nothing and sends only cookieless "consent signals" until the
+ * visitor accepts via the ConsentBanner, which calls
+ * window.gtag('consent', 'update', ...). Everywhere else analytics defaults
+ * to granted and no banner is shown. Google resolves the region itself, so
+ * this does not depend on our geo endpoint. A stored choice is re-applied
+ * on every load.
  */
+import { CONSENT_REGIONS } from '../lib/consent-regions';
+
 const gaId = import.meta.env.PUBLIC_GA4_ID;
 const gtagSrc = gaId
   ? `https://www.googletagmanager.com/gtag/js?id=${gaId}`
@@ -19,23 +24,32 @@ const gtagSrc = gaId
 
 {gaId && (
   <Fragment>
-    <script is:inline define:vars={{ gaId }}>
+    <script is:inline define:vars={{ gaId, consentRegions: CONSENT_REGIONS }}>
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
       window.gtag = gtag;
 
-      // Default everything to denied until the visitor opts in.
+      // Consent regions: everything denied until the visitor opts in.
       gtag('consent', 'default', {
         analytics_storage: 'denied',
         ad_storage: 'denied',
         ad_user_data: 'denied',
         ad_personalization: 'denied',
+        region: consentRegions,
+      });
+      // Everywhere else: analytics on, ads signals still off (we run none).
+      gtag('consent', 'default', {
+        analytics_storage: 'granted',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
       });
 
-      // Re-apply a stored "granted" choice from a previous visit.
+      // Re-apply a stored choice from a previous visit.
       try {
-        if (localStorage.getItem('grolabs-analytics-consent') === 'granted') {
-          gtag('consent', 'update', { analytics_storage: 'granted' });
+        var stored = localStorage.getItem('grolabs-analytics-consent');
+        if (stored === 'granted' || stored === 'denied') {
+          gtag('consent', 'update', { analytics_storage: stored });
         }
       } catch (e) {}
 

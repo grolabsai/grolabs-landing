@@ -4,7 +4,9 @@
  *
  * Paired with Analytics.astro. Renders nothing unless PUBLIC_GA4_ID is
  * set. Hidden by default; the inline script reveals it only when the
- * visitor has not yet made a choice. "Accept" flips Consent Mode to
+ * visitor has not yet made a choice AND /api/consent-region says their
+ * country needs consent (EEA, UK, CH — see lib/consent-regions.ts). If
+ * that lookup fails the banner shows, erring toward compliance. "Accept" flips Consent Mode to
  * granted and persists the choice; "Decline" persists a denied choice
  * (analytics stays off). The stored key is read back by Analytics.astro
  * on subsequent loads, so the banner appears at most once.
@@ -74,7 +76,12 @@ const copy = {
       var stored = null;
       try { stored = localStorage.getItem(KEY); } catch (e) {}
       if (stored !== 'granted' && stored !== 'denied') {
-        banner.classList.remove('hidden');
+        fetch('/api/consent-region')
+          .then(function (r) { return r.ok ? r.json() : { required: true }; })
+          .catch(function () { return { required: true }; })
+          .then(function (d) {
+            if (d.required !== false) banner.classList.remove('hidden');
+          });
       }
 
       function choose(value) {
