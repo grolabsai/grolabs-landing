@@ -25,6 +25,7 @@ const defaults = {
       'GroLabs — recover lost revenue and grow your business without paying for more traffic.',
     nav: {
       home: 'Home',
+      growth: 'Growth strategy',
       resources: 'Resources',
       books: 'Books',
       simulators: 'Simulators',
@@ -46,6 +47,7 @@ const defaults = {
       'GroLabs — recupera los ingresos perdidos y haz crecer tu negocio sin pagar por más tráfico.',
     nav: {
       home: 'Inicio',
+      growth: 'Estrategia de crecimiento',
       resources: 'Recursos',
       books: 'Libros',
       simulators: 'Simuladores',
@@ -91,6 +93,8 @@ const resourcesHref = isSpanish ? `${base}/es/resources` : `${base}/resources`;
 // so both locales share the EN page.
 const booksHref = resourcesHref;
 const simulatorsHref = `${base}/resources/simulators/unit-economics`;
+// Growth strategy has no ES port yet, so both locales share the EN page.
+const growthHref = `${base}/growth-strategy`;
 const blogHref = isSpanish ? `${base}/es/blog` : `${base}/blog`;
 const siteUrl = 'https://grolabs.ai';
 const ogImageUrl = `${siteUrl}${base}/og-image.png`;
@@ -203,6 +207,9 @@ const canonicalUrl = `${siteUrl}${path}`;
         <nav data-site-nav class="order-2 w-auto md:order-2 md:justify-self-center md:self-end hidden md:flex items-center md:items-end gap-md md:gap-lg pt-0">
           <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none inline-flex items-center gap-2 py-[13px] px-1 md:p-0" href={home} aria-label={t.nav.home}>
             <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span class="hidden md:inline">{t.nav.home}</span>
+          </a>
+          <a class="font-mono text-xs tracking-[0.2em] uppercase text-white hover:text-primary transition-colors leading-none inline-flex items-center gap-2 py-[13px] px-1 md:p-0" href={growthHref} aria-label={t.nav.growth}>
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="shrink-0" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg><span class="hidden md:inline">{t.nav.growth}</span>
           </a>
           {/* Resources dropdown — Books + Simulators. CSS-only: opens on
               hover/focus-within (desktop) and on tap-focus (mobile). The

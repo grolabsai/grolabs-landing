@@ -1,0 +1,416 @@
+---
+/**
+ * /growth-strategy — the e-commerce growth driver tree. A collapsible map of
+ * what grows profit; yellow marks what GroLabs attends. No ES port yet, so
+ * both locales share this page.
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Growth strategy | GroLabs"
+  description="A map of what grows an online store's profit, and where GroLabs does the work."
+>
+  <div class="gdt">
+  <h2 class="gdt-title">EcommerceGrowthDriverTree</h2>
+  <p class="lede">Everything that grows an online store's profit. Yellow marks where GroLabs does the work.</p>
+  <div class="bar">
+    <button type="button" id="expand-all">Expand all</button>
+    <button type="button" id="collapse-all">Collapse all</button>
+    <div class="key"><span><i></i>GroLabs attends this</span><span><i class="in"></i>Optional scope</span></div>
+  </div>
+  <div id="tree"></div>
+  <section class="notes">
+    <div class="nrow">
+      <h2>Cross-cutting check</h2>
+      <div>
+        <p><strong>Can the business serve the additional demand?</strong></p>
+        <p>Before expanding a successful change, examine inventory accuracy, preparation capacity, dispatch performance, delivery reliability, and the additional cost of fulfilling orders. Growth can proceed within existing capacity, alongside capacity expansion, or after operational improvements.</p>
+      </div>
+    </div>
+    <div class="nrow">
+      <h2>The branches overlap deliberately</h2>
+      <p>Improving ingredients and suitability information, for example, can improve filters, semantic search, recommendations, chat answers, and purchase confidence at the same time.</p>
+    </div>
+  </section>
+</div>
+</BaseLayout>
+
+<style is:global>
+.gdt{
+  --bg:#131316; --surface:#1c1d24; --hover:#22232a;
+  --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.16);
+  --text:#EDEAE0; --strong:#FFFFFF; --text-2:rgba(237,234,224,.6); --text-3:rgba(237,234,224,.4);
+  --accent:#fae194; --accent-hover:#fcebab; --on-accent:#131316; --accent-soft:rgba(250,225,148,.12);
+  --font:"Hanken Grotesk",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --brand:"Permanent Marker",cursive;
+  max-width:860px;margin:0 auto;padding:48px 16px 64px;
+  background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.4;
+.gdt-title{margin:0 0 8px;font-family:var(--brand);font-weight:400;font-size:clamp(26px,5vw,36px);line-height:1.15;color:var(--strong);text-wrap:balance}
+.lede{margin:0 0 20px;color:var(--text-2);max-width:62ch}
+.key{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-left:auto;font-size:12px;color:var(--text-2)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{display:block;width:14px;height:14px;border-radius:3px;background:var(--accent)}
+.key i.in{background:none;border:1px dashed var(--accent)}
+.bar{position:sticky;top:56px;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 0;background:var(--bg);border-bottom:1px solid var(--border)}
+.bar button{font:inherit;font-size:13px;font-weight:500;color:var(--text);background:none;border:1px solid var(--border-strong);border-radius:6px;padding:6px 12px;cursor:pointer}
+.bar button:hover{background:var(--hover)}
+button:focus-visible{outline:2px solid var(--strong);outline-offset:2px}
+ul{list-style:none;margin:0;padding:0}
+ul ul{margin-left:13px;padding-left:10px;border-left:1px solid var(--border)}
+.row{display:flex;align-items:flex-start;gap:8px;width:100%;box-sizing:border-box;padding:7px 8px;margin:0;font:inherit;color:inherit;text-align:left;background:none;border:0;border-left:3px solid transparent}
+button.row{cursor:pointer}
+button.row:hover{background:var(--hover)}
+.caret{flex:none;width:20px;height:20px;font-size:20px;line-height:20px;overflow:hidden;color:var(--text-2);transition:transform .12s}
+[aria-expanded="true"]>.caret{transform:rotate(90deg)}
+.spacer{flex:none;width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+.spacer::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--text-3)}
+.icon{flex:none;width:20px;height:20px;font-size:20px;line-height:20px;overflow:hidden;color:var(--text-2)}
+.material-symbols-outlined{font-family:"Material Symbols Outlined";font-weight:400;font-style:normal;white-space:nowrap;font-feature-settings:"liga";-webkit-font-smoothing:antialiased}
+.body{min-width:0;flex:1;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;row-gap:2px}
+.label{min-width:0;color:var(--text)}
+.branch>.body>.label{font-weight:500;color:var(--strong)}
+.root>.body>.label,.top>.body>.label{font-family:var(--brand);font-weight:400;text-transform:uppercase;letter-spacing:.02em}
+.root>.body>.label{font-size:22px}
+.top{padding-block:12px;border-top:1px solid var(--border)}
+.top>.body>.label{font-size:18px}
+.row.gl-in .label,.row.gl-in.branch>.body>.label{color:var(--strong)}
+.row.gl-in .icon{color:var(--accent)}
+.row.gl-in .spacer::before{background:var(--accent)}
+.row.gl-in .meter b.on{background:var(--accent);border-color:var(--accent)}
+.row.gl-lead{background:var(--accent);border-radius:6px;margin-block:2px}
+button.row.gl-lead:hover{background:var(--accent-hover)}
+.row.gl-lead .label,.row.gl-lead.branch>.body>.label,.row.gl-lead .icon,.row.gl-lead .caret,.row.gl-lead .tag,.row.gl-lead .count,.row.gl-lead .note{color:var(--on-accent)}
+.row.gl-opt{outline:1px dashed var(--accent);outline-offset:-1px;border-radius:6px;margin-block:2px}
+.has{color:var(--accent);font-size:12px;font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+.count,.tag{font-size:12px;color:var(--text-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.meter{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);white-space:nowrap}
+.meter i{display:inline-flex;gap:2px}
+.meter b{display:block;width:8px;height:6px;border:1px solid var(--border-strong);border-radius:1px}
+.meter b.on{background:var(--text-2);border-color:var(--text-2)}
+.note{flex-basis:100%;font-size:13px;color:var(--text-2);max-width:62ch}
+.notes{margin-top:36px;border-top:1px solid var(--border-strong)}
+.nrow{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;padding:16px 0;border-bottom:1px solid var(--border)}
+.nrow h2{margin:0;font-size:14px;font-weight:600;color:var(--strong);line-height:1.4}
+.nrow p{margin:0;color:var(--text-2);max-width:65ch}
+.nrow p+p{margin-top:8px}
+.nrow strong{font-weight:500;color:var(--text)}
+@media (min-width:768px){.bar{top:80px}}
+@media (max-width:560px){.nrow{grid-template-columns:minmax(0,1fr);gap:6px}ul ul{margin-left:9px;padding-left:6px}}
+@media (prefers-reduced-motion:reduce){.caret{transition:none}}
+}
+</style>
+
+<script is:inline>
+(function(){
+const n=(label,icon,children,opts)=>({label,icon,children:children||[],...(opts||{})});
+const CORE={tag:'core'};
+const lvl=(level,of,label,icon,children,opts)=>n(label,icon,children,{level,of,...(opts||{})});
+
+const TREE=n('Grow profit','savings',[
+  n('1. Grow sales','trending_up',[
+    n('1.1. Attract more potential buyers','person_add',[
+      n('Paid acquisition','ads_click',[
+        n('Search and shopping ads.','manage_search'),
+        n('Social advertising.','campaign'),
+        n('Affiliate and creator partnerships.','handshake'),
+      ]),
+      n('Organic discovery','travel_explore',[
+        n('Search engine visibility.','search'),
+        n('Product feeds and free listings.','rss_feed'),
+        n('Visibility in AI-assisted discovery.','auto_awesome'),
+        n('Useful articles, buying guides, and category content.','article'),
+        n('Organic social content.','share'),
+      ]),
+      n('Referrals and word of mouth','forum',[
+        n('Customer recommendations.','thumb_up'),
+        n('Referral programs.','redeem'),
+        n('Communities and business partnerships.','groups'),
+      ]),
+    ]),
+    n('1.2. Help more visitors buy','shopping_bag',[
+      n('Find the right product','my_location',[
+        n('Catalog quality: levels of capability','inventory_2',[
+          lvl(1,6,'Basic product listing','sell',[
+            'Product title.','One identifying photo.','Price.','Short description.','Basic category and purchase option.',
+          ],{note:'Illustrative starting point.'}),
+          lvl(2,6,'Show the complete product','photo_library',[
+            'Multiple accurate photos: front, back, sides, and relevant details.',
+            'Readable packaging, ingredient lists, nutrition panels, or technical labels.',
+            'Dimensions, weight, quantity, and package contents.',
+            'Images for each relevant variation.',
+            'Clear identification of what the customer will receive.',
+          ]),
+          lvl(3,6,'Structure the facts','table_chart',[
+            'Consistent brand, model, SKU, and product identifiers.',
+            'Category-specific attributes in separate fields.',
+            'Normalized units, sizes, materials, ingredients, or specifications.',
+            'Clear relationships between products and their variations.',
+            'Attributes usable by search, filters, comparisons, and feeds.',
+          ]),
+          lvl(4,6,'Explain suitability and use','menu_book',[
+            'What the product does and which needs it addresses.',
+            'Who or what it is suitable for.',
+            'Use cases and practical examples.',
+            'Instructions, preparation, installation, or care.',
+            'Compatibility, requirements, limitations, and relevant warnings.',
+            'Answers to common buying questions.',
+            'Verified claims supported by appropriate source information.',
+          ]),
+          lvl(5,6,'Help shoppers compare and decide','compare_arrows',[
+            'Consistent comparison attributes across similar products.',
+            'Clear differences between models, formats, and price points.',
+            'Relevant alternatives and substitutes.',
+            'Compatible accessories and complementary products.',
+            'Buying guides organized around customer needs.',
+            'Evidence such as verified reviews, demonstrations, or certifications.',
+          ]),
+          lvl(6,6,'Maintain a connected, dependable catalog','hub',[
+            'Defined sources and owners for product information.',
+            'Repeatable supplier imports and enrichment workflows.',
+            'Validation for missing, inconsistent, or outdated information.',
+            'Synchronized pricing and availability.',
+            'Consistent information across the website, search index, feeds, and support tools.',
+            'Update history and review dates for important information.',
+          ]),
+        ],{note:'Catalog levels represent increasing usefulness to shoppers. Each level builds on the previous one, with requirements adapted to the product category.'}),
+        n('Product search: levels of capability','search',[
+          lvl(1,4,'Default platform search','search',[
+            'Match shopper keywords against indexed product information.',
+            'Support basic product-name, brand, or SKU searches.',
+          ]),
+          lvl(2,4,'Enhanced text search','spellcheck',[
+            'Handle typos, synonyms, and alternative names.',
+            'Improve searchable fields and relevance ranking.',
+            'Interpret and refine queries, with AI assistance where useful.',
+          ]),
+          lvl(3,4,'Semantic search','psychology',[
+            'Match meaning and intent beyond exact wording.',
+            'Understand descriptions of needs and use cases.',
+            'Combine semantic matching with exact terms and structured filters.',
+          ]),
+          lvl(4,4,'Conversational search','chat',[
+            'Ask clarifying questions.',
+            'Remember requirements within the conversation.',
+            'Refine suitable options through dialogue.',
+            'Explain recommendations using verified product information.',
+          ]),
+        ]),
+        n('Personalize product discovery','person_search',[
+          n('Remember explicitly stated preferences.','favorite',['Size, brands, budget, interests, and requirements.']),
+          n('Use relevant shopping history.','history',['Previous purchases, viewed products, and saved items.']),
+          n('Adapt to the current context.','location_on',['Current intent, location, availability, and delivery needs.']),
+          n('Rank products and recommendations for the individual.','sort',['The same query can produce different suitable rankings for different shoppers.']),
+          n('Allow preferences to be corrected, reset, or overridden.','tune'),
+        ]),
+        n('Useful categories, filters, and navigation','filter_list',[
+          'Organize products around recognizable customer needs.',
+          'Offer category-specific filters.',
+          'Make active filters and available results clear.',
+          'Preserve useful navigation paths between related products.',
+        ]),
+        n('Recover unsuccessful searches','search_off',[
+          'Detect empty results and irrelevant results.',
+          'Suggest corrections and useful refinements.',
+          'Offer appropriate alternatives.',
+          'Distinguish a search failure from a genuinely unavailable product.',
+          'Measure repeated attempts, successful recovery, and abandonment.',
+        ]),
+      ],CORE),
+      n('Feel confident choosing','verified',[
+        n('Clear product descriptions and specifications.','description'),
+        n('Accurate images and variation information.','image'),
+        n('Comparable product attributes.','compare_arrows'),
+        n('Relevant alternatives and recommendations.','recommend'),
+        n('Clear evidence supporting important product claims.','fact_check'),
+        n('Get buying questions answered promptly','support_agent',[
+          'Live online chat with a person.',
+          'AI-assisted answers grounded in verified store information.',
+          'Help with suitability, compatibility, availability, delivery, payment, and returns.',
+          'Clear handoff to a person when needed.',
+          'Resolve uncertainty while the shopper is still considering the purchase.',
+          'Reduce the risk of losing a sale while the shopper waits for an email response.',
+        ],{tag:'optional'}),
+      ],CORE),
+      n('Complete the purchase','credit_card',[
+        n('Mobile usability and performance.','smartphone'),
+        n('Clear product availability.','event_available'),
+        n('Credible delivery dates and expectations.','schedule'),
+        n('Transparent shipping charges and total costs.','receipt'),
+        n('Suitable payment methods.','payments'),
+        n('Simple, reliable cart and checkout.','shopping_cart_checkout'),
+        n('Clear policies and accessible help.','help'),
+      ]),
+      n('Recover unfinished purchases','remove_shopping_cart',[
+        n('Cart and checkout recovery.','shopping_cart'),
+        n('Saved carts and wish lists.','bookmark'),
+        n('Appropriate follow-up.','mail'),
+        n('Address the underlying reason for abandonment.','troubleshoot'),
+      ]),
+      n('Improve the user experience (UX)','touch_app',[
+        n('SSO login: sign in with an account the shopper already has.','login'),
+        n('Easy-to-identify variants: each size, color, or format is clear and has its own image.','palette'),
+        n('Fast-loading pages.','speed'),
+        n('Comfortable to use on a phone.','smartphone'),
+        n('Search that is easy to find on every page.','search'),
+        n('Key product information visible without hunting for it.','visibility'),
+        n('Checkout without a required account.','person_off'),
+        n('Short forms with autofill.','edit_note'),
+        n('Clear feedback on cart changes, errors, and order confirmation.','check_circle'),
+        n('Accessible design: readable text, strong contrast, and keyboard support.','accessibility_new'),
+      ],{note:'Ten example criteria.'}),
+    ]),
+    n('1.3. Increase value per order','add_shopping_cart',[
+      n('Relevant complementary products','extension',null,CORE),
+      n('Suitable upgrades and alternatives','upgrade',null,CORE),
+      n('Bundles and multipacks.','stacks'),
+      n('Convenient replenishment quantities.','autorenew'),
+      n('Order incentives with sustainable economics.','local_offer'),
+      n('Consider additional picking, packing, and shipping requirements.','package_2'),
+    ]),
+    n('1.4. Bring customers back','replay',[
+      n('Reliable product and fulfillment experience.','task_alt'),
+      n('Easy reordering and replenishment.','repeat'),
+      n('Remembered preferences and useful account features.','manage_accounts'),
+      n('Subscriptions where appropriate.','subscriptions'),
+      n('Loyalty programs where appropriate.','loyalty'),
+      n('Useful lifecycle communication.','mail'),
+      n('Customer reactivation.','notifications_active'),
+      n('Effective resolution of product and delivery problems.','build'),
+    ]),
+  ]),
+  n('2. Improve contribution per sale','paid',[
+    n('Pricing and discount discipline','percent',[
+      'Appropriate pricing.','Sustainable promotions.','Avoid unnecessary discounts.',
+    ]),
+    n('Product and customer mix','pie_chart',[
+      'Surface suitable products with healthy contribution.',
+      'Understand profitability by product, order, and customer segment.',
+    ]),
+    n('Purchasing and product costs','handshake',[
+      'Supplier terms.','Purchasing efficiency.','Inventory losses and obsolescence.',
+    ]),
+    n('Transaction and fulfillment economics','local_shipping',[
+      'Payment and channel fees.','Packaging costs.','Shipping costs and subsidies.','Variable handling and support costs.',
+    ]),
+    n('Minimize returns','assignment_return',[
+      'Improve search accuracy so shoppers land on the product they meant.',
+      'Identify the key attributes of each product, such as size, format, and compatibility.',
+      'Use those attributes to avoid delivering the wrong product.',
+      'Fix returns caused by unclear or incorrect product information.',
+    ],CORE),
+    n('Reduce other avoidable losses','money_off',[
+      'Cancellations caused by inaccurate availability.',
+      'Picking errors, damage, refunds, and failed deliveries.',
+    ]),
+  ]),
+  n('3. Improve operating efficiency','settings',[
+    n('Catalog maintenance and publishing','edit_note',[
+      'Reduce repeated manual entry.','Automate imports and validation.','Assign clear ownership and review workflows.',
+    ]),
+    n('Inventory accuracy and availability','warehouse',[
+      'Reliable stock records.','Timely availability updates.','Appropriate reservation and overselling controls.',
+    ]),
+    n('Order processing','receipt_long',[
+      'Reduce manual handling and exceptions.','Integrate storefront and operational systems.',
+    ]),
+    n('Picking and packing','package_2',[
+      'Accurate preparation.','Sustainable capacity.','Efficient handling of different order compositions.',
+    ]),
+    n('Carrier handoff and delivery coordination','local_shipping',[
+      'Reliable dispatch.','Appropriate carrier services.','Track performance against customer promises.',
+    ]),
+    n('Customer support and returns','headset_mic',[
+      'Accessible answers.','Effective escalation.','Efficient issue resolution.','Feed recurring questions back into catalog improvements.',
+    ]),
+    n('Automation','smart_toy',[
+      'Remove repetitive work.','Monitor failures and exceptions.','Keep human review where judgment is needed.',
+    ]),
+  ]),
+]);
+
+const norm=c=>typeof c==='string'?n(c):c;
+const leaves=node=>node.children.length?node.children.map(norm).reduce((s,c)=>s+leaves(c),0):1;
+const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};
+const sym=(name,cls)=>{const s=el('span','material-symbols-outlined '+cls,name);s.setAttribute('aria-hidden','true');return s;};
+
+const open=new Set();
+(function mark(node,inside){
+  node.children=node.children.map(norm);
+  node._lead=node.tag==='core';
+  node._in=inside||node._lead;
+  node._attended=node.children.length?node.children.reduce((s,c)=>s+mark(c,node._in),0):(node._in?1:0);
+  return node._attended;
+})(TREE,false);
+
+function rowFor(node,depth){
+  const kids=node.children.map(norm);
+  const isBranch=kids.length>0;
+  const row=el(isBranch?'button':'div','row'+(isBranch?' branch':'')+(depth===0?' root':'')+(depth===1?' top':'')+(node._in?' gl-in':'')+(node._lead?' gl-lead':'')+(node.tag==='optional'?' gl-opt':''));
+  if(isBranch){
+    row.type='button';
+    row.setAttribute('aria-expanded',open.has(node)?'true':'false');
+    row.append(sym('chevron_right','caret'));
+  }
+  if(node.icon)row.append(sym(node.icon,'icon'));
+  else row.append(el('span','spacer'));
+  const body=el('span','body');
+  if(node.level){
+    const m=el('span','meter');
+    m.setAttribute('aria-label','Level '+node.level+' of '+node.of);
+    const bars=el('i');
+    for(let i=1;i<=node.of;i++)bars.append(el('b',i<=node.level?'on':''));
+    m.append(bars,document.createTextNode('Level '+node.level));
+    body.append(m);
+  }
+  body.append(el('span','label',node.label));
+  if(node.tag==='optional')body.append(el('span','tag','Optional scope'));
+  if(isBranch&&!node._in&&node._attended)body.append(el('span','has',node._attended+' with GroLabs'));
+  if(isBranch&&!open.has(node)){const c=leaves(node);body.append(el('span','count',c+(c===1?' item':' items')));}
+  if(isBranch&&open.has(node)&&node.note)body.append(el('span','note',node.note));
+  row.append(body);
+  if(isBranch)row.addEventListener('click',e=>toggle(node,e.detail===0));
+  return row;
+}
+
+function closeBelow(node){open.delete(node);node.children.map(norm).forEach(closeBelow);}
+function toggle(node,byKeyboard){
+  if(open.has(node))closeBelow(node);else open.add(node);
+  render(byKeyboard?node:null);
+}
+function renderList(nodes,depth){
+  const ul=el('ul');
+  nodes.forEach(node=>{
+    const li=el('li');
+    node._el=li;
+    fill(li,node,depth);
+    ul.append(li);
+  });
+  return ul;
+}
+function fill(li,node,depth){
+  li.replaceChildren(rowFor(node,depth));
+  node._depth=depth;
+  if(open.has(node)&&node.children.length){
+    node.children=node.children.map(norm);
+    li.append(renderList(node.children,depth+1));
+  }
+}
+function render(focusNode){
+  const tree=document.getElementById('tree');
+  tree.replaceChildren(renderList([TREE],0));
+  if(focusNode&&focusNode._el){const b=focusNode._el.querySelector('button.row');if(b)b.focus({preventScroll:true});}
+}
+function setAll(node,on){
+  node.children=node.children.map(norm);
+  if(node.children.length){if(on)open.add(node);else open.delete(node);}
+  node.children.forEach(c=>setAll(c,on));
+}
+document.getElementById('expand-all').addEventListener('click',()=>{setAll(TREE,true);render();});
+document.getElementById('collapse-all').addEventListener('click',()=>{setAll(TREE,false);open.add(TREE);render();});
+
+open.add(TREE);
+render();
+})();
+</script>
