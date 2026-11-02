@@ -47,7 +47,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   --brand:"Permanent Marker",cursive;
   max-width:860px;margin:0 auto;padding:48px 16px 64px;
   background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.4;
-.gdt-title{margin:0 0 8px;font-family:var(--brand);font-weight:400;font-size:clamp(26px,5vw,36px);line-height:1.15;color:var(--strong);text-wrap:balance}
+.gdt-title{margin:0 0 8px;font-family:var(--brand);font-weight:400;font-size:clamp(18px,6vw,36px);line-height:1.15;color:var(--strong);text-wrap:balance}
 .lede{margin:0 0 20px;color:var(--text-2);max-width:62ch}
 .key{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-left:auto;font-size:12px;color:var(--text-2)}
 .key span{display:inline-flex;align-items:center;gap:6px}
@@ -260,6 +260,59 @@ const TREE=n('Grow profit','savings',[
         n('Clear feedback on cart changes, errors, and order confirmation.','check_circle'),
         n('Accessible design: readable text, strong contrast, and keyboard support.','accessibility_new'),
       ],{note:'Ten example criteria.'}),
+      n('Urgency, scarcity, and pricing tactics','timer',[
+        n('Urgency','hourglass_top',[
+          'Countdown timers on discounts.',
+          'Flash sales and limited-time offers.',
+          'Order-by cutoffs for a delivery date, such as "Order within 2 hours for delivery tomorrow."',
+        ]),
+        n('Scarcity','inventory',[
+          'Low-stock messages, such as "Only 3 left."',
+          'Limited editions and product drops.',
+          'Live demand signals, such as "12 people bought this today."',
+        ]),
+        n('Variable pricing','price_change',[
+          'Dynamic pricing by demand, season, or remaining stock, as airlines and hotels do.',
+          'Prices for specific groups, such as members or first-time buyers.',
+          'Personalized pricing based on signals such as repeat visits, location, or device.',
+        ]),
+        n('Use them with care','gavel',[
+          'Deadlines and stock counts must be real. False ones can break consumer protection law.',
+          'In the EU, stores must tell shoppers when an automated system personalized the price.',
+          'Shoppers who feel tricked may not come back, so measure repeat purchases and returns too.',
+        ]),
+      ],{note:'Common tactics worth knowing. Listing one here does not mean GroLabs provides it.'}),
+      n('Research, test, and learn','science',[
+        n('Listen to shoppers','hearing',[
+          'On-site and post-purchase surveys.',
+          'Customer interviews.',
+          'Usability tests with real shoppers.',
+          'Patterns in support tickets, chat logs, and reviews.',
+        ]),
+        n('Study behavior','monitoring',[
+          'Funnel analysis by device, channel, and new or returning visitor.',
+          'Session recordings and heatmaps.',
+          'Form and checkout drop-off analysis.',
+          'What shoppers search for and fail to find.',
+        ]),
+        n('Decide what to try first','checklist',[
+          'UX audits against known best practices.',
+          'Comparison with competing stores.',
+          'Written hypotheses: what will change, for whom, and why.',
+          'Ranking ideas by likely impact, confidence, and effort.',
+        ]),
+        n('Run controlled tests','experiment',[
+          'A/B tests with one primary metric, plus guardrails such as returns and margin.',
+          'Sample size and test length set before the test starts.',
+          'Multivariate tests only where traffic can support them.',
+          'Before-and-after comparisons when traffic is too low for an A/B test.',
+        ]),
+        n('Keep what works','library_books',[
+          'A shared log of every test, including the losers.',
+          'Rolling out winners and checking that the gain lasts.',
+          'Judging results by profit per visitor, not conversion rate alone.',
+        ]),
+      ]),
     ]),
     n('1.3. Increase value per order','add_shopping_cart',[
       n('Relevant complementary products','extension',null,CORE),
